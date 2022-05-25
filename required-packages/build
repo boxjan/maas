@@ -1,5 +1,4 @@
 debhelper
 dh-apport
 dh-exec
-dh-systemd
 fakeroot
