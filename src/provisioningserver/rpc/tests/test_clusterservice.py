@@ -35,10 +35,10 @@ from twisted.internet.defer import Deferred, fail, inlineCallbacks, succeed
 from twisted.internet.endpoints import TCP6ClientEndpoint
 from twisted.internet.error import ConnectionClosed
 from twisted.internet.task import Clock
+from twisted.internet.testing import StringTransportWithDisconnection
 from twisted.protocols import amp
 from twisted.python.failure import Failure
 from twisted.python.threadable import isInIOThread
-from twisted.test.proto_helpers import StringTransportWithDisconnection
 from twisted.web.client import Headers
 from zope.interface.verify import verifyObject
 
