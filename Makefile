@@ -1,5 +1,5 @@
 python := python3
-snapcraft := SNAPCRAFT_BUILD_INFO=1 /snap/bin/snapcraft
+snapcraft := SNAPCRAFT_BUILD_INFO=1 /snap/bin/snapcraft -v
 
 VENV := .ve
 
