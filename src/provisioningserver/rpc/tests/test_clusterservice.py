@@ -4396,7 +4396,7 @@ class TestClusterProtocol_DisableAndShutoffRackd(MAASTestCase):
     def test_raises_error_on_failure_snap(self):
         mock_call_and_check = self.patch(clusterservice, "call_and_check")
         mock_call_and_check.side_effect = ExternalProcessError(
-            random.randint(1, 255), "maas-wrapper", "failure"
+            random.randint(1, 255), "maas", "failure"
         )
         with ExpectedException(exceptions.CannotDisableAndShutoffRackd):
             yield call_responder(Cluster(), cluster.DisableAndShutoffRackd, {})
@@ -4405,7 +4405,7 @@ class TestClusterProtocol_DisableAndShutoffRackd(MAASTestCase):
         self.patch(clusterservice, "running_in_snap").return_value = True
         mock_call_and_check = self.patch(clusterservice, "call_and_check")
         mock_call_and_check.side_effect = ExternalProcessError(
-            -15, "maas-wrapper", "failure"
+            -15, "maas", "failure"
         )
         response = call_responder(
             Cluster(), cluster.DisableAndShutoffRackd, {}
