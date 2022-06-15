@@ -545,13 +545,10 @@ class TestMachinesAPI(APITestCase.ForUser):
         expected_counts = [1, 2, 3]
         self.assertEqual(machines_count, expected_counts)
         base_count = 98
-        self.assertEqual(
-            queries_count,
-            [
-                base_count + (machine_count * 7)
-                for machine_count in machines_count
-            ],
-        )
+        for idx, machine_count in enumerate(machines_count):
+            self.assertLessEqual(
+                queries_count[idx], base_count + (machine_count * 7)
+            )
 
     def test_GET_without_machines_returns_empty_list(self):
         # If there are no machines to list, the "read" op still works but

@@ -158,7 +158,7 @@ class TestControllerHandler(MAASServerTestCase):
         # It is important to keep this number as low as possible. A larger
         # number means regiond has to do more work slowing down its process
         # and slowing down the client waiting for the response.
-        self.assertEqual(
+        self.assertLessEqual(
             queries,
             31,
             "Number of queries has changed; make sure this is expected.",

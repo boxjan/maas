@@ -650,12 +650,12 @@ class TestMachineHandler(MAASServerTestCase):
         # number means regiond has to do more work slowing down its process
         # and slowing down the client waiting for the response.
         expected_query_count = 23
-        self.assertEqual(
+        self.assertLessEqual(
             queries_one,
             expected_query_count,
             "Number of queries has changed; make sure this is expected.",
         )
-        self.assertEqual(
+        self.assertLessEqual(
             queries_total,
             expected_query_count,
             "Number of queries has changed; make sure this is expected.",
@@ -703,12 +703,12 @@ class TestMachineHandler(MAASServerTestCase):
         # number means regiond has to do more work slowing down its process
         # and slowing down the client waiting for the response.
         expected_query_count = 23
-        self.assertEqual(
+        self.assertLessEqual(
             queries_one,
             expected_query_count,
             "Number of queries has changed; make sure this is expected.",
         )
-        self.assertEqual(
+        self.assertLessEqual(
             queries_total,
             expected_query_count,
             "Number of queries has changed; make sure this is expected.",
@@ -776,7 +776,7 @@ class TestMachineHandler(MAASServerTestCase):
 
         handler = MachineHandler(owner, {}, None)
         queries, _ = count_queries(handler.get, {"system_id": node.system_id})
-        self.assertEqual(
+        self.assertLessEqual(
             queries,
             54,
             "Number of queries has changed; make sure this is expected.",
