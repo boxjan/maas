@@ -23,6 +23,8 @@ proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 proxy_set_header X-Forwarded-Proto $scheme;
 proxy_set_header X-Forwarded-Host $http_host;
 
+error_log /tmp/error.log debug;
+
 server {
     {{if tls_enabled}}
     listen [::]:{{tls_port}} ssl http2;
