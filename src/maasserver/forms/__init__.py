@@ -753,7 +753,8 @@ class MachineForm(NodeForm):
         # We only want the license key field to render in the UI if the `OS`
         # and `Release` fields are also present.
         if self.has_owner:
-            self.set_up_osystem_and_distro_series_fields(instance)
+            if self.instance.status not in (NODE_STATUS.DEPLOYED, NODE_STATUS.DEPLOYING):
+                self.set_up_osystem_and_distro_series_fields(instance)
             self.fields["license_key"] = forms.CharField(
                 label="License Key",
                 required=False,
@@ -813,6 +814,7 @@ class MachineForm(NodeForm):
                 initial="",
                 error_messages={"invalid_choice": invalid_osystem_message},
             )
+
             self.fields["distro_series"] = forms.ChoiceField(
                 label="Release",
                 choices=distro_choices,
@@ -820,7 +822,7 @@ class MachineForm(NodeForm):
                 initial="",
                 error_messages={
                     "invalid_choice": invalid_distro_series_message
-                },
+                 },
             )
         else:
             self.fields["osystem"] = forms.ChoiceField(
