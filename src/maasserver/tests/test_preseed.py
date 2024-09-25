@@ -1165,14 +1165,14 @@ class TestComposeCurtinKernelCrashDump(MAASServerTestCase):
         node = factory.make_Node(enable_kernel_crash_dump=True)
         self.assertEqual(
             {"kernel-crash-dumps": {"enabled": True}},
-            yaml.safe_load(compose_curtin_kernel_crash_dump_config(node))[0],
+            yaml.safe_load(compose_curtin_kernel_crash_dump_config(node)[0]),
         )
 
     def test_is_disabled(self):
         node = factory.make_Node(enable_kernel_crash_dump=False)
         self.assertEqual(
             {"kernel-crash-dumps": {"enabled": False}},
-            yaml.safe_load(compose_curtin_kernel_crash_dump_config(node))[0],
+            yaml.safe_load(compose_curtin_kernel_crash_dump_config(node)[0]),
         )
 
 

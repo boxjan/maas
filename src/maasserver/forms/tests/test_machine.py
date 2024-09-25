@@ -64,6 +64,7 @@ class TestMachineForm(MAASServerTestCase):
                 "ephemeral_deploy",
                 "enable_hw_sync",
                 "commission",
+                "enable_kernel_crash_dump",
             },
             form.fields.keys(),
         )
