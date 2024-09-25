@@ -538,6 +538,7 @@ class TestAdminMachineForm(MAASServerTestCase):
                 "pool",
                 "commission",
                 "enable_hw_sync",
+                "enable_kernel_crash_dump",
             },
             form.fields.keys(),
         )
