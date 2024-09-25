@@ -511,6 +511,7 @@ class Deploy(NodeAction):
         user_data=None,
         enable_hw_sync=False,
         ephemeral_deploy=False,
+        enable_kernel_crash_dump=None,
     ):
         """See `NodeAction.execute`."""
         if install_kvm or register_vmhost:
@@ -528,6 +529,13 @@ class Deploy(NodeAction):
                 "Can’t deploy to disk in a diskless machine. Deploy to memory must be used instead."
             )
         self.node.ephemeral_deploy = ephemeral_deploy
+
+        if enable_kernel_crash_dump is None:
+            enable_kernel_crash_dump = Config.objects.get_config(
+                "enable_kernel_crash_dump"
+            )
+        self.node.enable_kernel_crash_dump = enable_kernel_crash_dump
+
         if self.node.owner is None:
             with locks.node_acquire:
                 try:

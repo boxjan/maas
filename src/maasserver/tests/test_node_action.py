@@ -1041,6 +1041,77 @@ class TestDeployAction(MAASServerTestCase):
         action = Deploy(node, user, request)
         self.assertRaises(NodeActionError, action.execute, **extra)
 
+    def test_Deploy_enable_kernel_crash_dump_default(self):
+        user = factory.make_User()
+        request = factory.make_fake_request("/")
+        Config.objects.set_config(name="enable_kernel_crash_dump", value=True)
+        request.user = user
+        node = factory.make_Node(
+            interface=True,
+            status=NODE_STATUS.ALLOCATED,
+            power_type="manual",
+            owner=user,
+        )
+        self.patch(node_action_module, "get_curtin_config")
+        self.patch(node, "start")
+
+        osystem, releases = make_usable_osystem(
+            self, osystem_name="ubuntu", releases=["jammy"]
+        )
+        os_name = osystem
+        extra = {
+            "osystem": os_name,
+            "ephemeral_deploy": True,
+        }
+        Deploy(node, user, request).execute(**extra)
+        assert node.osystem == os_name
+        assert node.enable_kernel_crash_dump is True
+
+    def test_Deploy_set_enable_kernel_crash_dump(self):
+        user = factory.make_User()
+        request = factory.make_fake_request("/")
+        request.user = user
+        node = factory.make_Node(
+            interface=True,
+            status=NODE_STATUS.ALLOCATED,
+            power_type="manual",
+            owner=user,
+        )
+        self.patch(node_action_module, "get_curtin_config")
+        self.patch(node, "start")
+
+        osystem, releases = make_usable_osystem(
+            self, osystem_name="ubuntu", releases=["jammy"]
+        )
+        os_name = osystem
+        extra = {"osystem": os_name, "enable_kernel_crash_dump": True}
+        Deploy(node, user, request).execute(**extra)
+        assert node.osystem == os_name
+        assert node.enable_kernel_crash_dump is True
+
+    def test_Deploy_set_enable_kernel_crash_dump_overrides_default(self):
+        user = factory.make_User()
+        request = factory.make_fake_request("/")
+        Config.objects.set_config(name="enable_kernel_crash_dump", value=True)
+        request.user = user
+        node = factory.make_Node(
+            interface=True,
+            status=NODE_STATUS.ALLOCATED,
+            power_type="manual",
+            owner=user,
+        )
+        self.patch(node_action_module, "get_curtin_config")
+        self.patch(node, "start")
+
+        osystem, releases = make_usable_osystem(
+            self, osystem_name="ubuntu", releases=["jammy"]
+        )
+        os_name = osystem
+        extra = {"osystem": os_name, "enable_kernel_crash_dump": False}
+        Deploy(node, user, request).execute(**extra)
+        assert node.osystem == os_name
+        assert node.enable_kernel_crash_dump is False
+
 
 class TestDeployActionTransactional(MAASTransactionServerTestCase):
     """The following TestDeployAction tests require

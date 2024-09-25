@@ -1548,7 +1548,7 @@ class TestMachineAPI(APITestCase.ForUser):
     ):
         self.patch(node_module.Node, "_start")
         self.patch(machines_module, "get_curtin_merged_config")
-        Config.objects.set_config("enable_kernel_crash_dump", True)
+        Config.objects.set_config(name="enable_kernel_crash_dump", value=True)
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
         make_usable_osystem(
