@@ -986,6 +986,10 @@ class MachineForm(NodeForm):
         self.is_bound = True
         self.data["enable_hw_sync"] = enable_hw_sync
 
+    def set_enable_kernel_crash_dump(self, enable_kernel_crash_dump=False):
+        self.is_bound = True
+        self.data["enable_kernel_crash_dump"] = enable_kernel_crash_dump
+
     def save(self, *args, **kwargs):
         from maasserver.models import ScriptSet
 
@@ -1028,6 +1032,7 @@ class MachineForm(NodeForm):
             "hwe_kernel",
             "install_rackd",
             "ephemeral_deploy",
+            "enable_kernel_crash_dump",
             "enable_hw_sync",
             "commission",
         )

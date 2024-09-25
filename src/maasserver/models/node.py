@@ -1120,6 +1120,8 @@ class Node(CleanSave, TimestampedModel):
 
     ephemeral_deploy = BooleanField(default=False)
 
+    enable_kernel_crash_dump = BooleanField(default=False)
+
     license_key = CharField(max_length=30, null=True, blank=True)
 
     # Whether this is a machine that was composed on allocation, or a machine
