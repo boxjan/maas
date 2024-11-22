@@ -411,19 +411,20 @@ class DeployWorkflow:
 
     @workflow_run_with_context
     async def run(self, params: DeployParam) -> DeployResult:
-        logger.info(f"deploying {params.system_id}")
+        logger.info(f"DeployWorkflow: deploying {params.system_id}")
 
         await self._start_deployment(params)
 
-        await workflow.wait_condition(lambda: self._has_netbooted)
-
-        logger.debug(f"{params.system_id} has finished netboot")
-
+        logger.info(f"DeployWorkflow: params {params.ephemeral_deploy}")
         if not params.ephemeral_deploy:
+            await workflow.wait_condition(lambda: self._has_netbooted)
+
+            logger.debug(f"DeployWorkflow: {params.system_id} has net booted")
             if params.can_set_boot_order:
                 await self._set_boot_order(params)
 
-            await workflow.wait_condition(lambda: self._deployed_os_ready)
-            logger.debug(f"{params.system_id} has booted into deployed OS")
+        await workflow.wait_condition(lambda: self._deployed_os_ready)
+        logger.debug(f"DeployWorkflow: {params.system_id} has booted into deployed OS")
 
+        logger.debug("DeployWorkflow: {params.system_id} finished successfully")
         return DeployResult(system_id=params.system_id, success=True)
