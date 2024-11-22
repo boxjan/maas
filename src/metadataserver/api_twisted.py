@@ -376,8 +376,6 @@ class StatusWorkerService(TimerService):
         failed = result in ["FAIL", "FAILURE"]
         default_exit_status = 1 if failed else 0
 
-        print(f"  XXX _processMessage() -> {node.system_id=} {node.status=} {message=}")
-
         # Add this event to the node event log if 'start' or a 'failure'.
         if event_type == "start" or failed:
             add_event_to_node_event_log(
