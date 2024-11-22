@@ -427,5 +427,7 @@ class DeployWorkflow:
             "DeployWorkflow: %s has booted into deployed OS", params.system_id
         )
 
-        logger.info("DeployWorkflow: {params.system_id} finished successfully")
+        logger.info(
+            "DeployWorkflow: %s finished successfully", params.system_id
+        )
         return DeployResult(system_id=params.system_id, success=True)
