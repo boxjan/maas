@@ -318,9 +318,6 @@ class DeployManyWorkflow:
 
     @workflow_run_with_context
     async def run(self, params: DeployManyParam) -> None:
-        # timeout of workflow is defined as 3 times the default node timeout
-        wf_timeout = 3 * NODE_TIMEOUT
-
         pending: list[workflow.ChildWorkflowHandle] = []
 
         for param in params.params:
@@ -332,7 +329,7 @@ class DeployManyWorkflow:
                 retry_policy=RetryPolicy(
                     maximum_interval=DEFAULT_DEPLOY_RETRY_TIMEOUT
                 ),
-                execution_timeout=timedelta(minutes=wf_timeout),
+                execution_timeout=timedelta(minutes=param.timeout),
             )
             pending.append(wf)
 
