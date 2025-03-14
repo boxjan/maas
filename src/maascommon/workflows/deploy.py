@@ -18,7 +18,7 @@ class DeployParam:
     can_set_boot_order: bool
     task_queue: str
     power_params: PowerParam
-    timeout: int = 2*NODE_TIMEOUT
+    timeout: int = 2 * NODE_TIMEOUT
 
 
 @dataclass
