@@ -17,7 +17,6 @@ from temporalio.exceptions import (
     TimeoutError,
 )
 
-from maascommon.constants import NODE_TIMEOUT
 from maascommon.enums.node import NodeStatus
 from maascommon.enums.power import PowerState
 from maascommon.workflows.deploy import (
