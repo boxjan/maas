@@ -5982,7 +5982,7 @@ class Node(CleanSave, TimestampedModel):
         d: Deferred,
         power_info: PowerInfo,
         task_queue: str,
-        wf_timeout=timedelta(minutes=2 * NODE_TIMEOUT),
+        timeout: timedelta = timedelta(minutes=2 * NODE_TIMEOUT),
     ) -> Deferred:
         dd = start_workflow(
             DEPLOY_MANY_WORKFLOW_NAME,
@@ -5999,11 +5999,11 @@ class Node(CleanSave, TimestampedModel):
                         ephemeral_deploy=bool(self.ephemeral_deploy),
                         can_set_boot_order=bool(power_info.can_set_boot_order),
                         task_queue="region",
-                        timeout=wf_timeout,
+                        timeout=timeout,
                     ),
                 ],
             ),
-            execution_timeout=timedelta(minutes=wf_timeout),
+            execution_timeout=timeout,
             task_queue="region",
             id_reuse_policy=WorkflowIDReusePolicy.ALLOW_DUPLICATE,
         )
@@ -6077,9 +6077,11 @@ class Node(CleanSave, TimestampedModel):
             # vary significantly depending on the environment.
             # Setting the workflow timeout to twice the node timeout offers a
             # reasonable compromise.
-            wf_timeout = 2 * Config.objects.get_config("node_timeout")
+            timeout = timedelta(
+                minutes=2 * Config.objects.get_config("node_timeout")
+            )
             d.addCallback(
-                self._temporal_deploy, d, power_info, task_queue, wf_timeout
+                self._temporal_deploy, d, power_info, task_queue, timeout
             )
 
         elif self.status in COMMISSIONING_LIKE_STATUSES:
@@ -6115,9 +6117,11 @@ class Node(CleanSave, TimestampedModel):
             # environment.
             # Setting the workflow timeout to twice the node timeout offers a
             # reasonable compromise.
-            wf_timeout = 2 * Config.objects.get_config("node_timeout")
+            timeout = timedelta(
+                minutes=2 * Config.objects.get_config("node_timeout")
+            )
             d.addCallback(
-                self._temporal_deploy, d, power_info, task_queue, wf_timeout
+                self._temporal_deploy, d, power_info, task_queue, timeout
             )
         else:
             set_deployment_timeout = False
