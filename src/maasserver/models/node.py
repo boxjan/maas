@@ -5972,11 +5972,13 @@ class Node(CleanSave, TimestampedModel):
         NodeUserData.objects.set_user_data(self, user_data)
 
     def _temporal_deploy(
-        self, _, d: Deferred, power_info: PowerInfo, task_queue: str
+        self,
+        _,
+        d: Deferred,
+        power_info: PowerInfo,
+        task_queue: str,
+        wf_timeout=2 * NODE_TIMEOUT,
     ) -> Deferred:
-        # timeout of workflow is defined as 3 times the default node timeout
-        wf_timeout = 3 * NODE_TIMEOUT
-
         dd = start_workflow(
             DEPLOY_MANY_WORKFLOW_NAME,
             param=DeployManyParam(
@@ -5992,6 +5994,7 @@ class Node(CleanSave, TimestampedModel):
                         ephemeral_deploy=bool(self.ephemeral_deploy),
                         can_set_boot_order=bool(power_info.can_set_boot_order),
                         task_queue="region",
+                        timeout=wf_timeout,
                     ),
                 ],
             ),
@@ -6034,7 +6037,6 @@ class Node(CleanSave, TimestampedModel):
             does not support it, `None` will be returned. The node must be
             powered on manually.
         """
-
         if not user.has_perm(NodePermission.edit, self):
             # You can't start a node you don't own unless you're an admin.
             raise PermissionDenied()
@@ -6064,7 +6066,10 @@ class Node(CleanSave, TimestampedModel):
             needs_power_call = False
             task_queue = str(get_temporal_task_queue_for_bmc(self))
 
-            d.addCallback(self._temporal_deploy, d, power_info, task_queue)
+            wf_timeout = 2 * Config.objects.get_config("node_timeout")
+            d.addCallback(
+                self._temporal_deploy, d, power_info, task_queue, wf_timeout
+            )
 
         elif self.status in COMMISSIONING_LIKE_STATUSES:
             if old_status is None:
