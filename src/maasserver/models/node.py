@@ -6074,7 +6074,7 @@ class Node(CleanSave, TimestampedModel):
             # Previously, the node timeout was defined as the period since the
             # node last sent notification. In the current implementation, the
             # timeout applies to the entire Temporal workflow process, which can
-            # vary significantly depending on the environment.
+            # vary significantly depending on the environment. 
             # Setting the workflow timeout to twice the node timeout offers a
             # reasonable compromise.
             timeout = timedelta(
