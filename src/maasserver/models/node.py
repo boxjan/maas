@@ -5982,7 +5982,7 @@ class Node(CleanSave, TimestampedModel):
         d: Deferred,
         power_info: PowerInfo,
         task_queue: str,
-        wf_timeout=2 * NODE_TIMEOUT,
+        wf_timeout=timedelta(minutes=2 * NODE_TIMEOUT),
     ) -> Deferred:
         dd = start_workflow(
             DEPLOY_MANY_WORKFLOW_NAME,
@@ -6108,7 +6108,17 @@ class Node(CleanSave, TimestampedModel):
 
             task_queue = str(get_temporal_task_queue_for_bmc(self))
 
-            d.addCallback(self._temporal_deploy, d, power_info, task_queue)
+            # Previously, the node timeout was defined as the period since the
+            # node last sent notification. In the current workflow
+            # implementation, the timeout applies to the entire workflow
+            # process, which can vary significantly depending on the
+            # environment.
+            # Setting the workflow timeout to twice the node timeout offers a
+            # reasonable compromise.
+            wf_timeout = 2 * Config.objects.get_config("node_timeout")
+            d.addCallback(
+                self._temporal_deploy, d, power_info, task_queue, wf_timeout
+            )
         else:
             set_deployment_timeout = False
 

@@ -2,6 +2,7 @@
 #  GNU Affero General Public License version 3 (see the file LICENSE).
 
 from dataclasses import dataclass
+from datetime import timedelta
 
 from maascommon.constants import NODE_TIMEOUT
 from maascommon.workflows.power import PowerParam
@@ -18,7 +19,7 @@ class DeployParam:
     can_set_boot_order: bool
     task_queue: str
     power_params: PowerParam
-    timeout: int = 2 * NODE_TIMEOUT
+    timeout: timedelta = timedelta(minutes=2 * NODE_TIMEOUT)
 
 
 @dataclass
