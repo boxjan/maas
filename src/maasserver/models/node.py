@@ -6072,10 +6072,9 @@ class Node(CleanSave, TimestampedModel):
             task_queue = str(get_temporal_task_queue_for_bmc(self))
 
             # Previously, the node timeout was defined as the period since the
-            # node last sent notification. In the current workflow
-            # implementation, the timeout applies to the entire workflow
-            # process, which can vary significantly depending on the
-            # environment.
+            # node last sent notification. In the current implementation, the
+            # timeout applies to the entire Temporal workflow process, which can
+            # vary significantly depending on the environment.
             # Setting the workflow timeout to twice the node timeout offers a
             # reasonable compromise.
             wf_timeout = 2 * Config.objects.get_config("node_timeout")
