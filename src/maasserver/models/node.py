@@ -5999,7 +5999,6 @@ class Node(CleanSave, TimestampedModel):
                         ephemeral_deploy=bool(self.ephemeral_deploy),
                         can_set_boot_order=bool(power_info.can_set_boot_order),
                         task_queue="region",
-                        timeout=timeout,
                     ),
                 ],
             ),
