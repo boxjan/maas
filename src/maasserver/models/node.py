@@ -5982,7 +5982,7 @@ class Node(CleanSave, TimestampedModel):
         d: Deferred,
         power_info: PowerInfo,
         task_queue: str,
-        timeout: timedelta = timedelta(minutes=2 * NODE_TIMEOUT),
+        timeout: int = 2 * NODE_TIMEOUT,
     ) -> Deferred:
         dd = start_workflow(
             DEPLOY_MANY_WORKFLOW_NAME,
@@ -5999,10 +5999,11 @@ class Node(CleanSave, TimestampedModel):
                         ephemeral_deploy=bool(self.ephemeral_deploy),
                         can_set_boot_order=bool(power_info.can_set_boot_order),
                         task_queue="region",
+                        timeout=timeout,
                     ),
                 ],
             ),
-            execution_timeout=timeout,
+            execution_timeout=timedelta(minutes=timeout),
             task_queue="region",
             id_reuse_policy=WorkflowIDReusePolicy.ALLOW_DUPLICATE,
         )
@@ -6076,9 +6077,7 @@ class Node(CleanSave, TimestampedModel):
             # vary significantly depending on the environment.
             # Setting the workflow timeout to twice the node timeout offers a
             # reasonable compromise.
-            timeout = timedelta(
-                minutes=2 * Config.objects.get_config("node_timeout")
-            )
+            timeout = 2 * Config.objects.get_config("node_timeout")
             d.addCallback(
                 self._temporal_deploy, d, power_info, task_queue, timeout
             )
@@ -6116,9 +6115,7 @@ class Node(CleanSave, TimestampedModel):
             # environment.
             # Setting the workflow timeout to twice the node timeout offers a
             # reasonable compromise.
-            timeout = timedelta(
-                minutes=2 * Config.objects.get_config("node_timeout")
-            )
+            timeout = 2 * Config.objects.get_config("node_timeout")
             d.addCallback(
                 self._temporal_deploy, d, power_info, task_queue, timeout
             )
