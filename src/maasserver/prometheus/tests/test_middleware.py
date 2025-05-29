@@ -23,11 +23,7 @@ class TestPrometheusRequestMetricsMiddleware(MAASTestCase):
         middleware(factory.make_fake_request("/MAAS/accounts/login/"))
         middleware(factory.make_fake_request("/MAAS/accounts/login/"))
         middleware(factory.make_fake_request("/MAAS/other/path"))
-        middleware(
-            factory.make_fake_request(
-                "/MAAS/other/path", data={"op": "do-foo"}
-            )
-        )
+        middleware(factory.make_fake_request("/MAAS/other/path", data={"op": "do-foo"}))
         middleware(
             factory.make_fake_request(
                 "/MAAS/other/path", method="POST", data={"op": "do-bar"}

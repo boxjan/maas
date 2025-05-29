@@ -62,9 +62,7 @@ class SSLKeysHandler(OperationsHandler):
         form = SSLKeyForm(user=request.user, data=request.data)
         if form.is_valid():
             sslkey = form.save(ENDPOINT.API, request)
-            emitter = JSONEmitter(
-                sslkey, typemapper, None, DISPLAY_SSLKEY_FIELDS
-            )
+            emitter = JSONEmitter(sslkey, typemapper, None, DISPLAY_SSLKEY_FIELDS)
             stream = emitter.render(request)
             return HttpResponse(
                 stream,
@@ -141,9 +139,7 @@ class SSLKeyHandler(OperationsHandler):
         if key.user != request.user:
             return HttpResponseForbidden(
                 "Can't delete a key you don't own.",
-                content_type=(
-                    "text/plain; charset=%s" % settings.DEFAULT_CHARSET
-                ),
+                content_type=("text/plain; charset=%s" % settings.DEFAULT_CHARSET),
             )
         key.delete()
         create_audit_event(

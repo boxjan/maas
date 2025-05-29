@@ -25,9 +25,7 @@ class DNSResourceForm(MAASModelForm):
     """DNSResource creation/edition form."""
 
     name = forms.CharField(label="Name")
-    domain = forms.ModelChoiceField(
-        label="Domain", queryset=Domain.objects.all()
-    )
+    domain = forms.ModelChoiceField(label="Domain", queryset=Domain.objects.all())
     address_ttl = forms.IntegerField(
         required=False,
         min_value=0,
@@ -46,13 +44,7 @@ class DNSResourceForm(MAASModelForm):
         fields = ("name", "domain", "address_ttl", "ip_addresses")
 
     def __init__(
-        self,
-        data=None,
-        instance=None,
-        request=None,
-        user=None,
-        *args,
-        **kwargs
+        self, data=None, instance=None, request=None, user=None, *args, **kwargs
     ):
         # Always save the user, in case we create a StaticIPAddress in save().
         if request is not None:

@@ -203,8 +203,7 @@ def make_hwe_kernel_ui_text(hwe_kernel):
 
 def list_hwe_kernel_choices(hwe_kernels):
     return [
-        (hwe_kernel, make_hwe_kernel_ui_text(hwe_kernel))
-        for hwe_kernel in hwe_kernels
+        (hwe_kernel, make_hwe_kernel_ui_text(hwe_kernel)) for hwe_kernel in hwe_kernels
     ]
 
 
@@ -256,9 +255,7 @@ def list_release_choices(
     else:
         choices = []
     for osystem in sorted(osystems.values(), key=attrgetter("title")):
-        for release in sorted(
-            osystem.releases.values(), key=attrgetter("title")
-        ):
+        for release in sorted(osystem.releases.values(), key=attrgetter("title")):
             if with_key_required:
                 requires_key = get_release_requires_key(release)
             else:
@@ -312,9 +309,7 @@ def list_commissioning_choices(osystems):
             name="commissioning_distro_series"
         )
         found_commissioning_series = False
-        sorted_releases = sorted(
-            ubuntu.releases.values(), key=attrgetter("title")
-        )
+        sorted_releases = sorted(ubuntu.releases.values(), key=attrgetter("title"))
         releases = []
         for release in sorted_releases:
             if not release.can_commission:
@@ -348,9 +343,7 @@ def validate_osystem_and_distro_series(osystem, distro_series):
     usable_osystems = list_all_usable_osystems()
     found_osystem = usable_osystems.get(osystem)
     if found_osystem is None:
-        raise ValidationError(
-            "%s is not a supported operating system." % osystem
-        )
+        raise ValidationError("%s is not a supported operating system." % osystem)
     found_release = found_osystem.releases.get(release)
     if found_release is None:
         raise ValidationError(
@@ -396,10 +389,7 @@ def get_release_from_db(string):
     bsc = BootSourceCache.objects.filter(
         (
             (Q(subarch="hwe-%s" % string) | Q(subarch="ga-%s" % string))
-            & (
-                Q(release_title__startswith=string)
-                | Q(release__startswith=string)
-            )
+            & (Q(release_title__startswith=string) | Q(release__startswith=string))
         )
         | Q(release__startswith=string)
         | Q(release_title__startswith=string)
@@ -627,8 +617,7 @@ def get_release_version_from_string(
             version = [0, 0]
         else:
             raise ValueError(
-                "%s not found amongst the known Ubuntu releases!"
-                % kernel_string
+                "%s not found amongst the known Ubuntu releases!" % kernel_string
             )
 
     if kflavor and kflavor != "generic":
@@ -696,14 +685,10 @@ def get_working_kernel(
             osystem = Config.objects.get_config("commissioning_osystem")
         distro_series = commissioning_distro_series
         if distro_series is undefined:
-            distro_series = Config.objects.get_config(
-                "commissioning_distro_series"
-            )
+            distro_series = Config.objects.get_config("commissioning_distro_series")
 
     os_release = osystem + "/" + distro_series
-    kernel_str_valid = requested_kernel and validate_kernel_str(
-        requested_kernel
-    )
+    kernel_str_valid = requested_kernel and validate_kernel_str(requested_kernel)
     min_compat_lvl_valid = min_compatibility_level and validate_kernel_str(
         min_compatibility_level
     )
@@ -723,9 +708,7 @@ def get_working_kernel(
                 f"{requested_kernel} is too old to use on {os_release}."
             )
         if min_compat_lvl_valid and (
-            not release_a_newer_than_b(
-                requested_kernel, min_compatibility_level
-            )
+            not release_a_newer_than_b(requested_kernel, min_compatibility_level)
         ):
             raise ValidationError(
                 "chosen kernel (%s) is older than minimal kernel required by the machine (%s)."
@@ -767,12 +750,8 @@ def get_working_kernel(
     for kernel in available_kernels:
         # TODO We need to switch to dataclasses to describe kernels.
         p = parse_subarch_kernel_string(kernel)
-        old_style_platform = (
-            not p.channel and p.platform and p.platform != "generic"
-        )
-        if old_style_platform and (
-            kernel == requested_kernel or kernel == platform
-        ):
+        old_style_platform = not p.channel and p.platform and p.platform != "generic"
+        if old_style_platform and (kernel == requested_kernel or kernel == platform):
             # We can do that because we filtered for `os_release` above
             return kernel
         elif release_a_newer_than_b(kernel, distro_series):
@@ -855,8 +834,6 @@ def validate_min_hwe_kernel(min_hwe_kernel):
         BootResource.objects.get_supported_kernel_compatibility_levels()
     )
     if min_hwe_kernel not in compatibility_levels:
-        raise ValidationError(
-            'No kernel matches ">=%s" requirement.' % min_hwe_kernel
-        )
+        raise ValidationError('No kernel matches ">=%s" requirement.' % min_hwe_kernel)
     else:
         return min_hwe_kernel

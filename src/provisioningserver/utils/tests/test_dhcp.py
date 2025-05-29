@@ -26,9 +26,7 @@ class TestDHCP(MAASTestCase):
         packet = factory.make_dhcp_packet(truncated_option_length=True)
         dhcp = DHCP(packet)
         self.assertFalse(dhcp.valid)
-        self.assertEqual(
-            dhcp.invalid_reason, "Truncated length field in DHCP option."
-        )
+        self.assertEqual(dhcp.invalid_reason, "Truncated length field in DHCP option.")
 
     def test_valid_returns_false_for_truncated_option_value(self):
         packet = factory.make_dhcp_packet(truncated_option_value=True)

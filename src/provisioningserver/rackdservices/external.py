@@ -67,9 +67,7 @@ class RackOnlyExternalService(metaclass=ABCMeta):
     def _configure(self):
         """Configure the service."""
 
-    def _genRegionIps(
-        self, connections, bracket_ipv6=False, include_name=False
-    ):
+    def _genRegionIps(self, connections, bracket_ipv6=False, include_name=False):
         """Generate IP addresses for all region controllers this rack
         controller is connected to."""
 
@@ -88,9 +86,7 @@ class RackOnlyExternalService(metaclass=ABCMeta):
             # Sort the connections so the same IP is always picked per
             # region controller. This ensures that the HTTP configuration
             # is not reloaded unless its actually required to reload.
-            conn = list(sorted(connections, key=lambda conn: conn.address[0]))[
-                0
-            ]
+            conn = list(sorted(connections, key=lambda conn: conn.address[0]))[0]
             addr = IPAddress(conn.address[0])
             if addr.is_ipv4_mapped():
                 addr = str(addr.ipv4())
@@ -172,9 +168,7 @@ class RackNTP(RackOnlyExternalService):
         :param configuration: The configuration object obtained from
             `_getConfiguration`.
         """
-        d = deferToThread(
-            configure_rack, configuration.references, configuration.peers
-        )
+        d = deferToThread(configure_rack, configuration.references, configuration.peers)
         d.addCallback(callOut, service_monitor.restartService, "ntp_rack")
         return d
 
@@ -195,9 +189,7 @@ class RackDNS(RackOnlyExternalService):
         d.addCallback(self._maybeApplyConfiguration)
         return d
 
-    def _getConfiguration(
-        self, controller_type, dns_configuration, connections
-    ):
+    def _getConfiguration(self, controller_type, dns_configuration, connections):
         """Return DNS server configuration.
 
         The configuration object returned is comparable with previous and
@@ -226,9 +218,7 @@ class RackDNS(RackOnlyExternalService):
         )
 
         # No zones on the rack controller.
-        bind_write_configuration(
-            [], list(sorted(configuration.trusted_networks))
-        )
+        bind_write_configuration([], list(sorted(configuration.trusted_networks)))
 
     def _bindReload(self):
         """Reload bind for the rack controller."""
@@ -242,9 +232,7 @@ class RackDNS(RackOnlyExternalService):
             `_getConfiguration`.
         """
         d = deferToThread(self._bindConfigure, configuration)
-        d.addCallback(
-            callOut, service_monitor.ensureService, self.service_name
-        )
+        d.addCallback(callOut, service_monitor.ensureService, self.service_name)
         d.addCallback(callOutToThread, self._bindReload)
         return d
 
@@ -265,9 +253,7 @@ class RackProxy(RackOnlyExternalService):
         d.addCallback(self._maybeApplyConfiguration)
         return d
 
-    def _getConfiguration(
-        self, controller_type, proxy_configuration, connections
-    ):
+    def _getConfiguration(self, controller_type, proxy_configuration, connections):
         """Return proxy server configuration.
 
         The configuration object returned is comparable with previous and
@@ -310,9 +296,7 @@ class RackProxy(RackOnlyExternalService):
                     callOut, service_monitor.restartService, self.service_name
                 )
             else:
-                d.addCallback(
-                    callOut, service_monitor.reloadService, self.service_name
-                )
+                d.addCallback(callOut, service_monitor.reloadService, self.service_name)
             return d
         else:
             # Proxy is managed by the region.
@@ -348,9 +332,7 @@ class RackSyslog(RackOnlyExternalService):
         d.addCallback(self._maybeApplyConfiguration)
         return d
 
-    def _getConfiguration(
-        self, controller_type, syslog_configuration, connections
-    ):
+    def _getConfiguration(self, controller_type, syslog_configuration, connections):
         """Return syslog server configuration.
 
         The configuration object returned is comparable with previous and
@@ -358,9 +340,7 @@ class RackSyslog(RackOnlyExternalService):
         determine whether a change needs to be applied to the syslog server.
         """
         forwarders = list(
-            self._genRegionIps(
-                connections, bracket_ipv6=True, include_name=True
-            )
+            self._genRegionIps(connections, bracket_ipv6=True, include_name=True)
         )
         return _SyslogConfiguration(
             port=syslog_configuration["port"],
@@ -380,9 +360,7 @@ class RackSyslog(RackOnlyExternalService):
         if configuration.is_rack and not configuration.is_region:
             service.on()
             d = deferToThread(self._configure, configuration)
-            d.addCallback(
-                callOut, service_monitor.restartService, self.service_name
-            )
+            d.addCallback(callOut, service_monitor.restartService, self.service_name)
             return d
         else:
             # Proxy is managed by the region.
@@ -439,9 +417,7 @@ class RackAgent(RackOnlyExternalService):
     ) -> Deferred:
         """Configure the maas agent"""
         d = deferToThread(self._configure, configuration)
-        d.addCallback(
-            callOut, service_monitor.restartService, self.service_name
-        )
+        d.addCallback(callOut, service_monitor.restartService, self.service_name)
         return d
 
     def _configure(self, configuration: agent_config.Configuration) -> None:
@@ -486,9 +462,7 @@ class RackExternalService(TimerService):
     @inlineCallbacks
     def _getConfiguration(self):
         client = yield self._rpc_service.getClientNow()
-        controller_type = yield client(
-            GetControllerType, system_id=client.localIdent
-        )
+        controller_type = yield client(GetControllerType, system_id=client.localIdent)
         time_configuration = yield client(
             GetTimeConfiguration, system_id=client.localIdent
         )

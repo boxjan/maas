@@ -6,9 +6,7 @@ from provisioningserver.refresh.node_info_scripts import (
 
 
 def make_scripts(machine, lxd_info: bytes):
-    commissioning_set = ScriptSet.objects.create_commissioning_script_set(
-        machine
-    )
+    commissioning_set = ScriptSet.objects.create_commissioning_script_set(machine)
     result = commissioning_set.scriptresult_set.get(
         script_name=COMMISSIONING_OUTPUT_NAME
     )

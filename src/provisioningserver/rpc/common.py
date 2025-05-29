@@ -94,9 +94,7 @@ class Client:
 
     def __init__(self, conn):
         super().__init__()
-        assert IConnection.providedBy(
-            conn
-        ), f"{conn!r} does not provide IConnection"
+        assert IConnection.providedBy(conn), f"{conn!r} does not provide IConnection"
         self._conn = conn
 
     @property
@@ -128,9 +126,7 @@ class Client:
         if IConnectionToRegion.providedBy(self._conn):
             return self._conn.address
         else:
-            raise NotImplementedError(
-                "Client address is only available in the rack."
-            )
+            raise NotImplementedError("Client address is only available in the rack.")
 
     def _global_intercept_errback(self, failure):
         """Intercept exceptions for every call and take actions."""
@@ -292,9 +288,7 @@ class RPCProtocol(amp.AMP):
     def _sendBoxCommand(self, command, box, requiresAnswer=True):
         """Override `_sendBoxCommand` to log the sent RPC message."""
         box[amp.COMMAND] = command
-        return super()._sendBoxCommand(
-            command, box, requiresAnswer=requiresAnswer
-        )
+        return super()._sendBoxCommand(command, box, requiresAnswer=requiresAnswer)
 
     def dispatchCommand(self, box):
         """Call up, but coerce errors into non-fatal failures.
@@ -416,9 +410,7 @@ class SecuredRPCProtocol(RPCProtocol):
             else:
                 # Exponential backoff
                 sleep_time = ((2**retry) - 1) / 2
-                log.debug(
-                    f"Connection not trusted yet. Retry in {sleep_time} seconds"
-                )
+                log.debug(f"Connection not trusted yet. Retry in {sleep_time} seconds")
                 yield pause(sleep_time)
             retry += 1
         returnValue(False)

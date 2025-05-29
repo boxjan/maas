@@ -73,9 +73,7 @@ class MicrosoftOCSPowerDriver(PowerDriver):
         url_base = "http://{power_address}:{power_port}/".format(**context)
         url = urllib.parse.urljoin(url_base, command) + "?" + "&".join(params)
         authinfo = urllib.request.HTTPPasswordMgrWithDefaultRealm()
-        authinfo.add_password(
-            None, url, context["power_user"], context["power_pass"]
-        )
+        authinfo.add_password(None, url, context["power_user"], context["power_pass"])
         proxy_handler = urllib.request.ProxyHandler({})
         auth_handler = urllib.request.HTTPBasicAuthHandler(authinfo)
         opener = urllib.request.build_opener(proxy_handler, auth_handler)
@@ -95,9 +93,7 @@ class MicrosoftOCSPowerDriver(PowerDriver):
         else:
             return response.read()
 
-    def set_next_boot_device(
-        self, context, pxe=False, uefi=False, persistent=False
-    ):
+    def set_next_boot_device(self, context, pxe=False, uefi=False, persistent=False):
         """Set Next Boot Device."""
         boot_pxe = "2" if pxe else "3"
         boot_uefi = "true" if uefi else "false"
@@ -119,9 +115,7 @@ class MicrosoftOCSPowerDriver(PowerDriver):
         blades = {}
         root = fromstring(self.get("GetChassisInfo", context))
         namespace = {"ns": root.nsmap[None]}
-        blade_collections = root.find(
-            ".//ns:bladeCollections", namespaces=namespace
-        )
+        blade_collections = root.find(".//ns:bladeCollections", namespaces=namespace)
         # Iterate over all BladeInfo Elements
         for blade_info in blade_collections:
             blade_mac_address = blade_info.find(
@@ -130,15 +124,11 @@ class MicrosoftOCSPowerDriver(PowerDriver):
             macs = []
             # Iterate over all NicInfo Elements and add MAC Addresses
             for nic_info in blade_mac_address:
-                macs.append(
-                    nic_info.findtext(".//ns:macAddress", namespaces=namespace)
-                )
+                macs.append(nic_info.findtext(".//ns:macAddress", namespaces=namespace))
             macs = [mac for mac in macs if bool(mac)]
             if macs:
                 # Retrive blade id number
-                bladeid = blade_info.findtext(
-                    ".//ns:bladeNumber", namespaces=namespace
-                )
+                bladeid = blade_info.findtext(".//ns:bladeNumber", namespaces=namespace)
                 # Add MAC Addresses for blade
                 blades[bladeid] = macs
 
@@ -154,9 +144,7 @@ class MicrosoftOCSPowerDriver(PowerDriver):
             # Set next boot to PXE
             self.set_next_boot_device(context, pxe=True)
             # Power on blade
-            self.get(
-                "SetBladeOn", context, ["bladeid=%s" % context["blade_id"]]
-            )
+            self.get("SetBladeOn", context, ["bladeid=%s" % context["blade_id"]])
         except PowerConnError as e:
             raise PowerActionError(
                 "MicrosoftOCS Power Driver unable to power on blade_id %s: %s"
@@ -167,9 +155,7 @@ class MicrosoftOCSPowerDriver(PowerDriver):
         """Power off MicrosoftOCS blade."""
         try:
             # Power off blade
-            self.get(
-                "SetBladeOff", context, ["bladeid=%s" % context["blade_id"]]
-            )
+            self.get("SetBladeOff", context, ["bladeid=%s" % context["blade_id"]])
         except PowerConnError as e:
             raise PowerActionError(
                 "MicrosoftOCS Power Driver unable to power off blade_id %s: %s"
@@ -242,8 +228,7 @@ def probe_and_enlist_msftocs(
         raise PowerFatalError(
             "Failed to probe nodes for Microsoft OCS with ip=%s "
             "port=%s, username=%s, password=%s. "
-            "Server could not be reached: %s"
-            % (ip, port, username, password, e.reason)
+            "Server could not be reached: %s" % (ip, port, username, password, e.reason)
         )
     else:
         for blade_id, macs in blades.items():
@@ -252,9 +237,7 @@ def probe_and_enlist_msftocs(
             msftocs_driver.set_next_boot_device(context, persistent=True)
             # Set next boot to PXE
             msftocs_driver.set_next_boot_device(context, pxe=True)
-            system_id = create_node(
-                macs, "amd64", "msftocs", context, domain
-            ).wait(30)
+            system_id = create_node(macs, "amd64", "msftocs", context, domain).wait(30)
 
             if accept_all:
                 commission_node(system_id, user).wait(30)

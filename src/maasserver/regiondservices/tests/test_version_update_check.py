@@ -29,13 +29,9 @@ class TestRegionVersionUpdateCheckService(MAASTransactionServerTestCase):
         self.useFixture(MAASIDFixture(region.system_id))
 
         versions_info = SnapVersionsInfo(
-            current=SnapVersion(
-                revision="1234", version="3.0.0~alpha1-111-g.deadbeef"
-            ),
+            current=SnapVersion(revision="1234", version="3.0.0~alpha1-111-g.deadbeef"),
             channel=SnapChannel(track="3.0"),
-            update=SnapVersion(
-                revision="5678", version="3.0.0~alpha2-222-g.cafecafe"
-            ),
+            update=SnapVersion(revision="5678", version="3.0.0~alpha2-222-g.cafecafe"),
         )
         self.patch(
             version_update_check, "get_versions_info"

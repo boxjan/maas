@@ -32,9 +32,7 @@ class VersionedTextFile(CleanSave, TimestampedModel):
         related_name="next_versions",
     )
 
-    data = TextField(
-        editable=False, blank=True, null=True, help_text="File contents"
-    )
+    data = TextField(editable=False, blank=True, null=True, help_text="File contents")
 
     comment = CharField(
         editable=True,

@@ -14,9 +14,7 @@ from warnings import filterwarnings
 
 def get_testing_timeout(timeout=None):
     wait_time = (
-        environ.get("MAAS_WAIT_FOR_REACTOR", 60.0)
-        if timeout is None
-        else timeout
+        environ.get("MAAS_WAIT_FOR_REACTOR", 60.0) if timeout is None else timeout
     )
     return float(wait_time)
 
@@ -42,9 +40,7 @@ packages = {
     "metadataserver",
     "provisioningserver",
 }
-packages_expr = r"^(?:%s)\b" % "|".join(
-    re.escape(package) for package in packages
-)
+packages_expr = r"^(?:%s)\b" % "|".join(re.escape(package) for package in packages)
 
 # Enable some warnings that we ought to pay heed to.
 filterwarnings("error", category=BytesWarning, module=packages_expr)
@@ -113,9 +109,7 @@ class MAASTracebackContent(testtools.content.Content):
         content_type = testtools.content.ContentType(
             "text", "x-traceback", {"language": "python", "charset": "utf8"}
         )
-        super().__init__(
-            content_type, lambda: [x.encode("utf8") for x in stack_lines]
-        )
+        super().__init__(content_type, lambda: [x.encode("utf8") for x in stack_lines])
 
 
 testtools.content.TracebackContent = MAASTracebackContent

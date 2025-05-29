@@ -50,9 +50,7 @@ def get_partition_by_id_or_name__or_404(node_config, partition_id):
     return partition
 
 
-def raise_error_for_invalid_state_on_allocated_operations(
-    node, user, operation
-):
+def raise_error_for_invalid_state_on_allocated_operations(node, user, operation):
     if node.status not in [NODE_STATUS.READY, NODE_STATUS.ALLOCATED]:
         raise NodeStateViolation(
             "Cannot %s partition because the node is not Ready "
@@ -240,9 +238,7 @@ class PartitionHandler(OperationsHandler):
         device = BlockDevice.objects.get_block_device_or_404(
             system_id, device_id, request.user, NodePermission.admin
         )
-        partition_table = get_object_or_404(
-            PartitionTable, block_device=device
-        )
+        partition_table = get_object_or_404(PartitionTable, block_device=device)
         node = device.get_node()
         if node.status != NODE_STATUS.READY:
             raise NodeStateViolation(

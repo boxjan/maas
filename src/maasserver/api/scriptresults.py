@@ -121,9 +121,7 @@ class NodeScriptResultsHandler(OperationsHandler):
             system_id=system_id, user=request.user, perm=NodePermission.view
         )
         result_type = get_optional_param(request.GET, "type")
-        include_output = get_optional_param(
-            request.GET, "include_output", False, Bool
-        )
+        include_output = get_optional_param(request.GET, "include_output", False, Bool)
         filters = get_optional_param(request.GET, "filters", None, String)
         if filters is not None:
             filters = filters.split(",")
@@ -133,9 +131,7 @@ class NodeScriptResultsHandler(OperationsHandler):
             except ValidationError as e:
                 raise MAASAPIValidationError(e)
             else:
-                qs = ScriptSet.objects.filter(
-                    node=node, result_type=result_type
-                )
+                qs = ScriptSet.objects.filter(node=node, result_type=result_type)
         else:
             qs = ScriptSet.objects.filter(node=node)
 
@@ -222,10 +218,7 @@ class NodeScriptResultHandler(OperationsHandler):
         ):
             # Don't show password parameter values over the API.
             for parameter in script_result.parameters.values():
-                if (
-                    parameter.get("type") == "password"
-                    and "value" in parameter
-                ):
+                if parameter.get("type") == "password" and "value" in parameter:
                     parameter["value"] = "REDACTED"
             result = {
                 "id": script_result.id,
@@ -310,9 +303,7 @@ class NodeScriptResultHandler(OperationsHandler):
             No Node matches the given query.
         """
         script_set = self._get_script_set(request, system_id, id)
-        include_output = get_optional_param(
-            request.GET, "include_output", False, Bool
-        )
+        include_output = get_optional_param(request.GET, "include_output", False, Bool)
         filters = get_optional_param(request.GET, "filters", None, String)
         if filters is not None:
             filters = filters.split(",")
@@ -430,9 +421,7 @@ class NodeScriptResultHandler(OperationsHandler):
                 raise MAASAPIValidationError(e)
 
         bin_regex = re.compile(r".+\.tar(\..+)?")
-        for script_result in filter_script_results(
-            script_set, filters, hardware_type
-        ):
+        for script_result in filter_script_results(script_set, filters, hardware_type):
             mtime = time.mktime(script_result.updated.timetuple())
             if bin_regex.search(script_result.name) is not None:
                 # Binary files only have one output
@@ -483,9 +472,7 @@ class NodeScriptResultHandler(OperationsHandler):
                 else:
                     binary.write(content)
                 binary.write(b"\n")
-            return HttpResponse(
-                binary.getvalue(), content_type="application/binary"
-            )
+            return HttpResponse(binary.getvalue(), content_type="application/binary")
         elif filetype == "tar.xz":
             binary = BytesIO()
             root_dir = "{}-{}-{}".format(
@@ -502,9 +489,7 @@ class NodeScriptResultHandler(OperationsHandler):
                     tarinfo.mode = 0o644
                     tarinfo.mtime = times[filename]
                     tar.addfile(tarinfo, BytesIO(content))
-            return HttpResponse(
-                binary.getvalue(), content_type="application/x-tar"
-            )
+            return HttpResponse(binary.getvalue(), content_type="application/x-tar")
         else:
             raise MAASAPIValidationError(
                 'Unknown filetype "%s" must be txt or tar.xz' % filetype
@@ -549,9 +534,7 @@ class NodeScriptResultHandler(OperationsHandler):
             No Node matches the given query.
         """
         script_set = self._get_script_set(request, system_id, id)
-        include_output = get_optional_param(
-            request.PUT, "include_output", False, Bool
-        )
+        include_output = get_optional_param(request.PUT, "include_output", False, Bool)
         filters = get_optional_param(request.PUT, "filters", None, String)
         if filters is not None:
             filters = filters.split(",")
@@ -564,9 +547,7 @@ class NodeScriptResultHandler(OperationsHandler):
         script_set.include_output = include_output
         script_set.filters = filters
         script_set.hardware_type = hardware_type
-        suppressed = get_optional_param(
-            request.data, "suppressed", None, StringBool
-        )
+        suppressed = get_optional_param(request.data, "suppressed", None, StringBool)
         # Set the suppressed flag for the script results.
         if suppressed is not None:
             for script_result in filter_script_results(

@@ -139,9 +139,7 @@ class MAASSensibleOAuthClient(MAASSensibleClient):
             "oauth_consumer_key": self.consumer.key,
         }
         req = OAuthRequest(http_url=url, parameters=params)
-        req.sign_request(
-            OAuthSignatureMethod_PLAINTEXT(), self.consumer, self.token
-        )
+        req.sign_request(OAuthSignatureMethod_PLAINTEXT(), self.consumer, self.token)
         header = req.to_header()
         # Django uses the 'HTTP_AUTHORIZATION' to look up Authorization
         # credentials.

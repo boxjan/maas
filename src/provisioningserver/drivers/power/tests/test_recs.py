@@ -32,9 +32,7 @@ from provisioningserver.utils.twisted import asynchronous
 class TestRECSPowerDriver(MAASTestCase):
     """Tests for RECS|Box custom hardware."""
 
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def test_no_missing_packages(self):
         mock = self.patch(has_command_available)
@@ -69,9 +67,7 @@ class TestRECSPowerDriver(MAASTestCase):
     def test_power_off_calls_power_control_recs(self):
         ip, port, username, password, node_id, context = self.make_context()
         recs_power_driver = RECSPowerDriver()
-        power_control_recs_mock = self.patch(
-            recs_power_driver, "power_control_recs"
-        )
+        power_control_recs_mock = self.patch(recs_power_driver, "power_control_recs")
         recs_power_driver.power_off(context["node_id"], context)
 
         power_control_recs_mock.assert_called_once_with(
@@ -81,9 +77,7 @@ class TestRECSPowerDriver(MAASTestCase):
     def test_power_on_calls_power_control_recs(self):
         ip, port, username, password, node_id, context = self.make_context()
         recs_power_driver = RECSPowerDriver()
-        power_control_recs_mock = self.patch(
-            recs_power_driver, "power_control_recs"
-        )
+        power_control_recs_mock = self.patch(recs_power_driver, "power_control_recs")
         set_boot_source_recs_mock = self.patch(
             recs_power_driver, "set_boot_source_recs"
         )
@@ -102,9 +96,7 @@ class TestRECSPowerDriver(MAASTestCase):
     def test_power_query_calls_power_state_recs(self):
         ip, port, username, password, node_id, context = self.make_context()
         recs_power_driver = RECSPowerDriver()
-        power_state_recs_mock = self.patch(
-            recs_power_driver, "power_state_recs"
-        )
+        power_state_recs_mock = self.patch(recs_power_driver, "power_state_recs")
         recs_power_driver.power_query(context["node_id"], context)
 
         power_state_recs_mock.assert_called_once_with(
@@ -144,9 +136,7 @@ class TestRECSPowerDriver(MAASTestCase):
         api = RECSAPI(ip, port, username, password)
         command = factory.make_string()
         mock_urlopen = self.patch(urllib.request, "urlopen")
-        mock_urlopen.side_effect = urllib.error.HTTPError(
-            None, None, None, None, None
-        )
+        mock_urlopen.side_effect = urllib.error.HTTPError(None, None, None, None, None)
         self.assertRaises(PowerConnError, api.get, command, context)
 
     def test_get_crashes_on_url_error(self):
@@ -161,9 +151,7 @@ class TestRECSPowerDriver(MAASTestCase):
         ip, port, username, password, node_id, context = self.make_context()
         api = RECSAPI(ip, port, username, password)
         command = factory.make_string()
-        params = {
-            factory.make_string(): factory.make_string() for _ in range(3)
-        }
+        params = {factory.make_string(): factory.make_string() for _ in range(3)}
         expected = dedent(
             """
             <node health="OK" id="RCU_84055620466592_BB_1_0" state="0" />
@@ -179,9 +167,7 @@ class TestRECSPowerDriver(MAASTestCase):
         api = RECSAPI(ip, port, username, password)
         command = factory.make_string()
         mock_urlopen = self.patch(urllib.request, "urlopen")
-        mock_urlopen.side_effect = urllib.error.HTTPError(
-            None, None, None, None, None
-        )
+        mock_urlopen.side_effect = urllib.error.HTTPError(None, None, None, None, None)
         self.assertRaises(PowerConnError, api.post, command, context)
 
     def test_post_crashes_on_url_error(self):
@@ -196,9 +182,7 @@ class TestRECSPowerDriver(MAASTestCase):
         ip, port, username, password, node_id, context = self.make_context()
         api = RECSAPI(ip, port, username, password)
         command = factory.make_string()
-        params = {
-            factory.make_string(): factory.make_string() for _ in range(3)
-        }
+        params = {factory.make_string(): factory.make_string() for _ in range(3)}
         expected = dedent(
             """
             <node health="OK" id="RCU_84055620466592_BB_1_0" state="0" />
@@ -214,9 +198,7 @@ class TestRECSPowerDriver(MAASTestCase):
         api = RECSAPI(ip, port, username, password)
         command = factory.make_string()
         mock_urlopen = self.patch(urllib.request, "urlopen")
-        mock_urlopen.side_effect = urllib.error.HTTPError(
-            None, None, None, None, None
-        )
+        mock_urlopen.side_effect = urllib.error.HTTPError(None, None, None, None, None)
         self.assertRaises(PowerConnError, api.put, command, context)
 
     def test_put_crashes_on_url_error(self):
@@ -381,9 +363,7 @@ class TestRECSPowerDriver(MAASTestCase):
         mock_get_node_power_state = self.patch(
             RECSAPI, "get_node_power_state", Mock(return_value="0")
         )
-        mock_get_node_power_state.side_effect = urllib.error.URLError(
-            "URL Error"
-        )
+        mock_get_node_power_state.side_effect = urllib.error.URLError("URL Error")
         self.assertRaises(
             RECSError,
             recs_power_driver.power_state_recs,
@@ -429,9 +409,7 @@ class TestRECSPowerDriver(MAASTestCase):
         domain = factory.make_name("domain")
         macs = [factory.make_mac_address() for _ in range(3)]
         mock_get_nodes = self.patch(RECSAPI, "get_nodes")
-        mock_get_nodes.return_value = {
-            node_id: {"macs": macs, "arch": "amd64"}
-        }
+        mock_get_nodes.return_value = {node_id: {"macs": macs, "arch": "amd64"}}
         self.patch(RECSAPI, "set_boot_source")
         mock_create_node = self.patch(recs_module, "create_node")
         mock_create_node.side_effect = asynchronous(lambda *args: node_id)

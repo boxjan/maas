@@ -235,8 +235,7 @@ class TestPXEBootMethodRender(MAASTestCase):
         output_before = method.get_reader(**options).read(10000)
         # Sprinkle some magic in.
         options.update(
-            (factory.make_name("name"), factory.make_name("value"))
-            for _ in range(10)
+            (factory.make_name("name"), factory.make_name("value")) for _ in range(10)
         )
         # Capture the output after sprinking in some random options.
         output_after = method.get_reader(**options).read(10000)
@@ -260,9 +259,7 @@ class TestPXEBootMethodRender(MAASTestCase):
         method = PXEBootMethod()
         options = {
             "backend": None,
-            "kernel_params": make_kernel_parameters(
-                arch="i386", purpose="local"
-            ),
+            "kernel_params": make_kernel_parameters(arch="i386", purpose="local"),
         }
         output = method.get_reader(**options).read(10000)
         self.assertIn(b"chain.c32", output)
@@ -274,9 +271,7 @@ class TestPXEBootMethodRender(MAASTestCase):
         method = PXEBootMethod()
         options = {
             "backend": None,
-            "kernel_params": make_kernel_parameters(
-                arch="amd64", purpose="local"
-            ),
+            "kernel_params": make_kernel_parameters(arch="amd64", purpose="local"),
         }
         output = method.get_reader(**options).read(10000)
         self.assertIn(b"chain.c32", output)
@@ -362,9 +357,7 @@ class TestPXEBootMethodRenderConfigScenariosEnlist(MAASTestCase):
         # The default section uses the ifcpu64 module, branching to the "i386"
         # or "amd64" labels accordingly.
         self.assertEqual("ifcpu64.c32", default_section["KERNEL"])
-        self.assertEqual(
-            ["amd64", "--", "i386"], default_section["APPEND"].split()
-        )
+        self.assertEqual(["amd64", "--", "i386"], default_section["APPEND"].split())
         # Both "i386" and "amd64" sections exist.
         self.assertIn("i386", config)
         self.assertIn("amd64", config)
@@ -374,9 +367,7 @@ class TestPXEBootMethodRenderConfigScenariosEnlist(MAASTestCase):
         # architectures.
         for section_label in ("i386", "amd64"):
             section = config[section_label]
-            self.assertGreaterEqual(
-                section.keys(), {"KERNEL", "INITRD", "APPEND"}
-            )
+            self.assertGreaterEqual(section.keys(), {"KERNEL", "INITRD", "APPEND"})
             self.assertEqual(
                 f"{fs_host}/{options['kernel_params'].kernel}",
                 section["KERNEL"],
@@ -512,9 +503,7 @@ class TestPXEBootMethodRegex(MAASTestCase):
     def test_re_config_file_with_default_arch_and_subarch(self):
         arch = factory.make_name("arch", sep="").encode("ascii")
         subarch = factory.make_name("subarch", sep="").encode("ascii")
-        match = re_config_file.match(
-            b"pxelinux.cfg/default.%s-%s" % (arch, subarch)
-        )
+        match = re_config_file.match(b"pxelinux.cfg/default.%s-%s" % (arch, subarch))
         self.assertIsNotNone(match)
         self.assertDictEqual(
             {

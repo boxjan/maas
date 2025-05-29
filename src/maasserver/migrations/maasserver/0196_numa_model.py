@@ -30,9 +30,9 @@ def create_and_link_numa_nodes(apps, schema_editor):
         PhysicalBlockDevice.objects.filter(node_id=numa_node.node_id).update(
             numa_node_id=numa_node.id
         )
-        Interface.objects.filter(
-            node_id=numa_node.node_id, type="physical"
-        ).update(numa_node_id=numa_node.id)
+        Interface.objects.filter(node_id=numa_node.node_id, type="physical").update(
+            numa_node_id=numa_node.id
+        )
 
 
 class Migration(migrations.Migration):

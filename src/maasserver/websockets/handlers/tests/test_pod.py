@@ -157,9 +157,7 @@ class TestPodHandler(MAASTransactionServerTestCase):
         self.assertIsNone(result["host"])
         self.assertEqual(result["attached_vlans"], [])
         self.assertEqual(result["boot_vlans"], [])
-        self.assertEqual(
-            result["storage_pools"], expected_data["storage_pools"]
-        )
+        self.assertEqual(result["storage_pools"], expected_data["storage_pools"])
         self.assertEqual(result["power_parameters"], power_params)
 
     def test_get_with_storage_pool(self):
@@ -184,14 +182,11 @@ class TestPodHandler(MAASTransactionServerTestCase):
         expected_data = handler.full_dehydrate(pod)
         result = handler.get({"id": pod.id})
         self.assertEqual(expected_data.keys(), result.keys())
-        self.assertEqual(
-            result["storage_pools"], expected_data["storage_pools"]
-        )
+        self.assertEqual(result["storage_pools"], expected_data["storage_pools"])
         storage_pool_ids = [pool["id"] for pool in result["storage_pools"]]
         self.assertIn(storage_pool.pool_id, storage_pool_ids)
         resource_storage_pool_ids = [
-            pool["id"]
-            for pool in result["resources"]["storage_pools"].values()
+            pool["id"] for pool in result["resources"]["storage_pools"].values()
         ]
         self.assertIn(storage_pool.pool_id, resource_storage_pool_ids)
 
@@ -201,9 +196,7 @@ class TestPodHandler(MAASTransactionServerTestCase):
         vlan = factory.make_VLAN(dhcp_on=True)
         subnet = factory.make_Subnet(vlan=vlan)
         node = factory.make_Node_with_Interface_on_Subnet(subnet=subnet)
-        ip = factory.make_StaticIPAddress(
-            interface=node.boot_interface, subnet=subnet
-        )
+        ip = factory.make_StaticIPAddress(interface=node.boot_interface, subnet=subnet)
         numa_node0 = node.default_numanode
         numa_node0.cores = [0, 3]
         numa_node0.memory = 4096
@@ -572,9 +565,7 @@ class TestPodHandler(MAASTransactionServerTestCase):
         vlan = factory.make_VLAN(dhcp_on=False)
         subnet = factory.make_Subnet(vlan=vlan)
         node = factory.make_Node_with_Interface_on_Subnet(subnet=subnet)
-        ip = factory.make_StaticIPAddress(
-            interface=node.boot_interface, subnet=subnet
-        )
+        ip = factory.make_StaticIPAddress(interface=node.boot_interface, subnet=subnet)
         pod = self.make_pod_with_hints(ip_address=ip)
         expected_data = handler.full_dehydrate(pod)
         result = handler.get({"id": pod.id})
@@ -601,9 +592,7 @@ class TestPodHandler(MAASTransactionServerTestCase):
             {
                 "CN": sample_cert.cn(),
                 "fingerprint": sample_cert.cert_hash(),
-                "expiration": sample_cert.expiration().strftime(
-                    DATETIME_FORMAT
-                ),
+                "expiration": sample_cert.expiration().strftime(DATETIME_FORMAT),
             },
         )
 
@@ -645,9 +634,7 @@ class TestPodHandler(MAASTransactionServerTestCase):
         vlan = factory.make_VLAN(dhcp_on=True)
         subnet = factory.make_Subnet(vlan=vlan)
         node = factory.make_Node_with_Interface_on_Subnet(subnet=subnet)
-        ip = factory.make_StaticIPAddress(
-            interface=node.boot_interface, subnet=subnet
-        )
+        ip = factory.make_StaticIPAddress(interface=node.boot_interface, subnet=subnet)
         numa_node0 = node.default_numanode
         numa_node0.cores = [0, 3]
         numa_node0.memory = 4096
@@ -791,9 +778,9 @@ class TestPodHandler(MAASTransactionServerTestCase):
         user = await deferToDatabase(factory.make_admin)
         handler = PodHandler(user, {}, None)
         pod = await deferToDatabase(self.make_pod_with_hints)
-        self.patch(
-            pod_module, "discover_and_sync_vmhost_async"
-        ).return_value = succeed(pod)
+        self.patch(pod_module, "discover_and_sync_vmhost_async").return_value = succeed(
+            pod
+        )
         expected_data = await deferToDatabase(
             handler.full_dehydrate, pod, for_list=False
         )
@@ -871,9 +858,7 @@ class TestPodHandler(MAASTransactionServerTestCase):
         zone = await deferToDatabase(factory.make_Zone)
         pod_info = self.make_pod_info()
         pod_info["zone"] = zone.id
-        pod = await deferToDatabase(
-            factory.make_Pod, pod_type=pod_info["type"]
-        )
+        pod = await deferToDatabase(factory.make_Pod, pod_type=pod_info["type"])
         pod_info["id"] = pod.id
         pod_info["name"] = factory.make_name("pod")
         await deferToDatabase(self.fake_pod_discovery)
@@ -895,9 +880,7 @@ class TestPodHandler(MAASTransactionServerTestCase):
         zone = await deferToDatabase(factory.make_Zone)
         pod_info = self.make_pod_info()
         pod_info["zone"] = zone.id
-        pod = await deferToDatabase(
-            factory.make_Pod, pod_type=pod_info["type"]
-        )
+        pod = await deferToDatabase(factory.make_Pod, pod_type=pod_info["type"])
         pod_info["id"] = pod.id
         pod_info["name"] = factory.make_name("pod")
         await deferToDatabase(setup_fakes)

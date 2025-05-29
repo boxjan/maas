@@ -33,9 +33,7 @@ django_signal_names = [
 
 
 def pick_django_signal():
-    return namedObject(
-        "django.db.models.signals." + random.choice(django_signal_names)
-    )
+    return namedObject("django.db.models.signals." + random.choice(django_signal_names))
 
 
 class TestConnectToFieldChange(MAASLegacyTransactionServerTestCase):
@@ -186,9 +184,7 @@ class TestConnectToFieldChange(MAASLegacyTransactionServerTestCase):
         self.connect(callback, ["name1", "name2"])
         old_name1_value = factory.make_name("old1")
         old_name2_value = factory.make_name("old2")
-        obj = FieldChangeTestModel(
-            name1=old_name1_value, name2=old_name2_value
-        )
+        obj = FieldChangeTestModel(name1=old_name1_value, name2=old_name2_value)
         obj.save()
         obj.name1 = factory.make_name("new1")
         obj.name2 = factory.make_name("new2")
@@ -236,9 +232,7 @@ class TestSignalsManager(MAASServerTestCase):
 
         self.assertEqual(len(manager._signals), 1)
         [signal] = manager._signals
-        self.assertEqual(
-            signal.connect.func, Config.objects.config_changed_connect
-        )
+        self.assertEqual(signal.connect.func, Config.objects.config_changed_connect)
         self.assertEqual(signal.connect.args, (config_name, callback))
         self.assertEqual(signal.connect.keywords, {})
 

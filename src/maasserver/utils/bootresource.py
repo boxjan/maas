@@ -277,15 +277,11 @@ class LocalBootResourceFile:
 
     @property
     def lock_file(self) -> Path:
-        return (
-            get_maas_lock_path() / f"maas:bootres_{self.filename_on_disk}.lock"
-        )
+        return get_maas_lock_path() / f"maas:bootres_{self.filename_on_disk}.lock"
 
     def acquire_lock(self, try_lock: bool = False) -> bool:
         if self._lock_fd is None:
-            self._lock_fd = os.open(
-                self.lock_file, os.O_RDWR | os.O_CREAT | os.O_TRUNC
-            )
+            self._lock_fd = os.open(self.lock_file, os.O_RDWR | os.O_CREAT | os.O_TRUNC)
         flags = fcntl.LOCK_EX
         if try_lock:
             flags |= fcntl.LOCK_NB
@@ -350,6 +346,4 @@ class LocalBootResourceFile:
         target_dir = store / extract_path
         target_dir.mkdir(exist_ok=True, parents=True)
         with tarfile.open(self.path, mode="r") as tar:
-            tar.extractall(
-                path=target_dir.absolute(), filter=tarfile.tar_filter
-            )
+            tar.extractall(path=target_dir.absolute(), filter=tarfile.tar_filter)

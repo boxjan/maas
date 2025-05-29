@@ -232,8 +232,7 @@ class Select(Plugin):
                 self.addDirectory(path)
             if self.log.isEnabledFor(logging.DEBUG):
                 self.log.debug(
-                    "Limiting to the following directories "
-                    "(exact matches only):"
+                    "Limiting to the following directories " "(exact matches only):"
                 )
                 for path in sorted(self.dirs):
                     self.log.debug("- %s", path)

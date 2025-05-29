@@ -36,9 +36,7 @@ class TestMAASLogger(MAASTestCase):
         self.patch(logging, "Formatter")
         name = factory.make_string()
         maaslog = get_maas_logger(name)
-        self.assertRaises(
-            NotImplementedError, maaslog.exception, factory.make_string()
-        )
+        self.assertRaises(NotImplementedError, maaslog.exception, factory.make_string())
 
     def test_returns_MAASLogger_instances(self):
         self.patch(_maaslog, "SysLogHandler")

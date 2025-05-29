@@ -16,9 +16,7 @@ from maastesting.pytest.database import cluster_stash
 
 
 @pytest.fixture
-def test_config(
-    request: pytest.FixtureRequest, ensuremaasdb: str
-) -> Iterator[Config]:
+def test_config(request: pytest.FixtureRequest, ensuremaasdb: str) -> Iterator[Config]:
     """Set up the test config schema."""
     yield Config(
         db=DatabaseConfig(ensuremaasdb, host=abspath("db/")),
@@ -28,9 +26,7 @@ def test_config(
 
 
 @pytest.fixture
-async def db(
-    request: pytest.FixtureRequest, test_config: Config
-) -> Iterator[Database]:
+async def db(request: pytest.FixtureRequest, test_config: Config) -> Iterator[Database]:
     db = Database(test_config.db, echo=test_config.debug_queries)
     yield db
     await db.engine.dispose()
@@ -120,9 +116,7 @@ class Fixture:
         type_result: Type[T],
         *filters: ColumnOperators,
     ) -> list[T]:
-        return [
-            type_result(**row) for row in (await self.get(table, *filters))
-        ]
+        return [type_result(**row) for row in (await self.get(table, *filters))]
 
     def random_string(self, length: int = 10) -> str:
         return "".join(random.choices(string.ascii_letters, k=length))

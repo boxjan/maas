@@ -115,9 +115,7 @@ class FakeRefresher:
         self.mock_capture_script_output = testcase.patch(
             refresh_module, "capture_script_output"
         )
-        self.mock_capture_script_output.side_effect = (
-            self.fake_capture_script_output
-        )
+        self.mock_capture_script_output.side_effect = self.fake_capture_script_output
         self.credentials = {"consumer_secret": ""}
         self.credentials.update(credentials)
         self.reset()
@@ -156,15 +154,9 @@ class FakeRefresher:
         exit_status=None,
         retry=True,
     ):
-        self.testcase.assertEqual(
-            self.credentials["token_key"], creds.token_key
-        )
-        self.testcase.assertEqual(
-            self.credentials["token_secret"], creds.token_secret
-        )
-        self.testcase.assertEqual(
-            self.credentials["consumer_key"], creds.consumer_key
-        )
+        self.testcase.assertEqual(self.credentials["token_key"], creds.token_key)
+        self.testcase.assertEqual(self.credentials["token_secret"], creds.token_secret)
+        self.testcase.assertEqual(self.credentials["consumer_key"], creds.consumer_key)
         self.testcase.assertEqual(
             self.credentials["consumer_secret"], creds.consumer_secret
         )
@@ -328,9 +320,7 @@ class TestNetworksMonitoringService(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.all_interfaces_mock = self.patch(
-            services, "get_all_interfaces_definition"
-        )
+        self.all_interfaces_mock = self.patch(services, "get_all_interfaces_definition")
         self.all_interfaces_mock.return_value = {}
         self.metadata_credentials = {
             "consumer_key": factory.make_string(),
@@ -348,9 +338,7 @@ class TestNetworksMonitoringService(MAASTestCase):
     def test_init(self):
         service = self.makeService()
         self.assertIsInstance(service, MultiService)
-        self.assertEqual(
-            service._timer_service.step, service.INTERVAL.total_seconds()
-        )
+        self.assertEqual(service._timer_service.step, service.INTERVAL.total_seconds())
         self.assertEqual(
             (service._do_action, (), {}),
             service._timer_service.call,
@@ -390,9 +378,7 @@ class TestNetworksMonitoringService(MAASTestCase):
         service.running = 1
         with TwistedLoggerFixture() as logger:
             error_message = factory.make_string()
-            get_interfaces = self.patch(
-                services, "get_all_interfaces_definition"
-            )
+            get_interfaces = self.patch(services, "get_all_interfaces_definition")
             get_interfaces.side_effect = Exception(error_message)
             yield service._do_action()
         self.assertTrue(
@@ -436,9 +422,7 @@ class TestNetworksMonitoringService(MAASTestCase):
             "hints": {"my-hint": "foo"},
         }
         self.all_interfaces_mock.return_value = network_extra["interfaces"]
-        self.patch(
-            service, "_get_topology_hints"
-        ).return_value = network_extra["hints"]
+        self.patch(service, "_get_topology_hints").return_value = network_extra["hints"]
 
         yield service.startService()
         service.clock.advance(0)
@@ -446,9 +430,7 @@ class TestNetworksMonitoringService(MAASTestCase):
 
         metadata_url = service.maas_url + "/metadata/2012-03-01/"
         script_runs = self.fake_refresher.script_runs[metadata_url]
-        self.assertEqual(
-            "finished", script_runs[COMMISSIONING_OUTPUT_NAME].status
-        )
+        self.assertEqual("finished", script_runs[COMMISSIONING_OUTPUT_NAME].status)
         commissioning_data_out = json.loads(
             script_runs[COMMISSIONING_OUTPUT_NAME].out.decode("utf-8")
         )
@@ -458,9 +440,7 @@ class TestNetworksMonitoringService(MAASTestCase):
         expected_commisioning_data = base_lxd_data.copy()
         expected_commisioning_data.update({"network-extra": network_extra})
         self.assertEqual(expected_commisioning_data, commissioning_data_out)
-        self.assertEqual(
-            expected_commisioning_data, commissioning_data_combined
-        )
+        self.assertEqual(expected_commisioning_data, commissioning_data_combined)
 
     @inlineCallbacks
     def test_runs_refresh_and_annotates_commissioning_without_hints(self):
@@ -494,9 +474,7 @@ class TestNetworksMonitoringService(MAASTestCase):
 
         metadata_url = service.maas_url + "/metadata/2012-03-01/"
         script_runs = self.fake_refresher.script_runs[metadata_url]
-        self.assertEqual(
-            "finished", script_runs[COMMISSIONING_OUTPUT_NAME].status
-        )
+        self.assertEqual("finished", script_runs[COMMISSIONING_OUTPUT_NAME].status)
         commissioning_data_out = json.loads(
             script_runs[COMMISSIONING_OUTPUT_NAME].out.decode("utf-8")
         )
@@ -506,9 +484,7 @@ class TestNetworksMonitoringService(MAASTestCase):
         expected_commisioning_data = base_lxd_data.copy()
         expected_commisioning_data.update({"network-extra": network_extra})
         self.assertEqual(expected_commisioning_data, commissioning_data_out)
-        self.assertEqual(
-            expected_commisioning_data, commissioning_data_combined
-        )
+        self.assertEqual(expected_commisioning_data, commissioning_data_combined)
 
     @inlineCallbacks
     def test_recordInterfaces_called_when_interfaces_changed(self):
@@ -540,9 +516,7 @@ class TestNetworksMonitoringService(MAASTestCase):
         self.assertEqual(service.interfaces, [])
 
         with TwistedLoggerFixture() as logger:
-            self.fake_refresher.mock_signal.side_effect = SignalException(
-                "boom"
-            )
+            self.fake_refresher.mock_signal.side_effect = SignalException("boom")
             yield service._do_action()
             self.assertEqual(service.interfaces, [])
             self.assertEqual(
@@ -556,9 +530,7 @@ class TestNetworksMonitoringService(MAASTestCase):
 
         # The next time it's run, and no signal error occurs, the interfaces get recorded.
         self.fake_refresher.reset()
-        self.fake_refresher.mock_signal.side_effect = (
-            self.fake_refresher.fake_signal
-        )
+        self.fake_refresher.mock_signal.side_effect = self.fake_refresher.fake_signal
         yield service._do_action()
         self.assertEqual(service.interfaces, [my_interfaces])
 
@@ -862,16 +834,12 @@ class TestProcessProtocolService(MAASTestCase):
             yield service.stopService()
             result = yield service._protocol.done
             self.assertIsNone(result)
-        self.assertEqual(
-            logger.messages[0], "ForeverProcessProtocolService started."
-        )
+        self.assertEqual(logger.messages[0], "ForeverProcessProtocolService started.")
         self.assertEqual(
             logger.messages[-1],
             "ForeverProcessProtocolService was terminated.",
         )
-        self.assertRaises(
-            ProcessExitedAlready, service._process.signalProcess, "INT"
-        )
+        self.assertRaises(ProcessExitedAlready, service._process.signalProcess, "INT")
 
     @inlineCallbacks
     def test_handles_normal_process_exit(self):
@@ -899,9 +867,7 @@ class TestProcessProtocolService(MAASTestCase):
         with TwistedLoggerFixture() as logger:
             service.startService()
             yield service.stopService()
-        self.assertEqual(
-            logger.messages[0], "ForeverProcessProtocolService started."
-        )
+        self.assertEqual(logger.messages[0], "ForeverProcessProtocolService started.")
         self.assertEqual(
             logger.messages[-1],
             "ForeverProcessProtocolService was terminated.",
@@ -1378,9 +1344,7 @@ class TestBeaconingSocketProtocol(SharedSecretTestCase):
         uuid = str(uuid1())
         # Make the protocol think we sent a beacon with this UUID already.
         tx_mac = factory.make_mac_address()
-        fake_tx_beacon = FakeBeaconPayload(
-            uuid, ifname="eth1", mac=tx_mac, vid=100
-        )
+        fake_tx_beacon = FakeBeaconPayload(uuid, ifname="eth1", mac=tx_mac, vid=100)
         fake_rx_beacon = {
             "source_ip": "127.0.0.1",
             "source_port": 5240,
@@ -1423,9 +1387,7 @@ class TestBeaconingSocketProtocol(SharedSecretTestCase):
         uuid = str(uuid1())
         # Make the protocol think we sent a beacon with this UUID already.
         tx_mac = factory.make_mac_address()
-        fake_tx_beacon = FakeBeaconPayload(
-            uuid, ifname="eth1", mac=tx_mac, vid=100
-        )
+        fake_tx_beacon = FakeBeaconPayload(uuid, ifname="eth1", mac=tx_mac, vid=100)
         fake_rx_beacon = {
             "source_ip": "127.0.0.1",
             "source_port": 5240,

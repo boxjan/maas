@@ -169,12 +169,8 @@ class VlanHandler(OperationsHandler):
                 raise PermissionDenied()
         elif fabric_id is not None and vid is not None:
             # User passed in a URL like /fabrics/<fabric_id>/vlans/<vid>.
-            fabric = Fabric.objects.get_fabric_or_404(
-                fabric_id, user, permission
-            )
-            vlan = VLAN.objects.get_object_by_specifiers_or_raise(
-                vid, fabric=fabric
-            )
+            fabric = Fabric.objects.get_fabric_or_404(fabric_id, user, permission)
+            vlan = VLAN.objects.get_object_by_specifiers_or_raise(vid, fabric=fabric)
         else:
             raise Http404("A vlan_id or (fabric_id, vid) pair is required.")
         return vlan

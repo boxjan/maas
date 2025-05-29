@@ -43,9 +43,7 @@ def vault_regionconfig(mocker):
         yield RegionConfiguration(store)
 
     mocker.patch.object(vault.RegionConfiguration, "open", config_ctx)
-    mocker.patch.object(
-        vault.RegionConfiguration, "open_for_update", config_ctx
-    )
+    mocker.patch.object(vault.RegionConfiguration, "open_for_update", config_ctx)
     yield store
 
 

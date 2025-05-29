@@ -94,9 +94,7 @@ def get_status_from_qs(qs):
     # The status order below represents the order of precedence.
     # Skipped is omitted here otherwise one skipped test will show
     # a warning icon in the UI on the test tab.
-    return get_overall_status(
-        [result.status for result in qs if not result.suppressed]
-    )
+    return get_overall_status([result.status for result in qs if not result.suppressed])
 
 
 def get_status_from_list_qs(script_result_statuses: list[int]) -> int:
@@ -145,14 +143,10 @@ class ScriptSetManager(Manager):
         paramaters passed to them.
 
         """
-        scripts = (
-            [] if scripts is None else list(scripts)
-        )  # ensure it's always a list
+        scripts = [] if scripts is None else list(scripts)  # ensure it's always a list
         requested_tags = self._filter_tags(scripts)
         builtin_scripts = Script.objects.filter(default=True)
-        builtin_scripts_names = list(
-            builtin_scripts.values_list("name", flat=True)
-        )
+        builtin_scripts_names = list(builtin_scripts.values_list("name", flat=True))
         if node.is_controller:
             # Controllers can only run the builtin scripts for them.
             requested_tags = ["deploy-info"]
@@ -306,17 +300,13 @@ class ScriptSetManager(Manager):
             if filter_modaliases(modaliases, *script.ForHardware):
                 yield script
 
-    def _add_user_selected_scripts(
-        self, script_set, scripts=None, script_input=None
-    ):
+    def _add_user_selected_scripts(self, script_set, scripts=None, script_input=None):
         """Add user selected scripts to the ScriptSet."""
         if scripts is None:
             scripts = []
         if script_input is None:
             script_input = {}
-        ids = [
-            int(id) for id in scripts if isinstance(id, int) or id.isdigit()
-        ]
+        ids = [int(id) for id in scripts if isinstance(id, int) or id.isdigit()]
         match script_set.result_type:
             case RESULT_TYPE.COMMISSIONING:
                 script_type = SCRIPT_TYPE.COMMISSIONING
@@ -353,9 +343,7 @@ class ScriptSetManager(Manager):
                 limit : limit + 1
             ].first()
             if first_to_delete is not None:
-                script_result.history.filter(
-                    pk__lte=first_to_delete.pk
-                ).delete()
+                script_result.history.filter(pk__lte=first_to_delete.pk).delete()
 
         # LP:1731075 - Before commissioning is run on a node MAAS does not know
         # what storage devices are available on the system. If storage tests
@@ -378,10 +366,7 @@ class ScriptSetManager(Manager):
             .exclude(script_set=new_script_set)
         ):
             for param in script_result.parameters.values():
-                if (
-                    param.get("type") == "storage"
-                    and param.get("value") == "all"
-                ):
+                if param.get("type") == "storage" and param.get("value") == "all":
                     script_result.delete()
                     break
 
@@ -438,9 +423,7 @@ class ScriptSet(CleanSave, Model):
     @property
     def status(self):
         return get_status_from_qs(
-            self.scriptresult_set.all().only(
-                "status", "script_set_id", "suppressed"
-            )
+            self.scriptresult_set.all().only("status", "script_set_id", "suppressed")
         )
 
     @property
@@ -468,9 +451,7 @@ class ScriptSet(CleanSave, Model):
                 return None
             else:
                 return (
-                    self.scriptresult_set.only(
-                        "status", "ended", "script_set_id"
-                    )
+                    self.scriptresult_set.only("status", "ended", "script_set_id")
                     .latest("ended")
                     .ended
                 )
@@ -550,18 +531,14 @@ class ScriptSet(CleanSave, Model):
             "status", "script__for_hardware", "script_set_id"
         )
         for script_result in script_results:
-            matches = filter_modaliases(
-                modaliases, *script_result.script.ForHardware
-            )
+            matches = filter_modaliases(modaliases, *script_result.script.ForHardware)
             found_hw_match = False
             if hw_pairs:
                 for hardware in script_result.script.for_hardware:
                     if hardware in hw_pairs:
                         found_hw_match = True
                         break
-            matches = filter_modaliases(
-                modaliases, *script_result.script.ForHardware
-            )
+            matches = filter_modaliases(modaliases, *script_result.script.ForHardware)
             if len(matches) == 0 and not found_hw_match:
                 script_result.delete()
 

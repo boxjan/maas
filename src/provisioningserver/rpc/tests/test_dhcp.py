@@ -41,9 +41,7 @@ class TestDHCPState(MAASTestCase):
         omapi_key = factory.make_name("omapi_key")
         failover_peers = [make_failover_peer_config() for _ in range(3)]
         shared_networks = [make_shared_network() for _ in range(3)]
-        shared_networks = fix_shared_networks_failover(
-            shared_networks, failover_peers
-        )
+        shared_networks = fix_shared_networks_failover(shared_networks, failover_peers)
         hosts = [make_host() for _ in range(3)]
         interfaces = [make_interface() for _ in range(3)]
         return (
@@ -147,9 +145,7 @@ class TestDHCPState(MAASTestCase):
             copy.deepcopy(interfaces),
             copy.deepcopy(global_dhcp_snippets),
         )
-        self.assertFalse(
-            new_state.requires_restart(state, is_dhcpv6_server=False)
-        )
+        self.assertFalse(new_state.requires_restart(state, is_dhcpv6_server=False))
 
     def test_requires_restart_returns_True_when_hosts_are_ipv6_and_server_is_ipv4(
         self,
@@ -179,9 +175,7 @@ class TestDHCPState(MAASTestCase):
             copy.deepcopy(interfaces),
             copy.deepcopy(global_dhcp_snippets),
         )
-        self.assertTrue(
-            new_state.requires_restart(state, is_dhcpv6_server=False)
-        )
+        self.assertTrue(new_state.requires_restart(state, is_dhcpv6_server=False))
 
     def test_requires_restart_returns_False_when_hosts_are_ipv6_and_server_is_ipv6(
         self,
@@ -211,9 +205,7 @@ class TestDHCPState(MAASTestCase):
             copy.deepcopy(interfaces),
             copy.deepcopy(global_dhcp_snippets),
         )
-        self.assertFalse(
-            new_state.requires_restart(state, is_dhcpv6_server=True)
-        )
+        self.assertFalse(new_state.requires_restart(state, is_dhcpv6_server=True))
 
     def test_requires_restart_returns_True_when_failover_different(self):
         (
@@ -375,9 +367,7 @@ class TestDHCPState(MAASTestCase):
             interfaces,
             global_dhcp_snippets,
         )
-        changed_global_dhcp_snippets = make_global_dhcp_snippets(
-            allow_empty=False
-        )
+        changed_global_dhcp_snippets = make_global_dhcp_snippets(allow_empty=False)
         new_state = dhcp.DHCPState(
             omapi_key,
             copy.deepcopy(failover_peers),
@@ -408,9 +398,7 @@ class TestDHCPState(MAASTestCase):
         changed_shared_networks = copy.deepcopy(shared_networks)
         for shared_network in changed_shared_networks:
             for subnet in shared_network["subnets"]:
-                subnet["dhcp_snippets"] = make_subnet_dhcp_snippets(
-                    allow_empty=False
-                )
+                subnet["dhcp_snippets"] = make_subnet_dhcp_snippets(allow_empty=False)
         new_state = dhcp.DHCPState(
             omapi_key,
             copy.deepcopy(failover_peers),
@@ -518,9 +506,7 @@ class TestDHCPState(MAASTestCase):
             failover_peers=state.failover_peers,
             shared_networks=state.shared_networks,
             hosts=sorted(state.hosts.values(), key=itemgetter("host")),
-            global_dhcp_snippets=sorted(
-                global_dhcp_snippets, key=itemgetter("name")
-            ),
+            global_dhcp_snippets=sorted(global_dhcp_snippets, key=itemgetter("name")),
         )
 
 
@@ -595,9 +581,7 @@ class TestUpdateHosts(MAASTestCase):
 
 
 class TestConfigureDHCP(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     scenarios = (
         ("DHCPv4", {"server": dhcp.DHCPv4Server}),
@@ -666,9 +650,7 @@ class TestConfigureDHCP(MAASTestCase):
         mock_exists = self.patch_os_exists()
         mock_exists.return_value = True
         mock_sudo_delete = self.patch_sudo_delete_file()
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         self.patch_autospec(dhcp_service, "off")
         self.patch_restartService()
         self.patch_ensureService()
@@ -679,9 +661,7 @@ class TestConfigureDHCP(MAASTestCase):
     def test_stops_dhcp_server_if_no_subnets_defined(self):
         mock_exists = self.patch_os_exists()
         mock_exists.return_value = False
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         off = self.patch_autospec(dhcp_service, "off")
         restart_service = self.patch_restartService()
         ensure_service = self.patch_ensureService()
@@ -695,9 +675,7 @@ class TestConfigureDHCP(MAASTestCase):
         dhcp._current_server_state[self.server.dhcp_service] = sentinel.state
         mock_exists = self.patch_os_exists()
         mock_exists.return_value = False
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         self.patch_autospec(dhcp_service, "off")
         self.patch_restartService()
         self.patch_ensureService()
@@ -720,9 +698,7 @@ class TestConfigureDHCP(MAASTestCase):
         expected_config = factory.make_name("config")
         self.patch_get_config().return_value = expected_config
 
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         on = self.patch_autospec(dhcp_service, "on")
 
         omapi_key = factory.make_name("omapi_key")
@@ -779,9 +755,7 @@ class TestConfigureDHCP(MAASTestCase):
         expected_config = factory.make_name("config")
         self.patch_get_config().return_value = expected_config
 
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         on = self.patch_autospec(dhcp_service, "on")
 
         old_state = dhcp.DHCPState(
@@ -849,9 +823,7 @@ class TestConfigureDHCP(MAASTestCase):
         expected_config = factory.make_name("config")
         self.patch_get_config().return_value = expected_config
 
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         on = self.patch_autospec(dhcp_service, "on")
 
         omapi_key = factory.make_name("omapi_key")
@@ -907,9 +879,7 @@ class TestConfigureDHCP(MAASTestCase):
     def test_writes_config_and_doesnt_use_omapi_when_was_off(self):
         write_file = self.patch_sudo_write_file()
         get_service_state = self.patch_getServiceState()
-        get_service_state.return_value = ServiceState(
-            SERVICE_STATE.OFF, "dead"
-        )
+        get_service_state.return_value = ServiceState(SERVICE_STATE.OFF, "dead")
         restart_service = self.patch_restartService()
         ensure_service = self.patch_ensureService()
         update_hosts = self.patch_update_hosts()
@@ -925,9 +895,7 @@ class TestConfigureDHCP(MAASTestCase):
         expected_config = factory.make_name("config")
         self.patch_get_config().return_value = expected_config
 
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         on = self.patch_autospec(dhcp_service, "on")
 
         omapi_key = factory.make_name("omapi_key")
@@ -966,9 +934,7 @@ class TestConfigureDHCP(MAASTestCase):
             ]
         )
         on.assert_called_once_with()
-        get_service_state.assert_called_once_with(
-            self.server.dhcp_service, now=True
-        )
+        get_service_state.assert_called_once_with(self.server.dhcp_service, now=True)
         restart_service.assert_not_called()
         ensure_service.assert_called_once_with(self.server.dhcp_service)
         update_hosts.assert_not_called()
@@ -988,9 +954,7 @@ class TestConfigureDHCP(MAASTestCase):
     def test_writes_config_and_uses_omapi_to_update_hosts(self):
         write_file = self.patch_sudo_write_file()
         get_service_state = self.patch_getServiceState()
-        get_service_state.return_value = ServiceState(
-            SERVICE_STATE.ON, "running"
-        )
+        get_service_state.return_value = ServiceState(SERVICE_STATE.ON, "running")
         restart_service = self.patch_restartService()
         ensure_service = self.patch_ensureService()
         update_hosts = self.patch_update_hosts()
@@ -1006,9 +970,7 @@ class TestConfigureDHCP(MAASTestCase):
         expected_config = factory.make_name("config")
         self.patch_get_config().return_value = expected_config
 
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         on = self.patch_autospec(dhcp_service, "on")
 
         omapi_key = factory.make_name("omapi_key")
@@ -1055,9 +1017,7 @@ class TestConfigureDHCP(MAASTestCase):
             ]
         )
         on.assert_called_once_with()
-        get_service_state.assert_called_once_with(
-            self.server.dhcp_service, now=True
-        )
+        get_service_state.assert_called_once_with(self.server.dhcp_service, now=True)
         restart_service.assert_not_called()
         ensure_service.assert_called_once_with(self.server.dhcp_service)
         update_hosts.assert_called_once_with(
@@ -1079,9 +1039,7 @@ class TestConfigureDHCP(MAASTestCase):
     def test_writes_config_and_restarts_when_omapi_fails(self):
         write_file = self.patch_sudo_write_file()
         get_service_state = self.patch_getServiceState()
-        get_service_state.return_value = ServiceState(
-            SERVICE_STATE.ON, "running"
-        )
+        get_service_state.return_value = ServiceState(SERVICE_STATE.ON, "running")
         restart_service = self.patch_restartService()
         ensure_service = self.patch_ensureService()
         update_hosts = self.patch_update_hosts()
@@ -1098,9 +1056,7 @@ class TestConfigureDHCP(MAASTestCase):
         expected_config = factory.make_name("config")
         self.patch_get_config().return_value = expected_config
 
-        dhcp_service = dhcp.service_monitor.getServiceByName(
-            self.server.dhcp_service
-        )
+        dhcp_service = dhcp.service_monitor.getServiceByName(self.server.dhcp_service)
         on = self.patch_autospec(dhcp_service, "on")
 
         omapi_key = factory.make_name("omapi_key")
@@ -1148,9 +1104,7 @@ class TestConfigureDHCP(MAASTestCase):
             ]
         )
         on.assert_called_once_with()
-        get_service_state.assert_called_once_with(
-            self.server.dhcp_service, now=True
-        )
+        get_service_state.assert_called_once_with(self.server.dhcp_service, now=True)
         restart_service.assert_called_once_with(self.server.dhcp_service)
         ensure_service.assert_called_once_with(self.server.dhcp_service)
         update_hosts.assert_called_once_with(
@@ -1230,9 +1184,7 @@ class TestConfigureDHCP(MAASTestCase):
         self.patch_ensureService().side_effect = ServiceActionError()
         with FakeLogger("maas") as logger:
             with self.assertRaises(exceptions.CannotConfigureDHCP):
-                yield self.configure(
-                    factory.make_name("key"), [], [], [], [], []
-                )
+                yield self.configure(factory.make_name("key"), [], [], [], [], [])
         self.assertEqual("", logger.output)
 
     @inlineCallbacks
@@ -1244,9 +1196,7 @@ class TestConfigureDHCP(MAASTestCase):
         )
         with FakeLogger("maas") as logger:
             with self.assertRaises(exceptions.CannotConfigureDHCP):
-                yield self.configure(
-                    factory.make_name("key"), [], [], [], [], []
-                )
+                yield self.configure(factory.make_name("key"), [], [], [], [], [])
         self.assertRegex(
             logger.output,
             r"DHCPv[46] server failed to stop: DHCP is on strike today",

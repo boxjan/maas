@@ -46,9 +46,7 @@ BEACON_HEADER_FORMAT_V1 = "!BBH"
 BEACON_HEADER_LENGTH_V1 = 4
 
 
-BeaconPayload = namedtuple(
-    "BeaconPayload", ("bytes", "version", "type", "payload")
-)
+BeaconPayload = namedtuple("BeaconPayload", ("bytes", "version", "type", "payload"))
 
 ReceivedBeacon = namedtuple(
     "ReceivedBeacon",
@@ -160,8 +158,7 @@ def read_beacon_payload(beacon_bytes):
     """
     if len(beacon_bytes) < BEACON_HEADER_LENGTH_V1:
         raise InvalidBeaconingPacket(
-            "Beaconing packet must be at least %d bytes."
-            % BEACON_HEADER_LENGTH_V1
+            "Beaconing packet must be at least %d bytes." % BEACON_HEADER_LENGTH_V1
         )
     header = beacon_bytes[:BEACON_HEADER_LENGTH_V1]
     version, beacon_type_code, expected_payload_length = struct.unpack(
@@ -183,9 +180,7 @@ def read_beacon_payload(beacon_bytes):
             pass
         else:
             try:
-                decrypted_data = fernet_decrypt_psk(
-                    payload_bytes, ttl=60, raw=True
-                )
+                decrypted_data = fernet_decrypt_psk(payload_bytes, ttl=60, raw=True)
             except InvalidToken:
                 raise InvalidBeaconingPacket(
                     "Failed to decrypt inner payload: check MAAS secret key."
@@ -325,9 +320,7 @@ def add_arguments(parser):
     )
 
 
-def run(
-    args, output=sys.stdout, stdin=sys.stdin, stdin_buffer=sys.stdin.buffer
-):
+def run(args, output=sys.stdout, stdin=sys.stdin, stdin_buffer=sys.stdin.buffer):
     """Observe an Ethernet interface and print beaconing packets."""
 
     # First, become a progress group leader, so that signals can be directed

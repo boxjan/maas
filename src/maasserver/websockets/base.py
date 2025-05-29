@@ -338,16 +338,12 @@ class Handler(metaclass=HandlerMetaclass):
     def _get_object(self, params, permission=None):
         """Get object by using the `pk` in `params`."""
         if self._meta.pk not in params:
-            raise HandlerValidationError(
-                {self._meta.pk: ["This field is required"]}
-            )
+            raise HandlerValidationError({self._meta.pk: ["This field is required"]})
         pk = params[self._meta.pk]
         try:
             obj = self.get_queryset(for_list=False).get(**{self._meta.pk: pk})
         except self._meta.object_class.DoesNotExist:
-            raise HandlerDoesNotExistError(
-                f"Object with id ({pk}) does not exist"
-            )
+            raise HandlerDoesNotExistError(f"Object with id ({pk}) does not exist")
         if permission is not None or self._meta.view_permission is not None:
             if permission is None:
                 permission = self._meta.view_permission
@@ -403,9 +399,7 @@ class Handler(metaclass=HandlerMetaclass):
         # Handler methods are predominantly transactional and thus
         # blocking/synchronous. Genuinely non-blocking/asynchronous
         # methods must out themselves explicitly.
-        if IAsynchronous.providedBy(method) or asyncio.iscoroutinefunction(
-            method
-        ):
+        if IAsynchronous.providedBy(method) or asyncio.iscoroutinefunction(method):
             # Running in the io thread so clear RBAC now.
             rbac.clear()
 
@@ -428,9 +422,7 @@ class Handler(metaclass=HandlerMetaclass):
                 self.user.refresh_from_db()
 
                 # Perform the work in the database.
-                return self._call_method_track_queries(
-                    method_name, method, params
-                )
+                return self._call_method_track_queries(method_name, method, params)
 
             # Force the name of the function to include the handler
             # name so the debug logging is useful.
@@ -441,9 +433,7 @@ class Handler(metaclass=HandlerMetaclass):
 
             # This is going to block and hold a database connection so
             # we limit its concurrency.
-            return concurrency.webapp.run(
-                deferToDatabase, prep_user_execute, params
-            )
+            return concurrency.webapp.run(deferToDatabase, prep_user_execute, params)
 
     @PROMETHEUS_METRICS.record_call_latency(
         "maas_websocket_call_latency",
@@ -512,11 +502,7 @@ class Handler(metaclass=HandlerMetaclass):
         keys = keys or []
 
         if params.get("sort_key"):
-            desc = (
-                "-"
-                if (params.get("sort_direction", None) == "descending")
-                else ""
-            )
+            desc = "-" if (params.get("sort_direction", None) == "descending") else ""
             keys.append(f"{desc}{self._get_group_expr(params['sort_key'])}")
 
         keys.append(self._meta.batch_key)
@@ -553,9 +539,7 @@ class Handler(metaclass=HandlerMetaclass):
         """
         return None
 
-    def list(
-        self, params, use_sqlalchemy_list=False, full_dehydrate_function=None
-    ):
+    def list(self, params, use_sqlalchemy_list=False, full_dehydrate_function=None):
         """List objects.
 
         :param start: A value of the `batch_key` column and NOT `pk`. They are
@@ -583,9 +567,7 @@ class Handler(metaclass=HandlerMetaclass):
             qs_filter = self._filter(qs_filter, "list", params["filter"])
 
         if self._meta.use_paginated_list:
-            return self._build_list_grouping(
-                qs_filter, params, full_dehydrate_function
-            )
+            return self._build_list_grouping(qs_filter, params, full_dehydrate_function)
         else:
             return self._build_list_simple(qs_filter, params)
 
@@ -687,9 +669,9 @@ class Handler(metaclass=HandlerMetaclass):
                 else:
                     top_this_page = gid_getter(page_objs[0])
                     cmp = "gte" if top_this_page == bottom_prev_page else "gt"
-                    qs_grouping &= Q(
-                        **{f"{grp_expr}__{cmp}": bottom_prev_page}
-                    ) | Q(**{f"{grp_expr}__isnull": True})
+                    qs_grouping &= Q(**{f"{grp_expr}__{cmp}": bottom_prev_page}) | Q(
+                        **{f"{grp_expr}__isnull": True}
+                    )
 
             if current_page.has_next():
                 bottom_this_page = gid_getter(page_objs[-1])
@@ -722,8 +704,7 @@ class Handler(metaclass=HandlerMetaclass):
         else:
             grp = new_grp(None, None, result["count"], False)
             grp["items"] = [
-                full_dehydrate_function(obj, for_list=True)
-                for obj in page_objs
+                full_dehydrate_function(obj, for_list=True) for obj in page_objs
             ]
             result["groups"] = [grp]
 
@@ -962,9 +943,7 @@ class AdminOnlyMixin(Handler):
 
     def create(self, parameters):
         """Only allow an administrator to create this object."""
-        if not self.user.has_perm(
-            NodePermission.admin, self._meta.object_class
-        ):
+        if not self.user.has_perm(NodePermission.admin, self._meta.object_class):
             raise HandlerPermissionError()
         return super().create(parameters)
 

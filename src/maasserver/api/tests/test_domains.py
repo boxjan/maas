@@ -40,9 +40,7 @@ class TestDomainsAPI(APITestCase.ForUser):
         uri = get_domains_uri()
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [domain.id for domain in Domain.objects.all()]
         result_ids = [domain["id"] for domain in response.json()]
         self.assertCountEqual(expected_ids, result_ids)
@@ -52,23 +50,17 @@ class TestDomainsAPI(APITestCase.ForUser):
         domain_name = factory.make_name("domain")
         uri = get_domains_uri()
         response = self.client.post(uri, {"name": domain_name})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             domain_name,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "name"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["name"],
         )
 
     def test_create_admin_only(self):
         domain_name = factory.make_name("domain")
         uri = get_domains_uri()
         response = self.client.post(uri, {"name": domain_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_create_requires_name(self):
         self.become_admin()
@@ -83,12 +75,8 @@ class TestDomainsAPI(APITestCase.ForUser):
         self.become_admin()
         uri = get_domains_uri()
         serial = random.randint(1, INT_MAX)
-        response = self.client.post(
-            uri, {"op": "set_serial", "serial": str(serial)}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.post(uri, {"op": "set_serial", "serial": str(serial)})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         # The handler forces a DNS reload by creating a new DNS publication,
         # so the serial has already been incremented.
         self.assertEqual(serial + 1, next(zone_serial))
@@ -99,9 +87,7 @@ class TestDomainsAPI(APITestCase.ForUser):
         uri = get_domains_uri()
         # A serial of 1 is fine.
         response = self.client.post(uri, {"op": "set_serial", "serial": "1"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         # A serial of 0 is rejected.
         response = self.client.post(uri, {"op": "set_serial", "serial": "0"})
         self.assertEqual(
@@ -113,16 +99,10 @@ class TestDomainsAPI(APITestCase.ForUser):
         self.become_admin()
         uri = get_domains_uri()
         # A serial of 4294967295 is fine.
-        response = self.client.post(
-            uri, {"op": "set_serial", "serial": "4294967295"}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.post(uri, {"op": "set_serial", "serial": "4294967295"})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         # A serial of 4294967296 is rejected.
-        response = self.client.post(
-            uri, {"op": "set_serial", "serial": "4294967296"}
-        )
+        response = self.client.post(uri, {"op": "set_serial", "serial": "4294967296"})
         self.assertEqual(
             http.client.BAD_REQUEST, response.status_code, response.content
         )
@@ -141,9 +121,7 @@ class TestDomainAPI(APITestCase.ForUser):
             factory.make_DNSData(domain=domain)
         uri = get_domain_uri(domain)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_domain = response.json()
         self.assertEqual(parsed_domain["id"], domain.id)
         self.assertEqual(parsed_domain["name"], domain.get_name())
@@ -157,25 +135,19 @@ class TestDomainAPI(APITestCase.ForUser):
         defaults.save()
         uri = get_domain_uri(domain)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_domain = response.json()
         self.assertTrue(parsed_domain.get("is_default"))
         uri = get_domain_uri(old_default)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_domain = response.json()
         self.assertFalse(parsed_domain.get("is_default"))
 
     def test_read_404_when_bad_id(self):
         uri = reverse("domain_handler", args=[random.randint(100, 1000)])
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_update(self):
         self.become_admin()
@@ -188,9 +160,7 @@ class TestDomainAPI(APITestCase.ForUser):
         response = self.client.put(
             uri, {"name": new_name, "authoritative": new_auth, "ttl": new_ttl}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         ret = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         domain = reload_object(domain)
         self.assertEqual(new_name, ret["name"])
@@ -205,9 +175,7 @@ class TestDomainAPI(APITestCase.ForUser):
         new_name = factory.make_name("domain")
         uri = get_domain_uri(domain)
         response = self.client.put(uri, {"name": new_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_set_default(self):
         self.become_admin()
@@ -215,9 +183,7 @@ class TestDomainAPI(APITestCase.ForUser):
         self.assertFalse(domain.is_default())
         uri = get_domain_uri(domain)
         response = self.client.post(uri, {"op": "set_default"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         ret = response.json()
         domain = reload_object(domain)
         self.assertTrue(ret["is_default"])
@@ -233,24 +199,18 @@ class TestDomainAPI(APITestCase.ForUser):
         domain = factory.make_Domain()
         uri = get_domain_uri(domain)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(domain))
 
     def test_delete_403_when_not_admin(self):
         domain = factory.make_Domain()
         uri = get_domain_uri(domain)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(domain))
 
     def test_delete_404_when_invalid_id(self):
         self.become_admin()
         uri = reverse("domain_handler", args=[random.randint(100, 1000)])
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)

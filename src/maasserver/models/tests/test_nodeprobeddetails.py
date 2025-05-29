@@ -50,9 +50,7 @@ class TestNodeDetail(MAASServerTestCase):
             (LSHW_OUTPUT_NAME, b"<lshw-data/>"),
             (LLDP_OUTPUT_NAME, b"<lldp-data/>"),
         ):
-            script_result = script_set.find_script_result(
-                script_name=script_name
-            )
+            script_result = script_set.find_script_result(script_name=script_name)
             script_result.store_result(exit_status=0, stdout=stdout)
         self.assertDictEqual(
             {"lshw": b"<lshw-data/>", "lldp": b"<lldp-data/>"},
@@ -72,9 +70,7 @@ class TestNodeDetail(MAASServerTestCase):
             (LSHW_OUTPUT_NAME, b"<lshw-data/>", 0),
             (LLDP_OUTPUT_NAME, b"<lldp-data/>", 1),
         ):
-            script_result = script_set.find_script_result(
-                script_name=script_name
-            )
+            script_result = script_set.find_script_result(script_name=script_name)
             script_result.store_result(exit_status=exit_status, stdout=stdout)
         self.assertDictEqual(
             {"lshw": b"<lshw-data/>", "lldp": None},

@@ -171,9 +171,7 @@ def get_dns_server_addresses(
         ips = [
             ip
             for ip in ips
-            if getattr(
-                Subnet.objects.get_best_subnet_for_ip(ip), "allow_dns", True
-            )
+            if getattr(Subnet.objects.get_best_subnet_for_ip(ip), "allow_dns", True)
         ]
     non_loop = [ip for ip in ips if not ip.is_loopback()]
     if non_loop:
@@ -229,7 +227,9 @@ class ZoneGenerator:
         self._dynamic_updates = dynamic_updates
         if self._dynamic_updates is None:
             self._dynamic_updates = []
-        self.force_config_write = force_config_write  # some data changed that nsupdate cannot update if true
+        self.force_config_write = (
+            force_config_write  # some data changed that nsupdate cannot update if true
+        )
         self._existing_subnet_cfgs = {}
 
     @staticmethod
@@ -300,18 +300,12 @@ class ZoneGenerator:
                 ttl = domain.get_base_ttl("A", default_ttl)
                 for dns_ip in dns_ip_list:
                     if dns_ip.version == 4:
-                        other_mapping["@"].rrset.add(
-                            (ttl, "A", dns_ip.format())
-                        )
+                        other_mapping["@"].rrset.add((ttl, "A", dns_ip.format()))
                     else:
-                        other_mapping["@"].rrset.add(
-                            (ttl, "AAAA", dns_ip.format())
-                        )
+                        other_mapping["@"].rrset.add((ttl, "AAAA", dns_ip.format()))
 
             domain_updates = [
-                update
-                for update in dynamic_updates
-                if update.zone == domain.name
+                update for update in dynamic_updates if update.zone == domain.name
             ]
 
             yield DNSForwardZoneConfig(
@@ -433,9 +427,7 @@ class ZoneGenerator:
     ):
         net_mappings = {}
         for k, v in mappings.items():
-            if ips_in_net := set(
-                ip for ip in v.ips if IPAddress(ip) in network
-            ):
+            if ips_in_net := set(ip for ip in v.ips if IPAddress(ip) in network):
                 net_mappings[k] = HostnameIPMapping(
                     v.system_id,
                     v.ttl,
@@ -468,8 +460,7 @@ class ZoneGenerator:
                     rfc2317_glue.setdefault(basenet, set()).add(network)
                 elif network.version == 6 and network.prefixlen > 124:
                     basenet = IPNetwork(
-                        "%s/124"
-                        % IPNetwork("%s/124" % network.network).network
+                        "%s/124" % IPNetwork("%s/124" % network.network).network
                     )
                     rfc2317_glue.setdefault(basenet, set()).add(network)
 
@@ -484,9 +475,7 @@ class ZoneGenerator:
         # network, then we need to generate the glue records.
         # We need to detect the need for glue in our networks that are
         # big.
-        if (
-            network.version == 6 and network.prefixlen < 124
-        ) or network.prefixlen < 24:
+        if (network.version == 6 and network.prefixlen < 124) or network.prefixlen < 24:
             glue = set()
             # This is the reason for needing the subnets sorted in
             # increasing order of size.
@@ -516,9 +505,9 @@ class ZoneGenerator:
         # to merge them, just add them if they haven't already
         if not existing[network]._dynamic_updates:
             existing[network]._dynamic_updates = dynamic_updates
-        existing[network]._rfc2317_ranges = existing[
-            network
-        ]._rfc2317_ranges.union(glue)
+        existing[network]._rfc2317_ranges = existing[network]._rfc2317_ranges.union(
+            glue
+        )
         for k, v in mapping.items():
             if k in existing[network]._mapping:
                 existing[network]._mapping[k].ips.union(v.ips)
@@ -572,17 +561,14 @@ class ZoneGenerator:
             if subnet.rdns_mode == RDNS_MODE.DISABLED:
                 # If we are not doing reverse dns for this subnet, then just
                 # skip to the next subnet.
-                logger.debug(
-                    "%s disabled subnet in DNS config list" % subnet.cidr
-                )
+                logger.debug("%s disabled subnet in DNS config list" % subnet.cidr)
                 continue
 
             networks = ZoneGenerator._split_large_subnet(base_network)
 
             # 1. Figure out the dynamic ranges.
             dynamic_ranges = [
-                ip_range.netaddr_iprange
-                for ip_range in subnet.get_dynamic_ranges()
+                ip_range.netaddr_iprange for ip_range in subnet.get_dynamic_ranges()
             ]
 
             for network in networks:
@@ -632,9 +618,7 @@ class ZoneGenerator:
             # Now provide any remaining rfc2317 glue networks.
             for network, ranges in rfc2317_glue.items():
                 exclude_set = {
-                    IPNetwork(s.cidr)
-                    for s in subnets
-                    if network in IPNetwork(s.cidr)
+                    IPNetwork(s.cidr) for s in subnets if network in IPNetwork(s.cidr)
                 }
                 domain_updates = []
                 for update in dynamic_updates:
@@ -654,9 +638,7 @@ class ZoneGenerator:
                         and update.answer_as_ip in network
                     ):
                         domain_updates.append(
-                            DynamicDNSUpdate.as_reverse_record_update(
-                                update, network
-                            )
+                            DynamicDNSUpdate.as_reverse_record_update(update, network)
                         )
 
                 if network in existing_subnet_cfgs:

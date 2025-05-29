@@ -27,9 +27,7 @@ class TestSelectorArguments:
     def _get_script_args(self):
         return list(parallel.test.call_args[0][0])
 
-    def test_all_scripts_are_selected_when_no_selectors(
-        self, mock_parallel_test
-    ):
+    def test_all_scripts_are_selected_when_no_selectors(self, mock_parallel_test):
         with pytest.raises(SystemExit) as sysexit:
             parallel.main([])
         assert sysexit.value.code == 0
@@ -98,9 +96,7 @@ class TestSubprocessArguments:
             parallel.main([])
 
         assert sysexit.value.code == 0
-        parallel.test.assert_called_once_with(
-            ANY, ANY, max(os.cpu_count() - 2, 2)
-        )
+        parallel.test.assert_called_once_with(ANY, ANY, max(os.cpu_count() - 2, 2))
 
     def test_subprocess_count_can_be_specified(self, mock_parallel_test):
         count = random.randrange(100, 1000)
@@ -123,9 +119,7 @@ class TestSubprocessArguments:
             error,
         )
 
-    def test_subprocess_count_non_numeric_is_rejected(
-        self, mock_parallel_test, capsys
-    ):
+    def test_subprocess_count_non_numeric_is_rejected(self, mock_parallel_test, capsys):
         with pytest.raises(SystemExit) as sysexit:
             parallel.main(["--subprocesses", "foo"])
         assert sysexit.value.code == 2

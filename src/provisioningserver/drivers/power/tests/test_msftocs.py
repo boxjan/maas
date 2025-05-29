@@ -96,9 +96,7 @@ class TestMicrosoftOCSPowerDriver(MAASTestCase):
         context = make_context()
         command = factory.make_string()
         mock_urlopen = self.patch(urllib.request, "urlopen")
-        mock_urlopen.side_effect = urllib.error.HTTPError(
-            None, None, None, None, None
-        )
+        mock_urlopen.side_effect = urllib.error.HTTPError(None, None, None, None, None)
         self.assertRaises(PowerConnError, driver.get, command, context)
 
     def test_get_crashes_on_url_error(self):
@@ -197,9 +195,7 @@ class TestMicrosoftOCSPowerDriver(MAASTestCase):
         self.patch(driver, "set_next_boot_device")
         mock_get = self.patch(driver, "get")
         mock_get.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_on, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_on, system_id, context)
 
     def test_power_off_powers_off_blade(self):
         driver = MicrosoftOCSPowerDriver()
@@ -217,9 +213,7 @@ class TestMicrosoftOCSPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         mock_get = self.patch(driver, "get")
         mock_get.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_off, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_off, system_id, context)
 
     @given(sampled_from([MicrosoftOCSState.ON, MicrosoftOCSState.OFF]))
     @settings(deadline=None)
@@ -233,9 +227,7 @@ class TestMicrosoftOCSPowerDriver(MAASTestCase):
         driver = MicrosoftOCSPowerDriver()
         context = make_context()
         system_id = factory.make_name("system_id")
-        mock_extract_from_response = self.patch(
-            driver, "extract_from_response"
-        )
+        mock_extract_from_response = self.patch(driver, "extract_from_response")
         mock_extract_from_response.return_value = power_state
         self.patch(driver, "get")
         output = driver.power_query(system_id, context)
@@ -245,37 +237,25 @@ class TestMicrosoftOCSPowerDriver(MAASTestCase):
         driver = MicrosoftOCSPowerDriver()
         context = make_context()
         system_id = factory.make_name("system_id")
-        mock_extract_from_response = self.patch(
-            driver, "extract_from_response"
-        )
-        mock_extract_from_response.side_effect = PowerConnError(
-            "Connection Error"
-        )
+        mock_extract_from_response = self.patch(driver, "extract_from_response")
+        mock_extract_from_response.side_effect = PowerConnError("Connection Error")
         self.patch(driver, "get")
-        self.assertRaises(
-            PowerActionError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_query, system_id, context)
 
     def test_power_query_crashes_when_unable_to_find_match(self):
         driver = MicrosoftOCSPowerDriver()
         context = make_context()
         system_id = factory.make_name("system_id")
-        mock_extract_from_response = self.patch(
-            driver, "extract_from_response"
-        )
+        mock_extract_from_response = self.patch(driver, "extract_from_response")
         mock_extract_from_response.return_value = "Rubbish"
         self.patch(driver, "get")
-        self.assertRaises(
-            PowerFatalError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerFatalError, driver.power_query, system_id, context)
 
 
 class TestMicrosoftOCSProbeAndEnlist(MAASTestCase):
     """Tests for `probe_and_enlist_msftocs`."""
 
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     @inlineCallbacks
     def test_probe_and_enlist_msftocs_probes_and_enlists(self):

@@ -30,9 +30,7 @@ class TestMultiPart(APIClientTestCase):
     def test_encode_multipart_data_produces_str(self):
         data = {factory.make_string(): factory.make_string().encode("ascii")}
         files = {
-            factory.make_string(): (
-                BytesIO(factory.make_string().encode("ascii"))
-            )
+            factory.make_string(): (BytesIO(factory.make_string().encode("ascii")))
         }
         body, headers = encode_multipart_data(data, files)
         self.assertIsInstance(body, str)
@@ -53,9 +51,7 @@ class TestMultiPart(APIClientTestCase):
         body, headers = encode_multipart_data(params, files)
         self.assertEqual("%s" % len(body), headers["Content-Length"])
         self.assertTrue(
-            headers["Content-Type"].startswith(
-                "multipart/form-data; boundary="
-            )
+            headers["Content-Type"].startswith("multipart/form-data; boundary=")
         )
         # Round-trip through Django's multipart code.
         post, files = self.parse_headers_and_body_with_django(headers, body)
@@ -87,14 +83,10 @@ class TestMultiPart(APIClientTestCase):
         body, headers = encode_multipart_data(params_in, files_in)
         self.assertEqual("%s" % len(body), headers["Content-Length"])
         self.assertTrue(
-            headers["Content-Type"].startswith(
-                "multipart/form-data; boundary="
-            )
+            headers["Content-Type"].startswith("multipart/form-data; boundary=")
         )
         # Round-trip through Django's multipart code.
-        params_out, files_out = self.parse_headers_and_body_with_django(
-            headers, body
-        )
+        params_out, files_out = self.parse_headers_and_body_with_django(headers, body)
         params_out_expected = MultiValueDict()
         params_out_expected.appendlist("one", "ABC")
         params_out_expected.appendlist("one", "XYZ")
@@ -108,8 +100,6 @@ class TestMultiPart(APIClientTestCase):
     def test_encode_multipart_data_list_params(self):
         params_in = [("one", ["ABC", "XYZ"]), ("one", "UVW")]
         body, headers = encode_multipart_data(params_in, [])
-        params_out, files_out = self.parse_headers_and_body_with_django(
-            headers, body
-        )
+        params_out, files_out = self.parse_headers_and_body_with_django(headers, body)
         self.assertEqual({"one": ["ABC", "XYZ", "UVW"]}, params_out)
         self.assertSetEqual(set(), set(files_out))

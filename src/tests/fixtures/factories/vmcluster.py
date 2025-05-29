@@ -6,9 +6,7 @@ from maasapiserver.v3.models.vmcluster import VmCluster
 from tests.maasapiserver.fixtures.db import Fixture
 
 
-async def create_test_vmcluster(
-    fixture: Fixture, **extra_details: Any
-) -> VmCluster:
+async def create_test_vmcluster(fixture: Fixture, **extra_details: Any) -> VmCluster:
     created_at = datetime.utcnow().astimezone()
     updated_at = datetime.utcnow().astimezone()
     vmcluster = {

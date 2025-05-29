@@ -662,9 +662,7 @@ class TestAdminMachineForm(MAASServerTestCase):
 class TestAdminMachineWithMACAddressForm(MAASServerTestCase):
     def test_generate_certs_for_lxd_power_type(self):
         sample_cert = get_sample_cert()
-        self.patch_autospec(
-            forms, "generate_certificate"
-        ).return_value = sample_cert
+        self.patch_autospec(forms, "generate_certificate").return_value = sample_cert
         hostname = factory.make_string()
         form = AdminMachineWithMACAddressesForm(
             data={
@@ -683,12 +681,8 @@ class TestAdminMachineWithMACAddressForm(MAASServerTestCase):
         power_params = machine.bmc.get_power_parameters()
         self.assertIn("certificate", power_params)
         self.assertIn("key", power_params)
-        cert = Certificate.from_pem(
-            power_params["certificate"], power_params["key"]
-        )
+        cert = Certificate.from_pem(power_params["certificate"], power_params["key"])
         self.assertEqual(cert.cn(), sample_cert.cn())
         # cert/key are not per-instance parameters
-        self.assertNotIn(
-            "certificate", machine.get_instance_power_parameters()
-        )
+        self.assertNotIn("certificate", machine.get_instance_power_parameters())
         self.assertNotIn("key", machine.get_instance_power_parameters())

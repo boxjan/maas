@@ -67,9 +67,7 @@ class Tag(CleanSave, TimestampedModel):
         if self.is_defined:
             # Schedule repopulate to happen after commit. This thread does not
             # wait for it to complete.
-            post_commit_do(
-                reactor.callLater, 0, deferToDatabase, populate_tags, self
-            )
+            post_commit_do(reactor.callLater, 0, deferToDatabase, populate_tags, self)
 
     def _populate_nodes_now(self):
         """Find all nodes that match this tag, and update them, now.

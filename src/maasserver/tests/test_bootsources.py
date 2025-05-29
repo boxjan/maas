@@ -123,9 +123,7 @@ class TestHelpers(MAASServerTestCase):
             source.keyring_filename,
             "/usr/share/keyrings/ubuntu-cloudimage-keyring.gpg",
         )
-        self.useFixture(
-            EnvironmentVariableFixture("SNAP", "/snap/maas/current")
-        )
+        self.useFixture(EnvironmentVariableFixture("SNAP", "/snap/maas/current"))
         self.patch(
             bootsources,
             "DEFAULT_KEYRINGS_PATH",
@@ -133,9 +131,7 @@ class TestHelpers(MAASServerTestCase):
         )
         self.assertFalse(ensure_boot_source_definition())
         source = reload_object(source)
-        self.assertEqual(
-            source.keyring_filename, "/some/other/path/keyring.gpg"
-        )
+        self.assertEqual(source.keyring_filename, "/some/other/path/keyring.gpg")
 
     def test_ensure_boot_source_definition_creates_with_default_arch(self):
         BootSource.objects.all().delete()
@@ -174,8 +170,7 @@ class TestHelpers(MAASServerTestCase):
 
     def test_get_boot_sources(self):
         sources = [
-            factory.make_BootSource(keyring_data="data").to_dict()
-            for _ in range(3)
+            factory.make_BootSource(keyring_data="data").to_dict() for _ in range(3)
         ]
         self.assertCountEqual(sources, get_boot_sources())
 
@@ -199,9 +194,7 @@ class TestHelpers(MAASServerTestCase):
         release_title = factory.make_name("release_title")
         self.assertEqual(
             f"{os_title} {release_title}",
-            get_product_title(
-                {"os_title": os_title, "release_title": release_title}
-            ),
+            get_product_title({"os_title": os_title, "release_title": release_title}),
         )
 
     def test_get_product_title_without_titles(self):
@@ -224,23 +217,17 @@ class TestGetOSInfoFromBootSources(MAASServerTestCase):
 
     def test_returns_sources_and_sets_of_releases_and_architectures(self):
         os = factory.make_name("os")
-        sources = [
-            factory.make_BootSource(keyring_data="1234") for _ in range(2)
-        ]
+        sources = [factory.make_BootSource(keyring_data="1234") for _ in range(2)]
         releases = set()
         arches = set()
         for source in sources:
             for _ in range(3):
                 release = factory.make_name("release")
                 arch = factory.make_name("arch")
-                factory.make_BootSourceCache(
-                    source, os=os, release=release, arch=arch
-                )
+                factory.make_BootSourceCache(source, os=os, release=release, arch=arch)
                 releases.add(release)
                 arches.add(arch)
-        self.assertEqual(
-            (sources, releases, arches), get_os_info_from_boot_sources(os)
-        )
+        self.assertEqual((sources, releases, arches), get_os_info_from_boot_sources(os))
 
 
 class TestPrivateUpdateCache(MAASServerTestCase):
@@ -281,9 +268,7 @@ class TestPrivateUpdateCache(MAASServerTestCase):
                 "support_eol": support_eol,
             },
         )
-        bootsources._update_cache(
-            source.to_dict_without_selections(), image_mapping
-        )
+        bootsources._update_cache(source.to_dict_without_selections(), image_mapping)
         cached = BootSourceCache.objects.filter(boot_source=source).first()
         self.assertEqual(release_codename, cached.release_codename)
         self.assertEqual(release_title, cached.release_title)
@@ -325,21 +310,15 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
         self.useFixture(SimplestreamsEnvFixture())
 
     def test_has_env_GNUPGHOME_set(self):
-        capture = patch_and_capture_env_for_download_all_image_descriptions(
-            self
-        )
+        capture = patch_and_capture_env_for_download_all_image_descriptions(self)
         factory.make_BootSource(keyring_data=b"1234")
         cache_boot_sources()
-        self.assertEqual(
-            bootsources.get_maas_user_gpghome(), capture.env["GNUPGHOME"]
-        )
+        self.assertEqual(bootsources.get_maas_user_gpghome(), capture.env["GNUPGHOME"])
 
     def test_has_env_http_and_https_proxy_set(self):
         proxy_address = factory.make_name("proxy")
         Config.objects.set_config("http_proxy", proxy_address)
-        capture = patch_and_capture_env_for_download_all_image_descriptions(
-            self
-        )
+        capture = patch_and_capture_env_for_download_all_image_descriptions(self)
         factory.make_BootSource(keyring_data=b"1234")
         with patch.dict("os.environ", {"no_proxy": ""}):
             cache_boot_sources()
@@ -356,9 +335,7 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
         proxy_address = factory.make_name("proxy")
         Config.objects.set_config("http_proxy", proxy_address)
         Config.objects.set_config("boot_images_no_proxy", True)
-        capture = patch_and_capture_env_for_download_all_image_descriptions(
-            self
-        )
+        capture = patch_and_capture_env_for_download_all_image_descriptions(self)
         factory.make_BootSource(
             keyring_data=b"1234", url="http://192.168.1.100:8080/ephemeral-v3/"
         )
@@ -378,26 +355,20 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
         proxy_address = factory.make_name("proxy")
         Config.objects.set_config("http_proxy", proxy_address)
         Config.objects.set_config("boot_images_no_proxy", True)
-        capture = patch_and_capture_env_for_download_all_image_descriptions(
-            self
-        )
+        capture = patch_and_capture_env_for_download_all_image_descriptions(self)
         factory.make_BootSource(
             keyring_data=b"1234", url="http://192.168.1.100:8080/ephemeral-v3/"
         )
         with patch.dict("os.environ", {"no_proxy": "http://my.direct.host"}):
             cache_boot_sources()
-        no_proxy_hosts = (
-            "http://my.direct.host,127.0.0.1,localhost,192.168.1.100"
-        )
+        no_proxy_hosts = "http://my.direct.host,127.0.0.1,localhost,192.168.1.100"
         self.assertEqual(no_proxy_hosts, capture.env["no_proxy"])
 
     def test_restores_proxy_settings_post_call(self):
         proxy_address = factory.make_name("proxy")
         Config.objects.set_config("http_proxy", proxy_address)
         Config.objects.set_config("boot_images_no_proxy", True)
-        mock_download = self.patch(
-            bootsources, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootsources, "download_all_image_descriptions")
         mock_download.return_value = make_boot_image_mapping()
 
         with patch.dict(
@@ -414,22 +385,16 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
             self.assertEqual(environ.get("https_proxy"), "my.https_proxy")
 
     def test_passes_user_agent_with_maas_version(self):
-        mock_download = self.patch(
-            bootsources, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootsources, "download_all_image_descriptions")
         factory.make_BootSource(keyring_data=b"1234")
         cache_boot_sources()
-        mock_download.assert_called_once_with(
-            ANY, user_agent=get_maas_user_agent()
-        )
+        mock_download.assert_called_once_with(ANY, user_agent=get_maas_user_agent())
 
     def test_doesnt_have_env_http_and_https_proxy_set_if_disabled(self):
         proxy_address = factory.make_name("proxy")
         Config.objects.set_config("http_proxy", proxy_address)
         Config.objects.set_config("enable_http_proxy", False)
-        capture = patch_and_capture_env_for_download_all_image_descriptions(
-            self
-        )
+        capture = patch_and_capture_env_for_download_all_image_descriptions(self)
         factory.make_BootSource(keyring_data=b"1234")
         env_http_proxy_address = factory.make_name("http-proxy")
         env_https_proxy_address = factory.make_name("https-proxy")
@@ -452,9 +417,7 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
     def test_returns_clears_entire_cache(self):
         source = factory.make_BootSource(keyring_data=b"1234")
         factory.make_BootSourceCache(source)
-        mock_download = self.patch(
-            bootsources, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootsources, "download_all_image_descriptions")
         mock_download.return_value = make_boot_image_mapping()
         cache_boot_sources()
         self.assertEqual(0, BootSourceCache.objects.all().count())
@@ -463,12 +426,8 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
         source = factory.make_BootSource(keyring_data=b"1234")
         os = factory.make_name("os")
         releases = [factory.make_name("release") for _ in range(3)]
-        image_specs = [
-            make_image_spec(os=os, release=release) for release in releases
-        ]
-        mock_download = self.patch(
-            bootsources, "download_all_image_descriptions"
-        )
+        image_specs = [make_image_spec(os=os, release=release) for release in releases]
+        mock_download = self.patch(bootsources, "download_all_image_descriptions")
         mock_download.return_value = make_boot_image_mapping(image_specs)
 
         cache_boot_sources()
@@ -496,9 +455,7 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
                 "support_eol": support_eol,
             },
         )
-        mock_download = self.patch(
-            bootsources, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootsources, "download_all_image_descriptions")
         mock_download.return_value = image_mapping
 
         cache_boot_sources()
@@ -518,16 +475,12 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
         image_mapping.setdefault(
             image_spec, {"os_title": os_title, "release_title": release_title}
         )
-        mock_download = self.patch(
-            bootsources, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootsources, "download_all_image_descriptions")
         mock_download.return_value = image_mapping
 
         cache_boot_sources()
         cached = BootSourceCache.objects.filter(boot_source=source).first()
-        self.assertDictEqual(
-            {"title": f"{os_title} {release_title}"}, cached.extra
-        )
+        self.assertDictEqual({"title": f"{os_title} {release_title}"}, cached.extra)
 
     def test_adds_title_with_gadget_to_extra(self):
         source = factory.make_BootSource(keyring_data=b"1234")
@@ -546,9 +499,7 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
                 "gadget_title": gadget_title,
             },
         )
-        mock_download = self.patch(
-            bootsources, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootsources, "download_all_image_descriptions")
         mock_download.return_value = image_mapping
 
         cache_boot_sources()
@@ -578,9 +529,7 @@ class TestBadConnectionHandling(MAASTransactionServerTestCase):
         self.useFixture(SimplestreamsEnvFixture())
 
     def test_catches_connection_errors_and_sets_component_error(self):
-        sources = [
-            factory.make_BootSource(keyring_data=b"1234") for _ in range(3)
-        ]
+        sources = [factory.make_BootSource(keyring_data=b"1234") for _ in range(3)]
         download_image_descriptions = self.patch(
             download_descriptions_module, "download_image_descriptions"
         )
@@ -605,9 +554,7 @@ class TestBadConnectionHandling(MAASTransactionServerTestCase):
         self.assertEqual(expected_error, actual_error)
 
     def test_clears_component_error_when_successful(self):
-        register_persistent_error(
-            COMPONENT.REGION_IMAGE_IMPORT, factory.make_string()
-        )
+        register_persistent_error(COMPONENT.REGION_IMAGE_IMPORT, factory.make_string())
         [factory.make_BootSource(keyring_data=b"1234") for _ in range(3)]
         download_image_descriptions = self.patch(
             download_descriptions_module, "download_image_descriptions"

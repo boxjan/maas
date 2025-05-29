@@ -22,9 +22,7 @@ class TestRegionControllerProcessEndpoint(MAASServerTestCase):
     def test_process_address_port_are_unique(self):
         region = factory.make_RegionController()
         pid = random.randint(1, 5000)
-        process = RegionControllerProcess.objects.create(
-            pid=pid, region=region
-        )
+        process = RegionControllerProcess.objects.create(pid=pid, region=region)
         address = factory.make_ip_address()
         port = random.randint(1, 5000)
         RegionControllerProcessEndpoint.objects.create(

@@ -53,9 +53,7 @@ class TestNovaPowerDriver(MAASTestCase):
             context,
         ) = self.make_parameters()
         nova_power_driver = NovaPowerDriver()
-        power_control_nova_mock = self.patch(
-            nova_power_driver, "power_control_nova"
-        )
+        power_control_nova_mock = self.patch(nova_power_driver, "power_control_nova")
         nova_power_driver.power_on(system_id, context)
 
         power_control_nova_mock.assert_called_once_with("on", **context)
@@ -71,9 +69,7 @@ class TestNovaPowerDriver(MAASTestCase):
             context,
         ) = self.make_parameters()
         nova_power_driver = NovaPowerDriver()
-        power_control_nova_mock = self.patch(
-            nova_power_driver, "power_control_nova"
-        )
+        power_control_nova_mock = self.patch(nova_power_driver, "power_control_nova")
         nova_power_driver.power_off(system_id, context)
 
         power_control_nova_mock.assert_called_once_with("off", **context)
@@ -89,9 +85,7 @@ class TestNovaPowerDriver(MAASTestCase):
             context,
         ) = self.make_parameters()
         nova_power_driver = NovaPowerDriver()
-        power_control_nova_mock = self.patch(
-            nova_power_driver, "power_control_nova"
-        )
+        power_control_nova_mock = self.patch(nova_power_driver, "power_control_nova")
         power_control_nova_mock.return_value = "off"
         expected_result = nova_power_driver.power_query(system_id, context)
 

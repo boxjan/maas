@@ -97,7 +97,6 @@ class ReverseDNSService(Service):
             yield deferToDatabase(self.delete_rdns_entry, ip)
         else:
             log.msg(
-                "Unsupported event from listener: action=%r, cidr=%r"
-                % (action, cidr),
+                "Unsupported event from listener: action=%r, cidr=%r" % (action, cidr),
                 system="reverse-dns",
             )

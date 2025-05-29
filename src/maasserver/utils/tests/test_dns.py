@@ -41,9 +41,7 @@ class TestURLValidator(MAASTestCase):
         )
 
     def test_accepts_git_scheme(self):
-        self.assertIsNone(
-            validate_url("git://example.com/", schemes=EXTENDED_SCHEMES)
-        )
+        self.assertIsNone(validate_url("git://example.com/", schemes=EXTENDED_SCHEMES))
 
     def test_accepts_git_ssh_scheme(self):
         self.assertIsNone(
@@ -56,9 +54,7 @@ class TestURLValidator(MAASTestCase):
     def test_accepts_single_digit_port(self):
         # newer versions of django fixed the regexp to accept single-digit
         # port. If this failes on the next assertion, we could drop this test
-        self.assertRaises(
-            ValidationError, URLValidator(), "http://example.com:5"
-        )
+        self.assertRaises(ValidationError, URLValidator(), "http://example.com:5")
         self.assertAccepts("http://example.com:5")
 
     def test_fails_hostname_starting_with_hyphen(self):
@@ -73,9 +69,7 @@ class TestURLValidator(MAASTestCase):
         self.assertRaises(
             ValidationError, validate_url, "http://www.djangoproject.com/\n"
         )
-        self.assertRaises(
-            ValidationError, validate_url, "http://[::ffff:192.9.5.5]\n"
-        )
+        self.assertRaises(ValidationError, validate_url, "http://[::ffff:192.9.5.5]\n")
 
     def test_fails_for_trailing_junk(self):
         self.assertRaises(
@@ -253,16 +247,10 @@ class TestIfaceBasedHostnameGenerator(MAASTestCase):
         self.assertEqual(get_iface_name_based_hostname("eth0"), "eth0")
 
     def test_interface_name_trailing(self):
-        self.assertEqual(
-            get_iface_name_based_hostname("interface-"), "interface"
-        )
+        self.assertEqual(get_iface_name_based_hostname("interface-"), "interface")
 
     def test_interface_name_leading(self):
-        self.assertEqual(
-            get_iface_name_based_hostname("-interface"), "interface"
-        )
+        self.assertEqual(get_iface_name_based_hostname("-interface"), "interface")
 
     def test_interface_name_leading_nonletter(self):
-        self.assertEqual(
-            get_iface_name_based_hostname("33inter_face"), "inter-face"
-        )
+        self.assertEqual(get_iface_name_based_hostname("33inter_face"), "inter-face")

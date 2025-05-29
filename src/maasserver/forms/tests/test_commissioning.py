@@ -18,9 +18,7 @@ class TestCommissioningFormForm(MAASServerTestCase):
         form = CommissioningForm()
         field = form.fields["commissioning_distro_series"]
         self.assertEqual(
-            compose_invalid_choice_text(
-                "commissioning_distro_series", field.choices
-            ),
+            compose_invalid_choice_text("commissioning_distro_series", field.choices),
             field.error_messages["invalid_choice"],
         )
 
@@ -28,9 +26,7 @@ class TestCommissioningFormForm(MAASServerTestCase):
         form = CommissioningForm()
         field = form.fields["default_min_hwe_kernel"]
         self.assertEqual(
-            compose_invalid_choice_text(
-                "default_min_hwe_kernel", field.choices
-            ),
+            compose_invalid_choice_text("default_min_hwe_kernel", field.choices),
             field.error_messages["invalid_choice"],
         )
 

@@ -47,16 +47,12 @@ class VaultSecretsCleanupService(SingleInstanceService):
 
     def _clean_secrets(self, client: VaultClient):
         deleted_paths = list(
-            VaultSecret.objects.filter(deleted=True).values_list(
-                "path", flat=True
-            )
+            VaultSecret.objects.filter(deleted=True).values_list("path", flat=True)
         )
         if not deleted_paths:
             return
 
-        logger.info(
-            f"processing deletion of {len(deleted_paths)} secrets in Vault"
-        )
+        logger.info(f"processing deletion of {len(deleted_paths)} secrets in Vault")
         for path in deleted_paths:
             with (
                 suppress(transaction.TransactionManagementError),

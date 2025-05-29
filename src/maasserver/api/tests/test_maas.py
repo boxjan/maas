@@ -45,20 +45,14 @@ class TestForbiddenNames(MAASTestCase):
 class TestMAASHandlerAPI(APITestCase.ForUser):
     def test_get_config_default_distro_series(self):
         default_distro_series = factory.make_name("distro_series")
-        Config.objects.set_config(
-            "default_distro_series", default_distro_series
-        )
+        Config.objects.set_config("default_distro_series", default_distro_series)
         response = self.client.get(
             reverse("maas_handler"),
             {"op": "get_config", "name": "default_distro_series"},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected = '"%s"' % default_distro_series
-        self.assertEqual(
-            expected.encode(settings.DEFAULT_CHARSET), response.content
-        )
+        self.assertEqual(expected.encode(settings.DEFAULT_CHARSET), response.content)
 
     def test_set_config_default_distro_series(self):
         self.become_admin()
@@ -73,9 +67,7 @@ class TestMAASHandlerAPI(APITestCase.ForUser):
                 "value": selected_release,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             selected_release,
             Config.objects.get_config("default_distro_series"),
@@ -103,9 +95,7 @@ class TestMAASHandlerAPI(APITestCase.ForUser):
     def assertInvalidConfigurationSetting(self, name, response):
         self.addDetail(
             "Response for op={get,set}_config&name=%s" % name,
-            text_content(
-                response.serialize().decode(settings.DEFAULT_CHARSET)
-            ),
+            text_content(response.serialize().decode(settings.DEFAULT_CHARSET)),
         )
         self.assertEqual(response.status_code, http.client.BAD_REQUEST)
         self.assertEqual(response["Content-Type"], "application/json")
@@ -194,9 +184,7 @@ class TestMAASHandlerAPI(APITestCase.ForUser):
             },
         )
         self.assertEqual(response.status_code, http.client.OK)
-        self.assertEqual(
-            main_archive, PackageRepository.get_main_archive().url
-        )
+        self.assertEqual(main_archive, PackageRepository.get_main_archive().url)
 
     def test_set_ports_archive_overrides_to_package_repository(self):
         self.become_admin()
@@ -210,9 +198,7 @@ class TestMAASHandlerAPI(APITestCase.ForUser):
             },
         )
         self.assertEqual(response.status_code, http.client.OK)
-        self.assertEqual(
-            ports_archive, PackageRepository.get_ports_archive().url
-        )
+        self.assertEqual(ports_archive, PackageRepository.get_ports_archive().url)
 
     def test_set_config_use_peer_proxy(self):
         self.become_admin()
@@ -252,13 +238,9 @@ class TestMAASHandlerAPI(APITestCase.ForUser):
             reverse("maas_handler"),
             {"op": "get_config", "name": "maas_internal_domain"},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected = '"%s"' % internal_domain
-        self.assertEqual(
-            expected.encode(settings.DEFAULT_CHARSET), response.content
-        )
+        self.assertEqual(expected.encode(settings.DEFAULT_CHARSET), response.content)
 
     def test_set_config_maas_internal_domain(self):
         self.become_admin()
@@ -271,9 +253,7 @@ class TestMAASHandlerAPI(APITestCase.ForUser):
                 "value": internal_domain,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             internal_domain, Config.objects.get_config("maas_internal_domain")
         )
@@ -285,13 +265,9 @@ class TestMAASHandlerAPI(APITestCase.ForUser):
             reverse("maas_handler"),
             {"op": "get_config", "name": "maas_auto_ipmi_user"},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected = '"%s"' % ipmi_user
-        self.assertEqual(
-            expected.encode(settings.DEFAULT_CHARSET), response.content
-        )
+        self.assertEqual(expected.encode(settings.DEFAULT_CHARSET), response.content)
 
     def test_set_config_maas_ipmi_user(self):
         self.become_admin()
@@ -304,12 +280,8 @@ class TestMAASHandlerAPI(APITestCase.ForUser):
                 "value": ipmi_user,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        self.assertEqual(
-            ipmi_user, Config.objects.get_config("maas_auto_ipmi_user")
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        self.assertEqual(ipmi_user, Config.objects.get_config("maas_auto_ipmi_user"))
 
 
 class TestMAASHandlerAPIForProxyPort(APITestCase.ForUser):
@@ -338,9 +310,7 @@ class TestMAASHandlerAPIForProxyPort(APITestCase.ForUser):
         )
         if self.valid:
             self.assertEqual(http.client.OK, response.status_code)
-            self.assertEqual(
-                port, Config.objects.get_config("maas_proxy_port")
-            )
+            self.assertEqual(port, Config.objects.get_config("maas_proxy_port"))
         else:
             self.assertEqual(
                 http.client.BAD_REQUEST, response.status_code, response.content

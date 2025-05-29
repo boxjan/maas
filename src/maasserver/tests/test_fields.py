@@ -49,14 +49,10 @@ class TestModelNameValidator(MAASServerTestCase):
         self.assertIsNone(MODEL_NAME_VALIDATOR("with spaces"))
 
     def test_invalid_start_space(self):
-        self.assertRaises(
-            ValidationError, MODEL_NAME_VALIDATOR, " not-at-start"
-        )
+        self.assertRaises(ValidationError, MODEL_NAME_VALIDATOR, " not-at-start")
 
     def test_invalid_start_dash(self):
-        self.assertRaises(
-            ValidationError, MODEL_NAME_VALIDATOR, "-not-at-start"
-        )
+        self.assertRaises(ValidationError, MODEL_NAME_VALIDATOR, "-not-at-start")
 
 
 class TestXMLField(MAASLegacyServerTestCase):
@@ -86,9 +82,7 @@ class TestXMLField(MAASLegacyServerTestCase):
         self.assertEqual([], list(result))
 
     def test_save_non_wellformed_rejected(self):
-        self.assertRaises(
-            DatabaseError, XMLFieldModel.objects.create, value="<bad>"
-        )
+        self.assertRaises(DatabaseError, XMLFieldModel.objects.create, value="<bad>")
 
     def test_lookup_none(self):
         XMLFieldModel.objects.create(value=None)
@@ -208,9 +202,7 @@ class TestLargeObjectField(MAASLegacyServerTestCase):
 
     def test_to_python_raises_error_when_not_valid_type(self):
         field = LargeObjectField()
-        self.assertRaises(
-            AssertionError, field.to_python, factory.make_string()
-        )
+        self.assertRaises(AssertionError, field.to_python, factory.make_string())
 
 
 class TestCIDRField(MAASLegacyServerTestCase):
@@ -287,9 +279,7 @@ class TestIPListFormField(MAASTestCase):
     def test_rejects_invalid_input(self):
         invalid = factory.make_name("invalid")
         input = " ".join([factory.make_ip_address(), invalid])
-        error = self.assertRaises(
-            ValidationError, IPListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, IPListFormField().clean, input)
         self.assertIn("Invalid IP address: %s" % invalid, error.message)
 
     def test_separators_dont_conflict_with_ipv4_address(self):
@@ -308,9 +298,7 @@ class TestIPPortListFormField(MAASTestCase):
         ips = [factory.make_ip_address(ipv6=False) for _ in range(5)]
         ip_ports = [f"{ip}:80" for ip in ips]
         input = ",".join(ip_ports)
-        self.assertEqual(
-            [(ip, 80) for ip in ips], IPPortListFormField().clean(input)
-        )
+        self.assertEqual([(ip, 80) for ip in ips], IPPortListFormField().clean(input))
 
     def test_accepts_ipv4_without_port(self):
         ips = [factory.make_ip_address(ipv6=False) for _ in range(5)]
@@ -324,9 +312,7 @@ class TestIPPortListFormField(MAASTestCase):
         ips = [factory.make_ip_address(ipv6=True) for _ in range(5)]
         ip_ports = [f"[{ip}]:80" for ip in ips]
         input = ",".join(ip_ports)
-        self.assertEqual(
-            [(ip, 80) for ip in ips], IPPortListFormField().clean(input)
-        )
+        self.assertEqual([(ip, 80) for ip in ips], IPPortListFormField().clean(input))
 
     def test_accepts_ipv6_without_port(self):
         ips = [factory.make_ip_address(ipv6=True) for _ in range(5)]
@@ -337,18 +323,12 @@ class TestIPPortListFormField(MAASTestCase):
         )
 
     def test_rejects_invalid_ip(self):
-        ip_ports = [
-            f"{factory.make_ip_address(ipv6=False)}:80" for _ in range(4)
-        ]
+        ip_ports = [f"{factory.make_ip_address(ipv6=False)}:80" for _ in range(4)]
         invalid = f"{factory.make_name()}:80"
         ip_ports.append(invalid)
         input = ",".join(ip_ports)
-        error = self.assertRaises(
-            ValidationError, IPPortListFormField().clean, input
-        )
-        self.assertIn(
-            f"Invalid IP and port combination: {invalid}", error.message
-        )
+        error = self.assertRaises(ValidationError, IPPortListFormField().clean, input)
+        self.assertIn(f"Invalid IP and port combination: {invalid}", error.message)
 
 
 class TestHostListFormField(MAASTestCase):
@@ -371,16 +351,12 @@ class TestHostListFormField(MAASTestCase):
 
     def test_separators_dont_conflict_with_ipv4_address(self):
         self.assertIsNone(
-            re.search(
-                HostListFormField.separators, factory.make_ipv4_address()
-            )
+            re.search(HostListFormField.separators, factory.make_ipv4_address())
         )
 
     def test_separators_dont_conflict_with_ipv6_address(self):
         self.assertIsNone(
-            re.search(
-                HostListFormField.separators, factory.make_ipv6_address()
-            )
+            re.search(HostListFormField.separators, factory.make_ipv6_address())
         )
 
     def test_accepts_hostname(self):
@@ -412,9 +388,7 @@ class TestHostListFormField(MAASTestCase):
 
     def test_rejects_invalid_ipv4_address(self):
         input = "%s 12.34.56.999" % factory.make_hostname()
-        error = self.assertRaises(
-            ValidationError, HostListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, HostListFormField().clean, input)
         self.assertEqual(
             "Failed to detect a valid IP address from '12.34.56.999'.",
             error.message,
@@ -422,9 +396,7 @@ class TestHostListFormField(MAASTestCase):
 
     def test_rejects_invalid_ipv6_address(self):
         input = "%s fe80::abcde" % factory.make_hostname()
-        error = self.assertRaises(
-            ValidationError, HostListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, HostListFormField().clean, input)
         self.assertEqual(
             "Failed to detect a valid IP address from 'fe80::abcde'.",
             error.message,
@@ -432,13 +404,10 @@ class TestHostListFormField(MAASTestCase):
 
     def test_rejects_invalid_hostname(self):
         input = "%s abc-.foo" % factory.make_hostname()
-        error = self.assertRaises(
-            ValidationError, HostListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, HostListFormField().clean, input)
         self.assertEqual(
             error.message,
-            "Invalid hostname: Label cannot start or end with "
-            "hyphen: 'abc-'.",
+            "Invalid hostname: Label cannot start or end with " "hyphen: 'abc-'.",
         )
 
 
@@ -461,9 +430,7 @@ class TestNodeChoiceField(MAASServerTestCase):
         for _ in range(3):
             factory.make_Node()
         node_field = NodeChoiceField(Node.objects.filter())
-        self.assertRaises(
-            ValidationError, node_field.clean, factory.make_name("query")
-        )
+        self.assertRaises(ValidationError, node_field.clean, factory.make_name("query"))
 
     def test_works_with_multiple_entries_in_queryset(self):
         # Regression test for lp:1551399
@@ -511,16 +478,12 @@ class TestSubnetListFormField(MAASTestCase):
 
     def test_separators_dont_conflict_with_ipv4_address(self):
         self.assertIsNone(
-            re.search(
-                SubnetListFormField.separators, factory.make_ipv4_address()
-            )
+            re.search(SubnetListFormField.separators, factory.make_ipv4_address())
         )
 
     def test_separators_dont_conflict_with_ipv6_address(self):
         self.assertIsNone(
-            re.search(
-                SubnetListFormField.separators, factory.make_ipv6_address()
-            )
+            re.search(SubnetListFormField.separators, factory.make_ipv6_address())
         )
 
     def test_accepts_hostname(self):
@@ -535,9 +498,7 @@ class TestSubnetListFormField(MAASTestCase):
     def test_accepts_comma_separated_hostnames(self):
         hostnames = factory.make_hostname(), factory.make_hostname()
         input = ",".join(hostnames)
-        self.assertEqual(
-            " ".join(hostnames), SubnetListFormField().clean(input)
-        )
+        self.assertEqual(" ".join(hostnames), SubnetListFormField().clean(input))
 
     def test_accepts_misc(self):
         servers = {
@@ -554,41 +515,30 @@ class TestSubnetListFormField(MAASTestCase):
 
     def test_rejects_invalid_ipv4_address(self):
         input = "%s 12.34.56.999" % factory.make_hostname()
-        error = self.assertRaises(
-            ValidationError, SubnetListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, SubnetListFormField().clean, input)
         self.assertEqual("Invalid IP address: 12.34.56.999.", error.message)
 
     def test_rejects_invalid_ipv6_address(self):
         input = "%s fe80::abcde" % factory.make_hostname()
-        error = self.assertRaises(
-            ValidationError, SubnetListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, SubnetListFormField().clean, input)
         self.assertEqual("Invalid IP address: fe80::abcde.", error.message)
 
     def test_rejects_invalid_ipv4_subnet(self):
         input = "%s 10.10.10.300/24" % factory.make_ipv4_network()
-        error = self.assertRaises(
-            ValidationError, SubnetListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, SubnetListFormField().clean, input)
         self.assertEqual("Invalid network: 10.10.10.300/24.", error.message)
 
     def test_rejects_invalid_ipv6_subnet(self):
         input = "%s 100::/300" % factory.make_ipv6_network()
-        error = self.assertRaises(
-            ValidationError, SubnetListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, SubnetListFormField().clean, input)
         self.assertEqual("Invalid network: 100::/300.", error.message)
 
     def test_rejects_invalid_hostname(self):
         input = "%s abc-.foo" % factory.make_hostname()
-        error = self.assertRaises(
-            ValidationError, SubnetListFormField().clean, input
-        )
+        error = self.assertRaises(ValidationError, SubnetListFormField().clean, input)
         self.assertEqual(
             error.message,
-            "Invalid hostname: Label cannot start or end with "
-            "hyphen: 'abc-'.",
+            "Invalid hostname: Label cannot start or end with " "hyphen: 'abc-'.",
         )
 
 
@@ -602,9 +552,7 @@ class TestVersionedTextFileField(MAASServerTestCase):
 
     def test_create_requires_value(self):
         versioned_text_file_field = VersionedTextFileField()
-        self.assertRaises(
-            ValidationError, versioned_text_file_field.clean, None
-        )
+        self.assertRaises(ValidationError, versioned_text_file_field.clean, None)
 
     def test_create_new_accepts_dict_with_comment(self):
         data = factory.make_string()
@@ -699,9 +647,7 @@ class TestURLOrPPAValidator(MAASServerTestCase):
 
 class TestURLOrPPAFormField(MAASServerTestCase):
     def test_rejects_none(self):
-        error = self.assertRaises(
-            ValidationError, URLOrPPAFormField().clean, None
-        )
+        error = self.assertRaises(ValidationError, URLOrPPAFormField().clean, None)
         self.assertEqual("This field is required.", error.message)
 
     def test_URLOrPPAFormField_validates_URL(self):
@@ -710,9 +656,7 @@ class TestURLOrPPAFormField(MAASServerTestCase):
 
     def test_URLOrPPAFormField_catches_bad_url(self):
         bad_url = factory.make_name("bad_url")
-        error = self.assertRaises(
-            ValidationError, URLOrPPAFormField().clean, bad_url
-        )
+        error = self.assertRaises(ValidationError, URLOrPPAFormField().clean, bad_url)
         self.assertEqual(
             "Enter a valid repository URL or PPA location.",
             error.messages[0],
@@ -720,9 +664,7 @@ class TestURLOrPPAFormField(MAASServerTestCase):
 
     def test_URLOrPPAFormField_catches_bad_scheme(self):
         bad_url = factory.make_url(scheme="bad_scheme")
-        error = self.assertRaises(
-            ValidationError, URLOrPPAFormField().clean, bad_url
-        )
+        error = self.assertRaises(ValidationError, URLOrPPAFormField().clean, bad_url)
         self.assertEqual(
             "Enter a valid repository URL or PPA location.",
             error.messages[0],
@@ -734,9 +676,7 @@ class TestURLOrPPAFormField(MAASServerTestCase):
 
     def test_URLOrPPAFormField_catches_bad_PPA_format(self):
         bad_url = "ppa:%s" % factory.make_hostname()
-        error = self.assertRaises(
-            ValidationError, URLOrPPAFormField().clean, bad_url
-        )
+        error = self.assertRaises(ValidationError, URLOrPPAFormField().clean, bad_url)
         self.assertEqual(
             "Enter a valid repository URL or PPA location.",
             error.messages[0],
@@ -747,9 +687,7 @@ class TestURLOrPPAFormField(MAASServerTestCase):
             factory.make_hostname(),
             factory.make_hostname(),
         )
-        error = self.assertRaises(
-            ValidationError, URLOrPPAFormField().clean, bad_url
-        )
+        error = self.assertRaises(ValidationError, URLOrPPAFormField().clean, bad_url)
         self.assertEqual(
             "Enter a valid repository URL or PPA location.",
             error.messages[0],

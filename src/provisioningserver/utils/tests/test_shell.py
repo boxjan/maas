@@ -44,9 +44,7 @@ class TestCallAndCheck(MAASTestCase):
         command = factory.make_name("command")
         message = factory.make_string()
         self.patch_popen(returncode=1, stderr=message)
-        error = self.assertRaises(
-            ExternalProcessError, call_and_check, command
-        )
+        error = self.assertRaises(ExternalProcessError, call_and_check, command)
         self.assertEqual(1, error.returncode)
         self.assertEqual(command, error.cmd)
         self.assertEqual(message, error.output)
@@ -67,8 +65,7 @@ class TestCallAndCheck(MAASTestCase):
             env={"LC_ALL": "C"},
         )
         self.assertEqual(
-            b"/bin/cat: %s: No such file or directory"
-            % nonfile.encode("ascii"),
+            b"/bin/cat: %s: No such file or directory" % nonfile.encode("ascii"),
             error.output,
         )
 
@@ -100,9 +97,7 @@ class TestExternalProcessError(MAASTestCase):
         self.assertIs(error.__class__, error_type)
 
     def test_upgrade_returns_None(self):
-        self.assertIsNone(
-            ExternalProcessError.upgrade(factory.make_exception())
-        )
+        self.assertIsNone(ExternalProcessError.upgrade(factory.make_exception()))
 
     def test_to_unicode_decodes_to_unicode(self):
         # Byte strings are decoded as ASCII by _to_unicode(), replacing
@@ -155,25 +150,19 @@ class TestExternalProcessError(MAASTestCase):
     def test_str__contains_output(self):
         output = b"Mot\xf6rhead"
         unicode_output = "Mot\ufffdrhead"
-        error = ExternalProcessError(
-            returncode=-1, cmd="foo-bar", output=output
-        )
+        error = ExternalProcessError(returncode=-1, cmd="foo-bar", output=output)
         self.assertIn(unicode_output, error.__str__())
 
     def test_output_as_ascii(self):
         output = b"Joyeux No\xebl"
         ascii_output = b"Joyeux No?l"
-        error = ExternalProcessError(
-            returncode=-1, cmd="foo-bar", output=output
-        )
+        error = ExternalProcessError(returncode=-1, cmd="foo-bar", output=output)
         self.assertEqual(ascii_output, error.output_as_ascii)
 
     def test_output_as_unicode(self):
         output = b"Mot\xf6rhead"
         unicode_output = "Mot\ufffdrhead"
-        error = ExternalProcessError(
-            returncode=-1, cmd="foo-bar", output=output
-        )
+        error = ExternalProcessError(returncode=-1, cmd="foo-bar", output=output)
         self.assertEqual(unicode_output, error.output_as_unicode)
 
 
@@ -184,9 +173,7 @@ class TestHasCommandAvailable(MAASTestCase):
 
     def test_returns_True_when_ExternalProcessError_not_raised(self):
         command = factory.make_name("cmd")
-        self.patch(
-            shell_module.shutil, "which"
-        ).return_value = f"/bin/{command}"
+        self.patch(shell_module.shutil, "which").return_value = f"/bin/{command}"
         self.assertTrue(has_command_available(command))
 
 
@@ -238,13 +225,10 @@ class TestGetEnvWithLocale(MAASTestCase):
 
     def test_passes_other_variables_through(self):
         basis = {
-            factory.make_name("name"): factory.make_name("value")
-            for _ in range(5)
+            factory.make_name("name"): factory.make_name("value") for _ in range(5)
         }
         expected = basis.copy()
-        expected["LANG"] = expected["LC_ALL"] = expected[
-            "LANGUAGE"
-        ] = "C.UTF-8"
+        expected["LANG"] = expected["LC_ALL"] = expected["LANGUAGE"] = "C.UTF-8"
         observed = get_env_with_locale(basis)
         self.assertEqual(expected, observed)
 
@@ -296,9 +280,7 @@ class TestGetEnvWithBytesLocale(MAASTestCase):
         self.assertEqual(
             get_env_with_bytes_locale(
                 {
-                    name.encode("ascii"): factory.make_name(name).encode(
-                        "ascii"
-                    )
+                    name.encode("ascii"): factory.make_name(name).encode("ascii")
                     for name in LC_VAR_NAMES
                 }
             ),
@@ -317,9 +299,7 @@ class TestGetEnvWithBytesLocale(MAASTestCase):
             for _ in range(5)
         }
         expected = basis.copy()
-        expected[b"LANG"] = expected[b"LC_ALL"] = expected[
-            b"LANGUAGE"
-        ] = b"C.UTF-8"
+        expected[b"LANG"] = expected[b"LC_ALL"] = expected[b"LANGUAGE"] = b"C.UTF-8"
         observed = get_env_with_bytes_locale(basis)
         self.assertEqual(expected, observed)
 
@@ -335,9 +315,7 @@ class TestGetEnvWithBytesLocale(MAASTestCase):
 
 class TestRunCommand(MAASTestCase):
     def test_stdout_stderr(self):
-        with NamedTemporaryFile(
-            "w", encoding="utf-8", delete=False
-        ) as executable:
+        with NamedTemporaryFile("w", encoding="utf-8", delete=False) as executable:
             executable.write(
                 dedent(
                     """\
@@ -356,9 +334,7 @@ class TestRunCommand(MAASTestCase):
         self.assertEqual(result.returncode, 3)
 
     def test_no_decode(self):
-        with NamedTemporaryFile(
-            "w", encoding="utf-8", delete=False
-        ) as executable:
+        with NamedTemporaryFile("w", encoding="utf-8", delete=False) as executable:
             executable.write(
                 dedent(
                     """\

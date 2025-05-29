@@ -33,7 +33,4 @@ class TestMACAddressFormField:
         assert MACAddressFormField().validate(value) is None
 
     def test_normalise_mac_format(self):
-        assert (
-            MACAddressFormField().clean("aa-bb-cc-dd-ee-ff")
-            == "aa:bb:cc:dd:ee:ff"
-        )
+        assert MACAddressFormField().clean("aa-bb-cc-dd-ee-ff") == "aa:bb:cc:dd:ee:ff"

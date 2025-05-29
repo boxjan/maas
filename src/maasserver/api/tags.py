@@ -54,8 +54,7 @@ def check_rack_controller_access(request, rack_controller):
     token = tokens[-1] if tokens else None
     if token is None or key != token.key:
         raise PermissionDenied(
-            "Only allowed for the %r rack controller."
-            % (rack_controller.hostname)
+            "Only allowed for the %r rack controller." % (rack_controller.hostname)
         )
 
 
@@ -383,11 +382,8 @@ class TagHandler(OperationsHandler):
         if definition is not None and tag.definition != definition:
             return HttpResponse(
                 "Definition supplied '%s' "
-                "doesn't match current definition '%s'"
-                % (definition, tag.definition),
-                content_type=(
-                    "text/plain; charset=%s" % settings.DEFAULT_CHARSET
-                ),
+                "doesn't match current definition '%s'" % (definition, tag.definition),
+                content_type=("text/plain; charset=%s" % settings.DEFAULT_CHARSET),
                 status=int(http.client.CONFLICT),
             )
         nodes_to_add = self._get_nodes_for(request, "add")

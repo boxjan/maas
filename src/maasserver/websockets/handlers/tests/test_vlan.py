@@ -74,17 +74,14 @@ class TestVLANHandler(MAASServerTestCase):
             interface = node.get_boot_interface()
             interface.vlan = vlan
             interface.save()
-        self.assertEqual(
-            self.dehydrate_vlan(vlan), handler.get({"id": vlan.id})
-        )
+        self.assertEqual(self.dehydrate_vlan(vlan), handler.get({"id": vlan.id}))
 
     def test_list(self):
         user = factory.make_User()
         handler = VLANHandler(user, {}, None)
         factory.make_VLAN()
         expected_vlans = [
-            self.dehydrate_vlan(vlan, for_list=True)
-            for vlan in VLAN.objects.all()
+            self.dehydrate_vlan(vlan, for_list=True) for vlan in VLAN.objects.all()
         ]
         self.assertCountEqual(expected_vlans, handler.list({}))
 
@@ -94,9 +91,7 @@ class TestVLANHandler(MAASServerTestCase):
         fabric = factory.make_Fabric()
         vid = random.randint(1, 4094)
         name = factory.make_name("vlan")
-        new_vlan = handler.create(
-            {"fabric": fabric.id, "vid": vid, "name": name}
-        )
+        new_vlan = handler.create({"fabric": fabric.id, "vid": vid, "name": name})
         self.assertEqual(new_vlan.get("fabric"), fabric.id)
         self.assertEqual(new_vlan.get("name"), name)
         self.assertEqual(new_vlan.get("vid"), vid)
@@ -146,9 +141,7 @@ class TestVLANHandlerDelete(MAASServerTestCase):
         user = factory.make_User()
         handler = VLANHandler(user, {}, None)
         vlan = factory.make_VLAN()
-        self.assertRaises(
-            HandlerPermissionError, handler.delete, {"id": vlan.id}
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete, {"id": vlan.id})
 
 
 class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
@@ -159,9 +152,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
         factory.make_ipv4_Subnet_with_IPRanges(vlan=vlan)
-        handler.configure_dhcp(
-            {"id": vlan.id, "controllers": [rack.system_id]}
-        )
+        handler.configure_dhcp({"id": vlan.id, "controllers": [rack.system_id]})
         vlan = reload_object(vlan)
         self.assertTrue(vlan.dhcp_on)
         self.assertEqual(rack, vlan.primary_rack)
@@ -249,9 +240,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         vlan = factory.make_VLAN()
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
-        subnet = factory.make_Subnet(
-            vlan=vlan, cidr="10.0.0.0/24", gateway_ip=""
-        )
+        subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24", gateway_ip="")
         self.assertEqual(0, subnet.get_dynamic_ranges().count())
         handler.configure_dhcp(
             {
@@ -282,9 +271,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         vlan = factory.make_VLAN()
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
-        subnet = factory.make_Subnet(
-            vlan=vlan, cidr="10.0.0.0/24", gateway_ip=""
-        )
+        subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24", gateway_ip="")
         factory.make_ipv4_Subnet_with_IPRanges(vlan=vlan)
         self.assertEqual(0, subnet.get_dynamic_ranges().count())
         handler.configure_dhcp(
@@ -307,9 +294,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         vlan = factory.make_VLAN()
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
-        subnet = factory.make_Subnet(
-            vlan=vlan, cidr="10.0.0.0/24", gateway_ip=""
-        )
+        subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24", gateway_ip="")
         self.assertEqual(0, subnet.get_dynamic_ranges().count())
         handler.configure_dhcp(
             {
@@ -343,9 +328,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         vlan = factory.make_VLAN()
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
-        subnet = factory.make_Subnet(
-            vlan=vlan, cidr="10.0.0.0/24", gateway_ip=""
-        )
+        subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24", gateway_ip="")
         self.assertEqual(0, subnet.get_dynamic_ranges().count())
         handler.configure_dhcp(
             {
@@ -379,9 +362,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         vlan = factory.make_VLAN()
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
-        subnet = factory.make_Subnet(
-            vlan=vlan, cidr="10.0.0.0/24", gateway_ip=""
-        )
+        subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24", gateway_ip="")
         self.assertEqual(0, subnet.get_dynamic_ranges().count())
         self.assertRaises(
             ValueError,
@@ -404,9 +385,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         vlan = factory.make_VLAN()
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
-        subnet = factory.make_Subnet(
-            vlan=vlan, cidr="2001:db8::/64", gateway_ip=""
-        )
+        subnet = factory.make_Subnet(vlan=vlan, cidr="2001:db8::/64", gateway_ip="")
         self.assertEqual(0, subnet.get_dynamic_ranges().count())
         handler.configure_dhcp(
             {
@@ -429,9 +408,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         vlan = factory.make_VLAN()
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
-        subnet = factory.make_Subnet(
-            vlan=vlan, cidr="10.0.0.0/24", gateway_ip=""
-        )
+        subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24", gateway_ip="")
         self.assertEqual(0, subnet.get_dynamic_ranges().count())
         self.assertRaises(
             ValueError,
@@ -454,9 +431,7 @@ class TestVLANHandlerConfigureDHCP(MAASServerTestCase):
         vlan = factory.make_VLAN()
         rack = factory.make_RackController()
         factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
-        subnet = factory.make_Subnet(
-            vlan=vlan, cidr="10.0.0.0/24", gateway_ip=""
-        )
+        subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24", gateway_ip="")
         self.assertEqual(0, subnet.get_dynamic_ranges().count())
         self.assertRaises(
             ValueError,

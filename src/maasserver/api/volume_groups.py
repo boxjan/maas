@@ -178,8 +178,7 @@ class VolumeGroupHandler(OperationsHandler):
     @classmethod
     def devices(cls, volume_group):
         return [
-            filesystem.get_device()
-            for filesystem in volume_group.filesystems.all()
+            filesystem.get_device() for filesystem in volume_group.filesystems.all()
         ]
 
     def read(self, request, system_id, id):
@@ -327,8 +326,7 @@ class VolumeGroupHandler(OperationsHandler):
         node = volume_group.get_node()
         if node.status != NODE_STATUS.READY:
             raise NodeStateViolation(
-                "Cannot create logical volume because the machine is not "
-                "Ready."
+                "Cannot create logical volume because the machine is not " "Ready."
             )
         form = CreateLogicalVolumeForm(volume_group, data=request.data)
         if not form.is_valid():
@@ -367,8 +365,7 @@ class VolumeGroupHandler(OperationsHandler):
         node = volume_group.get_node()
         if node.status != NODE_STATUS.READY:
             raise NodeStateViolation(
-                "Cannot delete logical volume because the machine is not "
-                "Ready."
+                "Cannot delete logical volume because the machine is not " "Ready."
             )
         volume_id = get_mandatory_param(request.data, "id")
         try:

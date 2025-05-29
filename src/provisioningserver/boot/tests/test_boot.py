@@ -259,9 +259,7 @@ class TestGetArchiveUrl(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_rpc_methods(self, return_value=None):
         fixture = self.useFixture(MockLiveClusterToRegionRPCFixture())

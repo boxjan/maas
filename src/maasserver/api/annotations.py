@@ -237,8 +237,7 @@ class APIDocstringParser:
 
         if not self.is_valid_type(ttype):
             self._warn(
-                "%s is not a valid type for %s in '%s' tag"
-                % (ttype, tname, tag)
+                "%s is not a valid type for %s in '%s' tag" % (ttype, tname, tag)
             )
 
     def _warn(self, msg, context=""):
@@ -479,8 +478,7 @@ class APIDocstringParser:
         else:
             if not self._val_is_true_or_false(options["required"]):
                 warns.append(
-                    "Option key 'required' must be 'true' or 'false' in %s."
-                    % tag_name
+                    "Option key 'required' must be 'true' or 'false' in %s." % tag_name
                 )
 
         # Now check for formatting option
@@ -527,8 +525,7 @@ class APIDocstringParser:
         elif tag == "description":
             if self.description != "":
                 self._warn(
-                    "Found another description field. "
-                    "Will overwrite the original.",
+                    "Found another description field. " "Will overwrite the original.",
                     docstring,
                 )
 
@@ -558,16 +555,12 @@ class APIDocstringParser:
         # @param-example
         #
         elif tag == "param-example":
-            self.examples.append(
-                self._create_tag_dict(tname, ttype, opts, desc)
-            )
+            self.examples.append(self._create_tag_dict(tname, ttype, opts, desc))
         #
         # @success
         #
         elif tag == "success":
-            self.successes.append(
-                self._create_tag_dict(tname, ttype, opts, desc)
-            )
+            self.successes.append(self._create_tag_dict(tname, ttype, opts, desc))
 
             self._warn_on_invalid_type(ttype, tname, "success")
         #
@@ -588,9 +581,7 @@ class APIDocstringParser:
         # @error-example
         #
         elif tag == "error-example":
-            self.error_examples.append(
-                self._create_tag_dict(tname, ttype, opts, desc)
-            )
+            self.error_examples.append(self._create_tag_dict(tname, ttype, opts, desc))
         #
         # Fall through to warning message
         #
@@ -782,8 +773,7 @@ class APIDocstringParser:
                     ps = ParseState.TYPE
                 else:
                     self._syntax_error(
-                        "expecting annotation tag. Found '%s' "
-                        "' instead." % word,
+                        "expecting annotation tag. Found '%s' " "' instead." % word,
                         docstring,
                     )
 
@@ -850,9 +840,7 @@ class APIDocstringParser:
             if idx >= max_idx:
                 done = True
 
-        warn = self._sanity_check_tag_and_get_warning(
-            tag, tname, ttype, opts, desc
-        )
+        warn = self._sanity_check_tag_and_get_warning(tag, tname, ttype, opts, desc)
         if warn != "":
             self._warn(warn, docstring)
         self._process_docstring_tag(tag, tname, ttype, opts, desc, docstring)
@@ -883,9 +871,7 @@ class APIDocstringParser:
         self._warn_on_orphaned_examples(
             "successes", self.successes, self.success_examples
         )
-        self._warn_on_orphaned_examples(
-            "errors", self.errors, self.error_examples
-        )
+        self._warn_on_orphaned_examples("errors", self.errors, self.error_examples)
 
         # We must add warnings last because they are populated
         # in _map_list_to_examples

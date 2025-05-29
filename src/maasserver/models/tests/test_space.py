@@ -16,9 +16,7 @@ class TestSpaceManagerGetSpaceOr404(MAASServerTestCase):
         space = factory.make_Space()
         self.assertEqual(
             space,
-            Space.objects.get_space_or_404(
-                space.id, user, NodePermission.view
-            ),
+            Space.objects.get_space_or_404(space.id, user, NodePermission.view),
         )
 
     def test_user_edit_raises_PermissionError(self):
@@ -48,9 +46,7 @@ class TestSpaceManagerGetSpaceOr404(MAASServerTestCase):
         space = factory.make_Space()
         self.assertEqual(
             space,
-            Space.objects.get_space_or_404(
-                space.id, admin, NodePermission.view
-            ),
+            Space.objects.get_space_or_404(space.id, admin, NodePermission.view),
         )
 
     def test_admin_edit_returns_space(self):
@@ -58,9 +54,7 @@ class TestSpaceManagerGetSpaceOr404(MAASServerTestCase):
         space = factory.make_Space()
         self.assertEqual(
             space,
-            Space.objects.get_space_or_404(
-                space.id, admin, NodePermission.edit
-            ),
+            Space.objects.get_space_or_404(space.id, admin, NodePermission.edit),
         )
 
     def test_admin_admin_returns_space(self):
@@ -68,9 +62,7 @@ class TestSpaceManagerGetSpaceOr404(MAASServerTestCase):
         space = factory.make_Space()
         self.assertEqual(
             space,
-            Space.objects.get_space_or_404(
-                space.id, admin, NodePermission.admin
-            ),
+            Space.objects.get_space_or_404(space.id, admin, NodePermission.admin),
         )
 
 
@@ -80,9 +72,7 @@ class TestSpaceManager(MAASServerTestCase):
         space = factory.make_Space()
         factory.make_Space()
         id = space.id
-        self.assertCountEqual(
-            Space.objects.filter_by_specifiers("%s" % id), [space]
-        )
+        self.assertCountEqual(Space.objects.filter_by_specifiers("%s" % id), [space])
 
     def test_default_specifier_matches_name_with_id(self):
         factory.make_Space()
@@ -137,19 +127,13 @@ class TestSpace(MAASServerTestCase):
         self.assertEqual(DEFAULT_SPACE_NAME, default_space.name)
 
     def test_invalid_name_raises_exception(self):
-        self.assertRaises(
-            ValidationError, factory.make_Space, name="invalid*name"
-        )
+        self.assertRaises(ValidationError, factory.make_Space, name="invalid*name")
 
     def test_reserved_name_raises_exception(self):
-        self.assertRaises(
-            ValidationError, factory.make_Space, name="space-1999"
-        )
+        self.assertRaises(ValidationError, factory.make_Space, name="space-1999")
 
     def test_undefined_name_raises_exception(self):
-        self.assertRaises(
-            ValidationError, factory.make_Space, name=Space.UNDEFINED
-        )
+        self.assertRaises(ValidationError, factory.make_Space, name=Space.UNDEFINED)
 
     def test_create_sets_name(self):
         space = Space.objects.create(name=None)
@@ -173,9 +157,7 @@ class TestSpace(MAASServerTestCase):
 
     def test_rejects_duplicate_names(self):
         space1 = factory.make_Space()
-        self.assertRaises(
-            ValidationError, factory.make_Space, name=space1.name
-        )
+        self.assertRaises(ValidationError, factory.make_Space, name=space1.name)
 
     def test_get_default_space_is_idempotent(self):
         default_space = Space.objects.get_default_space()

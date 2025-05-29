@@ -26,8 +26,7 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
         for _ in range(3):
             cluster = factory.make_VMCluster(pool=pool, pods=0)
             vmhosts = [
-                factory.make_Pod(cluster=cluster, pod_type="lxd")
-                for _ in range(3)
+                factory.make_Pod(cluster=cluster, pod_type="lxd") for _ in range(3)
             ]
             vms = [
                 factory.make_VirtualMachine(
@@ -140,15 +139,11 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
         )
         self.assertEqual(
             resources.memory.general.allocated_tracked,
-            result["total_resources"]["memory"]["general"][
-                "allocated_tracked"
-            ],
+            result["total_resources"]["memory"]["general"]["allocated_tracked"],
         )
         self.assertEqual(
             resources.memory.hugepages.allocated_tracked,
-            result["total_resources"]["memory"]["hugepages"][
-                "allocated_tracked"
-            ],
+            result["total_resources"]["memory"]["hugepages"]["allocated_tracked"],
         )
         self.assertEqual(
             resources.storage.allocated_tracked,
@@ -164,17 +159,13 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
         )
         self.assertEqual(
             resources.memory.hugepages.allocated_tracked,
-            result["total_resources"]["memory"]["hugepages"][
-                "allocated_other"
-            ],
+            result["total_resources"]["memory"]["hugepages"]["allocated_other"],
         )
         self.assertEqual(
             resources.storage.allocated_tracked,
             result["total_resources"]["storage"]["allocated_other"],
         )
-        self.assertEqual(
-            resources.cores.free, result["total_resources"]["cpu"]["free"]
-        )
+        self.assertEqual(resources.cores.free, result["total_resources"]["cpu"]["free"])
         self.assertEqual(
             resources.memory.general.free,
             result["total_resources"]["memory"]["general"]["free"],
@@ -197,9 +188,7 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
             self.assertEqual(pool.path, ret_pool["path"])
             self.assertEqual(pool.free, ret_pool["free"])
             self.assertEqual(pool.total, ret_pool["total"])
-            self.assertEqual(
-                pool.allocated_tracked, ret_pool["allocated_tracked"]
-            )
+            self.assertEqual(pool.allocated_tracked, ret_pool["allocated_tracked"])
             self.assertEqual(pool.allocated_other, ret_pool["allocated_other"])
 
     def test_full_dehydrate(self):
@@ -243,9 +232,7 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
 
         result = handler.full_dehydrate(cluster)
 
-        self._assert_dehydrated_cluster_equal(
-            result, cluster, [vmhost], [tracked_vm]
-        )
+        self._assert_dehydrated_cluster_equal(result, cluster, [vmhost], [tracked_vm])
 
     def test_dehydrate(self):
         cluster = factory.make_VMCluster(pods=0)
@@ -263,9 +250,7 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
 
         handler = VMClusterHandler(factory.make_admin(), {}, None)
 
-        result = handler.dehydrate(
-            cluster, vmhosts, cluster.total_resources(), vms
-        )
+        result = handler.dehydrate(cluster, vmhosts, cluster.total_resources(), vms)
         self._assert_dehydrated_cluster_equal(result, cluster, vmhosts, vms)
 
     @wait_for_reactor
@@ -288,9 +273,7 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
 
     @wait_for_reactor
     async def test_list_by_physical_cluster(self):
-        cluster_groups = await deferToDatabase(
-            self.make_physical_cluster_group
-        )
+        cluster_groups = await deferToDatabase(self.make_physical_cluster_group)
         admin = await deferToDatabase(factory.make_admin)
 
         handler = VMClusterHandler(admin, {}, None)
@@ -302,8 +285,7 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
             for cluster_group in cluster_groups
         ]
         result_ids = [
-            [cluster["id"] for cluster in cluster_group]
-            for cluster_group in result
+            [cluster["id"] for cluster in cluster_group] for cluster_group in result
         ]
 
         self.assertCountEqual(result_ids, expected_ids)
@@ -377,9 +359,7 @@ class TestVMClusterHandler(MAASTransactionServerTestCase):
 
         self.assertIsNone(expected_vmcluster)
         self.assertEqual(2, mock_async_delete.call_count)
-        mock_async_delete.assert_called_with(
-            decompose=True, delete_peers=False
-        )
+        mock_async_delete.assert_called_with(decompose=True, delete_peers=False)
 
     @wait_for_reactor
     async def test_update(self):

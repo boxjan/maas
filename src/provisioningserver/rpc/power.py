@@ -73,9 +73,7 @@ def power_change_failure(system_id, hostname, power_change, message):
         system_id,
     )
     client = getRegionClient()
-    yield client(
-        MarkNodeFailed, system_id=system_id, error_description=message
-    )
+    yield client(MarkNodeFailed, system_id=system_id, error_description=message)
     if power_change == "on":
         event_type = EVENT_TYPES.NODE_POWER_ON_FAILED
     elif power_change == "off":
@@ -86,9 +84,7 @@ def power_change_failure(system_id, hostname, power_change, message):
 
 
 @asynchronous
-def perform_power_driver_change(
-    system_id, hostname, power_type, power_change, context
-):
+def perform_power_driver_change(system_id, hostname, power_type, power_change, context):
     """Execute power driver `power_change` method.
 
     On failure the node will be marked as broken and the error will be
@@ -127,9 +123,7 @@ def power_change_success(system_id, hostname, power_change):
     :param hostname: The node's hostname, used in messages.
     :param power_change: "on" or "off".
     """
-    assert power_change in ["on", "off"], (
-        "Unknown power change: %s" % power_change
-    )
+    assert power_change in ["on", "off"], "Unknown power change: %s" % power_change
     yield power_state_update(system_id, power_change)
     maaslog.info(
         "Changed power state (%s) of node: %s (%s)",
@@ -244,9 +238,7 @@ def maybe_change_power_state(
                 "%s: Power could not be set to %s; timed out."
                 % (hostname, power_change)
             )
-            return power_change_failure(
-                system_id, hostname, power_change, "Timed out"
-            )
+            return power_change_failure(system_id, hostname, power_change, "Timed out")
 
         d.addErrback(eb_cancelled)
 
@@ -268,8 +260,7 @@ def maybe_change_power_state(
         # so the option to cancel is available if we want it.
         raise PowerActionAlreadyInProgress(
             "Unable to change power state to '%s' for node %s: another "
-            "action is already in progress for that node."
-            % (power_change, hostname)
+            "action is already in progress for that node." % (power_change, hostname)
         )
 
 

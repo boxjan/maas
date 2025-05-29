@@ -74,9 +74,7 @@ class TestTimezoneSettings:
     def test_read_timezone(self):
         timezone = _read_timezone()
         assert timezone is not None
-        assert os.path.isfile(
-            os.path.join("/", "usr", "share", "zoneinfo", timezone)
-        )
+        assert os.path.isfile(os.path.join("/", "usr", "share", "zoneinfo", timezone))
 
     def get_local_timezone_falls_back_to_utc(self):
         # Force the file open to fail by passing an empty filename.
@@ -87,17 +85,13 @@ class TestTimezoneSettings:
 @pytest.fixture
 def db_creds_vault_path(mocker):
     path = factory.make_name("uuid")
-    mocker.patch.object(
-        settings, "get_db_creds_vault_path"
-    ).return_value = path
+    mocker.patch.object(settings, "get_db_creds_vault_path").return_value = path
     yield path
 
 
 class TestGetDefaultDbConfig:
     def test_uses_local_creds_when_vault_not_configured(self, mocker):
-        get_vault_mock = mocker.patch.object(
-            settings, "get_region_vault_client"
-        )
+        get_vault_mock = mocker.patch.object(settings, "get_region_vault_client")
         get_vault_mock.return_value = None
         config = {
             "database_name": "postgres",
@@ -112,9 +106,7 @@ class TestGetDefaultDbConfig:
         assert observed["USER"] == config["database_user"]
         assert observed["PASSWORD"] == config["database_pass"]
 
-    def test_uses_vault_when_vault_is_configured(
-        self, mocker, db_creds_vault_path
-    ):
+    def test_uses_vault_when_vault_is_configured(self, mocker, db_creds_vault_path):
         vault_client = MagicMock()
         expected = {
             "name": factory.make_name("uuid"),
@@ -128,9 +120,7 @@ class TestGetDefaultDbConfig:
             raise UnknownSecretPath(given_path)
 
         vault_client.get.side_effect = side_effect
-        get_vault_mock = mocker.patch.object(
-            settings, "get_region_vault_client"
-        )
+        get_vault_mock = mocker.patch.object(settings, "get_region_vault_client")
         get_vault_mock.return_value = vault_client
 
         observed = _get_default_db_config(RegionConfiguration({}))
@@ -138,9 +128,7 @@ class TestGetDefaultDbConfig:
         assert observed["USER"] == expected["user"]
         assert observed["PASSWORD"] == expected["pass"]
 
-    def test_raises_when_vault_db_creds_incomplete(
-        self, mocker, db_creds_vault_path
-    ):
+    def test_raises_when_vault_db_creds_incomplete(self, mocker, db_creds_vault_path):
         vault_client = MagicMock()
         vault_client.get.return_value = {"name": "any", "pass": "any"}
         mocker.patch.object(
@@ -149,9 +137,7 @@ class TestGetDefaultDbConfig:
         with pytest.raises(ImproperlyConfigured, match="'user'"):
             _get_default_db_config(RegionConfiguration({}))
 
-    def test_uses_local_creds_when_no_creds_in_vault(
-        self, mocker, db_creds_vault_path
-    ):
+    def test_uses_local_creds_when_no_creds_in_vault(self, mocker, db_creds_vault_path):
         expected = {
             "database_name": "postgres",
             "database_user": factory.make_name("uuid"),
@@ -167,9 +153,7 @@ class TestGetDefaultDbConfig:
         assert observed["USER"] == expected["database_user"]
         assert observed["PASSWORD"] == expected["database_pass"]
 
-    def test_uses_local_creds_on_vault_error(
-        self, mocker, db_creds_vault_path
-    ):
+    def test_uses_local_creds_on_vault_error(self, mocker, db_creds_vault_path):
         expected = {
             "database_name": "postgres",
             "database_user": factory.make_name("uuid"),
@@ -186,24 +170,17 @@ class TestGetDefaultDbConfig:
         assert observed["PASSWORD"] == expected["database_pass"]
 
     def test_returns_expected_application_name(self, mocker):
-        mocker.patch.object(
-            settings, "get_region_vault_client"
-        ).return_value = None
+        mocker.patch.object(settings, "get_region_vault_client").return_value = None
         maas_id_mock = mocker.patch.object(settings, "MAAS_ID")
         maas_id = factory.make_name("id")
         maas_id_mock.get.return_value = maas_id
 
         observed = _get_default_db_config(RegionConfiguration({}))
         assert "application_name" in observed["OPTIONS"]
-        assert (
-            observed["OPTIONS"]["application_name"]
-            == f"maas-regiond-{maas_id}"
-        )
+        assert observed["OPTIONS"]["application_name"] == f"maas-regiond-{maas_id}"
 
     def test_returns_random_application_name_with_no_maas_id(self, mocker):
-        mocker.patch.object(
-            settings, "get_region_vault_client"
-        ).return_value = None
+        mocker.patch.object(settings, "get_region_vault_client").return_value = None
         mocker.patch.object(settings, "MAAS_ID").get.return_value = None
 
         observed = _get_default_db_config(RegionConfiguration({}))

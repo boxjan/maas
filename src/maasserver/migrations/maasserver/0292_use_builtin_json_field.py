@@ -20,10 +20,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        *(
-            migrations.RunSQL(query)
-            for query in MIGRATE_DEFAULT_VALUES_QUERIES
-        ),
+        *(migrations.RunSQL(query) for query in MIGRATE_DEFAULT_VALUES_QUERIES),
         migrations.AlterField(
             model_name="bootresource",
             name="extra",

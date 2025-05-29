@@ -26,9 +26,7 @@ from maasserver.utils.orm import get_one, reload_object
 
 class TestFormatBlockDeviceForm(MAASServerTestCase):
     def test_requires_fields(self):
-        form = FormatBlockDeviceForm(
-            block_device=factory.make_BlockDevice(), data={}
-        )
+        form = FormatBlockDeviceForm(block_device=factory.make_BlockDevice(), data={})
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual({"fstype"}, form.errors.keys())
 
@@ -43,11 +41,7 @@ class TestFormatBlockDeviceForm(MAASServerTestCase):
             "Should be invalid because block device has a partition table.",
         )
         self.assertEqual(
-            {
-                "__all__": [
-                    "Cannot format block device with a partition table."
-                ]
-            },
+            {"__all__": ["Cannot format block device with a partition table."]},
             form._errors,
         )
 
@@ -106,9 +100,7 @@ class TestFormatBlockDeviceForm(MAASServerTestCase):
 
     def test_is_not_valid_if_non_user_format_fstype(self):
         block_device = factory.make_PhysicalBlockDevice()
-        factory.make_Filesystem(
-            fstype="bcache-backing", block_device=block_device
-        )
+        factory.make_Filesystem(fstype="bcache-backing", block_device=block_device)
         data = {"fstype": FILESYSTEM_TYPE.EXT4}
         form = FormatBlockDeviceForm(block_device, data=data)
         self.assertRaises(ValidationError, form.save)
@@ -121,9 +113,7 @@ class TestFormatBlockDeviceForm(MAASServerTestCase):
         form = FormatBlockDeviceForm(block_device, data=data)
         self.assertTrue(form.is_valid(), form._errors)
         form.save()
-        filesystem = get_one(
-            Filesystem.objects.filter(block_device=block_device)
-        )
+        filesystem = get_one(Filesystem.objects.filter(block_device=block_device))
         self.assertIsNotNone(filesystem)
         self.assertEqual(fstype, filesystem.fstype)
         self.assertEqual(fsuuid, filesystem.uuid)
@@ -142,9 +132,7 @@ class TestFormatBlockDeviceForm(MAASServerTestCase):
             "Should only be one filesystem that exists for block device.",
         )
         self.assertIsNone(reload_object(prev_filesystem))
-        filesystem = get_one(
-            Filesystem.objects.filter(block_device=block_device)
-        )
+        filesystem = get_one(Filesystem.objects.filter(block_device=block_device))
         self.assertIsNotNone(filesystem)
         self.assertEqual(fstype, filesystem.fstype)
 
@@ -159,9 +147,7 @@ class TestCreatePhysicalBlockDeviceForm(MAASServerTestCase):
                 "name": ["This field is required."],
                 "size": ["This field is required."],
                 "block_size": ["This field is required."],
-                "__all__": [
-                    "serial/model are required if id_path is not provided."
-                ],
+                "__all__": ["serial/model are required if id_path is not provided."],
             },
             form.errors,
         )
@@ -171,9 +157,7 @@ class TestCreatePhysicalBlockDeviceForm(MAASServerTestCase):
         name = factory.make_name("sd")
         model = factory.make_name("model")
         serial = factory.make_name("serial")
-        size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10
-        )
+        size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10)
         block_size = 4096
         form = CreatePhysicalBlockDeviceForm(
             node,
@@ -198,9 +182,7 @@ class TestCreatePhysicalBlockDeviceForm(MAASServerTestCase):
         node = factory.make_Node()
         name = factory.make_name("sd")
         id_path = factory.make_absolute_path()
-        size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10
-        )
+        size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10)
         block_size = 4096
         form = CreatePhysicalBlockDeviceForm(
             node,
@@ -224,9 +206,7 @@ class TestCreatePhysicalBlockDeviceForm(MAASServerTestCase):
         numa_node = factory.make_NUMANode(node=node)
         name = factory.make_name("sd")
         id_path = factory.make_absolute_path()
-        size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10
-        )
+        size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10)
         block_size = 4096
         form = CreatePhysicalBlockDeviceForm(
             node,
@@ -250,9 +230,7 @@ class TestCreatePhysicalBlockDeviceForm(MAASServerTestCase):
         node = factory.make_Node()
         name = factory.make_name("sd")
         id_path = factory.make_absolute_path()
-        size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10
-        )
+        size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10)
         block_size = 4096
         form = CreatePhysicalBlockDeviceForm(
             node,
@@ -283,9 +261,7 @@ class TestUpdatePhysicalBlockDeviceForm(MAASServerTestCase):
         model = factory.make_name("model")
         serial = factory.make_name("serial")
         id_path = factory.make_absolute_path()
-        size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10
-        )
+        size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE * 10)
         block_size = 4096
         form = UpdatePhysicalBlockDeviceForm(
             instance=block_device,
@@ -360,9 +336,7 @@ class TestUpdatePhysicalBlockDeviceForm(MAASServerTestCase):
 class TestUpdateDeployedPhysicalBlockDeviceForm(MAASServerTestCase):
     def test_requires_no_fields(self):
         block_device = factory.make_PhysicalBlockDevice()
-        form = UpdateDeployedPhysicalBlockDeviceForm(
-            instance=block_device, data={}
-        )
+        form = UpdateDeployedPhysicalBlockDeviceForm(instance=block_device, data={})
         self.assertTrue(form.is_valid(), form.errors)
         self.assertEqual(set(), form.errors.keys())
 

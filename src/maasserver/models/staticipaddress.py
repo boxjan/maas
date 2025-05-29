@@ -85,9 +85,7 @@ SpecialMappingQueryResult = namedtuple(
 
 MappingQueryResult = namedtuple("MappingQueryResult", _mapping_query_result)
 
-InterfaceMappingResult = namedtuple(
-    "InterfaceMappingResult", _interface_mapping_result
-)
+InterfaceMappingResult = namedtuple("InterfaceMappingResult", _interface_mapping_result)
 
 
 class HostnameIPMapping:
@@ -199,9 +197,7 @@ class FreeIPAddress:
             assert pending >= 0
             if pending > 0:
                 excl = self.queue.get_reserved(self._exclude)
-                addresses = self._subnet.get_next_ip_for_allocation(
-                    excl, count=pending
-                )
+                addresses = self._subnet.get_next_ip_for_allocation(excl, count=pending)
                 self.queue.fill(addresses)
                 self._update_counter(-len(addresses))
 
@@ -236,14 +232,11 @@ class StaticIPAddressManager(Manager):
 
         if user is None:
             if alloc_type == IPADDRESS_TYPE.USER_RESERVED:
-                raise AssertionError(
-                    "Must provide user for USER_RESERVED alloc_type."
-                )
+                raise AssertionError("Must provide user for USER_RESERVED alloc_type.")
         else:
             if alloc_type != IPADDRESS_TYPE.USER_RESERVED:
                 raise AssertionError(
-                    "Must not provide user for alloc_type other "
-                    "than USER_RESERVED."
+                    "Must not provide user for alloc_type other " "than USER_RESERVED."
                 )
 
     def _attempt_allocation(
@@ -368,13 +361,9 @@ class StaticIPAddressManager(Manager):
 
         if subnet is None:
             if requested_address:
-                subnet = Subnet.objects.get_best_subnet_for_ip(
-                    requested_address
-                )
+                subnet = Subnet.objects.get_best_subnet_for_ip(requested_address)
             else:
-                raise StaticIPAddressOutOfRange(
-                    "Could not find an appropriate subnet."
-                )
+                raise StaticIPAddressOutOfRange("Could not find an appropriate subnet.")
 
         if requested_address is None:
             with FreeIPAddress(subnet, exclude_addresses) as free_address:
@@ -864,9 +853,9 @@ class StaticIPAddressManager(Manager):
             raise ValueError(
                 f"IP address family {family} is not a member of IPADDRESS_FAMILY."
             )
-        return self.annotate(
-            ip_family=Func(F("ip"), function="family")
-        ).filter(ip_family=Value(family))
+        return self.annotate(ip_family=Func(F("ip"), function="family")).filter(
+            ip_family=Value(family)
+        )
 
 
 class StaticIPAddress(CleanSave, TimestampedModel):
@@ -912,9 +901,7 @@ class StaticIPAddress(CleanSave, TimestampedModel):
 
     # Used only by DISCOVERED address to set the lease_time for an active
     # lease. Time is in seconds.
-    lease_time = IntegerField(
-        default=0, editable=False, null=False, blank=False
-    )
+    lease_time = IntegerField(default=0, editable=False, null=False, blank=False)
 
     # Used to mark a `StaticIPAddress` as temperary until the assignment
     # can be confirmed to be free in the subnet.
@@ -978,9 +965,7 @@ class StaticIPAddress(CleanSave, TimestampedModel):
     def is_linked_to_one_unknown_interface(self):
         """Return True if the IP address is only linked to one unknown
         interface."""
-        interface_types = [
-            interface.type for interface in self.interface_set.all()
-        ]
+        interface_types = [interface.type for interface in self.interface_set.all()]
         return interface_types == [INTERFACE_TYPE.UNKNOWN]
 
     def get_ip(self):
@@ -1016,14 +1001,10 @@ class StaticIPAddress(CleanSave, TimestampedModel):
         #   IP address with `get_ip()`.
         if self.alloc_type == IPADDRESS_TYPE.USER_RESERVED:
             if not self.ip:
-                raise ValidationError(
-                    {"ip": ["IP address must be specified."]}
-                )
+                raise ValidationError({"ip": ["IP address must be specified."]})
         if self.alloc_type == IPADDRESS_TYPE.DHCP:
             if self.ip:
-                raise ValidationError(
-                    {"ip": ["IP address must not be specified."]}
-                )
+                raise ValidationError({"ip": ["IP address must not be specified."]})
 
         if self.ip and self.subnet and self.subnet.cidr:
             address = self.get_ipaddress()
@@ -1049,9 +1030,7 @@ class StaticIPAddress(CleanSave, TimestampedModel):
 
     def get_mac_addresses(self):
         """Return set of all MAC's linked to this ip."""
-        return {
-            interface.mac_address for interface in self.interface_set.all()
-        }
+        return {interface.mac_address for interface in self.interface_set.all()}
 
     def clean(self, *args, **kwargs):
         super().clean(*args, **kwargs)
@@ -1100,10 +1079,7 @@ class StaticIPAddress(CleanSave, TimestampedModel):
                 }
                 if iface is not None:
                     data["node_summary"]["via"] = iface.name
-                if (
-                    with_username
-                    and self.alloc_type != IPADDRESS_TYPE.DISCOVERED
-                ):
+                if with_username and self.alloc_type != IPADDRESS_TYPE.DISCOVERED:
                     # If a user owns this node, overwrite any username we found
                     # earlier. A node's owner takes precedence.
                     if node.owner and node.owner.username:

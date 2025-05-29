@@ -14,11 +14,7 @@ def create_virtual_machines(apps, schema_editor):
     VirtualMachine = apps.get_model("maasserver", "VirtualMachine")
     nodes_info = (
         Node.objects.filter(bmc__power_type="lxd")
-        .annotate(
-            identifier=RawSQL(
-                "instance_power_parameters->>'instance_name'", ()
-            )
-        )
+        .annotate(identifier=RawSQL("instance_power_parameters->>'instance_name'", ()))
         .values(
             "memory",
             "bmc_id",

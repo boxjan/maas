@@ -16,9 +16,7 @@ class EncryptionCodec(PayloadCodec):
     async def encode(self, payloads: Iterable[Payload]) -> List[Payload]:
         return [
             Payload(
-                metadata={
-                    "encoding": bytes(METADATA_ENCODING_ENCRYPTED, "utf-8")
-                },
+                metadata={"encoding": bytes(METADATA_ENCODING_ENCRYPTED, "utf-8")},
                 data=self.encrypt(p.SerializeToString()),
             )
             for p in payloads
@@ -28,10 +26,7 @@ class EncryptionCodec(PayloadCodec):
         ret: List[Payload] = []
         for p in payloads:
             # Ignore ones without expected encoding
-            if (
-                p.metadata.get("encoding", b"").decode()
-                != METADATA_ENCODING_ENCRYPTED
-            ):
+            if p.metadata.get("encoding", b"").decode() != METADATA_ENCODING_ENCRYPTED:
                 ret.append(p)
                 continue
 

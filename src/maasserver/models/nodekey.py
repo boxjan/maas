@@ -60,9 +60,7 @@ class NodeKeyManager(Manager):
             uniquely associated with this node.
         :rtype: piston3.models.Token
         """
-        nodekey = get_one(
-            self.filter(node=node).prefetch_related("token__consumer")
-        )
+        nodekey = get_one(self.filter(node=node).prefetch_related("token__consumer"))
         if nodekey is None:
             return self._create_token(node)
         else:

@@ -57,9 +57,7 @@ def delete_filesystem_group(sender, instance, **kwargs):
             # Possible that it was deleted the same time this
             # virtual block device was deleted.
             return
-        not_volume_group = (
-            filesystem_group.group_type != FILESYSTEM_GROUP_TYPE.LVM_VG
-        )
+        not_volume_group = filesystem_group.group_type != FILESYSTEM_GROUP_TYPE.LVM_VG
         if filesystem_group.id is not None and not_volume_group:
             filesystem_group.delete()
 

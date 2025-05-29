@@ -87,9 +87,7 @@ class TestSplitIPv4IPv6Subnets(MAASServerTestCase):
             key=lambda *args: random.randint(0, 10),
         )
 
-        ipv4_result, ipv6_result = dhcp.split_managed_ipv4_ipv6_subnets(
-            subnets
-        )
+        ipv4_result, ipv6_result = dhcp.split_managed_ipv4_ipv6_subnets(subnets)
 
         self.assertCountEqual(ipv4_subnets, ipv4_result)
         self.assertCountEqual(ipv6_subnets, ipv6_result)
@@ -114,9 +112,7 @@ class TestSplitIPv4IPv6Subnets(MAASServerTestCase):
             key=lambda *args: random.randint(0, 10),
         )
 
-        ipv4_result, ipv6_result = dhcp.split_managed_ipv4_ipv6_subnets(
-            subnets
-        )
+        ipv4_result, ipv6_result = dhcp.split_managed_ipv4_ipv6_subnets(subnets)
 
         self.assertCountEqual(
             [s for s in ipv4_subnets if s.managed is True], ipv4_result
@@ -152,15 +148,9 @@ class TestGetBestInterface(MAASServerTestCase):
 
     def test_returns_bond_over_physical(self):
         rack_controller = factory.make_RackController()
-        physical = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=rack_controller
-        )
-        nic0 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=rack_controller
-        )
-        nic1 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=rack_controller
-        )
+        physical = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack_controller)
+        nic0 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack_controller)
+        nic1 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack_controller)
         bond = factory.make_Interface(
             INTERFACE_TYPE.BOND, node=rack_controller, parents=[nic0, nic1]
         )
@@ -168,9 +158,7 @@ class TestGetBestInterface(MAASServerTestCase):
 
     def test_returns_physical_over_vlan(self):
         rack_controller = factory.make_RackController()
-        physical = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=rack_controller
-        )
+        physical = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack_controller)
         vlan = factory.make_Interface(
             INTERFACE_TYPE.VLAN, node=rack_controller, parents=[physical]
         )
@@ -179,18 +167,14 @@ class TestGetBestInterface(MAASServerTestCase):
     def test_returns_first_interface_when_all_physical(self):
         rack_controller = factory.make_RackController()
         interfaces = [
-            factory.make_Interface(
-                INTERFACE_TYPE.PHYSICAL, node=rack_controller
-            )
+            factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack_controller)
             for _ in range(3)
         ]
         self.assertEqual(interfaces[0], dhcp.get_best_interface(interfaces))
 
     def test_returns_first_interface_when_all_vlan(self):
         rack_controller = factory.make_RackController()
-        physical = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=rack_controller
-        )
+        physical = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack_controller)
         interfaces = [
             factory.make_Interface(
                 INTERFACE_TYPE.VLAN, node=rack_controller, parents=[physical]
@@ -207,15 +191,9 @@ class TestGetInterfacesWithIPOnVLAN(MAASServerTestCase):
         rack_controller = factory.make_RackController()
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(cidr="10.0.0.0/8", vlan=vlan)
-        factory.make_IPRange(
-            subnet=subnet, start_ip="10.0.1.0", end_ip="10.0.1.254"
-        )
-        factory.make_IPRange(
-            subnet=subnet, start_ip="10.0.2.0", end_ip="10.0.2.254"
-        )
-        factory.make_IPRange(
-            subnet=subnet, start_ip="10.0.3.0", end_ip="10.0.3.254"
-        )
+        factory.make_IPRange(subnet=subnet, start_ip="10.0.1.0", end_ip="10.0.1.254")
+        factory.make_IPRange(subnet=subnet, start_ip="10.0.2.0", end_ip="10.0.2.254")
+        factory.make_IPRange(subnet=subnet, start_ip="10.0.3.0", end_ip="10.0.3.254")
         # Make a multiple interfaces.
         for _ in range(10):
             interface = factory.make_Interface(
@@ -327,9 +305,7 @@ class TestGetInterfacesWithIPOnVLAN(MAASServerTestCase):
         interface_two = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL, node=rack_controller, vlan=vlan
         )
-        subnet_with_dynamic_range = factory.make_ipv4_Subnet_with_IPRanges(
-            vlan=vlan
-        )
+        subnet_with_dynamic_range = factory.make_ipv4_Subnet_with_IPRanges(vlan=vlan)
         factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.AUTO,
             subnet=subnet_with_dynamic_range,
@@ -678,9 +654,7 @@ class TestGenManagedVLANsFor(MAASServerTestCase):
         )
 
         # Relay VLANs atteched to the vlan.
-        relay_vlans = {
-            factory.make_VLAN(relay_vlan=vlan_one) for _ in range(3)
-        }
+        relay_vlans = {factory.make_VLAN(relay_vlan=vlan_one) for _ in range(3)}
 
         # Should only contain the subnets that are managed by the rack
         # controller and the best interface should have been selected.
@@ -792,9 +766,7 @@ class TestIPIsOnVLAN(MAASServerTestCase):
             # make_StaticIPAddress always creates a subnet so set it to None.
             ip_address.subnet = None
             ip_address.save()
-        self.assertEqual(
-            self.result, dhcp.ip_is_on_vlan(ip_address, expected_vlan)
-        )
+        self.assertEqual(self.result, dhcp.ip_is_on_vlan(ip_address, expected_vlan))
 
 
 class TestGetIPAddressForInterface(MAASServerTestCase):
@@ -812,9 +784,7 @@ class TestGetIPAddressForInterface(MAASServerTestCase):
         )
         self.assertEqual(
             ip_address,
-            dhcp.get_ip_address_for_interface(
-                interface, vlan, subnet.get_ip_version()
-            ),
+            dhcp.get_ip_address_for_interface(interface, vlan, subnet.get_ip_version()),
         )
 
     def test_returns_None(self):
@@ -1014,9 +984,7 @@ class TestGetNTPServerAddressesForRack(MAASServerTestCase):
         rack = factory.make_RackController()
         interface = factory.make_Interface(node=rack)
 
-        count, result = count_queries(
-            dhcp.get_ntp_server_addresses_for_rack, rack
-        )
+        count, result = count_queries(dhcp.get_ntp_server_addresses_for_rack, rack)
         self.assertEqual(1, count)
         self.assertEqual({}, result)
 
@@ -1032,9 +1000,7 @@ class TestGetNTPServerAddressesForRack(MAASServerTestCase):
                         alloc_type=IPADDRESS_TYPE.STICKY,
                     )
 
-        count, result = count_queries(
-            dhcp.get_ntp_server_addresses_for_rack, rack
-        )
+        count, result = count_queries(dhcp.get_ntp_server_addresses_for_rack, rack)
         self.assertEqual(1, count)
         self.assertNotEqual({}, result)
 
@@ -1067,32 +1033,24 @@ class TestGetDefaultDNSServers(MAASServerTestCase):
         mock_get_source_address.return_value = "10.0.0.1"
         vlan = factory.make_VLAN()
         r1 = factory.make_RegionRackController(interface=False)
-        self.patch(
-            server_address_module.MAAS_ID, "get"
-        ).return_value = r1.system_id
+        self.patch(server_address_module.MAAS_ID, "get").return_value = r1.system_id
         r2 = factory.make_RegionRackController(interface=False)
         subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24")
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r2
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r2)
         address = factory.make_StaticIPAddress(
             interface=interface,
             subnet=subnet,
             alloc_type=IPADDRESS_TYPE.STICKY,
         )
         servers = get_default_dns_servers(r1, subnet, False)
-        self.assertEqual(
-            [IPAddress(address.ip), IPAddress("10.0.0.1")], servers
-        )
+        self.assertEqual([IPAddress(address.ip), IPAddress("10.0.0.1")], servers)
 
     def test_racks_on_subnet_comes_before_region(self):
         mock_get_source_address = self.patch(dhcp, "get_source_address")
         mock_get_source_address.return_value = "10.0.0.1"
         vlan = factory.make_VLAN()
         r1 = factory.make_RegionRackController(interface=False)
-        self.patch(
-            server_address_module.MAAS_ID, "get"
-        ).return_value = r1.system_id
+        self.patch(server_address_module.MAAS_ID, "get").return_value = r1.system_id
         subnet = factory.make_Subnet(vlan=vlan, cidr="10.0.0.0/24")
         r1_interface = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r1
@@ -1124,9 +1082,7 @@ class TestGetDefaultDNSServers(MAASServerTestCase):
         rack = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN(dhcp_on=True, primary_rack=rack)
         subnet = factory.make_Subnet(vlan=vlan, cidr="192.168.200.0/24")
-        iface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack
-        )
+        iface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack)
         factory.make_StaticIPAddress(
             interface=iface,
             subnet=subnet,
@@ -1145,15 +1101,11 @@ class TestGetDefaultDNSServers(MAASServerTestCase):
         vlan2_secondary = factory.make_VLAN(
             primary_rack=rack, dhcp_on=False, relay_vlan=vlan1_primary
         )
-        subnet1 = factory.make_Subnet(
-            vlan=vlan1_primary, vid=10, cidr="10.20.40.0/24"
-        )
+        subnet1 = factory.make_Subnet(vlan=vlan1_primary, vid=10, cidr="10.20.40.0/24")
         subnet2 = factory.make_Subnet(
             vlan=vlan2_secondary, vid=20, cidr="10.20.50.0/24"
         )
-        rack_interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=rack
-        )
+        rack_interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack)
         rack_interface_vlan1 = factory.make_Interface(
             INTERFACE_TYPE.VLAN,
             vlan=vlan1_primary,
@@ -1172,9 +1124,7 @@ class TestGetDefaultDNSServers(MAASServerTestCase):
             alloc_type=IPADDRESS_TYPE.STICKY,
             ip="10.20.40.1",
         )
-        dns_servers = dhcp.get_default_dns_servers(
-            rack, subnet2, use_rack_proxy=True
-        )
+        dns_servers = dhcp.get_default_dns_servers(rack, subnet2, use_rack_proxy=True)
         self.assertEqual(dns_servers, [IPAddress("10.20.40.1")])
 
     def test_no_default_region_ip(self):
@@ -1195,9 +1145,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller,
@@ -1230,9 +1178,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan, dns_servers=[], version=4)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         maas_dns = IPAddress(factory.make_ipv4_address())
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
@@ -1245,9 +1191,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan, dns_servers=[], version=6)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         maas_dns = IPAddress(factory.make_ipv6_address())
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
@@ -1260,9 +1204,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan, dns_servers=[])
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1274,9 +1216,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan, dns_servers=[])
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller, subnet, [""], {}, default_domain
@@ -1295,9 +1235,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
             subnet=subnet,
             alloc_type=IPADDRESS_TYPE.STICKY,
         )
-        ntp_servers = {
-            (vlan.space_id, subnet.get_ipnetwork().version): address.ip
-        }
+        ntp_servers = {(vlan.space_id, subnet.get_ipnetwork().version): address.ip}
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller, subnet, [""], ntp_servers, default_domain
@@ -1309,24 +1247,16 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         r2 = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN(primary_rack=r1, secondary_rack=r2)
         subnet = factory.make_Subnet(vlan=vlan, dns_servers=[], space=None)
-        r1_eth0 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r1
-        )
-        r2_eth0 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r2
-        )
+        r1_eth0 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r1)
+        r2_eth0 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r2)
         a1 = factory.make_StaticIPAddress(
             interface=r1_eth0, subnet=subnet, alloc_type=IPADDRESS_TYPE.STICKY
         )
         a2 = factory.make_StaticIPAddress(
             interface=r2_eth0, subnet=subnet, alloc_type=IPADDRESS_TYPE.STICKY
         )
-        r1_ntp_servers = {
-            (vlan.space_id, subnet.get_ipnetwork().version): a1.ip
-        }
-        r2_ntp_servers = {
-            (vlan.space_id, subnet.get_ipnetwork().version): a2.ip
-        }
+        r1_ntp_servers = {(vlan.space_id, subnet.get_ipnetwork().version): a1.ip}
+        r2_ntp_servers = {(vlan.space_id, subnet.get_ipnetwork().version): a2.ip}
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             r1, subnet, [""], r1_ntp_servers, default_domain, peer_rack=r2
@@ -1344,9 +1274,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
             vlan=vlan, version=4, dns_servers=["8.8.8.8", "8.8.4.4"]
         )
         maas_dns = IPAddress(factory.make_ipv4_address())
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1362,9 +1290,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan, version=4, dns_servers=[])
         maas_dns = IPAddress(factory.make_ipv4_address())
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1382,9 +1308,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
             dns_servers=["8.8.8.8", "8.8.4.4"],
         )
         maas_dns = IPAddress(factory.make_ipv4_address())
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1402,9 +1326,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
             vlan=vlan, version=4, allow_dns=False, dns_servers=[]
         )
         maas_dns = IPAddress(factory.make_ipv4_address())
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1419,9 +1341,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
             vlan=vlan, version=6, dns_servers=["2001:db8::1", "2001:db8::2"]
         )
         maas_dns = IPAddress(factory.make_ipv6_address())
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1437,9 +1357,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan, version=6, dns_servers=[])
         maas_dns = IPAddress(factory.make_ipv6_address())
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1457,9 +1375,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
             dns_servers=["2001:db8::1", "2001:db8::2"],
         )
         maas_dns = IPAddress(factory.make_ipv6_address())
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1477,9 +1393,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
             vlan=vlan, version=6, allow_dns=False, dns_servers=[]
         )
         maas_dns = IPAddress(factory.make_ipv6_address())
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         ntp_servers = [factory.make_name("ntp")]
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
@@ -1491,9 +1405,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller,
@@ -1508,9 +1420,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller,
@@ -1529,9 +1439,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller,
@@ -1551,9 +1459,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(cidr=str(network.cidr), vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         search_list = [default_domain.name, "foo.example.com"]
         config = dhcp.make_subnet_config(
@@ -1579,9 +1485,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(cidr=str(network.cidr), vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         search_list = [default_domain.name, "foo.example.com"]
         config = dhcp.make_subnet_config(
@@ -1615,9 +1519,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         subnet = factory.make_Subnet(cidr=str(network.cidr), vlan=vlan)
         factory.make_IPRange(subnet, "10.9.8.11", "10.9.8.20")
         factory.make_IPRange(subnet, "10.9.8.21", "10.9.8.30")
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller,
@@ -1650,9 +1552,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         subnet = factory.make_Subnet(cidr=str(network.cidr), vlan=vlan)
         factory.make_IPRange(subnet, "10.9.8.11", "10.9.8.20")
         factory.make_IPRange(subnet, "10.9.8.21", "10.9.8.30")
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         failover_peer = factory.make_name("peer")
         config = dhcp.make_subnet_config(
@@ -1685,9 +1585,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         subnet.gateway_ip = None
         subnet.save()
@@ -1704,13 +1602,10 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         dhcp_snippets = [
-            factory.make_DHCPSnippet(subnet=subnet, enabled=True)
-            for _ in range(3)
+            factory.make_DHCPSnippet(subnet=subnet, enabled=True) for _ in range(3)
         ]
         config = dhcp.make_subnet_config(
             rack_controller,
@@ -1736,9 +1631,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller,
@@ -1758,18 +1651,13 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         subnet = factory.make_ipv4_Subnet_with_IPRanges(vlan=vlan)
         iprange = subnet.get_dynamic_ranges().first()
         iprange.save()
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         subnet_snippets = [
-            factory.make_DHCPSnippet(subnet=subnet, enabled=True)
-            for _ in range(3)
+            factory.make_DHCPSnippet(subnet=subnet, enabled=True) for _ in range(3)
         ]
         iprange_snippets = [
-            factory.make_DHCPSnippet(
-                subnet=subnet, iprange=iprange, enabled=True
-            )
+            factory.make_DHCPSnippet(subnet=subnet, iprange=iprange, enabled=True)
             for _ in range(3)
         ]
         dhcp_snippets = subnet_snippets + iprange_snippets
@@ -1815,9 +1703,7 @@ class TestMakeSubnetConfig(MAASServerTestCase):
         subnet2 = factory.make_Subnet(
             cidr=str(network2.cidr), vlan=vlan, gateway_ip=None
         )
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         default_domain = Domain.objects.get_default_domain()
         config = dhcp.make_subnet_config(
             rack_controller,
@@ -1844,9 +1730,7 @@ class TestMakeHostsForSubnet(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         node = factory.make_Node(interface=False)
 
         # Make AUTO IP without an IP. Should not be in output.
@@ -1927,8 +1811,7 @@ class TestMakeHostsForSubnet(MAASServerTestCase):
             factory.make_DHCPSnippet(node=node, enabled=True) for _ in range(3)
         ]
         device_dhcp_snippets = [
-            factory.make_DHCPSnippet(node=device, enabled=True)
-            for _ in range(3)
+            factory.make_DHCPSnippet(node=device, enabled=True) for _ in range(3)
         ]
 
         expected_hosts = [
@@ -1989,9 +1872,7 @@ class TestMakeHostsForSubnet(MAASServerTestCase):
     def tests__returns_hosts_interface_once_when_on_multiple_subnets(self):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         node = factory.make_Node(interface=False)
         interface = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=node
@@ -2026,9 +1907,7 @@ class TestMakeHostsForSubnet(MAASServerTestCase):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         node = factory.make_Node(interface=False)
 
         # Create a bond with an IP address, to make sure all MAC address in
@@ -2075,23 +1954,17 @@ class TestMakeHostsForSubnet(MAASServerTestCase):
             },
         ]
 
-        self.assertCountEqual(
-            expected_hosts, dhcp.make_hosts_for_subnets([subnet])
-        )
+        self.assertCountEqual(expected_hosts, dhcp.make_hosts_for_subnets([subnet]))
 
     def tests__returns_hosts_first_created_ip_address(self):
         rack_controller = factory.make_RackController(interface=False)
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=rack_controller)
         node = factory.make_Node(interface=False)
 
         # Add two IP address to interface. Only the first should be added.
-        eth0 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=node, vlan=vlan
-        )
+        eth0 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node, vlan=vlan)
         auto_ip = factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.AUTO, subnet=subnet, interface=eth0
         )
@@ -2288,8 +2161,7 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
         )
         ha_network = ha_subnet.get_ipnetwork()
         ha_dhcp_snippets = [
-            factory.make_DHCPSnippet(subnet=ha_subnet, enabled=True)
-            for _ in range(3)
+            factory.make_DHCPSnippet(subnet=ha_subnet, enabled=True) for _ in range(3)
         ]
         primary_interface = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL, node=primary_rack, vlan=ha_vlan
@@ -2373,8 +2245,7 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
                             {
                                 "ip_range_low": str(ip_range.start_ip),
                                 "ip_range_high": str(ip_range.end_ip),
-                                "failover_peer": "failover-vlan-%d"
-                                % ha_vlan.id,
+                                "failover_peer": "failover-vlan-%d" % ha_vlan.id,
                                 "dhcp_snippets": [],
                             }
                             for ip_range in (
@@ -2408,14 +2279,11 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
                             {
                                 "ip_range_low": str(ip_range.start_ip),
                                 "ip_range_high": str(ip_range.end_ip),
-                                "failover_peer": "failover-vlan-%d"
-                                % ha_vlan.id,
+                                "failover_peer": "failover-vlan-%d" % ha_vlan.id,
                                 "dhcp_snippets": [],
                             }
                             for ip_range in (
-                                other_subnet.get_dynamic_ranges().order_by(
-                                    "id"
-                                )
+                                other_subnet.get_dynamic_ranges().order_by("id")
                             )
                         ],
                     },
@@ -2424,9 +2292,7 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
             ),
             observed_subnets,
         )
-        self.assertCountEqual(
-            dhcp.make_hosts_for_subnets([ha_subnet]), observed_hosts
-        )
+        self.assertCountEqual(dhcp.make_hosts_for_subnets([ha_subnet]), observed_hosts)
         self.assertEqual(primary_interface.name, observed_interface)
 
     def test_returns_for_ipv6(self):
@@ -2439,9 +2305,7 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
             primary_rack=primary_rack,
             secondary_rack=secondary_rack,
         )
-        ha_subnet = factory.make_Subnet(
-            vlan=ha_vlan, cidr="fd38:c341:27da:c831::/64"
-        )
+        ha_subnet = factory.make_Subnet(vlan=ha_vlan, cidr="fd38:c341:27da:c831::/64")
         ha_network = ha_subnet.get_ipnetwork()
         factory.make_IPRange(
             ha_subnet,
@@ -2449,8 +2313,7 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
             "fd38:c341:27da:c831:0:1:ffff:0",
         )
         ha_dhcp_snippets = [
-            factory.make_DHCPSnippet(subnet=ha_subnet, enabled=True)
-            for _ in range(3)
+            factory.make_DHCPSnippet(subnet=ha_subnet, enabled=True) for _ in range(3)
         ]
         primary_interface = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL, node=primary_rack, vlan=ha_vlan
@@ -2533,8 +2396,7 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
                             {
                                 "ip_range_low": str(ip_range.start_ip),
                                 "ip_range_high": str(ip_range.end_ip),
-                                "failover_peer": "failover-vlan-%d"
-                                % ha_vlan.id,
+                                "failover_peer": "failover-vlan-%d" % ha_vlan.id,
                                 "dhcp_snippets": [],
                             }
                             for ip_range in (
@@ -2563,14 +2425,11 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
                             {
                                 "ip_range_low": str(ip_range.start_ip),
                                 "ip_range_high": str(ip_range.end_ip),
-                                "failover_peer": "failover-vlan-%d"
-                                % ha_vlan.id,
+                                "failover_peer": "failover-vlan-%d" % ha_vlan.id,
                                 "dhcp_snippets": [],
                             }
                             for ip_range in (
-                                other_subnet.get_dynamic_ranges().order_by(
-                                    "id"
-                                )
+                                other_subnet.get_dynamic_ranges().order_by("id")
                             )
                         ],
                     },
@@ -2579,9 +2438,7 @@ class TestGetDHCPConfigureFor(MAASServerTestCase):
             ),
             observed_subnets,
         )
-        self.assertCountEqual(
-            dhcp.make_hosts_for_subnets([ha_subnet]), observed_hosts
-        )
+        self.assertCountEqual(dhcp.make_hosts_for_subnets([ha_subnet]), observed_hosts)
         self.assertEqual(primary_interface.name, observed_interface)
 
 
@@ -2590,17 +2447,13 @@ class TestGetDHCPConfiguration(MAASServerTestCase):
 
     def setUp(self):
         super().setUp()
-        SecretManager().set_simple_secret(
-            "omapi-key", factory.make_name("omapi")
-        )
+        SecretManager().set_simple_secret("omapi-key", factory.make_name("omapi"))
 
     def make_RackController_ready_for_DHCP(self):
         rack = factory.make_RackController()
         vlan = factory.make_VLAN(dhcp_on=True, primary_rack=rack)
         subnet4 = factory.make_Subnet(vlan=vlan, cidr="10.20.30.0/24")
-        subnet6 = factory.make_Subnet(
-            vlan=vlan, cidr="fd38:c341:27da:c831::/64"
-        )
+        subnet6 = factory.make_Subnet(vlan=vlan, cidr="fd38:c341:27da:c831::/64")
         interface = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan
         )
@@ -2616,9 +2469,7 @@ class TestGetDHCPConfiguration(MAASServerTestCase):
         )
         return rack, (address4, address6)
 
-    def assertHasConfigurationForNTP(
-        self, shared_network, subnet, ntp_servers
-    ):
+    def assertHasConfigurationForNTP(self, shared_network, subnet, ntp_servers):
         [network] = shared_network
         [the_subnet] = network.get("subnets", [])
         self.assertEqual(the_subnet.get("subnet_cidr"), subnet.cidr)
@@ -2660,9 +2511,7 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
 
     def setUp(self):
         super().setUp()
-        SecretManager().set_simple_secret(
-            "omapi-key", factory.make_name("omapi")
-        )
+        SecretManager().set_simple_secret("omapi-key", factory.make_name("omapi"))
 
     @synchronous
     def prepare_rpc(self, rack_controller):
@@ -2670,9 +2519,7 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
         self.useFixture(RegionEventLoopFixture("rpc"))
         self.useFixture(RunningEventLoopFixture())
         fixture = self.useFixture(MockLiveRegionToClusterRPCFixture())
-        cluster = fixture.makeCluster(
-            rack_controller, ConfigureDHCPv4, ConfigureDHCPv6
-        )
+        cluster = fixture.makeCluster(rack_controller, ConfigureDHCPv4, ConfigureDHCPv6)
         return (
             cluster,
             getattr(cluster, ConfigureDHCPv4.commandName.decode("ascii")),
@@ -2741,12 +2588,8 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
             )
 
         for _ in range(3):
-            factory.make_DHCPSnippet(
-                subnet=subnet_v4, iprange=iprange_v4, enabled=True
-            )
-            factory.make_DHCPSnippet(
-                subnet=subnet_v6, iprange=iprange_v6, enabled=True
-            )
+            factory.make_DHCPSnippet(subnet=subnet_v4, iprange=iprange_v4, enabled=True)
+            factory.make_DHCPSnippet(subnet=subnet_v6, iprange=iprange_v6, enabled=True)
             factory.make_DHCPSnippet(subnet=subnet_v4, enabled=True)
             factory.make_DHCPSnippet(subnet=subnet_v6, enabled=True)
             factory.make_DHCPSnippet(enabled=True)
@@ -2759,9 +2602,7 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
     def test_calls_configure_for_both_ipv4_and_ipv6(self):
         # ... when DHCP_CONNECT is True.
         self.patch(dhcp.settings, "DHCP_CONNECT", True)
-        rack_controller, config = yield deferToDatabase(
-            self.create_rack_controller
-        )
+        rack_controller, config = yield deferToDatabase(self.create_rack_controller)
         protocol, ipv4_stub, ipv6_stub = yield deferToThread(
             self.prepare_rpc, rack_controller
         )
@@ -2797,18 +2638,16 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
         # ... when DHCP_CONNECT is True.
         self.patch(dhcp.settings, "DHCP_CONNECT", True)
 
-        rack_controller, config = yield deferToDatabase(
-            self.create_rack_controller
-        )
+        rack_controller, config = yield deferToDatabase(self.create_rack_controller)
         protocol, ipv4_stub, ipv6_stub = yield deferToThread(
             self.prepare_rpc, rack_controller
         )
 
         # Get the client and simulate a closed handler
         client = yield getClientFor(rack_controller.system_id)
-        self.patch(
-            client._conn, "_sendBoxCommand"
-        ).side_effect = always_fail_with(RuntimeError("the handler is closed"))
+        self.patch(client._conn, "_sendBoxCommand").side_effect = always_fail_with(
+            RuntimeError("the handler is closed")
+        )
 
         ipv4_stub.side_effect = always_succeed_with({})
         ipv6_stub.side_effect = always_succeed_with({})
@@ -2826,9 +2665,7 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
     def test_doesnt_call_configure_for_both_ipv4_and_ipv6(self):
         # ... when DHCP_CONNECT is False.
         self.patch(dhcp.settings, "DHCP_CONNECT", False)
-        rack_controller, config = yield deferToDatabase(
-            self.create_rack_controller
-        )
+        rack_controller, config = yield deferToDatabase(self.create_rack_controller)
         protocol, ipv4_stub, ipv6_stub = yield deferToThread(
             self.prepare_rpc, rack_controller
         )
@@ -2853,14 +2690,10 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
 
         @transactional
         def service_statuses_are_unknown():
-            dhcpv4_service = Service.objects.get(
-                node=rack_controller, name="dhcpd"
-            )
+            dhcpv4_service = Service.objects.get(node=rack_controller, name="dhcpd")
             self.assertEqual(dhcpv4_service.status, SERVICE_STATUS.UNKNOWN)
             self.assertEqual(dhcpv4_service.status_info, "")
-            dhcpv6_service = Service.objects.get(
-                node=rack_controller, name="dhcpd6"
-            )
+            dhcpv6_service = Service.objects.get(node=rack_controller, name="dhcpd6")
             self.assertEqual(dhcpv6_service.status, SERVICE_STATUS.UNKNOWN)
             self.assertEqual(dhcpv6_service.status_info, "")
 
@@ -2870,14 +2703,10 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
 
         @transactional
         def services_are_running():
-            dhcpv4_service = Service.objects.get(
-                node=rack_controller, name="dhcpd"
-            )
+            dhcpv4_service = Service.objects.get(node=rack_controller, name="dhcpd")
             self.assertEqual(dhcpv4_service.status, SERVICE_STATUS.RUNNING)
             self.assertEqual(dhcpv4_service.status_info, "")
-            dhcpv6_service = Service.objects.get(
-                node=rack_controller, name="dhcpd6"
-            )
+            dhcpv6_service = Service.objects.get(node=rack_controller, name="dhcpd6")
             self.assertEqual(dhcpv6_service.status, SERVICE_STATUS.RUNNING)
             self.assertEqual(dhcpv6_service.status_info, "")
 
@@ -2898,15 +2727,11 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
 
         @transactional
         def service_statuses_are_unknown():
-            dhcpv4_service = Service.objects.get(
-                node=rack_controller, name="dhcpd"
-            )
+            dhcpv4_service = Service.objects.get(node=rack_controller, name="dhcpd")
             self.assertEqual(dhcpv4_service.status, SERVICE_STATUS.UNKNOWN)
             self.assertEqual(dhcpv4_service.status_info, "")
 
-            dhcpv6_service = Service.objects.get(
-                node=rack_controller, name="dhcpd6"
-            )
+            dhcpv6_service = Service.objects.get(node=rack_controller, name="dhcpd6")
             self.assertEqual(dhcpv6_service.status, SERVICE_STATUS.UNKNOWN)
             self.assertEqual(dhcpv6_service.status_info, "")
 
@@ -2916,14 +2741,10 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
 
         @transactional
         def service_status_updated():
-            dhcpv4_service = Service.objects.get(
-                node=rack_controller, name="dhcpd"
-            )
+            dhcpv4_service = Service.objects.get(node=rack_controller, name="dhcpd")
             self.assertEqual(dhcpv4_service.status, SERVICE_STATUS.OFF)
             self.assertEqual(dhcpv4_service.status_info, "")
-            dhcpv6_service = Service.objects.get(
-                node=rack_controller, name="dhcpd6"
-            )
+            dhcpv6_service = Service.objects.get(node=rack_controller, name="dhcpd6")
             self.assertEqual(dhcpv6_service.status, SERVICE_STATUS.OFF)
             self.assertEqual(dhcpv6_service.status_info, "")
 
@@ -2949,14 +2770,10 @@ class TestConfigureDHCP(MAASTransactionServerTestCase):
 
         @transactional
         def service_status_updated():
-            dhcpv4_service = Service.objects.get(
-                node=rack_controller, name="dhcpd"
-            )
+            dhcpv4_service = Service.objects.get(node=rack_controller, name="dhcpd")
             self.assertEqual(dhcpv4_service.status, SERVICE_STATUS.DEAD)
             self.assertEqual(dhcpv4_service.status_info, ipv4_exc)
-            dhcpv6_service = Service.objects.get(
-                node=rack_controller, name="dhcpd6"
-            )
+            dhcpv6_service = Service.objects.get(node=rack_controller, name="dhcpd6")
             self.assertEqual(dhcpv6_service.status, SERVICE_STATUS.DEAD)
             self.assertEqual(dhcpv6_service.status_info, ipv6_exc)
 
@@ -2969,14 +2786,10 @@ class TestGetDHCPRackcontroller(MAASTransactionServerTestCase):
         dhcp_subnet = factory.make_Subnet(
             vlan=dhcp_vlan, cidr=IPNetwork(primary_address).cidr
         )
-        primary_rack = factory.make_rack_with_interfaces(
-            eth0=[primary_address]
-        )
+        primary_rack = factory.make_rack_with_interfaces(eth0=[primary_address])
         secondary_rack = None
         if secondary_adress is not None:
-            secondary_rack = factory.make_rack_with_interfaces(
-                eth0=[secondary_adress]
-            )
+            secondary_rack = factory.make_rack_with_interfaces(eth0=[secondary_adress])
         dhcp_vlan.dhcp_on = True
         dhcp_vlan.primary_rack = primary_rack
         dhcp_vlan.secondary_rack = secondary_rack
@@ -3036,9 +2849,7 @@ class TestGetDHCPRackcontroller(MAASTransactionServerTestCase):
         relay_subnet = factory.make_Subnet(cidr="10.10.30.0/24")
         relay_subnet.vlan.relay_vlan = dhcp_subnet.vlan
         relay_subnet.vlan.save()
-        node = factory.make_Machine_with_Interface_on_Subnet(
-            subnet=relay_subnet
-        )
+        node = factory.make_Machine_with_Interface_on_Subnet(subnet=relay_subnet)
         snippet = factory.make_DHCPSnippet(node=node, enabled=True)
         self.assertCountEqual(
             [dhcp_subnet.vlan.primary_rack], _get_dhcp_rackcontrollers(snippet)
@@ -3050,9 +2861,7 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
 
     def setUp(self):
         super().setUp()
-        SecretManager().set_simple_secret(
-            "omapi-key", factory.make_name("omapi")
-        )
+        SecretManager().set_simple_secret("omapi-key", factory.make_name("omapi"))
 
     def prepare_rpc(self, rack_controller, return_value=None):
         """Set up test case for speaking RPC to `rack_controller`."""
@@ -3062,13 +2871,9 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
         cluster = fixture.makeCluster(
             rack_controller, ValidateDHCPv4Config, ValidateDHCPv6Config
         )
-        ipv4_stub = getattr(
-            cluster, ValidateDHCPv4Config.commandName.decode("ascii")
-        )
+        ipv4_stub = getattr(cluster, ValidateDHCPv4Config.commandName.decode("ascii"))
         ipv4_stub.return_value = defer.succeed({"errors": return_value})
-        ipv6_stub = getattr(
-            cluster, ValidateDHCPv6Config.commandName.decode("ascii")
-        )
+        ipv6_stub = getattr(cluster, ValidateDHCPv6Config.commandName.decode("ascii"))
         ipv6_stub.return_value = defer.succeed({"errors": return_value})
         return ipv4_stub, ipv6_stub
 
@@ -3083,17 +2888,11 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
             primary_rack=primary_rack,
             secondary_rack=secondary_rack,
         )
-        primary_interface = primary_rack.current_config.interface_set.get(
-            vlan=vlan
-        )
-        secondary_interface = secondary_rack.current_config.interface_set.get(
-            vlan=vlan
-        )
+        primary_interface = primary_rack.current_config.interface_set.get(vlan=vlan)
+        secondary_interface = secondary_rack.current_config.interface_set.get(vlan=vlan)
 
         subnet_v4 = factory.make_ipv4_Subnet_with_IPRanges(vlan=vlan)
-        subnet_v6 = factory.make_Subnet(
-            vlan=vlan, cidr="fd38:c341:27da:c831::/64"
-        )
+        subnet_v6 = factory.make_Subnet(vlan=vlan, cidr="fd38:c341:27da:c831::/64")
         iprange_v4 = subnet_v4.get_dynamic_ranges().first()
         iprange_v4.save()
         iprange_v6 = factory.make_IPRange(
@@ -3124,12 +2923,8 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
         )
 
         for _ in range(3):
-            factory.make_DHCPSnippet(
-                subnet=subnet_v4, iprange=iprange_v4, enabled=True
-            )
-            factory.make_DHCPSnippet(
-                subnet=subnet_v6, iprange=iprange_v6, enabled=True
-            )
+            factory.make_DHCPSnippet(subnet=subnet_v4, iprange=iprange_v4, enabled=True)
+            factory.make_DHCPSnippet(subnet=subnet_v6, iprange=iprange_v6, enabled=True)
             factory.make_DHCPSnippet(subnet=subnet_v4, enabled=True)
             factory.make_DHCPSnippet(subnet=subnet_v6, enabled=True)
             factory.make_DHCPSnippet(enabled=True)
@@ -3209,8 +3004,8 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
         vlan = factory.make_VLAN(
             primary_rack=disconnected_rack, secondary_rack=rack_controller
         )
-        disconnected_interface = (
-            disconnected_rack.current_config.interface_set.get(vlan=vlan)
+        disconnected_interface = disconnected_rack.current_config.interface_set.get(
+            vlan=vlan
         )
         secondary_interface = rack_controller.current_config.interface_set.get(
             vlan=vlan
@@ -3268,9 +3063,7 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
         # DHCPSnippetForm generates a new DHCPSnippet in memory and validates
         # it with validate_dhcp_config before committing it.
         value = VersionedTextFile.objects.create(data=factory.make_string())
-        new_dhcp_snippet = DHCPSnippet(
-            name=factory.make_name("name"), value=value
-        )
+        new_dhcp_snippet = DHCPSnippet(name=factory.make_name("name"), value=value)
         dhcp.validate_dhcp_config(new_dhcp_snippet)
         config.global_dhcp_snippets.append(
             {
@@ -3342,10 +3135,7 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
 
         updated_dhcp_snippet = DHCPSnippet.objects.get(
             name=random.choice(
-                [
-                    dhcp_snippet["name"]
-                    for dhcp_snippet in config.global_dhcp_snippets
-                ]
+                [dhcp_snippet["name"] for dhcp_snippet in config.global_dhcp_snippets]
             )
         )
         updated_dhcp_snippet.value = updated_dhcp_snippet.value.update(
@@ -3389,9 +3179,7 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
         )
 
         factory.make_Subnet(vlan=vlan1_primary, cidr="10.20.30.0/24")
-        subnet2 = factory.make_Subnet(
-            vlan=vlan2_secondary, cidr="10.20.31.0/24"
-        )
+        subnet2 = factory.make_Subnet(vlan=vlan2_secondary, cidr="10.20.31.0/24")
         self.assertCountEqual([rack1], dhcp.get_racks_by_subnet(subnet2))
 
     def test_get_racks_by_subnet_rack_primary(self):
@@ -3445,6 +3233,4 @@ class TestValidateDHCPConfig(MAASTransactionServerTestCase):
     def test_rack_not_found_raises_validation_error(self):
         subnet = factory.make_Subnet()
         dhcp_snippet = factory.make_DHCPSnippet(subnet=subnet)
-        self.assertRaises(
-            ValidationError, dhcp.validate_dhcp_config, dhcp_snippet
-        )
+        self.assertRaises(ValidationError, dhcp.validate_dhcp_config, dhcp_snippet)

@@ -139,9 +139,7 @@ class TestRegionServer(MAASTransactionServerTestCase):
         service.connections[protocol.ident] = {protocol}
 
         protocol.connectionLost(reason=None)
-        ipcWorker.rpcUnregisterConnection.assert_called_once_with(
-            protocol.connid
-        )
+        ipcWorker.rpcUnregisterConnection.assert_called_once_with(protocol.connid)
         # The connection is removed from the set, but the key remains.
         self.assertEqual({protocol.ident: set()}, service.connections)
         # connectionLost() is called on the superclass.
@@ -179,9 +177,7 @@ class TestRegionServer(MAASTransactionServerTestCase):
         self.assertEqual(False, protocol.auth_status.is_authenticated)
 
         transport = self.patch(protocol, "transport")
-        transport.getPeer.return_value = IPv4Address(
-            type="TCP", host="test", port=1337
-        )
+        transport.getPeer.return_value = IPv4Address(type="TCP", host="test", port=1337)
 
         self.assertEqual(False, protocol.auth_status.is_authenticated)
         self.assertEqual({}, service.connections)
@@ -287,16 +283,12 @@ class TestRegionServer(MAASTransactionServerTestCase):
 
     def test_register_is_registered(self):
         protocol = RegionServer()
-        responder = protocol.locateResponder(
-            RegisterRackController.commandName
-        )
+        responder = protocol.locateResponder(RegisterRackController.commandName)
         self.assertIsNotNone(responder)
 
     @inlineCallbacks
     def installFakeRegion(self):
-        region = yield deferToDatabase(
-            transactional(factory.make_RegionController)
-        )
+        region = yield deferToDatabase(transactional(factory.make_RegionController))
         self.patch(
             RegionController.objects, "get_running_controller"
         ).return_value = region
@@ -390,9 +382,7 @@ class TestRegionServer(MAASTransactionServerTestCase):
             },
         )
         self.assertEqual(
-            json.loads(
-                fernet_decrypt_psk(response["encrypted_cluster_certificate"])
-            ),
+            json.loads(fernet_decrypt_psk(response["encrypted_cluster_certificate"])),
             {"key": "key", "cert": "cert", "cacerts": "cacerts"},
         )
 
@@ -579,25 +569,19 @@ class TestRackClient(MAASTestCase):
     def test_call__adds_result_to_cache(self):
         conn = DummyConnection()
         conn.ident = factory.make_name("ident")
-        self.patch(conn, "callRemote").return_value = succeed(
-            sentinel.power_types
-        )
+        self.patch(conn, "callRemote").return_value = succeed(sentinel.power_types)
         client = RackClient(conn, {})
         call_cache = client._getCallCache()
         result = yield client(cluster.DescribePowerTypes)
         self.assertIs(sentinel.power_types, result)
-        self.assertIs(
-            sentinel.power_types, call_cache[cluster.DescribePowerTypes]
-        )
+        self.assertIs(sentinel.power_types, call_cache[cluster.DescribePowerTypes])
 
     @wait_for_reactor
     @inlineCallbacks
     def test_call__doesnt_add_result_to_cache_for_not_cache_call(self):
         conn = DummyConnection()
         conn.ident = factory.make_name("ident")
-        self.patch(conn, "callRemote").return_value = succeed(
-            sentinel.boot_images
-        )
+        self.patch(conn, "callRemote").return_value = succeed(sentinel.boot_images)
         client = RackClient(conn, {})
         call_cache = client._getCallCache()
         result = yield client(cluster.PowerDriverCheck)
@@ -610,9 +594,7 @@ class TestRackClient(MAASTestCase):
         mock_metrics = self.patch(PROMETHEUS_METRICS, "update")
         conn = DummyConnection()
         conn.ident = factory.make_name("ident")
-        self.patch(conn, "callRemote").return_value = succeed(
-            sentinel.boot_images
-        )
+        self.patch(conn, "callRemote").return_value = succeed(sentinel.boot_images)
         client = RackClient(conn, {})
         yield client(cluster.PowerDriverCheck)
         mock_metrics.assert_called_with(
@@ -818,9 +800,7 @@ class TestRegionService(MAASTestCase):
     def test_stopping_closes_connections_cleanly(self):
         service = RegionService(sentinel.ipcWorker)
         service.starting = Deferred()
-        service.starting.addErrback(
-            lambda failure: failure.trap(CancelledError)
-        )
+        service.starting.addErrback(lambda failure: failure.trap(CancelledError))
         service.factory.protocol = HandshakingRegionServer
         connections = {
             service.factory.buildProtocol(None),
@@ -839,9 +819,7 @@ class TestRegionService(MAASTestCase):
     def test_stopping_logs_errors_when_closing_connections(self):
         service = RegionService(sentinel.ipcWorker)
         service.starting = Deferred()
-        service.starting.addErrback(
-            lambda failure: failure.trap(CancelledError)
-        )
+        service.starting.addErrback(lambda failure: failure.trap(CancelledError))
         service.factory.protocol = HandshakingRegionServer
         connections = {
             service.factory.buildProtocol(None),

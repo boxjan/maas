@@ -54,9 +54,7 @@ class EventHandler(TimestampedModelHandler):
         try:
             node = Node.objects.get(id=node_id)
         except Node.DoesNotExist:
-            raise HandlerDoesNotExistError(
-                f"Node with id ({node_id}) does not exist"
-            )
+            raise HandlerDoesNotExistError(f"Node with id ({node_id}) does not exist")
         return node
 
     def list(self, params):

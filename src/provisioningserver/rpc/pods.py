@@ -57,9 +57,7 @@ def discover_pod_projects(pod_type, context):
         }
 
     d.addCallback(convert)
-    d.addErrback(
-        convert_errors, log_message="Failed to discover VM host projects."
-    )
+    d.addErrback(convert_errors, log_message="Failed to discover VM host projects.")
     return d
 
 
@@ -78,8 +76,7 @@ def discover_pod(pod_type, context, pod_id=None, name=None):
         d = ensureDeferred(pod_driver.discover(pod_id, context))
     except NotACoroutineError:
         raise PodActionFail(
-            "bad pod driver '%s'; 'discover' did not return Deferred."
-            % pod_type
+            "bad pod driver '%s'; 'discover' did not return Deferred." % pod_type
         )
 
     def convert(result):
@@ -90,8 +87,7 @@ def discover_pod(pod_type, context, pod_id=None, name=None):
             return {"cluster": result}
         elif not isinstance(result, DiscoveredPod):
             raise PodActionFail(
-                "bad pod driver '%s'; 'discover' returned invalid result."
-                % pod_type
+                "bad pod driver '%s'; 'discover' returned invalid result." % pod_type
             )
         else:
             return {"pod": result}
@@ -115,8 +111,7 @@ def compose_machine(pod_type, context, request, pod_id, name):
     d = pod_driver.compose(pod_id, context, request)
     if not isinstance(d, Deferred):
         raise PodActionFail(
-            "bad pod driver '%s'; 'compose' did not return Deferred."
-            % pod_type
+            "bad pod driver '%s'; 'compose' did not return Deferred." % pod_type
         )
 
     def convert(result):
@@ -206,9 +201,7 @@ def send_pod_commissioning_results(
                 )
 
     d.addCallback(
-        lambda commissioning_results: deferToThread(
-            send_items, commissioning_results
-        )
+        lambda commissioning_results: deferToThread(send_items, commissioning_results)
     )
     d.addCallback(lambda _: {})
     d.addErrback(
@@ -227,16 +220,14 @@ def decompose_machine(pod_type, context, pod_id, name):
     d = pod_driver.decompose(pod_id, context)
     if not isinstance(d, Deferred):
         raise PodActionFail(
-            "bad pod driver '%s'; 'decompose' did not return Deferred."
-            % pod_type
+            "bad pod driver '%s'; 'decompose' did not return Deferred." % pod_type
         )
 
     def convert(result):
         """Convert the result to send over RPC."""
         if result is None or not isinstance(result, DiscoveredPodHints):
             raise PodActionFail(
-                "bad pod driver '%s'; 'decompose' returned invalid result."
-                % pod_type
+                "bad pod driver '%s'; 'decompose' returned invalid result." % pod_type
             )
         else:
             return {"hints": result}

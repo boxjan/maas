@@ -42,20 +42,13 @@ class WedgePowerDriver(PowerDriver):
         return []
 
     def run_wedge_command(
-        self,
-        command,
-        power_address=None,
-        power_user=None,
-        power_pass=None,
-        **extra
+        self, command, power_address=None, power_user=None, power_pass=None, **extra
     ):
         """Run a single command and return unparsed text from stdout."""
         try:
             ssh_client = SSHClient()
             ssh_client.set_missing_host_key_policy(AutoAddPolicy())
-            ssh_client.connect(
-                power_address, username=power_user, password=power_pass
-            )
+            ssh_client.connect(power_address, username=power_user, password=power_pass)
             _, stdout, _ = ssh_client.exec_command(command)
             output = stdout.read().decode("utf-8").strip()
         except (SSHException, EOFError, SOCKETError) as e:
@@ -71,18 +64,14 @@ class WedgePowerDriver(PowerDriver):
     def power_on(self, system_id, context):
         """Power on Wedge."""
         try:
-            self.run_wedge_command(
-                "/usr/local/bin/wedge_power.sh on", **context
-            )
+            self.run_wedge_command("/usr/local/bin/wedge_power.sh on", **context)
         except PowerConnError:
             raise PowerActionError("Wedge Power Driver unable to power on")
 
     def power_off(self, system_id, context):
         """Power off Wedge."""
         try:
-            self.run_wedge_command(
-                "/usr/local/bin/wedge_power.sh off", **context
-            )
+            self.run_wedge_command("/usr/local/bin/wedge_power.sh off", **context)
         except PowerConnError:
             raise PowerActionError("Wedge Power Driver unable to power off")
 

@@ -21,9 +21,7 @@ from provisioningserver.certificates import Certificate
 from provisioningserver.events import EVENT_TYPES
 
 
-def _update_tls_config(
-    config_manager, key=None, cert=None, cacert=None, port=None
-):
+def _update_tls_config(config_manager, key=None, cert=None, cacert=None, port=None):
     secrets = {
         "key": key,
         "cert": cert,

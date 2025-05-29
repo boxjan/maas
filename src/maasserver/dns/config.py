@@ -233,9 +233,7 @@ def _get_controller_ips_by_resource_name(controller):
                 is_dhcp = True
             if ip_address.ip:
                 if not is_dhcp or (not found_static and is_dhcp):
-                    resource_name = get_resource_name_for_subnet(
-                        ip_address.subnet
-                    )
+                    resource_name = get_resource_name_for_subnet(ip_address.subnet)
                     ips_by_resource[resource_name].add(ip_address.ip)
     return ips_by_resource
 
@@ -281,13 +279,9 @@ def get_internal_domain():
                 )
             else:
                 records.append(
-                    InternalDomainResourseRecord(
-                        rrtype="AAAA", rrdata=ip_address
-                    )
+                    InternalDomainResourseRecord(rrtype="AAAA", rrdata=ip_address)
                 )
-        resources.append(
-            InternalDomainResourse(name=resource_name, records=records)
-        )
+        resources.append(InternalDomainResourse(name=resource_name, records=records))
 
     return InternalDomain(
         name=Config.objects.get_config("maas_internal_domain"),
@@ -401,24 +395,14 @@ def process_dns_update_notify(message):
                     resource = DNSResource.objects.get(
                         name=update_list[2], domain__name=zone
                     )
-                    ttl = (
-                        int(resource.address_ttl)
-                        if resource.address_ttl
-                        else None
-                    )
-                    ip_addresses = list(
-                        resource.ip_addresses.exclude(ip__isnull=True)
-                    )
+                    ttl = int(resource.address_ttl) if resource.address_ttl else None
+                    ip_addresses = list(resource.ip_addresses.exclude(ip__isnull=True))
                 else:
                     iface_id = int(update_list[-1])
                     iface = Interface.objects.get(id=iface_id)
                     default_domain = Domain.objects.get_default_domain()
-                    ttl = (
-                        int(default_domain.ttl) if default_domain.ttl else None
-                    )
-                    ip_addresses = list(
-                        iface.ip_addresses.exclude(ip__isnull=True)
-                    )
+                    ttl = int(default_domain.ttl) if default_domain.ttl else None
+                    ip_addresses = list(iface.ip_addresses.exclude(ip__isnull=True))
                 updates += [
                     DynamicDNSUpdate.create_from_trigger(
                         operation="INSERT",

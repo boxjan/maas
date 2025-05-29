@@ -67,9 +67,7 @@ def has_ipv6_address(iface):
 
 
 def dhcp_explore():
-    all_ifaces = sorted(
-        get_iface_list(check_output(["ip", "-o", "link", "show"]))
-    )
+    all_ifaces = sorted(get_iface_list(check_output(["ip", "-o", "link", "show"])))
     print("INFO: Discovered interfaces - %s" % ", ".join(all_ifaces))
     configured_ifaces = sorted(
         get_iface_list(check_output(["ip", "-o", "link", "show", "up"]))
@@ -82,14 +80,8 @@ def dhcp_explore():
     ]
     unconfigured_ifaces_4 = sorted(set(all_ifaces) - set(configured_ifaces_4))
     unconfigured_ifaces_6 = sorted(set(all_ifaces) - set(configured_ifaces_6))
-    print(
-        "INFO: Unconfigured IPv4 interfaces - %s"
-        % ", ".join(unconfigured_ifaces_4)
-    )
-    print(
-        "INFO: Unconfigured IPv6 interfaces - %s"
-        % ", ".join(unconfigured_ifaces_6)
-    )
+    print("INFO: Unconfigured IPv4 interfaces - %s" % ", ".join(unconfigured_ifaces_4))
+    print("INFO: Unconfigured IPv6 interfaces - %s" % ", ".join(unconfigured_ifaces_6))
     # Run dhclient in the background to avoid blocking node_info.  We need to
     # run two dhclient processes (one for IPv6 and one for IPv4) and IPv6 will
     # run into issues if the link-local address has not finished
@@ -140,14 +132,10 @@ def dhcp_explore():
     # Wait up to 5s for interfaces to come up
     for _ in range(5):
         unconfigured_ifaces_4 = sorted(
-            iface
-            for iface in unconfigured_ifaces_4
-            if not has_ipv4_address(iface)
+            iface for iface in unconfigured_ifaces_4 if not has_ipv4_address(iface)
         )
         unconfigured_ifaces_6 = sorted(
-            iface
-            for iface in unconfigured_ifaces_6
-            if not has_ipv6_address(iface)
+            iface for iface in unconfigured_ifaces_6 if not has_ipv6_address(iface)
         )
         if unconfigured_ifaces_4:
             print(

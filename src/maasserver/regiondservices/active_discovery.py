@@ -78,9 +78,7 @@ class ActiveDiscoveryService(TimerService):
                 "seconds." % interval
             )
         elif not enabled and enabled_changed:
-            log.msg(
-                "Active network discovery: periodic discovery is disabled."
-            )
+            log.msg("Active network discovery: periodic discovery is disabled.")
         self.discovery_enabled = enabled
         self.discovery_interval = interval
         self.discovery_last_scan = last_scan
@@ -143,8 +141,7 @@ class ActiveDiscoveryService(TimerService):
         current_time = self.getCurrentTimestamp()
         if (last_scan + interval) > current_time:
             raise _InvalidScanState(
-                "Another region controller is already scanning. "
-                "Skipping scan."
+                "Another region controller is already scanning. " "Skipping scan."
             )
         cidrs = Subnet.objects.get_cidr_list_for_periodic_active_scan()
         return cidrs
@@ -273,6 +270,5 @@ class ActiveDiscoveryService(TimerService):
         """Called if refreshing the discovery configuration fails."""
         log.err(
             failure,
-            "Active network discovery: error refreshing discovery "
-            "configuration.",
+            "Active network discovery: error refreshing discovery " "configuration.",
         )

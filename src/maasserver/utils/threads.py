@@ -100,9 +100,7 @@ def install_default_pool(maxthreads=max_threads_for_default_pool):
         # configuration straight away; it may not be ready yet.
         reactor.threadpool = make_default_pool(maxthreads)
         reactor.callWhenRunning(reactor.threadpool.start)
-        reactor.addSystemEventTrigger(
-            "during", "shutdown", reactor.threadpool.stop
-        )
+        reactor.addSystemEventTrigger("during", "shutdown", reactor.threadpool.stop)
     else:
         raise AssertionError(
             "Too late; global/reactor thread-pool has "

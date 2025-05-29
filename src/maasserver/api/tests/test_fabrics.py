@@ -54,13 +54,9 @@ class TestFabricsAPI(APITestCase.ForUser):
         uri = get_fabrics_uri()
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [fabric.id for fabric in Fabric.objects.all()]
-        result_ids = [
-            fabric["id"] for fabric in json_load_bytes(response.content)
-        ]
+        result_ids = [fabric["id"] for fabric in json_load_bytes(response.content)]
         self.assertCountEqual(expected_ids, result_ids)
 
     def test_read_has_constant_number_of_queries(self):
@@ -95,20 +91,14 @@ class TestFabricsAPI(APITestCase.ForUser):
         fabric_name = factory.make_name("fabric")
         uri = get_fabrics_uri()
         response = self.client.post(uri, {"name": fabric_name})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        self.assertEqual(
-            fabric_name, json_load_bytes(response.content)["name"]
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        self.assertEqual(fabric_name, json_load_bytes(response.content)["name"])
 
     def test_create_admin_only(self):
         fabric_name = factory.make_name("fabric")
         uri = get_fabrics_uri()
         response = self.client.post(uri, {"name": fabric_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
 
 class TestFabricAPI(APITestCase.ForUser):
@@ -126,9 +116,7 @@ class TestFabricAPI(APITestCase.ForUser):
         uri = get_fabric_uri(fabric)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_fabric = json_load_bytes(response.content)
         self.assertEqual(parsed_fabric.get("id"), fabric.id)
         self.assertEqual(parsed_fabric.get("name"), fabric.get_name())
@@ -141,9 +129,7 @@ class TestFabricAPI(APITestCase.ForUser):
     def test_read_404_when_bad_id(self):
         uri = reverse("fabric_handler", args=[random.randint(100, 1000)])
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_update(self):
         self.become_admin()
@@ -151,9 +137,7 @@ class TestFabricAPI(APITestCase.ForUser):
         new_name = factory.make_name("fabric")
         uri = get_fabric_uri(fabric)
         response = self.client.put(uri, {"name": new_name})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(new_name, json_load_bytes(response.content)["name"])
         self.assertEqual(new_name, reload_object(fabric).name)
 
@@ -162,33 +146,25 @@ class TestFabricAPI(APITestCase.ForUser):
         new_name = factory.make_name("fabric")
         uri = get_fabric_uri(fabric)
         response = self.client.put(uri, {"name": new_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_delete_deletes_fabric(self):
         self.become_admin()
         fabric = factory.make_Fabric()
         uri = get_fabric_uri(fabric)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(fabric))
 
     def test_delete_403_when_not_admin(self):
         fabric = factory.make_Fabric()
         uri = get_fabric_uri(fabric)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(fabric))
 
     def test_delete_404_when_invalid_id(self):
         self.become_admin()
         uri = reverse("fabric_handler", args=[random.randint(100, 1000)])
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)

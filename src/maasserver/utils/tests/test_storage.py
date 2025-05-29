@@ -40,9 +40,7 @@ class TestGetEffectiveFilesystem(MAASServerTestCase):
     def test_returns_filesystem_if_node_not_in_acquired_state(self):
         node = factory.make_Node(status=NODE_STATUS.READY)
         model = self.factory(node=node)
-        filesystem = factory.make_Filesystem(
-            **{self.filesystem_property: model}
-        )
+        filesystem = factory.make_Filesystem(**{self.filesystem_property: model})
         self.assertEqual(filesystem, get_effective_filesystem(model))
 
     def test_returns_acquired_filesystem(self):
@@ -89,22 +87,15 @@ class TestUsedFor(MAASServerTestCase):
 
     def test_fs_formatted_and_mounted(self):
         block_device = factory.make_BlockDevice()
-        fs = factory.make_Filesystem(
-            block_device=block_device, mount_point="/mnt"
-        )
+        fs = factory.make_Filesystem(block_device=block_device, mount_point="/mnt")
         self.assertEqual(
-            (
-                "%s formatted filesystem mounted at %s"
-                % (fs.fstype, fs.mount_point)
-            ),
+            ("%s formatted filesystem mounted at %s" % (fs.fstype, fs.mount_point)),
             used_for(block_device),
         )
 
     def test_partitioned(self):
         block_device = factory.make_BlockDevice()
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = partition_table.partitions.count()
         if partitions > 1:
             expected_message = "%s partitioned with %d partitions"
@@ -157,9 +148,7 @@ class TestUsedFor(MAASServerTestCase):
     def test_bcache(self):
         cacheset = factory.make_CacheSet()
         blockdevice = cacheset.get_device()
-        self.assertEqual(
-            ("Cache device for %s" % cacheset.name), used_for(blockdevice)
-        )
+        self.assertEqual(("Cache device for %s" % cacheset.name), used_for(blockdevice))
 
     def test_bcache_backing(self):
         filesystem_group = factory.make_FilesystemGroup(

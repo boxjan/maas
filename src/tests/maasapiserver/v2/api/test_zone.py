@@ -155,12 +155,8 @@ class TestZoneApi:
         self, authenticated_api_client: AsyncClient, fixture: Fixture
     ) -> None:
         [zone] = await fixture.get("maasserver_zone")
-        await fixture.create(
-            "maasserver_bmc", [bmc_details(zone_id=zone["id"])]
-        )
-        await fixture.create(
-            "maasserver_node", [node_details(zone_id=zone["id"])]
-        )
+        await fixture.create("maasserver_bmc", [bmc_details(zone_id=zone["id"])])
+        await fixture.create("maasserver_node", [node_details(zone_id=zone["id"])])
 
         zone["created"] = zone["created"].isoformat()
         zone["updated"] = zone["updated"].isoformat()
@@ -176,9 +172,7 @@ class TestZoneApi:
         self, authenticated_api_client: AsyncClient, fixture: Fixture
     ) -> None:
         [zone1] = await fixture.get("maasserver_zone")
-        [zone2] = await fixture.create(
-            "maasserver_zone", [zone_details(name="zone2")]
-        )
+        [zone2] = await fixture.create("maasserver_zone", [zone_details(name="zone2")])
         [bmc1] = await fixture.create(
             "maasserver_bmc", [bmc_details(zone_id=zone1["id"])]
         )
@@ -210,11 +204,7 @@ class TestZoneApi:
         )
         await fixture.create(
             "maasserver_node",
-            [
-                node_details(
-                    bmc_id=bmc2["id"], node_type=1, zone_id=zone2["id"]
-                )
-            ],
+            [node_details(bmc_id=bmc2["id"], node_type=1, zone_id=zone2["id"])],
         )
 
         zone1["created"] = zone1["created"].isoformat()

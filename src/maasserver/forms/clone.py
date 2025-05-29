@@ -57,9 +57,7 @@ class CloneForm(forms.Form):
         self.fields["source"].queryset = Machine.objects.get_nodes(
             self.user, NodePermission.view
         )
-        self.fields[
-            "destinations"
-        ].base_field.queryset = Machine.objects.get_nodes(
+        self.fields["destinations"].base_field.queryset = Machine.objects.get_nodes(
             self.user,
             NodePermission.admin,
             from_nodes=Machine.objects.filter(
@@ -99,9 +97,7 @@ class CloneForm(forms.Form):
                         except ValidationError as exc:
                             error = prefix_validation_error(
                                 exc,
-                                prefix=destination_field.error_messages[
-                                    "storage"
-                                ],
+                                prefix=destination_field.error_messages["storage"],
                                 code="storage",
                                 params={
                                     "machine": str(dest),
@@ -115,9 +111,7 @@ class CloneForm(forms.Form):
                         except ValidationError as exc:
                             error = prefix_validation_error(
                                 exc,
-                                prefix=destination_field.error_messages[
-                                    "networking"
-                                ],
+                                prefix=destination_field.error_messages["networking"],
                                 code="networking",
                                 params={
                                     "machine": str(dest),
@@ -147,9 +141,7 @@ class CloneForm(forms.Form):
                 error.params["system_id"] for error in errors["destinations"]
             }
             return [
-                dest
-                for dest in submitted_destinations
-                if dest not in bogus_system_ids
+                dest for dest in submitted_destinations if dest not in bogus_system_ids
             ]
 
     def save(self):

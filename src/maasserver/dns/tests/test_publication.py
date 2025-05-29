@@ -82,9 +82,7 @@ class TestDNSPublicationGarbageService(MAASTestCase):
         self.assertFalse(dnsgc.running)
 
 
-class TestDNSPublicationGarbageServiceWithDatabase(
-    MAASTransactionServerTestCase
-):
+class TestDNSPublicationGarbageServiceWithDatabase(MAASTransactionServerTestCase):
     """Tests for `DNSPublicationGarbageService` with the database."""
 
     run_tests_with = MAASCrochetRunTest

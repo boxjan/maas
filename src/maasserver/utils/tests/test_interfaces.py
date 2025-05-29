@@ -30,9 +30,7 @@ class TestMakeNameFromInterface(MAASTestCase):
         self.assertNotIn(make_name_from_interface(""), (None, ""))
 
     def test_makes_up_unique_name_if_no_interface_given(self):
-        self.assertNotEqual(
-            make_name_from_interface(""), make_name_from_interface("")
-        )
+        self.assertNotEqual(make_name_from_interface(""), make_name_from_interface(""))
 
 
 class TestGetNameAndVlanFromClusterInterface(MAASTestCase):

@@ -21,6 +21,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(f"DROP VIEW IF EXISTS {name}")
-        for name in SUPPORT_VIEWS
+        migrations.RunSQL(f"DROP VIEW IF EXISTS {name}") for name in SUPPORT_VIEWS
     ]

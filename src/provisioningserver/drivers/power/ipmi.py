@@ -45,27 +45,19 @@ EndSection
 
 IPMI_ERRORS = {
     "username invalid": {
-        "message": (
-            "Incorrect username.  Check BMC configuration and try again."
-        ),
+        "message": ("Incorrect username.  Check BMC configuration and try again."),
         "exception": PowerAuthError,
     },
     "password invalid": {
-        "message": (
-            "Incorrect password.  Check BMC configuration and try again."
-        ),
+        "message": ("Incorrect password.  Check BMC configuration and try again."),
         "exception": PowerAuthError,
     },
     "password verification timeout": {
-        "message": (
-            "Authentication timeout.  Check BMC configuration and try again."
-        ),
+        "message": ("Authentication timeout.  Check BMC configuration and try again."),
         "exception": PowerAuthError,
     },
     "k_g invalid": {
-        "message": (
-            "Incorrect K_g key.  Check BMC configuration and try again."
-        ),
+        "message": ("Incorrect K_g key.  Check BMC configuration and try again."),
         "exception": PowerAuthError,
     },
     "privilege level insufficient": {
@@ -127,8 +119,7 @@ IPMI_ERRORS = {
     },
     "device not found": {
         "message": (
-            "Error locating IPMI device."
-            "  Check BMC configuration and try again."
+            "Error locating IPMI device." "  Check BMC configuration and try again."
         ),
         "exception": PowerSettingError,
     },
@@ -281,9 +272,7 @@ class IPMIPowerDriver(PowerDriver):
         make_setting_field(
             "power_pass", "Power password", field_type="password", secret=True
         ),
-        make_setting_field(
-            "k_g", "K_g BMC key", field_type="password", secret=True
-        ),
+        make_setting_field("k_g", "K_g BMC key", field_type="password", secret=True),
         make_setting_field(
             "cipher_suite_id",
             "Cipher Suite ID",
@@ -308,9 +297,7 @@ class IPMIPowerDriver(PowerDriver):
             default=["opensesspriv"],
             required=False,
         ),
-        make_setting_field(
-            "mac_address", "Power MAC", scope=SETTING_SCOPE.NODE
-        ),
+        make_setting_field("mac_address", "Power MAC", scope=SETTING_SCOPE.NODE),
         make_setting_field(
             "power_off_mode",
             "Power off mode",
@@ -339,15 +326,11 @@ class IPMIPowerDriver(PowerDriver):
     ):
         with NamedTemporaryFile("w+", encoding="utf-8") as tmp_config:
             # Write out the chassis configuration.
-            if (
-                power_boot_type is None
-                or power_boot_type == IPMI_BOOT_TYPE.DEFAULT
-            ):
+            if power_boot_type is None or power_boot_type == IPMI_BOOT_TYPE.DEFAULT:
                 tmp_config.write(IPMI_CONFIG)
             else:
                 tmp_config.write(
-                    IPMI_CONFIG_WITH_BOOT_TYPE
-                    % IPMI_BOOT_TYPE_MAPPING[power_boot_type]
+                    IPMI_CONFIG_WITH_BOOT_TYPE % IPMI_BOOT_TYPE_MAPPING[power_boot_type]
                 )
             tmp_config.flush()
             # Use it when running the chassis config command.
@@ -416,9 +399,9 @@ class IPMIPowerDriver(PowerDriver):
         # The `-W opensesspriv` workaround is required on many BMCs, and
         # should have no impact on BMCs that don't require it.
         # See https://bugs.launchpad.net/maas/+bug/1287964
-        ipmi_chassis_config_command = [
-            "ipmi-chassis-config"
-        ] + self._workarounds(workaround_flags)
+        ipmi_chassis_config_command = ["ipmi-chassis-config"] + self._workarounds(
+            workaround_flags
+        )
         ipmipower_command = ["ipmipower"] + self._workarounds(workaround_flags)
 
         # Arguments in common between chassis config and power control. See
@@ -477,10 +460,7 @@ class IPMIPowerDriver(PowerDriver):
         try:
             self._issue_ipmi_command("on", **context)
         except PowerAuthError as e:
-            if (
-                context.get("k_g")
-                and str(e) == IPMI_ERRORS["k_g invalid"]["message"]
-            ):
+            if context.get("k_g") and str(e) == IPMI_ERRORS["k_g invalid"]["message"]:
                 send_node_event(
                     EVENT_TYPES.NODE_POWER_ON_FAILED,
                     system_id,
@@ -496,10 +476,7 @@ class IPMIPowerDriver(PowerDriver):
         try:
             self._issue_ipmi_command("off", **context)
         except PowerAuthError as e:
-            if (
-                context.get("k_g")
-                and str(e) == IPMI_ERRORS["k_g invalid"]["message"]
-            ):
+            if context.get("k_g") and str(e) == IPMI_ERRORS["k_g invalid"]["message"]:
                 send_node_event(
                     EVENT_TYPES.NODE_POWER_OFF_FAILED,
                     system_id,
@@ -515,10 +492,7 @@ class IPMIPowerDriver(PowerDriver):
         try:
             return self._issue_ipmi_command("query", **context)
         except PowerAuthError as e:
-            if (
-                context.get("k_g")
-                and str(e) == IPMI_ERRORS["k_g invalid"]["message"]
-            ):
+            if context.get("k_g") and str(e) == IPMI_ERRORS["k_g invalid"]["message"]:
                 send_node_event(
                     EVENT_TYPES.NODE_POWER_QUERY_FAILED,
                     system_id,

@@ -49,6 +49,5 @@ def extract_address(addr):
         return addr[0], addr[1]
     else:
         raise AssertionError(
-            "The address tuple must contain at least 2 "
-            "elements, got: %r" % (addr,)
+            "The address tuple must contain at least 2 " "elements, got: %r" % (addr,)
         )

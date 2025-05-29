@@ -145,9 +145,7 @@ def get_lxd_machine_definition(request, include_profile=False):
         "config": {
             "limits.cpu": _get_cpu_limits(request),
             "limits.memory": str(request.memory * 1024**2),
-            "limits.memory.hugepages": "true"
-            if request.hugepages_backed
-            else "false",
+            "limits.memory.hugepages": "true" if request.hugepages_backed else "false",
             # LP: 1867387 - Disable secure boot until its fixed in MAAS
             "security.secureboot": "false",
         },
@@ -223,9 +221,7 @@ class LXDPodDriver(PodDriver):
             secret=True,
         ),
     ]
-    ip_extractor = make_ip_extractor(
-        "power_address", IP_EXTRACTOR_PATTERNS.URL
-    )
+    ip_extractor = make_ip_extractor("power_address", IP_EXTRACTOR_PATTERNS.URL)
 
     _pylxd_client_class = Client
 
@@ -274,9 +270,7 @@ class LXDPodDriver(PodDriver):
             try:
                 return LXD_VM_POWER_STATE[state]
             except KeyError:
-                raise LXDPodError(
-                    f"Pod {pod_id}: Unknown power status code: {state}"
-                )
+                raise LXDPodError(f"Pod {pod_id}: Unknown power status code: {state}")
 
     @threadDeferred
     def discover_projects(self, pod_id: int, context: dict):
@@ -337,9 +331,7 @@ class LXDPodDriver(PodDriver):
             # have a way to query which architectures are usable for VMs. The
             # safest bet is to just use the kernel_architecture.
             architectures=[
-                kernel_to_debian_architecture(
-                    environment["kernel_architecture"]
-                )
+                kernel_to_debian_architecture(environment["kernel_architecture"])
             ],
             name=environment["server_name"],
             version=environment["server_version"],
@@ -372,9 +364,7 @@ class LXDPodDriver(PodDriver):
         pools = []
         local_storage = 0
         for storage_pool in storage_pools:
-            discovered_storage_pool = self._get_discovered_storage_pool(
-                storage_pool
-            )
+            discovered_storage_pool = self._get_discovered_storage_pool(storage_pool)
             local_storage += discovered_storage_pool.storage
             pools.append(discovered_storage_pool)
         discovered_pod.storage_pools = pools
@@ -385,9 +375,7 @@ class LXDPodDriver(PodDriver):
         projects = [project.name for project in client.projects.all()]
         machines = []
         for project in projects:
-            with self._get_client(
-                pod_id, context, project=project
-            ) as project_cli:
+            with self._get_client(pod_id, context, project=project) as project_cli:
                 for virtual_machine in project_cli.virtual_machines.all():
                     discovered_machine = self._get_discovered_machine(
                         project_cli,
@@ -443,13 +431,9 @@ class LXDPodDriver(PodDriver):
             # Create the machine.
             create_kwargs = {"wait": True}
             if client.host_info["environment"]["server_clustered"]:
-                create_kwargs["target"] = client.host_info["environment"][
-                    "server_name"
-                ]
+                create_kwargs["target"] = client.host_info["environment"]["server_name"]
 
-            machine = client.virtual_machines.create(
-                definition, **create_kwargs
-            )
+            machine = client.virtual_machines.create(definition, **create_kwargs)
             # Pod hints are updated on the region after the machine is composed.
             discovered_machine = self._get_discovered_machine(
                 client, machine, storage_pools, request=request
@@ -488,9 +472,7 @@ class LXDPodDriver(PodDriver):
                 f"to support the following extensions: {','.join(missing_extensions)}"
             )
 
-    def _get_machine_disks(
-        self, requested_disks, storage_pools, default_storage_pool
-    ):
+    def _get_machine_disks(self, requested_disks, storage_pools, default_storage_pool):
         """Return definitions for machine disks, after creating needed volumes."""
         disks = {}
         for idx, disk in enumerate(requested_disks):
@@ -526,9 +508,7 @@ class LXDPodDriver(PodDriver):
             raise LXDPodError("No host network to attach VM interfaces to")
 
         nics = {}
-        ifnames = {
-            iface.ifname for iface in request.interfaces if iface.ifname
-        }
+        ifnames = {iface.ifname for iface in request.interfaces if iface.ifname}
         ifindex = 0
         for idx, interface in enumerate(request.interfaces):
             ifname = interface.ifname
@@ -582,9 +562,7 @@ class LXDPodDriver(PodDriver):
             name=client.project, description="Project managed by MAAS"
         )
 
-    def _get_usable_storage_pool(
-        self, disk, storage_pools, default_storage_pool=None
-    ):
+    def _get_usable_storage_pool(self, disk, storage_pools, default_storage_pool=None):
         """Return the storage pool and type that has enough space for `disk.size`."""
         # Filter off of tags.
         filtered_storage_pools = [
@@ -602,10 +580,7 @@ class LXDPodDriver(PodDriver):
                 "Not enough storage space on storage pools: %s"
                 % (
                     ", ".join(
-                        [
-                            storage_pool.name
-                            for storage_pool in filtered_storage_pools
-                        ]
+                        [storage_pool.name for storage_pool in filtered_storage_pools]
                     )
                 )
             )
@@ -637,25 +612,17 @@ class LXDPodDriver(PodDriver):
                 return storage_pool
         raise PodInvalidResources(
             "Not enough storage space on any storage pools: %s"
-            % (
-                ", ".join(
-                    [storage_pool.name for storage_pool in storage_pools]
-                )
-            )
+            % (", ".join([storage_pool.name for storage_pool in storage_pools]))
         )
 
-    def _get_discovered_machine(
-        self, client, machine, storage_pools, request=None
-    ):
+    def _get_discovered_machine(self, client, machine, storage_pools, request=None):
         """Get the discovered machine."""
         # Check the power state first.
         state = machine.status_code
         try:
             power_state = LXD_VM_POWER_STATE[state]
         except KeyError:
-            maaslog.error(
-                f"{machine.name}: Unknown power status code: {state}"
-            )
+            maaslog.error(f"{machine.name}: Unknown power status code: {state}")
             power_state = "unknown"
 
         def _get_discovered_block_device(name, device, requested_device=None):
@@ -706,9 +673,7 @@ class LXDPodDriver(PodDriver):
                 attach_name = device["parent"]
                 nictype = device["nictype"]
                 attach_type = (
-                    InterfaceAttachType.BRIDGE
-                    if nictype == "bridged"
-                    else nictype
+                    InterfaceAttachType.BRIDGE if nictype == "bridged" else nictype
                 )
             mac = device.get("hwaddr")
             if mac is None:
@@ -760,12 +725,8 @@ class LXDPodDriver(PodDriver):
             memory = convert_lxd_byte_suffixes(memory, divisor=1024**2)
         else:
             memory = 1024
-        hugepages_backed = _get_bool(
-            expanded_config.get("limits.memory.hugepages")
-        )
-        cores, pinned_cores = _parse_cpu_cores(
-            expanded_config.get("limits.cpu")
-        )
+        hugepages_backed = _get_bool(expanded_config.get("limits.memory.hugepages"))
+        cores, pinned_cores = _parse_cpu_cores(expanded_config.get("limits.cpu"))
         return DiscoveredMachine(
             hostname=machine.name,
             architecture=kernel_to_debian_architecture(machine.architecture),
@@ -884,9 +845,7 @@ class LXDPodDriver(PodDriver):
                 client = client_with_certs(maas_certs)
 
             if not client.trusted:
-                raise Error(
-                    "Certificate is not trusted and no password was given"
-                )
+                raise Error("Certificate is not trusted and no password was given")
         except ClientConnectionFailed as e:
             raise LXDPodError(
                 f"Pod {pod_id}: Failed to connect to the LXD REST API: {e}"

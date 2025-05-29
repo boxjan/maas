@@ -28,8 +28,7 @@ class TestTestForm(MAASServerTestCase):
         self.assertEqual(
             {
                 "__all__": [
-                    "Test is not available because of the current state "
-                    "of the node."
+                    "Test is not available because of the current state " "of the node."
                 ]
             },
             form.errors,
@@ -53,8 +52,7 @@ class TestTestForm(MAASServerTestCase):
         user = factory.make_admin()
         enable_ssh = factory.pick_bool()
         testing_scripts = [
-            factory.make_Script(script_type=SCRIPT_TYPE.TESTING).name
-            for _ in range(3)
+            factory.make_Script(script_type=SCRIPT_TYPE.TESTING).name for _ in range(3)
         ]
         mock_start_testing = self.patch_autospec(node, "start_testing")
         form = TestForm(
@@ -304,9 +302,7 @@ class TestTestForm(MAASServerTestCase):
         user = factory.make_admin()
         script = factory.make_Script(
             script_type=SCRIPT_TYPE.TESTING,
-            parameters={
-                "arg": {"type": "boolean", "argument_format": "--arg"}
-            },
+            parameters={"arg": {"type": "boolean", "argument_format": "--arg"}},
         )
         mock_start_testing = self.patch_autospec(node, "start_testing")
         form = TestForm(
@@ -382,28 +378,18 @@ class TestTestForm(MAASServerTestCase):
     def test_testing_scripts_cannt_be_none(self):
         node = factory.make_Node(status=NODE_STATUS.DEPLOYED, interface=True)
         user = factory.make_admin()
-        form = TestForm(
-            instance=node, user=user, data={"testing_scripts": "none"}
-        )
+        form = TestForm(instance=node, user=user, data={"testing_scripts": "none"})
         self.assertFalse(form.is_valid())
 
     def test_cannt_run_destructive_test_on_deployed_machine(self):
-        script = factory.make_Script(
-            script_type=SCRIPT_TYPE.TESTING, destructive=True
-        )
-        node = factory.make_Machine(
-            status=NODE_STATUS.DEPLOYED, interface=True
-        )
+        script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING, destructive=True)
+        node = factory.make_Machine(status=NODE_STATUS.DEPLOYED, interface=True)
         user = factory.make_admin()
-        form = TestForm(
-            instance=node, user=user, data={"testing_scripts": script.name}
-        )
+        form = TestForm(instance=node, user=user, data={"testing_scripts": script.name})
         self.assertFalse(form.is_valid())
 
     def test_cannt_run_destructive_test_on_non_machine(self):
-        script = factory.make_Script(
-            script_type=SCRIPT_TYPE.TESTING, destructive=True
-        )
+        script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING, destructive=True)
         node = factory.make_Node(
             node_type=factory.pick_choice(
                 NODE_TYPE_CHOICES, but_not=[NODE_TYPE.MACHINE]
@@ -411,9 +397,7 @@ class TestTestForm(MAASServerTestCase):
             interface=True,
         )
         user = factory.make_admin()
-        form = TestForm(
-            instance=node, user=user, data={"testing_scripts": script.name}
-        )
+        form = TestForm(instance=node, user=user, data={"testing_scripts": script.name})
         self.assertFalse(form.is_valid())
 
 
@@ -454,9 +438,7 @@ class TestCommissionForm(MAASServerTestCase):
             interface=True,
         )
         user = factory.make_admin()
-        mock_start_commissioning = self.patch_autospec(
-            node, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch_autospec(node, "start_commissioning")
         form = CommissionForm(instance=node, user=user, data={})
         self.assertTrue(form.is_valid(), form.errors)
         node = form.save()
@@ -483,12 +465,9 @@ class TestCommissionForm(MAASServerTestCase):
             for _ in range(3)
         ]
         testing_scripts = [
-            factory.make_Script(script_type=SCRIPT_TYPE.TESTING).name
-            for _ in range(3)
+            factory.make_Script(script_type=SCRIPT_TYPE.TESTING).name for _ in range(3)
         ]
-        mock_start_commissioning = self.patch_autospec(
-            node, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch_autospec(node, "start_commissioning")
         form = CommissionForm(
             instance=node,
             user=user,
@@ -532,9 +511,7 @@ class TestCommissionForm(MAASServerTestCase):
             script_type=SCRIPT_TYPE.TESTING,
             parameters={"storage": {"type": "storage"}},
         )
-        mock_start_commissioning = self.patch_autospec(
-            node, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch_autospec(node, "start_commissioning")
         commissioning_input = random.choice(
             [
                 str(commissioning_bd.id),
@@ -600,8 +577,7 @@ class TestCommissionForm(MAASServerTestCase):
             data={
                 "commissioning_scripts": commissioning_script.name,
                 "testing_scripts": testing_script.name,
-                "%s_storage"
-                % commissioning_script.name: factory.make_name("bad"),
+                "%s_storage" % commissioning_script.name: factory.make_name("bad"),
                 "%s_storage" % testing_script.name: factory.make_name("bad"),
             },
         )
@@ -620,9 +596,7 @@ class TestCommissionForm(MAASServerTestCase):
             script_type=SCRIPT_TYPE.TESTING,
             parameters={"interface": {"type": "interface"}},
         )
-        mock_start_commissioning = self.patch_autospec(
-            node, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch_autospec(node, "start_commissioning")
         commissioning_input = random.choice(
             [
                 str(commissioning_interface.id),
@@ -645,8 +619,7 @@ class TestCommissionForm(MAASServerTestCase):
                 str(testing_interface.mac_address),
                 testing_interface.vendor,
                 testing_interface.product,
-                "%s:%s"
-                % (testing_interface.vendor, testing_interface.product),
+                "%s:%s" % (testing_interface.vendor, testing_interface.product),
             ]
             + testing_interface.tags
         )
@@ -656,8 +629,7 @@ class TestCommissionForm(MAASServerTestCase):
             data={
                 "commissioning_scripts": commissioning_script.name,
                 "testing_scripts": testing_script.name,
-                "%s_interface"
-                % commissioning_script.name: commissioning_input,
+                "%s_interface" % commissioning_script.name: commissioning_input,
                 "%s_interface" % testing_script.name: testing_input,
             },
         )
@@ -696,8 +668,7 @@ class TestCommissionForm(MAASServerTestCase):
             data={
                 "commissioning_scripts": commissioning_script.name,
                 "testing_scripts": testing_script.name,
-                "%s_interface"
-                % commissioning_script.name: factory.make_name("bad"),
+                "%s_interface" % commissioning_script.name: factory.make_name("bad"),
                 "%s_interface" % testing_script.name: factory.make_name("bad"),
             },
         )
@@ -714,9 +685,7 @@ class TestCommissionForm(MAASServerTestCase):
             script_type=SCRIPT_TYPE.TESTING,
             parameters={"runtime": {"type": "runtime"}},
         )
-        mock_start_commissioning = self.patch_autospec(
-            node, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch_autospec(node, "start_commissioning")
         commissioning_input = random.choice(["168:00:00", "10080:00", 604800])
         testing_input = random.choice(["168:00:00", "10080:00", 604800])
         form = CommissionForm(
@@ -764,8 +733,7 @@ class TestCommissionForm(MAASServerTestCase):
             data={
                 "commissioning_scripts": commissioning_script.name,
                 "testing_scripts": testing_script.name,
-                "%s_runtime"
-                % commissioning_script.name: factory.make_name("bad"),
+                "%s_runtime" % commissioning_script.name: factory.make_name("bad"),
                 "%s_runtime" % testing_script.name: factory.make_name("bad"),
             },
         )
@@ -782,9 +750,7 @@ class TestCommissionForm(MAASServerTestCase):
             script_type=SCRIPT_TYPE.TESTING,
             parameters={"url": {"type": "url"}},
         )
-        mock_start_commissioning = self.patch_autospec(
-            node, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch_autospec(node, "start_commissioning")
         commissioning_input = factory.make_url(scheme="http")
         testing_input = factory.make_url(scheme="http")
         form = CommissionForm(
@@ -835,9 +801,7 @@ class TestCommissionForm(MAASServerTestCase):
             script_type=SCRIPT_TYPE.TESTING,
             parameters={"storage": {"type": "storage"}},
         )
-        mock_start_commissioning = self.patch_autospec(
-            node, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch_autospec(node, "start_commissioning")
         commissioning_input = random.choice(
             [
                 str(commissioning_bd.id),
@@ -908,9 +872,7 @@ class TestCommissionForm(MAASServerTestCase):
         self.assertFalse(form.is_valid())
 
     def test_validates_testing_scripts(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.READY, power_state=POWER_STATE.OFF
-        )
+        node = factory.make_Node(status=NODE_STATUS.READY, power_state=POWER_STATE.OFF)
         user = factory.make_admin()
         form = CommissionForm(
             instance=node,
@@ -925,9 +887,7 @@ class TestCommissionForm(MAASServerTestCase):
             power_state=POWER_STATE.OFF,
             interface=True,
         )
-        mock_start_commissioning = self.patch_autospec(
-            node, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch_autospec(node, "start_commissioning")
         user = factory.make_admin()
         form = CommissionForm(
             instance=node, user=user, data={"testing_scripts": "none"}

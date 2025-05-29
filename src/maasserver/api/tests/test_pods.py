@@ -180,9 +180,7 @@ class TestPodsAPIUser(PodAPITestForUser, PodMixin):
         )
 
     def test_create_requires_admin(self):
-        response = self.client.post(
-            reverse("pods_handler"), self.make_pod_info()
-        )
+        response = self.client.post(reverse("pods_handler"), self.make_pod_info())
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
 
@@ -241,9 +239,7 @@ class TestPodsAPIAdmin(PodAPITestForAdmin, PodMixin):
             {},
             {failed_rack.system_id: factory.make_exception()},
         )
-        response = self.client.post(
-            reverse("pods_handler"), self.make_pod_info()
-        )
+        response = self.client.post(reverse("pods_handler"), self.make_pod_info())
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
         self.assertTrue(Pod.objects.filter(id=parsed_result["id"]).exists())
@@ -307,39 +303,29 @@ class TestPodAPI(PodAPITestForUser, PodMixin):
     def test_GET_reads_pod(self):
         pod = factory.make_Pod()
         response = self.client.get(get_pod_uri(pod))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_pod = json_load_bytes(response.content)
         self.assertEqual(pod.id, parsed_pod["id"])
 
     def test_PUT_requires_admin(self):
         pod = factory.make_Pod()
         response = self.client.put(get_pod_uri(pod))
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_refresh_requires_admin(self):
         pod = factory.make_Pod()
         response = self.client.post(get_pod_uri(pod), {"op": "refresh"})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_parameters_requires_admin(self):
         pod = factory.make_Pod()
         response = self.client.get(get_pod_uri(pod), {"op": "parameters"})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_compose_requires_admin(self):
         pod = make_pod_with_hints()
         response = self.client.post(get_pod_uri(pod), {"op": "compose"})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_DELETE_rejects_deletion_if_not_permitted(self):
         pod = factory.make_Pod()
@@ -353,9 +339,7 @@ class TestPodAPI(PodAPITestForUser, PodMixin):
             get_pod_uri(pod),
             {"op": "add_tag", "tag": factory.make_name("tag")},
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_remove_tag_requires_admin(self):
         pod = factory.make_Pod()
@@ -364,9 +348,7 @@ class TestPodAPI(PodAPITestForUser, PodMixin):
             {"op": "remove_tag", "tag": factory.make_name("tag")},
         )
 
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
 
 class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
@@ -397,9 +379,7 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
                 "pool": new_pool.name,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         pod.refresh_from_db()
         self.assertIsNotNone(Tag.objects.get(name="pod-console-logging"))
         self.assertEqual(new_name, pod.name)
@@ -424,9 +404,7 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
                 "zone": pod_info["zone"],
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_output = json_load_bytes(response.content)
         self.assertEqual(new_name, parsed_output["name"])
         self.assertEqual(discovered_pod.cores, parsed_output["total"]["cores"])
@@ -438,15 +416,11 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
             "power_address": pod_info["power_address"],
             "power_pass": pod_info["power_pass"],
         }
-        pod = factory.make_Pod(
-            pod_type=pod_info["type"], parameters=power_parameters
-        )
+        pod = factory.make_Pod(pod_type=pod_info["type"], parameters=power_parameters)
         new_name = factory.make_name("pool")
         self.fake_pod_discovery()
         response = self.client.put(get_pod_uri(pod), {"name": new_name})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         pod.refresh_from_db()
         self.assertIsNotNone(Tag.objects.get(name="pod-console-logging"))
         self.assertEqual(new_name, pod.name)
@@ -461,9 +435,7 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
         response = self.client.put(
             get_pod_uri(pod), {"default_macvlan_mode": default_macvlan_mode}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         pod.refresh_from_db()
         self.assertEqual(pod.default_macvlan_mode, default_macvlan_mode)
 
@@ -472,22 +444,16 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
         pod = factory.make_Pod()
         discovered_pod, _, _ = self.fake_pod_discovery()
         response = self.client.post(get_pod_uri(pod), {"op": "refresh"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_output = json_load_bytes(response.content)
         self.assertEqual(discovered_pod.cores, parsed_output["total"]["cores"])
 
     def test_parameters_returns_pod_parameters(self):
         pod = factory.make_Pod()
-        pod.set_power_parameters(
-            {factory.make_name("key"): factory.make_name("value")}
-        )
+        pod.set_power_parameters({factory.make_name("key"): factory.make_name("value")})
         pod.save()
         response = self.client.get(get_pod_uri(pod), {"op": "parameters"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_params = json_load_bytes(response.content)
         self.assertEqual(pod.get_power_parameters(), parsed_params)
 
@@ -499,9 +465,7 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
         self.assertEqual(
             http.client.BAD_REQUEST, response.status_code, response.content
         )
-        self.assertEqual(
-            b"VM host does not support composability.", response.content
-        )
+        self.assertEqual(b"VM host does not support composability.", response.content)
 
     def test_compose_composes_with_defaults(self):
         self.patch(pods, "post_commit_do")
@@ -517,17 +481,13 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         # Mock start_commissioning so it doesn't use post commit hooks.
         self.patch(Machine, "start_commissioning")
 
         response = self.client.post(get_pod_uri(pod), {"op": "compose"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_machine = json_load_bytes(response.content)
         self.assertEqual(parsed_machine.keys(), {"resource_uri", "system_id"})
         machine = Machine.objects.get(system_id=parsed_machine["system_id"])
@@ -545,9 +505,7 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         # Mock start_commissioning so it doesn't use post commit hooks.
         self.patch(Machine, "start_commissioning")
@@ -556,9 +514,7 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
         response = self.client.post(
             get_pod_uri(pod), {"op": "compose", "pool": pool.id}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_machine = json_load_bytes(response.content)
         self.assertEqual(parsed_machine.keys(), {"resource_uri", "system_id"})
         machine = Machine.objects.get(system_id=parsed_machine["system_id"])
@@ -582,9 +538,7 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
         mock_async_delete = self.patch(Pod, "async_delete")
         mock_async_delete.return_value = mock_eventual
         response = self.client.delete(get_pod_uri(pod))
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         mock_eventual.wait.assert_called_once_with(60)
 
     def test_DELETE_calls_async_delete_decompose(self):
@@ -594,12 +548,8 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
         mock_eventual = MagicMock()
         mock_async_delete = self.patch(Pod, "async_delete")
         mock_async_delete.return_value = mock_eventual
-        response = self.client.delete(
-            get_pod_uri(pod), query={"decompose": True}
-        )
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        response = self.client.delete(get_pod_uri(pod), query={"decompose": True})
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         mock_eventual.wait.assert_called_once_with(60 * 4)
 
     def test_add_tag_to_pod(self):
@@ -609,26 +559,20 @@ class TestPodAPIAdmin(PodAPITestForAdmin, PodMixin):
             get_pod_uri(pod), {"op": "add_tag", "tag": tag_to_be_added}
         )
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_device = json_load_bytes(response.content)
         self.assertIn(tag_to_be_added, parsed_device["tags"])
         pod = reload_object(pod)
         self.assertIn(tag_to_be_added, pod.tags)
 
     def test_remove_tag_from_pod(self):
-        pod = factory.make_Pod(
-            tags=[factory.make_name("tag") for _ in range(3)]
-        )
+        pod = factory.make_Pod(tags=[factory.make_name("tag") for _ in range(3)])
         tag_to_be_removed = pod.tags[0]
         response = self.client.post(
             get_pod_uri(pod), {"op": "remove_tag", "tag": tag_to_be_removed}
         )
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_device = json_load_bytes(response.content)
         self.assertNotIn(tag_to_be_removed, parsed_device["tags"])
         pod = reload_object(pod)

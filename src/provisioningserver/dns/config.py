@@ -140,9 +140,7 @@ def get_zone_file_config_dir():
 
 def get_bind_config_dir():
     """Location of bind configuration files."""
-    setting = os.getenv(
-        "MAAS_BIND_CONFIG_DIR", locate_config(os.path.pardir, "bind")
-    )
+    setting = os.getenv("MAAS_BIND_CONFIG_DIR", locate_config(os.path.pardir, "bind"))
     if isinstance(setting, bytes):
         fsenc = sys.getfilesystemencoding()
         return setting.decode(fsenc)
@@ -174,9 +172,7 @@ class DNSConfigFail(Exception):
     """Raised if there's a problem with a DNS config."""
 
 
-SRVRecord = namedtuple(
-    "SRVRecord", ["service", "priority", "weight", "port", "target"]
-)
+SRVRecord = namedtuple("SRVRecord", ["service", "priority", "weight", "port", "target"])
 
 
 # Default 'controls' stanza to be included in the Bind configuration, to
@@ -208,9 +204,7 @@ def uncomment_named_conf(named_comment):
     return re.sub("^# ", "", named_comment, flags=re.MULTILINE)
 
 
-def generate_rndc(
-    port=953, key_name="rndc-maas-key", include_default_controls=True
-):
+def generate_rndc(port=953, key_name="rndc-maas-key", include_default_controls=True):
     """Use `rndc-confgen` (from bind9utils) to generate a rndc+named
     configuration.
 
@@ -336,9 +330,7 @@ def set_up_options_conf(overwrite=True, **kwargs):
     ]
 
     try:
-        parsed_options = read_isc_file(
-            compose_bind_config_path(NAMED_CONF_OPTIONS)
-        )
+        parsed_options = read_isc_file(compose_bind_config_path(NAMED_CONF_OPTIONS))
     except OSError:
         parsed_options = {}
 
@@ -465,9 +457,7 @@ class DNSConfig:
         for target_file_name in target_file_names:
             target_path = compose_config_path(target_file_name)
             if '"' in target_path:
-                maaslog.error(
-                    "DNS config path contains quote: %s." % target_path
-                )
+                maaslog.error("DNS config path contains quote: %s." % target_path)
             else:
                 snippet += 'include "%s";\n' % target_path
         return snippet

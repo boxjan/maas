@@ -92,9 +92,7 @@ def listenFor(channel):
         stop()
 
 
-class TestNodeListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestNodeListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the triggers code."""
 
     scenarios = (
@@ -266,9 +264,7 @@ class TestNodeListener(
         )
 
 
-class TestControllerListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestControllerListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the triggers code."""
 
     scenarios = (
@@ -347,9 +343,7 @@ class TestControllerListener(
             yield deferToDatabase(
                 self.set_versions_info,
                 controller,
-                SnapVersionsInfo(
-                    current={"version": "3.0.0", "revision": "1234"}
-                ),
+                SnapVersionsInfo(current={"version": "3.0.0", "revision": "1234"}),
             )
             yield dv.get(timeout=2)
             self.assertEqual(("update", controller.system_id), dv.value)
@@ -431,9 +425,7 @@ class TestDeviceWithParentListener(
             yield listener.stopService()
 
 
-class TestZoneListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestZoneListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the zone
     triggers code."""
 
@@ -568,9 +560,7 @@ class TestResourcePoolListener(
         listener.register("resourcepool", lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.create_node, {"node_type": NODE_TYPE.DEVICE}
-            )
+            yield deferToDatabase(self.create_node, {"node_type": NODE_TYPE.DEVICE})
             with self.assertRaisesRegex(CancelledError, "^$"):
                 yield dv.get(timeout=0.2)
         finally:
@@ -624,9 +614,7 @@ class TestResourcePoolListener(
         )
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.update_node, node.system_id, {"pool": pool2}
-            )
+            yield deferToDatabase(self.update_node, node.system_id, {"pool": pool2})
             yield dv1.get(timeout=2)
             yield dv2.get(timeout=2)
             values = sorted([dv1.value, dv2.value])
@@ -706,9 +694,7 @@ class TestResourcePoolListener(
                 if node_type != NODE_TYPE.MACHINE
             ]
         )
-        node = yield deferToDatabase(
-            self.create_node, {"node_type": initial_node_type}
-        )
+        node = yield deferToDatabase(self.create_node, {"node_type": initial_node_type})
         yield listener.startService()
         try:
             yield deferToDatabase(
@@ -752,9 +738,7 @@ class TestResourcePoolListener(
             yield listener.stopService()
 
 
-class TestTagListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestTagListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the tag
     triggers code."""
 
@@ -806,9 +790,7 @@ class TestTagListener(
             yield listener.stopService()
 
 
-class TestNodeTagListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestNodeTagListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the triggers on
     maasserver_node_tags table."""
 
@@ -911,9 +893,7 @@ class TestNodeTagListener(
             yield listener.stopService()
 
 
-class TestOwnerDataTriggers(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestOwnerDataTriggers(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     scenarios = (
         (
             "machine",
@@ -975,9 +955,7 @@ class TestOwnerDataTriggers(
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register(self.listener, lambda *args: dv.set(args))
-        yield deferToDatabase(
-            OwnerData.objects.set_owner_data, node, {"foo": "bar"}
-        )
+        yield deferToDatabase(OwnerData.objects.set_owner_data, node, {"foo": "bar"})
         yield listener.startService()
         try:
             yield deferToDatabase(
@@ -996,9 +974,7 @@ class TestOwnerDataTriggers(
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register(self.listener, lambda *args: dv.set(args))
-        yield deferToDatabase(
-            OwnerData.objects.set_owner_data, node, {"foo": "bar"}
-        )
+        yield deferToDatabase(OwnerData.objects.set_owner_data, node, {"foo": "bar"})
         yield listener.startService()
         try:
             yield deferToDatabase(
@@ -1164,9 +1140,7 @@ class TestDeviceWithParentTagListener(
             yield listener.stopService()
 
 
-class TestUserListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestUserListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the user
     triggers code."""
 
@@ -1225,9 +1199,7 @@ class TestUserListener(
             yield listener.stopService()
 
 
-class TestEventListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestEventListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the event
     triggers code."""
 
@@ -1246,9 +1218,7 @@ class TestEventListener(
             yield listener.stopService()
 
 
-class TestNodeEventListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestNodeEventListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the triggers on
     maasserver_event table that notifies its node."""
 
@@ -1296,9 +1266,7 @@ class TestNodeEventListener(
         listener.register(self.listener, lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.create_event, {"node": node, "type": event_type}
-            )
+            yield deferToDatabase(self.create_event, {"node": node, "type": event_type})
             yield dv.get(timeout=2)
             self.assertEqual(("update", node.system_id), dv.value)
         finally:
@@ -1362,18 +1330,14 @@ class TestNodeStaticIPAddressListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_create(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register(self.listener, lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.create_staticipaddress, {"interface": interface}
-            )
+            yield deferToDatabase(self.create_staticipaddress, {"interface": interface})
             yield dv.get(timeout=2)
             self.assertEqual(("update", node.system_id), dv.value)
         finally:
@@ -1383,9 +1347,7 @@ class TestNodeStaticIPAddressListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_delete(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
         sip = yield deferToDatabase(
             self.create_staticipaddress, {"interface": interface}
         )
@@ -1423,9 +1385,7 @@ class TestDeviceWithParentStaticIPAddressListener(
         listener.register("machine", lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.create_staticipaddress, {"interface": interface}
-            )
+            yield deferToDatabase(self.create_staticipaddress, {"interface": interface})
             yield dv.get(timeout=2)
             self.assertEqual(("update", parent.system_id), dv.value)
         finally:
@@ -1456,9 +1416,7 @@ class TestDeviceWithParentStaticIPAddressListener(
             yield listener.stopService()
 
 
-class TestScriptSetListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestScriptSetListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the triggers on
     maasserver_scriptset table that notifies its node."""
 
@@ -1663,9 +1621,7 @@ class TestNDScriptResultListener(
         yield deferToDatabase(load_builtin_scripts)
         node = yield deferToDatabase(self.create_node, self.params)
         script_set = yield deferToDatabase(self.create_scriptset, node)
-        script_result = yield deferToDatabase(
-            self.create_scriptresult, script_set
-        )
+        script_result = yield deferToDatabase(self.create_scriptresult, script_set)
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -1698,9 +1654,7 @@ class TestScriptResultListener(
         listener.register("scriptresult", lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            script_result = yield deferToDatabase(
-                self.create_scriptresult, script_set
-            )
+            script_result = yield deferToDatabase(self.create_scriptresult, script_set)
             yield dv.get(timeout=2)
             self.assertEqual(("create", str(script_result.id)), dv.value)
         finally:
@@ -1735,9 +1689,7 @@ class TestScriptResultListener(
         yield deferToDatabase(load_builtin_scripts)
         node = yield deferToDatabase(self.create_node)
         script_set = yield deferToDatabase(self.create_scriptset, node)
-        script_result = yield deferToDatabase(
-            self.create_scriptresult, script_set
-        )
+        script_result = yield deferToDatabase(self.create_scriptresult, script_set)
         script_result_id = script_result.id
 
         listener = self.make_listener_without_delay()
@@ -1813,9 +1765,7 @@ class TestNodeInterfaceListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_delete(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": node}
-        )
+        interface = yield deferToDatabase(self.create_interface, {"node": node})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -1833,9 +1783,7 @@ class TestNodeInterfaceListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": node}
-        )
+        interface = yield deferToDatabase(self.create_interface, {"node": node})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -1857,9 +1805,7 @@ class TestNodeInterfaceListener(
     def test_calls_handler_with_update_on_old_node_on_update(self):
         node1 = yield deferToDatabase(self.create_node, self.params)
         node2 = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": node1}
-        )
+        interface = yield deferToDatabase(self.create_interface, {"node": node1})
         dvs = [DeferredValue(), DeferredValue()]
 
         def set_defer_value(*args):
@@ -1916,9 +1862,7 @@ class TestDeviceWithParentInterfaceListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_delete(self):
         device, parent = yield deferToDatabase(self.create_device_with_parent)
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": device}
-        )
+        interface = yield deferToDatabase(self.create_interface, {"node": device})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -1935,9 +1879,7 @@ class TestDeviceWithParentInterfaceListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_update(self):
         device, parent = yield deferToDatabase(self.create_device_with_parent)
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": device}
-        )
+        interface = yield deferToDatabase(self.create_interface, {"node": device})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -1957,15 +1899,9 @@ class TestDeviceWithParentInterfaceListener(
     @wait_for_reactor
     @inlineCallbacks
     def test_calls_handler_with_update_on_old_node_on_update(self):
-        device1, parent1 = yield deferToDatabase(
-            self.create_device_with_parent
-        )
-        device2, parent2 = yield deferToDatabase(
-            self.create_device_with_parent
-        )
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": device1}
-        )
+        device1, parent1 = yield deferToDatabase(self.create_device_with_parent)
+        device2, parent2 = yield deferToDatabase(self.create_device_with_parent)
+        interface = yield deferToDatabase(self.create_interface, {"node": device1})
         dvs = [DeferredValue(), DeferredValue()]
 
         def set_defer_value(*args):
@@ -1996,9 +1932,7 @@ class TestDeviceWithParentInterfaceListener(
             yield listener.stopService()
 
 
-class TestFabricListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestFabricListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -2072,9 +2006,7 @@ class TestFabricListener(
             yield listener.stopService()
 
 
-class TestVLANListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestVLANListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -2129,9 +2061,7 @@ class TestVLANListener(
             yield listener.stopService()
 
 
-class TestIPRangeListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestIPRangeListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -2142,9 +2072,7 @@ class TestIPRangeListener(
         dv = DeferredValue()
         listener.register("iprange", lambda *args: dv.set(args))
         network = factory.make_ipv4_network()
-        subnet = yield deferToDatabase(
-            self.create_subnet, {"cidr": str(network)}
-        )
+        subnet = yield deferToDatabase(self.create_subnet, {"cidr": str(network)})
         params = {
             "subnet": subnet,
             "start_ip": IPAddress(network.first + 2),
@@ -2193,9 +2121,7 @@ class TestIPRangeListener(
             yield listener.stopService()
 
 
-class TestStaticRouteListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestStaticRouteListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -2219,9 +2145,7 @@ class TestStaticRouteListener(
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register("staticroute", lambda *args: dv.set(args))
-        staticroute = yield deferToDatabase(
-            self.create_staticroute, {"metric": 9}
-        )
+        staticroute = yield deferToDatabase(self.create_staticroute, {"metric": 9})
         yield listener.startService()
         try:
             yield deferToDatabase(
@@ -2250,9 +2174,7 @@ class TestStaticRouteListener(
             yield listener.stopService()
 
 
-class TestDomainListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestDomainListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -2311,9 +2233,7 @@ class TestDomainListener(
         domain = yield deferToDatabase(self.create_domain)
         params = {"node_type": NODE_TYPE.MACHINE, "domain": domain}
         node = yield deferToDatabase(self.create_node, params)
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": node}
-        )
+        interface = yield deferToDatabase(self.create_interface, {"node": node})
         subnet = yield deferToDatabase(self.create_subnet)
         ipaddress = yield deferToDatabase(
             self.create_staticipaddress,
@@ -2347,9 +2267,7 @@ class TestDomainListener(
         domain = yield deferToDatabase(self.create_domain)
         params = {"node_type": NODE_TYPE.MACHINE, "domain": domain}
         node = yield deferToDatabase(self.create_node, params)
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": node}
-        )
+        interface = yield deferToDatabase(self.create_interface, {"node": node})
         subnet = yield deferToDatabase(self.create_subnet)
 
         selected_ip = factory.pick_ip_in_network(subnet.get_ipnetwork())
@@ -2378,9 +2296,7 @@ class TestDomainListener(
         domain = yield deferToDatabase(self.create_domain)
         params = {"node_type": NODE_TYPE.MACHINE, "domain": domain}
         node = yield deferToDatabase(self.create_node, params)
-        interface = yield deferToDatabase(
-            self.create_interface, {"node": node}
-        )
+        interface = yield deferToDatabase(self.create_interface, {"node": node})
         subnet = yield deferToDatabase(self.create_subnet)
         selected_ip = factory.pick_ip_in_network(subnet.get_ipnetwork())
         ipaddress = yield deferToDatabase(
@@ -2453,9 +2369,7 @@ class TestDomainListener(
     @inlineCallbacks
     def test_calls_handler_on_dnsresource_address_removal(self):
         domain = yield deferToDatabase(self.create_domain)
-        dnsrr = yield deferToDatabase(
-            self.create_dnsresource, {"domain": domain}
-        )
+        dnsrr = yield deferToDatabase(self.create_dnsresource, {"domain": domain})
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register("domain", lambda *args: dv.set(args))
@@ -2474,9 +2388,7 @@ class TestDomainListener(
         domain = yield deferToDatabase(self.create_domain)
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
-        dnsrr = yield deferToDatabase(
-            self.create_dnsresource, {"domain": domain}
-        )
+        dnsrr = yield deferToDatabase(self.create_dnsresource, {"domain": domain})
         listener.register("domain", lambda *args: dv.set(args))
 
         yield listener.startService()
@@ -2495,9 +2407,7 @@ class TestDomainListener(
     @inlineCallbacks
     def test_calls_handler_on_dnsresource_delete_notification(self):
         domain = yield deferToDatabase(self.create_domain)
-        dnsrr = yield deferToDatabase(
-            self.create_dnsresource, {"domain": domain}
-        )
+        dnsrr = yield deferToDatabase(self.create_dnsresource, {"domain": domain})
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register("domain", lambda *args: dv.set(args))
@@ -2530,9 +2440,7 @@ class TestDomainListener(
         domain = yield deferToDatabase(self.create_domain)
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
-        dnsdata = yield deferToDatabase(
-            self.create_dnsdata, {"domain": domain}
-        )
+        dnsdata = yield deferToDatabase(self.create_dnsdata, {"domain": domain})
         listener.register("domain", lambda *args: dv.set(args))
 
         yield listener.startService()
@@ -2554,9 +2462,7 @@ class TestDomainListener(
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register("domain", lambda *args: dv.set(args))
-        dnsdata = yield deferToDatabase(
-            self.create_dnsdata, {"domain": domain}
-        )
+        dnsdata = yield deferToDatabase(self.create_dnsdata, {"domain": domain})
         yield listener.startService()
         try:
             yield deferToDatabase(self.delete_dnsdata, dnsdata.id)
@@ -2566,9 +2472,7 @@ class TestDomainListener(
             yield listener.stopService()
 
 
-class TestSubnetListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestSubnetListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -2648,9 +2552,7 @@ class TestSubnetListener(
             self.create_node,
             {"node_type": NODE_TYPE.MACHINE, "interface": True},
         )
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
         subnet = yield deferToDatabase(self.create_subnet)
 
         listener = self.make_listener_without_delay()
@@ -2679,9 +2581,7 @@ class TestSubnetListener(
             self.create_node,
             {"node_type": NODE_TYPE.MACHINE, "interface": True},
         )
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
         subnet = yield deferToDatabase(self.create_subnet)
         selected_ip = factory.pick_ip_in_network(subnet.get_ipnetwork())
         ipaddress = yield deferToDatabase(
@@ -2714,9 +2614,7 @@ class TestSubnetListener(
             self.create_node,
             {"node_type": NODE_TYPE.MACHINE, "interface": True},
         )
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
         subnet = yield deferToDatabase(self.create_subnet)
         ipaddress = yield deferToDatabase(
             self.create_staticipaddress,
@@ -2740,9 +2638,7 @@ class TestSubnetListener(
             yield listener.stopService()
 
 
-class TestSpaceListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestSpaceListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -2816,9 +2712,7 @@ class TestSpaceListener(
             yield listener.stopService()
 
 
-class TestNodeNetworkListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestNodeNetworkListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the triggers on
     maasserver_fabric, maasserver_space, maasserver_subnet, and
     maasserver_vlan tables that notifies affected nodes."""
@@ -2874,12 +2768,8 @@ class TestNodeNetworkListener(
     @inlineCallbacks
     def test_calls_handler_iface_with_update_on_fabric_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
-        yield deferToDatabase(
-            self.create_staticipaddress, {"interface": interface}
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
+        yield deferToDatabase(self.create_staticipaddress, {"interface": interface})
         fabric = yield deferToDatabase(self.get_interface_fabric, interface.id)
 
         listener = self.make_listener_without_delay()
@@ -2901,12 +2791,8 @@ class TestNodeNetworkListener(
     @inlineCallbacks
     def test_calls_handler_iface_with_update_on_vlan_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
-        yield deferToDatabase(
-            self.create_staticipaddress, {"interface": interface}
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
+        yield deferToDatabase(self.create_staticipaddress, {"interface": interface})
         vlan = yield deferToDatabase(self.get_interface_vlan, interface.id)
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -2925,9 +2811,7 @@ class TestNodeNetworkListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_subnet_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
         ipaddress = yield deferToDatabase(
             self.create_staticipaddress, {"interface": interface}
         )
@@ -2952,9 +2836,7 @@ class TestNodeNetworkListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_space_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
         ipaddress = yield deferToDatabase(
             self.create_staticipaddress, {"interface": interface}
         )
@@ -2979,9 +2861,7 @@ class TestNodeNetworkListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_ip_address_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        interface = yield deferToDatabase(
-            self.get_node_boot_interface, node.system_id
-        )
+        interface = yield deferToDatabase(self.get_node_boot_interface, node.system_id)
         subnet = yield deferToDatabase(self.create_subnet)
         selected_ip = factory.pick_ip_in_network(subnet.get_ipnetwork())
         ipaddress = yield deferToDatabase(
@@ -3024,9 +2904,7 @@ class TestDeviceWithParentNetworkListener(
         interface = yield deferToDatabase(
             self.get_node_boot_interface, device.system_id
         )
-        yield deferToDatabase(
-            self.create_staticipaddress, {"interface": interface}
-        )
+        yield deferToDatabase(self.create_staticipaddress, {"interface": interface})
         fabric = yield deferToDatabase(self.get_interface_fabric, interface.id)
 
         listener = self.make_listener_without_delay()
@@ -3053,9 +2931,7 @@ class TestDeviceWithParentNetworkListener(
         interface = yield deferToDatabase(
             self.get_node_boot_interface, device.system_id
         )
-        yield deferToDatabase(
-            self.create_staticipaddress, {"interface": interface}
-        )
+        yield deferToDatabase(self.create_staticipaddress, {"interface": interface})
         vlan = yield deferToDatabase(self.get_interface_vlan, interface.id)
 
         listener = self.make_listener_without_delay()
@@ -3274,9 +3150,7 @@ class TestMachineBlockDeviceListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_delete(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        blockdevice = yield deferToDatabase(
-            self.create_blockdevice, {"node": node}
-        )
+        blockdevice = yield deferToDatabase(self.create_blockdevice, {"node": node})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -3293,9 +3167,7 @@ class TestMachineBlockDeviceListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        blockdevice = yield deferToDatabase(
-            self.create_blockdevice, {"node": node}
-        )
+        blockdevice = yield deferToDatabase(self.create_blockdevice, {"node": node})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -3405,9 +3277,7 @@ class TestMachinePartitionTableListener(
         listener.register(self.listener, lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.delete_partitiontable, partitiontable.id
-            )
+            yield deferToDatabase(self.delete_partitiontable, partitiontable.id)
             yield dv.get(timeout=2)
             self.assertEqual(("update", node.system_id), dv.value)
         finally:
@@ -3475,9 +3345,7 @@ class TestMachinePartitionListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_delete(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        partition = yield deferToDatabase(
-            self.create_partition, {"node": node}
-        )
+        partition = yield deferToDatabase(self.create_partition, {"node": node})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -3495,9 +3363,7 @@ class TestMachinePartitionListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        partition = yield deferToDatabase(
-            self.create_partition, {"node": node}
-        )
+        partition = yield deferToDatabase(self.create_partition, {"node": node})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -3655,9 +3521,7 @@ class TestMachineFilesystemgroupListener(
         listener.register(self.listener, lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.delete_filesystemgroup, filesystemgroup.id
-            )
+            yield deferToDatabase(self.delete_filesystemgroup, filesystemgroup.id)
             yield dv.get(timeout=2)
             self.assertEqual(("update", node.system_id), dv.value)
         finally:
@@ -3710,9 +3574,7 @@ class TestMachineCachesetListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_create(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        partition = yield deferToDatabase(
-            self.create_partition, {"node": node}
-        )
+        partition = yield deferToDatabase(self.create_partition, {"node": node})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -3731,9 +3593,7 @@ class TestMachineCachesetListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_delete(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        partition = yield deferToDatabase(
-            self.create_partition, {"node": node}
-        )
+        partition = yield deferToDatabase(self.create_partition, {"node": node})
         cacheset = yield deferToDatabase(
             self.create_cacheset, {"node": node, "partition": partition}
         )
@@ -3753,9 +3613,7 @@ class TestMachineCachesetListener(
     @inlineCallbacks
     def test_calls_handler_with_update_on_update(self):
         node = yield deferToDatabase(self.create_node, self.params)
-        partition = yield deferToDatabase(
-            self.create_partition, {"node": node}
-        )
+        partition = yield deferToDatabase(self.create_partition, {"node": node})
         cacheset = yield deferToDatabase(
             self.create_cacheset, {"node": node, "partition": partition}
         )
@@ -3775,9 +3633,7 @@ class TestMachineCachesetListener(
             yield listener.stopService()
 
 
-class TestUserTokenListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestUserTokenListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the piston3_token
     table that notifies its user."""
 
@@ -3815,9 +3671,7 @@ class TestUserTokenListener(
             yield listener.stopService()
 
 
-class TestTokenListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestTokenListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the piston3_token
     table."""
 
@@ -3874,9 +3728,7 @@ class TestTokenListener(
             yield listener.stopService()
 
 
-class TestUserSSHKeyListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestUserSSHKeyListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the maasserver_sshkey
     table that notifies its user."""
 
@@ -3914,9 +3766,7 @@ class TestUserSSHKeyListener(
             yield listener.stopService()
 
 
-class TestSSHKeyListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestSSHKeyListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the maasserver_sshkey
     table."""
 
@@ -3941,9 +3791,7 @@ class TestSSHKeyListener(
     def test_calls_handler_on_update(self):
         user = yield deferToDatabase(self.create_user)
         sshkey = yield deferToDatabase(self.create_sshkey, {"user": user})
-        other_sshkey = yield deferToDatabase(
-            self.create_sshkey, {"user": user}
-        )
+        other_sshkey = yield deferToDatabase(self.create_sshkey, {"user": user})
         contents = other_sshkey.key
         yield deferToDatabase(self.delete_sshkey, other_sshkey.id)
 
@@ -3982,9 +3830,7 @@ class TestSSHKeyListener(
             yield listener.stopService()
 
 
-class TestUserSSLKeyListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestUserSSLKeyListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the maasserver_sslkey
     table that notifies its user."""
 
@@ -4022,9 +3868,7 @@ class TestUserSSLKeyListener(
             yield listener.stopService()
 
 
-class TestSSLKeyListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestSSLKeyListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the maasserver_sslkey
     table."""
 
@@ -4091,9 +3935,7 @@ class TestSSLKeyListener(
             yield listener.stopService()
 
 
-class TestDHCPSnippetListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestDHCPSnippetListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -4196,9 +4038,7 @@ class TestPackageRepositoryListener(
         repository = yield deferToDatabase(self.create_package_repository)
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.delete_package_repository, repository.id
-            )
+            yield deferToDatabase(self.delete_package_repository, repository.id)
             yield dv.get(timeout=2)
             self.assertEqual(("delete", str(repository.id)), dv.value)
         finally:
@@ -4342,9 +4182,7 @@ class TestIPRangeSubnetListener(
             yield listener.stopService()
 
 
-class TestBMCListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestBMCListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     scenarios = (
         (
             "machine",
@@ -4408,9 +4246,7 @@ class TestBMCListener(
             yield listener.stopService()
 
 
-class TestVMClusterListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestVMClusterListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     def create_vmcluster(self, values):
         return VMCluster.objects.create(**values)
 
@@ -4644,9 +4480,7 @@ class TestVMClusterListener(
             yield listener.stopService()
 
 
-class TestPodListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestPodListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the triggers on
     maasserver_bmc tables that notifies affected pods."""
 
@@ -4669,9 +4503,7 @@ class TestPodListener(
     @wait_for_reactor
     @inlineCallbacks
     def test_calls_handler_on_update_same_bmc_types_notification(self):
-        pod = yield deferToDatabase(
-            self.create_pod, {"name": factory.make_name("pod")}
-        )
+        pod = yield deferToDatabase(self.create_pod, {"name": factory.make_name("pod")})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -4689,18 +4521,14 @@ class TestPodListener(
     @wait_for_reactor
     @inlineCallbacks
     def test_calls_handler_on_update_new_POD_bmc_type_notification(self):
-        bmc = yield deferToDatabase(
-            self.create_bmc, {"name": factory.make_name("bmc")}
-        )
+        bmc = yield deferToDatabase(self.create_bmc, {"name": factory.make_name("bmc")})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register("pod", lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.update_bmc, bmc.id, {"bmc_type": BMC_TYPE.POD}
-            )
+            yield deferToDatabase(self.update_bmc, bmc.id, {"bmc_type": BMC_TYPE.POD})
             yield dv.get(timeout=2)
             self.assertEqual(("create", str(bmc.id)), dv.value)
         finally:
@@ -4709,18 +4537,14 @@ class TestPodListener(
     @wait_for_reactor
     @inlineCallbacks
     def test_calls_handler_on_update_new_BMC_bmc_type_notification(self):
-        pod = yield deferToDatabase(
-            self.create_pod, {"name": factory.make_name("pod")}
-        )
+        pod = yield deferToDatabase(self.create_pod, {"name": factory.make_name("pod")})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
         listener.register("pod", lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            yield deferToDatabase(
-                self.update_pod, pod.id, {"bmc_type": BMC_TYPE.BMC}
-            )
+            yield deferToDatabase(self.update_pod, pod.id, {"bmc_type": BMC_TYPE.BMC})
             yield dv.get(timeout=2)
             self.assertEqual(("delete", str(pod.id)), dv.value)
         finally:
@@ -4729,9 +4553,7 @@ class TestPodListener(
     @wait_for_reactor
     @inlineCallbacks
     def test_calls_handler_on_delete_notification(self):
-        pod = yield deferToDatabase(
-            self.create_pod, {"name": factory.make_name("pod")}
-        )
+        pod = yield deferToDatabase(self.create_pod, {"name": factory.make_name("pod")})
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -4768,9 +4590,7 @@ class TestPodListener(
         pod, host = yield deferToDatabase(
             self.create_pod_with_host, {"name": factory.make_name("pod")}
         )
-        interface = yield deferToDatabase(
-            lambda: factory.make_Interface(node=host)
-        )
+        interface = yield deferToDatabase(lambda: factory.make_Interface(node=host))
 
         def _change_vlan(interface):
             vlan2 = factory.make_VLAN()
@@ -4794,9 +4614,7 @@ class TestPodListener(
         pod, host = yield deferToDatabase(
             self.create_pod_with_host, {"name": factory.make_name("pod")}
         )
-        interface = yield deferToDatabase(
-            lambda: factory.make_Interface(node=host)
-        )
+        interface = yield deferToDatabase(lambda: factory.make_Interface(node=host))
 
         def _change_interface_node(interface):
             node2 = factory.make_Node()
@@ -4820,9 +4638,7 @@ class TestPodListener(
         pod, host = yield deferToDatabase(
             self.create_pod_with_host, {"name": factory.make_name("pod")}
         )
-        interface = yield deferToDatabase(
-            lambda: factory.make_Interface(node=host)
-        )
+        interface = yield deferToDatabase(lambda: factory.make_Interface(node=host))
 
         listener = self.make_listener_without_delay()
         dv = DeferredValue()
@@ -4836,9 +4652,7 @@ class TestPodListener(
             yield listener.stopService()
 
 
-class TestNodePodListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestNodePodListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the triggers on
     maasserver_bmc tables that notifies affected pods."""
 
@@ -4913,9 +4727,7 @@ class TestNodePodListener(
             yield listener.stopService()
 
 
-class TestNodeTypeChange(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestNodeTypeChange(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of node type change triggers code."""
 
     scenarios = (
@@ -5052,9 +4864,7 @@ class TestNodeTypeChange(
     def test_transition_notifies(self):
         listener1 = self.make_listener_without_delay()
         listener2 = self.make_listener_without_delay()
-        node = yield deferToDatabase(
-            self.create_node, {"node_type": self.from_type}
-        )
+        node = yield deferToDatabase(self.create_node, {"node_type": self.from_type})
         q_from, q_to = DeferredQueue(), DeferredQueue()
         listener1.register(self.from_listener, lambda *args: q_from.put(args))
         listener2.register(self.to_listener, lambda *args: q_to.put(args))
@@ -5168,16 +4978,12 @@ class TestNotificationDismissalListener(
             notification = yield deferToDatabase(factory.make_Notification)
             yield deferToDatabase(notification.dismiss, user)
             yield dv.get(timeout=2)
-            self.assertEqual(
-                ("create", "%d:%d" % (notification.id, user.id)), dv.value
-            )
+            self.assertEqual(("create", "%d:%d" % (notification.id, user.id)), dv.value)
         finally:
             yield listener.stopService()
 
 
-class TestScriptListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestScriptListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     """End-to-end test of both the listeners code and the cluster
     triggers code."""
 
@@ -5234,9 +5040,7 @@ class TestScriptListener(
             yield listener.stopService()
 
 
-class TestNodeDeviceListener(
-    MAASTransactionServerTestCase, TransactionalHelpersMixin
-):
+class TestNodeDeviceListener(MAASTransactionServerTestCase, TransactionalHelpersMixin):
     @wait_for_reactor
     @inlineCallbacks
     def test_calls_handler_on_create_notification(self):
@@ -5246,9 +5050,7 @@ class TestNodeDeviceListener(
         listener.register("nodedevice", lambda *args: dv.set(args))
         yield listener.startService()
         try:
-            node_device = yield deferToDatabase(
-                self.create_node_device, {"node": node}
-            )
+            node_device = yield deferToDatabase(self.create_node_device, {"node": node})
             yield dv.get(timeout=2)
             self.assertEqual(("create", str(node_device.id)), dv.value)
         finally:
@@ -5267,11 +5069,7 @@ class TestNodeDeviceListener(
             yield deferToDatabase(
                 self.update_node_device,
                 node_device.id,
-                {
-                    "commissioning_driver": factory.make_name(
-                        "commissioning_driver"
-                    )
-                },
+                {"commissioning_driver": factory.make_name("commissioning_driver")},
             )
             yield dv.get(timeout=2)
             self.assertEqual(("update", str(node_device.id)), dv.value)

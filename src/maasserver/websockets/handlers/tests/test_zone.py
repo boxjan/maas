@@ -80,9 +80,7 @@ class TestZoneHandler(MAASServerTestCase):
         user = factory.make_User()
         handler = ZoneHandler(user, {}, None)
         factory.make_Zone()
-        expected_zones = [
-            self.dehydrate_zone(zone) for zone in Zone.objects.all()
-        ]
+        expected_zones = [self.dehydrate_zone(zone) for zone in Zone.objects.all()]
         self.assertCountEqual(expected_zones, handler.list({}))
 
 

@@ -170,9 +170,7 @@ def deprecated(use):
             cls.api_doc_section_name += " (deprecated)"
 
     def func_name(func):
-        return re.sub(
-            "[_ ]", "-", getattr(func, "api_doc_section_name", func.__name__)
-        )
+        return re.sub("[_ ]", "-", getattr(func, "api_doc_section_name", func.__name__))
 
     def _decorator(func):
         if type(func) is not type(use):
@@ -282,9 +280,7 @@ class OperationsHandlerType(HandlerMetaClass):
 
         # Update the class.
         cls.exports = exports
-        cls.allowed_methods = frozenset(
-            http_method for http_method, name in exports
-        )
+        cls.allowed_methods = frozenset(http_method for http_method, name in exports)
 
         # Flags used later.
         has_fields = cls.fields is not BaseHandler.fields
@@ -311,11 +307,7 @@ class OperationsHandlerType(HandlerMetaClass):
         # to generate documentation. We ignore those modules we consider "for
         # internal use only" since we do not intend to generate documentation
         # for these.
-        if (
-            not has_resource_uri
-            and not is_internal_only
-            and not cls.is_anonymous
-        ):
+        if not has_resource_uri and not is_internal_only and not cls.is_anonymous:
             log.warn(
                 "{handler.__module__}.{handler.__name__} does not have "
                 "`resource_uri`. This means it may be omitted from generated "
@@ -381,9 +373,7 @@ class OperationsHandlerMixin:
 
         :param func: A single-argument callable.
         """
-        cls.exports = {
-            name: func(export) for name, export in cls.exports.items()
-        }
+        cls.exports = {name: func(export) for name, export in cls.exports.items()}
         # Now also decorate the anonymous handler, if present.
         if cls.anonymous is not None and bool(cls.anonymous):
             if issubclass(cls.anonymous, OperationsHandlerMixin):
@@ -441,9 +431,7 @@ class ModelOperationsHandlerType(OperationsHandlerType, ABCMeta):
     """Metaclass for ModelOperationsHandler"""
 
 
-class ModelOperationsHandler(
-    OperationsHandler, metaclass=ModelOperationsHandlerType
-):
+class ModelOperationsHandler(OperationsHandler, metaclass=ModelOperationsHandlerType):
     """Manage API access for a model.
 
     By default, the id is used as unique identifier to get instances. It can be

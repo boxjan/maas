@@ -22,9 +22,7 @@ class TestObserveARPCommand(MAASTestCase):
         parser = ArgumentParser()
         add_arguments(parser)
         args = parser.parse_args([])
-        with self.assertRaisesRegex(
-            ActionScriptError, "Required argument: interface"
-        ):
+        with self.assertRaisesRegex(ActionScriptError, "Required argument: interface"):
             run(args)
 
     def test_calls_subprocess_for_interface(self):

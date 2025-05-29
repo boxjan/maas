@@ -63,9 +63,7 @@ class TestRegisterAPICommands(MAASTestCase):
                 # Parsing these names as command-line arguments yields an
                 # options object. Its execute attribute is an instance of
                 # Action (or a subclass thereof).
-                options = parser.parse_args(
-                    (profile_name, handler_name, action_name)
-                )
+                options = parser.parse_args((profile_name, handler_name, action_name))
                 self.assertIsInstance(options.execute, api.Action)
 
 
@@ -123,9 +121,7 @@ class TestFunctions(MAASTestCase):
             api.fetch_api_description,
             "http://example.com/api/2.0/",
         )
-        self.assertEqual(
-            "Expected application/json, got: text/css", "%s" % error
-        )
+        self.assertEqual("Expected application/json, got: text/css", "%s" % error)
 
     def test_http_request_raises_error_if_cert_verify_fails(self):
         self.patch(
@@ -174,9 +170,7 @@ class TestFunctions(MAASTestCase):
         # Test uses SSHKeysImportAction as its know to exist.
         handler = {"name": "SSHKeysHandler", "handler_name": "sshkeys"}
         action = {"name": "import"}
-        self.assertEqual(
-            SSHKeysImportAction, api.get_action_class(handler, action)
-        )
+        self.assertEqual(SSHKeysImportAction, api.get_action_class(handler, action))
 
     def test_get_action_class_bases_returns_Action(self):
         handler = {
@@ -184,9 +178,7 @@ class TestFunctions(MAASTestCase):
             "handler_name": factory.make_name("handler"),
         }
         action = {"name": "create"}
-        self.assertEqual(
-            (api.Action,), api.get_action_class_bases(handler, action)
-        )
+        self.assertEqual((api.Action,), api.get_action_class_bases(handler, action))
 
     def test_get_action_class_bases_returns_BootResourcesCreateAction(self):
         # Test uses BootResourcesCreateAction as its know to exist.
@@ -234,9 +226,7 @@ class TestFunctions(MAASTestCase):
         with tempfile.TemporaryDirectory() as tmp:
             cert_file = Path(tmp) / (profile["name"] + ".pem")
             cert_file.touch()
-            self.assertEqual(
-                cert_file, api.materialize_certificate(profile, tmp)
-            )
+            self.assertEqual(cert_file, api.materialize_certificate(profile, tmp))
             mock_write_cert.assert_not_called()
 
 
@@ -256,9 +246,7 @@ class TestAction(MAASTestCase):
         self.assertRaises(CommandError, api.Action.name_value_pair, "foo bar")
 
     def test_name_value_pair_does_not_strip_whitespace(self):
-        self.assertEqual(
-            (" foo ", " bar "), api.Action.name_value_pair(" foo = bar ")
-        )
+        self.assertEqual((" foo ", " bar "), api.Action.name_value_pair(" foo = bar "))
 
     def test_compare_api_hashes_prints_nothing_if_hashes_match(self):
         example_hash = factory.make_name("hash")
@@ -406,9 +394,7 @@ class TestActionHelp(MAASTestCase):
         return ""
 
     def test_get_positional_args_returns_empty_list_if_no_args(self):
-        self.assertEqual(
-            [], api.ActionHelp.get_positional_args(ArgumentParser())
-        )
+        self.assertEqual([], api.ActionHelp.get_positional_args(ArgumentParser()))
 
     def test_get_positional_args_lists_arguments(self):
         option = factory.make_name("opt", sep="_")
@@ -428,9 +414,7 @@ class TestActionHelp(MAASTestCase):
         parser.add_argument("data")
         option = factory.make_name("opt", sep="_")
         parser.add_argument(option)
-        self.assertEqual(
-            ["data", option], api.ActionHelp.get_positional_args(parser)
-        )
+        self.assertEqual(["data", option], api.ActionHelp.get_positional_args(parser))
 
     def test_get_positional_args_returns_empty_if_data_is_only_arg(self):
         parser = ArgumentParser()
@@ -453,14 +437,10 @@ class TestActionHelp(MAASTestCase):
         parser = ArgumentParser(add_help=False)
         parser.add_argument(option)
         args = api.ActionHelp.get_optional_args(parser)
-        self.assertEqual(
-            [[option]], [action.option_strings for action in args]
-        )
+        self.assertEqual([[option]], [action.option_strings for action in args])
 
     def test_compose_positional_args_returns_empty_if_no_args(self):
-        self.assertEqual(
-            [], api.ActionHelp.compose_positional_args(ArgumentParser())
-        )
+        self.assertEqual([], api.ActionHelp.compose_positional_args(ArgumentParser()))
 
     def test_compose_positional_args_describes_positional_args(self):
         arg = factory.make_name("arg", sep="_")
@@ -484,18 +464,14 @@ class TestActionHelp(MAASTestCase):
         parser = ArgumentParser()
         parser.add_argument(arg)
         self.assertFalse(
-            "\n".join(api.ActionHelp.compose_positional_args(parser)).endswith(
-                "\n"
-            )
+            "\n".join(api.ActionHelp.compose_positional_args(parser)).endswith("\n")
         )
 
     def test_compose_epilog_returns_empty_if_no_epilog(self):
         self.assertEqual([], api.ActionHelp.compose_epilog(ArgumentParser()))
 
     def test_compose_epilog_returns_empty_if_epilog_is_empty(self):
-        self.assertEqual(
-            [], api.ActionHelp.compose_epilog(ArgumentParser(epilog=""))
-        )
+        self.assertEqual([], api.ActionHelp.compose_epilog(ArgumentParser(epilog="")))
 
     def test_compose_epilog_returns_empty_if_epilog_is_whitespace(self):
         self.assertEqual(
@@ -506,9 +482,7 @@ class TestActionHelp(MAASTestCase):
         epilog = factory.make_name("epi")
         self.assertEqual(
             "\n\n%s" % epilog,
-            "\n".join(
-                api.ActionHelp.compose_epilog(ArgumentParser(epilog=epilog))
-            ),
+            "\n".join(api.ActionHelp.compose_epilog(ArgumentParser(epilog=epilog))),
         )
 
     def test_compose_epilog_preserves_indentation(self):
@@ -516,26 +490,20 @@ class TestActionHelp(MAASTestCase):
         epilog = indent + factory.make_name("epi")
         self.assertEqual(
             "\n\n%s" % epilog,
-            "\n".join(
-                api.ActionHelp.compose_epilog(ArgumentParser(epilog=epilog))
-            ),
+            "\n".join(api.ActionHelp.compose_epilog(ArgumentParser(epilog=epilog))),
         )
 
     def test_compose_epilog_explains_documented_keyword_args(self):
         epilog = ":param foo: The amount of foo."
         self.assertEqual(
             f"\n\n{api.ActionHelp.keyword_args_help}\n{epilog}",
-            "\n".join(
-                api.ActionHelp.compose_epilog(ArgumentParser(epilog=epilog))
-            ),
+            "\n".join(api.ActionHelp.compose_epilog(ArgumentParser(epilog=epilog))),
         )
 
     def test_compose_optional_args_returns_empty_if_none_defined(self):
         self.assertEqual(
             [],
-            api.ActionHelp.compose_optional_args(
-                ArgumentParser(add_help=False)
-            ),
+            api.ActionHelp.compose_optional_args(ArgumentParser(add_help=False)),
         )
 
     def test_compose_optional_args_describes_optional_args(self):
@@ -564,9 +532,7 @@ class TestActionHelp(MAASTestCase):
     def test_compose_shows_at_least_usage_and_description(self):
         usage = factory.make_name("usage")
         description = factory.make_name("description")
-        parser = ArgumentParser(
-            usage=usage, description=description, add_help=False
-        )
+        parser = ArgumentParser(usage=usage, description=description, add_help=False)
         self.assertEqual(
             dedent(
                 """\
@@ -766,13 +732,9 @@ class TestPayloadPreparation:
         expected_body,
         expected_headers,
     ):
-        build_multipart_message = mocker.patch.object(
-            api, "build_multipart_message"
-        )
+        build_multipart_message = mocker.patch.object(api, "build_multipart_message")
         build_multipart_message.return_value = sentinel.message
-        encode_multipart_message = mocker.patch.object(
-            api, "encode_multipart_message"
-        )
+        encode_multipart_message = mocker.patch.object(api, "encode_multipart_message")
         encode_multipart_message.return_value = sentinel.headers, sentinel.body
         # The payload returned is a 3-tuple of (uri, body, headers).
         payload = api.Action.prepare_payload(

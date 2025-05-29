@@ -292,9 +292,7 @@ class SerializationFailureTestCase(
                 raise
 
 
-class UniqueViolationTestCase(
-    MAASTransactionServerTestCase, PostCommitHooksTestMixin
-):
+class UniqueViolationTestCase(MAASTransactionServerTestCase, PostCommitHooksTestMixin):
     def create_uvtest_table(self):
         with connection.cursor() as cursor:
             cursor.execute("DROP TABLE IF EXISTS uvtest")
@@ -358,9 +356,7 @@ class UniqueViolationTestCase(
         # Helper to switch the transaction to REPEATABLE READ.
         def set_repeatable_read():
             with connection.cursor() as cursor:
-                cursor.execute(
-                    "SET TRANSACTION ISOLATION LEVEL REPEATABLE READ"
-                )
+                cursor.execute("SET TRANSACTION ISOLATION LEVEL REPEATABLE READ")
 
         # Both threads / database sessions will attempt to insert this.
         conflicting_value = next(self.conflicting_values)
@@ -386,9 +382,7 @@ class UniqueViolationTestCase(
             # transaction, and so the database has a reference point for
             # repeatable reads.
             with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT 1 FROM uvtest WHERE a = %s", [conflicting_value]
-                )
+                cursor.execute("SELECT 1 FROM uvtest WHERE a = %s", [conflicting_value])
                 self.assertIsNone(
                     cursor.fetchone(),
                     (
@@ -407,9 +401,7 @@ class UniqueViolationTestCase(
 
             # Still no sign of that conflicting value from here.
             with connection.cursor() as cursor:
-                cursor.execute(
-                    "SELECT 1 FROM uvtest WHERE a = %s", [conflicting_value]
-                )
+                cursor.execute("SELECT 1 FROM uvtest WHERE a = %s", [conflicting_value])
                 self.assertIsNone(
                     cursor.fetchone(),
                     (
@@ -422,9 +414,7 @@ class UniqueViolationTestCase(
 
             # Inserting the same row will trigger a unique violation.
             with connection.cursor() as cursor:
-                cursor.execute(
-                    "INSERT INTO uvtest VALUES (%s)", [conflicting_value]
-                )
+                cursor.execute("INSERT INTO uvtest VALUES (%s)", [conflicting_value])
 
         if connection.in_atomic_block:
             # We're already in a transaction.

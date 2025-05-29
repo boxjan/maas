@@ -69,8 +69,7 @@ class DHCPSnippetForm(MAASModelForm):
         label="Global DHCP Snippet",
         required=False,
         help_text=(
-            "Set the DHCP snippet to be global, removes links to nodes or "
-            "subnets"
+            "Set the DHCP snippet to be global, removes links to nodes or " "subnets"
         ),
     )
 

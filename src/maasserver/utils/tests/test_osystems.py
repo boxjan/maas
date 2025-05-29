@@ -89,17 +89,13 @@ class TestOsystems(MAASServerTestCase):
     def test_list_osystem_choices_includes_default(self):
         self.assertEqual(
             [("", "Default OS")],
-            list_osystem_choices(
-                list_all_usable_osystems(), include_default=True
-            ),
+            list_osystem_choices(list_all_usable_osystems(), include_default=True),
         )
 
     def test_list_osystem_choices_doesnt_include_default(self):
         self.assertEqual(
             [],
-            list_osystem_choices(
-                list_all_usable_osystems(), include_default=False
-            ),
+            list_osystem_choices(list_all_usable_osystems(), include_default=False),
         )
 
     def test_list_osystem_choices_uses_name_and_title(self):
@@ -108,9 +104,7 @@ class TestOsystems(MAASServerTestCase):
         )
         self.assertEqual(
             [("custom", "Custom")],
-            list_osystem_choices(
-                list_all_usable_osystems(), include_default=False
-            ),
+            list_osystem_choices(list_all_usable_osystems(), include_default=False),
         )
 
     def test_list_osystem_choices_doesnt_duplicate(self):
@@ -122,9 +116,7 @@ class TestOsystems(MAASServerTestCase):
         )
         self.assertEqual(
             [("custom", "Custom")],
-            list_osystem_choices(
-                list_all_usable_osystems(), include_default=False
-            ),
+            list_osystem_choices(list_all_usable_osystems(), include_default=False),
         )
 
     def test_list_all_usable_osystems_can_deploy_to_memory(self):
@@ -208,10 +200,7 @@ class TestOsystems(MAASServerTestCase):
         self.assertEqual(["windows"], list(osystems.keys()))
         self.assertEqual(
             ["win2008r2", "win2012", "win2012r2"],
-            [
-                release.name
-                for release in osystems["windows"].releases.values()
-            ],
+            [release.name for release in osystems["windows"].releases.values()],
         )
 
     def test_get_release_requires_key_returns_asterisk_when_required(self):
@@ -244,15 +233,11 @@ class TestOsystems(MAASServerTestCase):
             factory.make_BootResource(name="custom/%s" % factory.make_name())
         choices = [
             self.make_release_choice("custom", release)
-            for release in list_all_usable_osystems()[
-                "custom"
-            ].releases.values()
+            for release in list_all_usable_osystems()["custom"].releases.values()
         ]
         self.assertCountEqual(
             choices,
-            list_release_choices(
-                list_all_usable_osystems(), include_default=False
-            ),
+            list_release_choices(list_all_usable_osystems(), include_default=False),
         )
 
     def test_list_release_choices_sorts(self):
@@ -263,15 +248,11 @@ class TestOsystems(MAASServerTestCase):
         custom = list_all_usable_osystems()["custom"]
         choices = [
             self.make_release_choice("custom", release)
-            for release in sorted(
-                custom.releases.values(), key=attrgetter("title")
-            )
+            for release in sorted(custom.releases.values(), key=attrgetter("title"))
         ]
         self.assertEqual(
             choices,
-            list_release_choices(
-                list_all_usable_osystems(), include_default=False
-            ),
+            list_release_choices(list_all_usable_osystems(), include_default=False),
         )
 
     def test_list_release_choices_includes_requires_key_asterisk(self):
@@ -283,9 +264,7 @@ class TestOsystems(MAASServerTestCase):
         ]
         self.assertCountEqual(
             choices,
-            list_release_choices(
-                list_all_usable_osystems(), include_default=False
-            ),
+            list_release_choices(list_all_usable_osystems(), include_default=False),
         )
 
     def test_get_distro_series_initial(self):
@@ -376,9 +355,7 @@ class TestOsystems(MAASServerTestCase):
         factory.make_BootResource(
             rtype=BOOT_RESOURCE_TYPE.UPLOADED,
         )
-        self.assertEqual(
-            [], list_commissioning_choices(list_all_usable_osystems())
-        )
+        self.assertEqual([], list_commissioning_choices(list_all_usable_osystems()))
 
     def test_list_commissioning_choices_returns_commissioning_releases(self):
         factory.make_default_ubuntu_release_bootable()
@@ -442,18 +419,14 @@ class TestOsystems(MAASServerTestCase):
         factory.make_BootSourceCache(
             os="ubuntu/%s" % release, subarch=kernel, release=release
         )
-        self.assertEqual(
-            f"{release} ({kernel})", make_hwe_kernel_ui_text(kernel)
-        )
+        self.assertEqual(f"{release} ({kernel})", make_hwe_kernel_ui_text(kernel))
 
     def test_make_hwe_kernel_ui_finds_release_from_ubuntudistroinfo(self):
         self.assertEqual("trusty (hwe-t)", make_hwe_kernel_ui_text("hwe-t"))
 
     def test_make_hwe_kernel_ui_returns_kernel_when_none_found(self):
         unknown_kernel = factory.make_name("kernel")
-        self.assertEqual(
-            unknown_kernel, make_hwe_kernel_ui_text(unknown_kernel)
-        )
+        self.assertEqual(unknown_kernel, make_hwe_kernel_ui_text(unknown_kernel))
 
 
 class TestValidateOsystemAndDistroSeries(MAASServerTestCase):
@@ -478,9 +451,7 @@ class TestValidateOsystemAndDistroSeries(MAASServerTestCase):
         error = self.assertRaises(
             ValidationError, validate_osystem_and_distro_series, os, release
         )
-        self.assertEqual(
-            "%s is not a supported operating system." % os, error.message
-        )
+        self.assertEqual("%s is not a supported operating system." % os, error.message)
 
     def test_raises_error_if_not_supported_release(self):
         factory.make_Node()
@@ -519,9 +490,7 @@ class TestGetReleaseVersionFromString(MAASServerTestCase):
         except AttributeError:
             ubuntu_rows = [row.__dict__ for row in ubuntu._releases]
         valid_releases = [
-            row
-            for row in ubuntu_rows
-            if int(row["version"].split(".")[0]) >= 12
+            row for row in ubuntu_rows if int(row["version"].split(".")[0]) >= 12
         ]
         release = random.choice(valid_releases)
         # Remove 'LTS' from version if it exists
@@ -555,8 +524,7 @@ class TestGetReleaseVersionFromString(MAASServerTestCase):
                 "GA kernel",
                 {
                     "string": "ga-%s" % version_str,
-                    "expected": version_tuple
-                    + tuple([NEW_STYLE_KERNEL_WEIGHT]),
+                    "expected": version_tuple + tuple([NEW_STYLE_KERNEL_WEIGHT]),
                 },
             ),
             (
@@ -572,16 +540,13 @@ class TestGetReleaseVersionFromString(MAASServerTestCase):
                 {
                     "string": "xgene-uboot-mustang-ga-%s" % version_str,
                     "expected": version_tuple
-                    + tuple(
-                        [NEW_STYLE_KERNEL_WEIGHT + PLATFORM_OPTIMISED_WEIGHT]
-                    ),
+                    + tuple([NEW_STYLE_KERNEL_WEIGHT + PLATFORM_OPTIMISED_WEIGHT]),
                 },
             ),
             (
                 "GA platform-optimised low latency kernel",
                 {
-                    "string": "xgene-uboot-mustang-ga-%s-lowlatency"
-                    % version_str,
+                    "string": "xgene-uboot-mustang-ga-%s-lowlatency" % version_str,
                     "expected": version_tuple
                     + tuple(
                         [
@@ -605,9 +570,7 @@ class TestGetReleaseVersionFromString(MAASServerTestCase):
                 {
                     "string": "hwe-%s-edge" % version_str,
                     "expected": version_tuple
-                    + tuple(
-                        [HWE_EDGE_CHANNEL_WEIGHT + NEW_STYLE_KERNEL_WEIGHT]
-                    ),
+                    + tuple([HWE_EDGE_CHANNEL_WEIGHT + NEW_STYLE_KERNEL_WEIGHT]),
                 },
             ),
             (
@@ -669,8 +632,7 @@ class TestGetReleaseVersionFromString(MAASServerTestCase):
             (
                 "Platform-optimised HWE low latency kernel",
                 {
-                    "string": "xgene-uboot-mustang-hwe-%s-lowlatency"
-                    % version_str,
+                    "string": "xgene-uboot-mustang-hwe-%s-lowlatency" % version_str,
                     "expected": version_tuple
                     + tuple(
                         [
@@ -762,8 +724,7 @@ class TestGetReleaseVersionFromString(MAASServerTestCase):
                         [
                             0,
                             0,
-                            PLATFORM_OPTIMISED_WEIGHT
-                            + PLATFORM_ONLY_STRING_WEIGHT,
+                            PLATFORM_OPTIMISED_WEIGHT + PLATFORM_ONLY_STRING_WEIGHT,
                         ]
                     ),
                 },
@@ -776,8 +737,7 @@ class TestGetReleaseVersionFromString(MAASServerTestCase):
                         [
                             0,
                             0,
-                            PLATFORM_OPTIMISED_WEIGHT
-                            + PLATFORM_ONLY_STRING_WEIGHT,
+                            PLATFORM_OPTIMISED_WEIGHT + PLATFORM_ONLY_STRING_WEIGHT,
                         ]
                     ),
                 },
@@ -785,9 +745,7 @@ class TestGetReleaseVersionFromString(MAASServerTestCase):
         )
 
     def test_get_release_version_from_string(self):
-        self.assertEqual(
-            self.expected, get_release_version_from_string(self.string)
-        )
+        self.assertEqual(self.expected, get_release_version_from_string(self.string))
 
 
 class TestReleaseANewerThanB(MAASServerTestCase):
@@ -812,14 +770,10 @@ class TestReleaseANewerThanB(MAASServerTestCase):
         )
 
     def test_accounts_for_edge(self):
-        self.assertFalse(
-            release_a_newer_than_b("hwe-rolling", "hwe-rolling-edge")
-        )
+        self.assertFalse(release_a_newer_than_b("hwe-rolling", "hwe-rolling-edge"))
 
     def test_flavoured_kernel_newer_than_flavourless(self):
-        self.assertTrue(
-            release_a_newer_than_b("hwe-rolling-lowlatency", "hwe-rolling")
-        )
+        self.assertTrue(release_a_newer_than_b("hwe-rolling-lowlatency", "hwe-rolling"))
         self.assertFalse(
             release_a_newer_than_b("hwe-rolling", "hwe-rolling-lowlatency")
         )
@@ -831,9 +785,7 @@ class TestGetWorkingKernel(MAASServerTestCase):
             "hwe-t",
             "hwe-u",
         ]
-        hwe_kernel = get_working_kernel(
-            None, None, "amd64/generic", "ubuntu", "trusty"
-        )
+        hwe_kernel = get_working_kernel(None, None, "amd64/generic", "ubuntu", "trusty")
         self.assertEqual(hwe_kernel, "hwe-t")
 
     def test_get_working_kernel_set_kernel(self):
@@ -873,9 +825,7 @@ class TestGetWorkingKernel(MAASServerTestCase):
             "hwe-u",
         ]
         try:
-            get_working_kernel(
-                "hwe-v", None, "amd64/generic", "ubuntu", "trusty"
-            )
+            get_working_kernel("hwe-v", None, "amd64/generic", "ubuntu", "trusty")
         except ValidationError as e:
             self.assertEqual(
                 "hwe-v is not available for ubuntu/trusty on amd64/generic.",
@@ -891,13 +841,9 @@ class TestGetWorkingKernel(MAASServerTestCase):
             "hwe-v",
         ]
         try:
-            get_working_kernel(
-                "hwe-t", None, "amd64/generic", "ubuntu", "vivid"
-            )
+            get_working_kernel("hwe-t", None, "amd64/generic", "ubuntu", "vivid")
         except ValidationError as e:
-            self.assertEqual(
-                "hwe-t is too old to use on ubuntu/vivid.", e.message
-            )
+            self.assertEqual("hwe-t is too old to use on ubuntu/vivid.", e.message)
             exception_raised = True
         self.assertTrue(exception_raised)
 
@@ -908,9 +854,7 @@ class TestGetWorkingKernel(MAASServerTestCase):
             "hwe-v",
         ]
         try:
-            get_working_kernel(
-                "hwe-t", "hwe-v", "amd64/generic", "ubuntu", "precise"
-            )
+            get_working_kernel("hwe-t", "hwe-v", "amd64/generic", "ubuntu", "precise")
         except ValidationError as e:
             self.assertEqual(
                 "chosen kernel (hwe-t) is older than minimal kernel required by the machine (hwe-v).",
@@ -926,9 +870,7 @@ class TestGetWorkingKernel(MAASServerTestCase):
             "hwe-v",
         ]
         try:
-            get_working_kernel(
-                "hwe-t", "hwe-v", "amd64/generic", "ubuntu", "precise"
-            )
+            get_working_kernel("hwe-t", "hwe-v", "amd64/generic", "ubuntu", "precise")
         except ValidationError as e:
             self.assertEqual(
                 "chosen kernel (hwe-t) is older than minimal kernel required by the machine (hwe-v).",
@@ -942,9 +884,7 @@ class TestGetWorkingKernel(MAASServerTestCase):
     ):
         exception_raised = False
         try:
-            get_working_kernel(
-                None, "hwe-v", "amd64/generic", "ubuntu", "trusty"
-            )
+            get_working_kernel(None, "hwe-v", "amd64/generic", "ubuntu", "trusty")
         except ValidationError as e:
             self.assertEqual(
                 "trusty has no kernels available which meet"
@@ -1057,26 +997,18 @@ class TestGetReleaseFromDistroInfo(MAASServerTestCase):
 
     def test_finds_by_series(self):
         release = self.pick_release()
-        self.assertEqual(
-            release, get_release_from_distro_info(release["series"])
-        )
+        self.assertEqual(release, get_release_from_distro_info(release["series"]))
 
     def test_finds_by_series_first_letter(self):
         release = self.pick_release()
-        self.assertEqual(
-            release, get_release_from_distro_info(release["series"][0])
-        )
+        self.assertEqual(release, get_release_from_distro_info(release["series"][0]))
 
     def test_finds_by_version(self):
         release = self.pick_release()
-        self.assertEqual(
-            release, get_release_from_distro_info(release["version"])
-        )
+        self.assertEqual(release, get_release_from_distro_info(release["version"]))
 
     def test_returns_none_when_not_found(self):
-        self.assertIsNone(
-            get_release_from_distro_info(factory.make_name("string"))
-        )
+        self.assertIsNone(get_release_from_distro_info(factory.make_name("string")))
 
 
 class TestGetReleaseFromDB(MAASServerTestCase):
@@ -1212,9 +1144,7 @@ class TestParseSubarchKernelString(MAASTestCase):
         )
 
     def test_supports_hwe_release_letter(self):
-        self._expect(
-            "hwe-x", channel="hwe", release="x", platform="", kflavor=""
-        )
+        self._expect("hwe-x", channel="hwe", release="x", platform="", kflavor="")
 
     def test_supports_hwe_release_letter_flavoured(self):
         self._expect(
@@ -1407,9 +1337,7 @@ class TestParseSubarchKernelString(MAASTestCase):
         )
 
     def test_raises_when_no_release(self):
-        self.assertRaises(
-            ValueError, parse_subarch_kernel_string, "some-platform-hwe"
-        )
+        self.assertRaises(ValueError, parse_subarch_kernel_string, "some-platform-hwe")
 
 
 class TestGetAvailableKernelsPrioritisingPlatform(MAASTestCase):
@@ -1456,9 +1384,7 @@ class TestGetAvailableKernelsPrioritisingPlatform(MAASTestCase):
             platform=expected_platform,
             kflavor=expected_kflavor,
         )
-        self.assertEqual(
-            [platform_optimised, platform_generic, generic], result
-        )
+        self.assertEqual([platform_optimised, platform_generic, generic], result)
 
     def test_no_generic_kernels_for_some_platforms(self):
         platform_prefix = "test-platform"

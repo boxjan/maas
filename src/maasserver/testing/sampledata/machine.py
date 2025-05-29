@@ -61,9 +61,7 @@ def make_machines(
         if n % vmhost_ratio == 0:
             bmc = next(bmcs)
             instance_power_parameters = {
-                "instance_name"
-                if bmc.power_type == "lxd"
-                else "power_id": hostname
+                "instance_name" if bmc.power_type == "lxd" else "power_id": hostname
             }
         elif redfish_bmc:
             bmc = redfish_bmc
@@ -73,11 +71,7 @@ def make_machines(
             instance_power_parameters = {}
 
         status = next(MACHINE_STATUSES)
-        owner = (
-            None
-            if status in (NODE_STATUS.NEW, NODE_STATUS.READY)
-            else next(owners)
-        )
+        owner = None if status in (NODE_STATUS.NEW, NODE_STATUS.READY) else next(owners)
         machine = Machine.objects.create(
             hostname=hostname,
             architecture=machine_info.debian_architecture,
@@ -90,9 +84,7 @@ def make_machines(
         machine.tags.add(*random.choices(tags, k=10))
         lxd_info = json.dumps(machine_info.render()).encode()
         process_lxd_results(machine, lxd_info, 0)
-        update_boot_interface(
-            machine, machine_info.render_kernel_cmdline().encode(), 0
-        )
+        update_boot_interface(machine, machine_info.render_kernel_cmdline().encode(), 0)
         make_scripts(machine, lxd_info)
         machines.append(machine)
         if n % 10 == 0:

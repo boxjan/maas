@@ -40,9 +40,7 @@ class TestZoneAPI(APITestCase.ForUser):
         zone = factory.make_Zone()
         response = self.client.get(get_zone_uri(zone))
         self.assertEqual(http.client.OK, response.status_code)
-        returned_zone = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        returned_zone = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(
             (zone.name, zone.description),
             (returned_zone["name"], returned_zone["description"]),
@@ -53,9 +51,7 @@ class TestZoneAPI(APITestCase.ForUser):
         zone = factory.make_Zone()
         new_description = factory.make_string()
 
-        response = self.client.put(
-            get_zone_uri(zone), {"description": new_description}
-        )
+        response = self.client.put(get_zone_uri(zone), {"description": new_description})
         self.assertEqual(http.client.OK, response.status_code)
 
         zone = reload_object(zone)

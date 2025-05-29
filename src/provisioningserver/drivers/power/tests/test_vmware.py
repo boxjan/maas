@@ -112,9 +112,7 @@ class TestVMwarePowerDriver(MAASTestCase):
             context,
         ) = self.make_parameters()
         vmware_power_driver = VMwarePowerDriver()
-        power_control_vmware = self.patch(
-            vmware_module, "power_control_vmware"
-        )
+        power_control_vmware = self.patch(vmware_module, "power_control_vmware")
         vmware_power_driver.power_on(system_id, context)
 
         power_control_vmware.assert_called_once_with(
@@ -142,9 +140,7 @@ class TestVMwarePowerDriver(MAASTestCase):
             context,
         ) = self.make_parameters()
         vmware_power_driver = VMwarePowerDriver()
-        power_control_vmware = self.patch(
-            vmware_module, "power_control_vmware"
-        )
+        power_control_vmware = self.patch(vmware_module, "power_control_vmware")
         vmware_power_driver.power_off(system_id, context)
 
         power_control_vmware.assert_called_once_with(

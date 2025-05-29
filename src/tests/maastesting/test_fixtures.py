@@ -44,8 +44,7 @@ class TestImportErrorFixture(MAASTestCase):
             self.assertNotEqual(
                 __real_import,
                 builtins.__import__,
-                "ImportErrorFixture did not properly "
-                "patch __builtin__.__import__",
+                "ImportErrorFixture did not properly " "patch __builtin__.__import__",
             )
         self.assertEqual(
             __real_import,
@@ -176,9 +175,7 @@ class TestCaptureStandardIO(MAASTestCase):
         print(after, file=getattr(sys, name), end=end)
 
         self.assertEqual(getter(stdio), during + end)
-        stream.write.assert_has_calls(
-            [call(before), call(end), call(after), call(end)]
-        )
+        stream.write.assert_has_calls([call(before), call(end), call(after), call(end)])
 
     def test_clearInput_clears_input(self):
         text = factory.make_name("text")
@@ -217,16 +214,12 @@ class TestCaptureStandardIO(MAASTestCase):
 
     def test_non_text_strings_are_rejected_on_stdout(self):
         with CaptureStandardIO():
-            error = self.assertRaises(
-                TypeError, sys.stdout.write, sample_binary_data
-            )
+            error = self.assertRaises(TypeError, sys.stdout.write, sample_binary_data)
         self.assertIn("write() argument must be str, not bytes", str(error))
 
     def test_non_text_strings_are_rejected_on_stderr(self):
         with CaptureStandardIO():
-            error = self.assertRaises(
-                TypeError, sys.stderr.write, sample_binary_data
-            )
+            error = self.assertRaises(TypeError, sys.stderr.write, sample_binary_data)
         self.assertIn("write() argument must be str, not bytes", str(error))
 
 

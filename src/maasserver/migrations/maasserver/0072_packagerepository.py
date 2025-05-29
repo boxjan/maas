@@ -29,15 +29,11 @@ class Migration(migrations.Migration):
                 ("description", models.TextField(blank=True, default="")),
                 (
                     "url",
-                    models.URLField(
-                        help_text="The URL of the PackageRepository."
-                    ),
+                    models.URLField(help_text="The URL of the PackageRepository."),
                 ),
                 (
                     "distro",
-                    models.CharField(
-                        editable=False, max_length=41, default="ubuntu"
-                    ),
+                    models.CharField(editable=False, max_length=41, default="ubuntu"),
                 ),
                 (
                     "pockets",

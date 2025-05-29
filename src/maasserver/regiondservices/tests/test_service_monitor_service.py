@@ -69,9 +69,7 @@ class TestServiceMonitorService(MAASTransactionServerTestCase):
 
     def test_monitorServices_calls_ensureServices(self):
         # Pretend we're in a production environment.
-        self.patch(
-            service_monitor_service, "is_dev_environment"
-        ).return_value = False
+        self.patch(service_monitor_service, "is_dev_environment").return_value = False
 
         monitor_service = ServiceMonitorService(Clock())
         mock_ensureServices = self.patch(service_monitor, "ensureServices")
@@ -80,9 +78,7 @@ class TestServiceMonitorService(MAASTransactionServerTestCase):
 
     def test_monitorServices_handles_failure(self):
         # Pretend we're in a production environment.
-        self.patch(
-            service_monitor_service, "is_dev_environment"
-        ).return_value = False
+        self.patch(service_monitor_service, "is_dev_environment").return_value = False
 
         monitor_service = ServiceMonitorService(Clock())
         mock_ensureServices = self.patch(service_monitor, "ensureServices")
@@ -98,9 +94,7 @@ class TestServiceMonitorService(MAASTransactionServerTestCase):
     @inlineCallbacks
     def test_updates_services_in_database(self):
         # Pretend we're in a production environment.
-        self.patch(
-            service_monitor_service, "is_dev_environment"
-        ).return_value = False
+        self.patch(service_monitor_service, "is_dev_environment").return_value = False
         self.patch(proxyconfig, "is_config_present").return_value = True
 
         service = self.pick_service()
@@ -108,9 +102,7 @@ class TestServiceMonitorService(MAASTransactionServerTestCase):
         mock_ensureServices = self.patch(service_monitor, "ensureServices")
         mock_ensureServices.return_value = succeed({service.name: state})
 
-        region = yield deferToDatabase(
-            transactional(factory.make_RegionController)
-        )
+        region = yield deferToDatabase(transactional(factory.make_RegionController))
         self.patch(
             RegionController.objects, "get_running_controller"
         ).return_value = region
@@ -132,9 +124,7 @@ class TestServiceMonitorService(MAASTransactionServerTestCase):
         monitor_service = ServiceMonitorService(Clock())
         service = self.pick_service()
         state = ServiceState(SERVICE_STATE.ON, "running")
-        observed_services = yield monitor_service._buildServices(
-            {service.name: state}
-        )
+        observed_services = yield monitor_service._buildServices({service.name: state})
         expected_services = [
             {"name": service.name, "status": "running", "status_info": ""}
         ]

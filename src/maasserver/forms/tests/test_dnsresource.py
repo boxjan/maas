@@ -67,9 +67,7 @@ class TestDNSResourceForm(MAASServerTestCase):
         name = factory.make_name("dnsresource")
         domain = factory.make_Domain()
         ips = [factory.make_StaticIPAddress() for _ in range(6)]
-        in_vals = [
-            str(ip.id) if factory.pick_bool() else str(ip.ip) for ip in ips
-        ]
+        in_vals = [str(ip.id) if factory.pick_bool() else str(ip.ip) for ip in ips]
         form = DNSResourceForm(
             {
                 "name": name,
@@ -97,9 +95,7 @@ class TestDNSResourceForm(MAASServerTestCase):
         name = factory.make_name("dnsresource")
         domain = factory.make_Domain()
         ttl = random.randint(1, 1000)
-        form = DNSResourceForm(
-            {"name": name, "domain": domain.id, "address_ttl": ttl}
-        )
+        form = DNSResourceForm({"name": name, "domain": domain.id, "address_ttl": ttl})
         self.assertTrue(form.is_valid(), form.errors)
         dnsresource = form.save()
         self.assertEqual(name, dnsresource.name)
@@ -110,14 +106,10 @@ class TestDNSResourceForm(MAASServerTestCase):
         name = factory.make_name("dnsresource")
         domain = factory.make_Domain()
         ttl = random.randint(1, 1000)
-        form = DNSResourceForm(
-            {"name": name, "domain": domain.id, "address_ttl": ttl}
-        )
+        form = DNSResourceForm({"name": name, "domain": domain.id, "address_ttl": ttl})
         self.assertTrue(form.is_valid(), form.errors)
         dnsresource = form.save()
-        form = DNSResourceForm(
-            instance=dnsresource, data={"address_ttl": None}
-        )
+        form = DNSResourceForm(instance=dnsresource, data={"address_ttl": None})
         self.assertTrue(form.is_valid(), form.errors)
         dnsresource = form.save()
         self.assertEqual(name, dnsresource.name)

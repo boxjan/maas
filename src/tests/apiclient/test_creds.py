@@ -13,9 +13,7 @@ from apiclient.testing.credentials import make_api_credentials
 class TestCreds(TestCase):
     def test_convert_tuple_to_string_converts_tuple_to_string(self):
         creds_tuple = make_api_credentials()
-        self.assertEqual(
-            ":".join(creds_tuple), convert_tuple_to_string(creds_tuple)
-        )
+        self.assertEqual(":".join(creds_tuple), convert_tuple_to_string(creds_tuple))
 
     def test_convert_tuple_to_string_rejects_undersized_tuple(self):
         self.assertRaises(
@@ -36,15 +34,11 @@ class TestCreds(TestCase):
 
     def test_convert_string_to_tuple_detects_malformed_string(self):
         broken_tuple = make_api_credentials()[:-1]
-        self.assertRaises(
-            ValueError, convert_string_to_tuple, ":".join(broken_tuple)
-        )
+        self.assertRaises(ValueError, convert_string_to_tuple, ":".join(broken_tuple))
 
     def test_convert_string_to_tuple_detects_spurious_colons(self):
         broken_tuple = make_api_credentials() + make_api_credentials()[:1]
-        self.assertRaises(
-            ValueError, convert_string_to_tuple, ":".join(broken_tuple)
-        )
+        self.assertRaises(ValueError, convert_string_to_tuple, ":".join(broken_tuple))
 
     def test_convert_string_to_tuple_inverts_convert_tuple_to_string(self):
         creds_tuple = make_api_credentials()

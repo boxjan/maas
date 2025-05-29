@@ -93,26 +93,20 @@ class TestSeaMicroAPIV09(MAASTestCase):
         url = "http://%s/" % factory.make_string()
         api = SeaMicroAPIV09(url)
         response = FakeResponse(401, "Unauthorized")
-        self.assertRaises(
-            SeaMicroAPIV09Error, api.parse_response, url, response
-        )
+        self.assertRaises(SeaMicroAPIV09Error, api.parse_response, url, response)
 
     def test_invalid_json_response(self):
         url = "http://%s/" % factory.make_string()
         api = SeaMicroAPIV09(url)
         response = FakeResponse(200, factory.make_string())
-        self.assertRaises(
-            SeaMicroAPIV09Error, api.parse_response, url, response
-        )
+        self.assertRaises(SeaMicroAPIV09Error, api.parse_response, url, response)
 
     def test_json_error_response(self):
         url = "http://%s/" % factory.make_string()
         api = SeaMicroAPIV09(url)
         data = {"error": {"code": 401}}
         response = FakeResponse(200, data, is_json=True)
-        self.assertRaises(
-            SeaMicroAPIV09Error, api.parse_response, url, response
-        )
+        self.assertRaises(SeaMicroAPIV09Error, api.parse_response, url, response)
 
     def test_json_valid_response(self):
         url = "http://%s/" % factory.make_string()
@@ -164,17 +158,13 @@ class TestSeaMicroAPIV09(MAASTestCase):
         token = factory.make_string()
         mock, api = self.configure_put_server_power(token)
         api.power_on("0/0", do_pxe=True)
-        self.assert_put_power_called(
-            mock, 0, POWER_STATUS.ON, "using-pxe=true", token
-        )
+        self.assert_put_power_called(mock, 0, POWER_STATUS.ON, "using-pxe=true", token)
 
     def test_put_server_power_on_not_using_pxe(self):
         token = factory.make_string()
         mock, api = self.configure_put_server_power(token)
         api.power_on("0/0", do_pxe=False)
-        self.assert_put_power_called(
-            mock, 0, POWER_STATUS.ON, "using-pxe=false", token
-        )
+        self.assert_put_power_called(mock, 0, POWER_STATUS.ON, "using-pxe=false", token)
 
     def test_put_server_power_reset_using_pxe(self):
         token = factory.make_string()
@@ -196,25 +186,19 @@ class TestSeaMicroAPIV09(MAASTestCase):
         token = factory.make_string()
         mock, api = self.configure_put_server_power(token)
         api.power_off("0/0", force=False)
-        self.assert_put_power_called(
-            mock, 0, POWER_STATUS.OFF, "force=false", token
-        )
+        self.assert_put_power_called(mock, 0, POWER_STATUS.OFF, "force=false", token)
 
     def test_put_server_power_off_force(self):
         token = factory.make_string()
         mock, api = self.configure_put_server_power(token)
         api.power_off("0/0", force=True)
-        self.assert_put_power_called(
-            mock, 0, POWER_STATUS.OFF, "force=true", token
-        )
+        self.assert_put_power_called(mock, 0, POWER_STATUS.OFF, "force=true", token)
 
 
 class TestSeaMicro(MAASTestCase):
     """Tests for SeaMicro custom hardware."""
 
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def test_select_seamicro15k_api_version_ipmi(self):
         versions = select_seamicro15k_api_version("ipmi")
@@ -505,9 +489,7 @@ class TestSeaMicro(MAASTestCase):
         mock_get_api = self.patch(seamicro, "get_seamicro15k_api")
         mock_get_api.return_value = fake_client
 
-        self.assertEqual(
-            "on", power_query_seamicro15k_v2(ip, username, password, "0")
-        )
+        self.assertEqual("on", power_query_seamicro15k_v2(ip, username, password, "0"))
 
     def test_power_query_seamicro15k_v2_power_off(self):
         ip = factory.make_ipv4_address()
@@ -523,9 +505,7 @@ class TestSeaMicro(MAASTestCase):
         mock_get_api = self.patch(seamicro, "get_seamicro15k_api")
         mock_get_api.return_value = fake_client
 
-        self.assertEqual(
-            "off", power_query_seamicro15k_v2(ip, username, password, "0")
-        )
+        self.assertEqual("off", power_query_seamicro15k_v2(ip, username, password, "0"))
 
     def test_power_query_seamicro15k_v2_raises_error_when_api_None(self):
         ip = factory.make_ipv4_address()

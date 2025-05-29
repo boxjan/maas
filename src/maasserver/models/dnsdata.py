@@ -32,19 +32,14 @@ CNAME_SPEC = rf"^({CNAME_LABEL}\.)*{CNAME_LABEL}\.?$"
 SUPPORTED_RRTYPES = {"CNAME", "MX", "NS", "SRV", "SSHFP", "TXT"}
 INVALID_CNAME_MSG = "Invalid CNAME: Should be '<server>'."
 INVALID_MX_MSG = (
-    "Invalid MX: Should be '<preference> <server>'."
-    " Range for preference is 0-65535."
+    "Invalid MX: Should be '<preference> <server>'." " Range for preference is 0-65535."
 )
 INVALID_SRV_MSG = (
     "Invalid SRV: Should be '<priority> <weight> <port> <server>'."
     " Range for priority, weight, and port are 0-65536."
 )
-INVALID_SSHFP_MSG = (
-    "Invalid SSHFP: Should be '<algorithm> <fptype> <fingerprint>'."
-)
-CNAME_AND_OTHER_MSG = (
-    "CNAME records for a name cannot coexist with non-CNAME records."
-)
+INVALID_SSHFP_MSG = "Invalid SSHFP: Should be '<algorithm> <fptype> <fingerprint>'."
+CNAME_AND_OTHER_MSG = "CNAME records for a name cannot coexist with non-CNAME records."
 MULTI_CNAME_MSG = "Only one CNAME can be associated with a name."
 DIFFERENT_TTL_MSG = "TTL of %d differs from other resource records TTL of %d."
 
@@ -55,8 +50,7 @@ def validate_rrtype(value):
     """Django validator: `value` must be a valid DNS RRtype name."""
     if value.upper() not in SUPPORTED_RRTYPES:
         raise ValidationError(
-            "%s is not one of %s."
-            % (value.upper(), " ".join(SUPPORTED_RRTYPES))
+            "%s is not one of %s." % (value.upper(), " ".join(SUPPORTED_RRTYPES))
         )
 
 
@@ -141,9 +135,7 @@ class DNSDataManager(Manager, DNSDataQueriesMixin):
         else:
             raise PermissionDenied()
 
-    def get_hostname_dnsdata_mapping(
-        self, domain, raw_ttl=False, with_ids=True
-    ):
+    def get_hostname_dnsdata_mapping(self, domain, raw_ttl=False, with_ids=True):
         """Return hostname to RRset mapping for this domain."""
         cursor = connection.cursor()
         default_ttl = "%d" % Config.objects.get_config("default_dns_ttl")
@@ -340,9 +332,7 @@ class DNSData(CleanSave, TimestampedModel):
         elif self.rrtype == "SSHFP":
             # SSHFP is <algo> <fptype> <fingerprint>.  Do minimal checking so
             # that we support future algorithms and types.
-            spec = re.compile(
-                r"^(?P<algo>[0-9]+)\s+(?P<fptype>[0-9]+)\s+(?P<fp>.*)$"
-            )
+            spec = re.compile(r"^(?P<algo>[0-9]+)\s+(?P<fptype>[0-9]+)\s+(?P<fp>.*)$")
             res = spec.search(self.rrdata)
             if res is None:
                 raise ValidationError(INVALID_SSHFP_MSG)
@@ -417,7 +407,5 @@ class DNSData(CleanSave, TimestampedModel):
                 rrtype=self.rrtype, dnsresource_id=self.dnsresource.id
             ).exclude(ttl=self.ttl)
             if rrset.exists():
-                maaslog.warning(
-                    DIFFERENT_TTL_MSG % (self.ttl, rrset.first().ttl)
-                )
+                maaslog.warning(DIFFERENT_TTL_MSG % (self.ttl, rrset.first().ttl))
         super().clean(*args, **kwargs)

@@ -127,9 +127,7 @@ def json_load_bytes(input: bytes, encoding=None):
     :type encoding: str
     """
     return json.loads(
-        input.decode(
-            settings.DEFAULT_CHARSET if encoding is None else encoding
-        )
+        input.decode(settings.DEFAULT_CHARSET if encoding is None else encoding)
     )
 
 
@@ -158,11 +156,7 @@ def systemd_interval_to_calendar(interval):
     hour_interval = f"00/{hours}" if hours and hours != "1" else "*"
     second_interval = f"00/{seconds}" if seconds else "00"
     minute_interval = (
-        f"00/{minutes}"
-        if minutes
-        else "00"
-        if second_interval == "00"
-        else "*"
+        f"00/{minutes}" if minutes else "00" if second_interval == "00" else "*"
     )
 
     return f"*-*-* {hour_interval}:{minute_interval}:{second_interval}"

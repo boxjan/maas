@@ -14,9 +14,7 @@ from maasserver.models.timestampedmodel import TimestampedModel
 class BootSource(CleanSave, TimestampedModel):
     """A source for boot resources."""
 
-    url = URLField(
-        blank=False, unique=True, help_text="The URL of the BootSource."
-    )
+    url = URLField(blank=False, unique=True, help_text="The URL of the BootSource.")
 
     keyring_filename = CharField(
         blank=True,
@@ -43,8 +41,7 @@ class BootSource(CleanSave, TimestampedModel):
         # both.
         if self.keyring_filename and self.keyring_data:
             raise ValidationError(
-                "Only one of keyring_filename or keyring_data can be "
-                "specified."
+                "Only one of keyring_filename or keyring_data can be " "specified."
             )
 
     def to_dict_without_selections(self):
@@ -91,15 +88,12 @@ class BootSource(CleanSave, TimestampedModel):
         """
         data = self.to_dict_without_selections()
         data["selections"] = [
-            selection.to_dict()
-            for selection in self.bootsourceselection_set.all()
+            selection.to_dict() for selection in self.bootsourceselection_set.all()
         ]
         # Always download all bootloaders from the stream. This will allow
         # machines to boot and get a 'Booting under direction of MAAS' message
         # even if boot images for that arch haven't downloaded yet.
-        for bootloader in self.bootsourcecache_set.exclude(
-            bootloader_type=None
-        ):
+        for bootloader in self.bootsourcecache_set.exclude(bootloader_type=None):
             data["selections"].append(
                 {
                     "os": bootloader.os,

@@ -86,9 +86,7 @@ class TestConfigForm(MAASServerTestCase):
         request.user = factory.make_User()
         value1 = factory.make_string(5)
         value2 = factory.make_string(5)
-        form = TestCompositeForm(
-            {"maas_name": value1, "non_config_field": value2}
-        )
+        form = TestCompositeForm({"maas_name": value1, "non_config_field": value2})
         result = form.save(endpoint, request)
 
         self.assertTrue(result, form._errors)

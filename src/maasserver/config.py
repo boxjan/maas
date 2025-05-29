@@ -40,9 +40,7 @@ class RegionConfiguration(Configuration, metaclass=RegionConfigurationMeta):
     maas_url = ConfigurationOption(
         "maas_url",
         "The HTTP URL for the MAAS region.",
-        ExtendedURL(
-            require_tld=False, if_missing="http://localhost:5240/MAAS"
-        ),
+        ExtendedURL(require_tld=False, if_missing="http://localhost:5240/MAAS"),
     )
 
     # This should be considered a fallback scenario as

@@ -36,9 +36,7 @@ class Migration(migrations.Migration):
                 ("uuid", models.CharField(max_length=36)),
                 (
                     "subnet",
-                    models.ForeignKey(
-                        to="maasserver.Subnet", on_delete=models.CASCADE
-                    ),
+                    models.ForeignKey(to="maasserver.Subnet", on_delete=models.CASCADE),
                 ),
             ],
             options={"abstract": False},

@@ -106,8 +106,7 @@ def get_nodes(Node, node_boot_disks):
         ),
     ).all()
     return {
-        node.id: annotate_node(node, node_boot_disks.get(node.id))
-        for node in nodes
+        node.id: annotate_node(node, node_boot_disks.get(node.id)) for node in nodes
     }
 
 

@@ -17,9 +17,7 @@ class Migration(migrations.Migration):
                 help_text="Interface name.",
                 max_length=255,
                 validators=[
-                    django.core.validators.RegexValidator(
-                        regex="^[\\w\\-_.:]+$"
-                    )
+                    django.core.validators.RegexValidator(regex="^[\\w\\-_.:]+$")
                 ],
             ),
         ),

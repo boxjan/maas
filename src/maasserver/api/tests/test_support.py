@@ -56,9 +56,7 @@ class TestOperationsResource(APITestCase.ForUser):
             if config == name:
                 raise TypeError()
 
-        self.patch(
-            ConfigManager, "get_config", Mock(side_effect=mock_get_config)
-        )
+        self.patch(ConfigManager, "get_config", Mock(side_effect=mock_get_config))
         self.become_admin()
         response = self.client.get(
             reverse("maas_handler"), {"op": "get_config", "name": name}
@@ -75,9 +73,7 @@ class TestOperationsResource(APITestCase.ForUser):
         response = self.client.get(
             reverse("maas_handler"), {"op": "get_config", "name": "maas_name"}
         )
-        self.assertEqual(
-            response["X-MAAS-API-Hash"], get_api_description()["hash"]
-        )
+        self.assertEqual(response["X-MAAS-API-Hash"], get_api_description()["hash"])
 
     def test_call_op_in_path(self):
         Config.objects.set_config("maas_name", factory.make_name("name"))
@@ -96,9 +92,7 @@ class TestOperationsResource(APITestCase.ForUser):
         self.assertFalse(resource.is_authentication_attempted)
 
     def test_authenticated_is_False_when_authentication_is_NoAuthn(self):
-        resource = OperationsResource(
-            StubHandler, authentication=NoAuthentication()
-        )
+        resource = OperationsResource(StubHandler, authentication=NoAuthentication())
         self.assertFalse(resource.is_authentication_attempted)
 
     def test_authenticated_is_True_when_authentication_is_provided(self):
@@ -203,9 +197,7 @@ class TestOperationsHandlerMixin(MAASTestCase):
         return type("TestHandler", (OperationsHandlerMixin,), namespace)
 
     def test_decorate_decorates_exports(self):
-        handler = self.make_handler(
-            exports={"foo": sentinel.foo, "bar": sentinel.bar}
-        )
+        handler = self.make_handler(exports={"foo": sentinel.foo, "bar": sentinel.bar})
         handler.decorate(lambda thing: str(thing).upper())
         self.assertEqual(
             {"foo": "SENTINEL.FOO", "bar": "SENTINEL.BAR"}, handler.exports

@@ -75,9 +75,7 @@ class DHCPState(DHCPStateBase):
         shared_networks = sorted(shared_networks, key=itemgetter("name"))
         hosts = {host["mac"]: host for host in hosts}
         interfaces = sorted(interface["name"] for interface in interfaces)
-        global_dhcp_snippets = sorted(
-            global_dhcp_snippets, key=itemgetter("name")
-        )
+        global_dhcp_snippets = sorted(global_dhcp_snippets, key=itemgetter("name"))
         return DHCPStateBase.__new__(
             cls,
             omapi_key=omapi_key,
@@ -115,9 +113,7 @@ class DHCPState(DHCPStateBase):
         # Currently the OMAPI doesn't allow you to add or remove arbitrary
         # config options. So gather a list of DHCP snippets from
         hosts_dhcp_snippets = gather_hosts_dhcp_snippets(self.hosts)
-        other_hosts_dhcp_snippets = gather_hosts_dhcp_snippets(
-            other_state.hosts
-        )
+        other_hosts_dhcp_snippets = gather_hosts_dhcp_snippets(other_state.hosts)
 
         return (
             self.omapi_key != other_state.omapi_key
@@ -359,9 +355,7 @@ def configure(
                 service_monitor.restartService,
                 server.dhcp_service,
             )
-        elif new_state.requires_restart(
-            current_state, is_dhcpv6_server=server.ipv6
-        ):
+        elif new_state.requires_restart(current_state, is_dhcpv6_server=server.ipv6):
             log.debug(
                 "Restarting {name} service; configuration change requires "
                 "full restart.",
@@ -379,8 +373,7 @@ def configure(
             if len(remove) + len(add) + len(modify) == 0:
                 # Nothing has changed, do nothing but make sure its running.
                 log.debug(
-                    "Doing nothing; {name} service configuration has not "
-                    "changed.",
+                    "Doing nothing; {name} service configuration has not " "changed.",
                     name=server.descriptive_name,
                 )
                 yield _catch_service_error(
@@ -420,9 +413,7 @@ def configure(
                         modify=_debug_hostmap_msg(modify),
                     )
                     try:
-                        yield deferToThread(
-                            _update_hosts, server, remove, add, modify
-                        )
+                        yield deferToThread(_update_hosts, server, remove, add, modify)
                     except Exception:
                         # Error updating the host maps over the OMAPI.
                         # Restart the DHCP service so that the host maps

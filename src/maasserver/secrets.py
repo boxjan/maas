@@ -72,9 +72,7 @@ UNSET = object()
 class SecretManager:
     """Handle operations on secrets."""
 
-    def __init__(
-        self, vault_client: VaultClient | None | Literal[UNSET] = UNSET
-    ):
+    def __init__(self, vault_client: VaultClient | None | Literal[UNSET] = UNSET):
         if vault_client is not UNSET:
             self._vault_client = vault_client
         else:
@@ -87,21 +85,13 @@ class SecretManager:
         path = self._get_secret_path(name, obj=obj)
         if self._vault_client:
             self._vault_client.set(path, value)
-            VaultSecret.objects.update_or_create(
-                path=path, defaults={"deleted": False}
-            )
+            VaultSecret.objects.update_or_create(path=path, defaults={"deleted": False})
         else:
-            Secret.objects.update_or_create(
-                path=path, defaults={"value": value}
-            )
+            Secret.objects.update_or_create(path=path, defaults={"value": value})
 
-    def set_simple_secret(
-        self, name: str, value: Any, obj: Optional[Model] = None
-    ):
+    def set_simple_secret(self, name: str, value: Any, obj: Optional[Model] = None):
         """Create or update a simple secret."""
-        self.set_composite_secret(
-            name, value={SIMPLE_SECRET_KEY: value}, obj=obj
-        )
+        self.set_composite_secret(name, value={SIMPLE_SECRET_KEY: value}, obj=obj)
 
     def delete_secret(self, name: str, obj: Optional[Model] = None):
         """Delete a secret, either global or for a model instance."""

@@ -224,13 +224,9 @@ class Notification(CleanSave, TimestampedModel):
 
     objects = NotificationManager()
 
-    ident = CharField(
-        max_length=40, null=True, blank=True, default=None, unique=True
-    )
+    ident = CharField(max_length=40, null=True, blank=True, default=None, unique=True)
 
-    user = ForeignKey(
-        User, null=True, blank=True, default=None, on_delete=CASCADE
-    )
+    user = ForeignKey(User, null=True, blank=True, default=None, on_delete=CASCADE)
     users = BooleanField(null=False, blank=True, default=False)
     admins = BooleanField(null=False, blank=True, default=False)
 
@@ -275,9 +271,7 @@ class Notification(CleanSave, TimestampedModel):
         """
         if not self.dismissable:
             raise NotificationNotDismissable()
-        NotificationDismissal.objects.get_or_create(
-            notification=self, user=user
-        )
+        NotificationDismissal.objects.get_or_create(notification=self, user=user)
 
     def clean(self):
         super().clean()
@@ -320,7 +314,5 @@ class NotificationDismissal(TimestampedModel):
 
     objects = Manager()
 
-    notification = ForeignKey(
-        Notification, null=False, blank=False, on_delete=CASCADE
-    )
+    notification = ForeignKey(Notification, null=False, blank=False, on_delete=CASCADE)
     user = ForeignKey(User, null=False, blank=False, on_delete=CASCADE)

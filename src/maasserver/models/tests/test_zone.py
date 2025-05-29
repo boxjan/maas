@@ -35,9 +35,7 @@ class TestZoneManager(MAASServerTestCase):
         default_zone.name = "myzone"
         default_zone.save()
 
-        self.assertEqual(
-            "myzone", DefaultResource.objects.get_default_zone().name
-        )
+        self.assertEqual("myzone", DefaultResource.objects.get_default_zone().name)
 
 
 class TestZone(MAASServerTestCase):

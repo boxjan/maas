@@ -87,9 +87,7 @@ class MaasHandler(OperationsHandler):
         @success-example "set-success"
             OK
         """
-        name = get_mandatory_param(
-            request.data, "name", validators.String(min=1)
-        )
+        name = get_mandatory_param(request.data, "name", validators.String(min=1))
         name = rewrite_config_name(name)
         value = get_mandatory_param(request.data, "value")
         form = get_maas_form(name, value)

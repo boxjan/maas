@@ -148,9 +148,7 @@ class TestConfigurationSet_DatabasePort(MAASTestCase):
     def test_exception_when_port_is_not_an_integer(self):
         self.useFixture(RegionConfigurationFixture())
         error = self.assertRaises(CommandError, call_set, database_port="foo")
-        self.assertEqual(
-            "database-port: Please enter an integer value.", str(error)
-        )
+        self.assertEqual("database-port: Please enter an integer value.", str(error))
 
     def test_exception_when_port_is_too_low(self):
         self.useFixture(RegionConfigurationFixture())
@@ -162,9 +160,7 @@ class TestConfigurationSet_DatabasePort(MAASTestCase):
 
     def test_exception_when_port_is_too_high(self):
         self.useFixture(RegionConfigurationFixture())
-        error = self.assertRaises(
-            CommandError, call_set, database_port=2**16
-        )
+        error = self.assertRaises(CommandError, call_set, database_port=2**16)
         self.assertEqual(
             str(error),
             "database-port: Please enter a number that is 65535 or smaller.",

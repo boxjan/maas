@@ -137,9 +137,7 @@ class Bcd:
 
     def _get_loader(self, bootmgr_elems):
         """Get default bootloader."""
-        (val,) = self.hive.node_values(
-            bootmgr_elems[self.BOOT_MGR_DISPLAY_ORDER]
-        )
+        (val,) = self.hive.node_values(bootmgr_elems[self.BOOT_MGR_DISPLAY_ORDER])
         loader = self.hive.value_multiple_strings(val)[0]
         return loader
 
@@ -164,9 +162,7 @@ class Bcd:
         if h is None:
             # No load options key in the hive, add the key
             # so the value can be set.
-            h = self.hive.node_add_child(
-                self.uids[self.loader][1], self.LOAD_OPTIONS
-            )
+            h = self.hive.node_add_child(self.uids[self.loader][1], self.LOAD_OPTIONS)
         k_type = 1
         key = "Element"
         data = {
@@ -303,9 +299,7 @@ class WindowsPXEBootMethod(BootMethod):
         # Generate the bcd file.
         bcd_template = self.get_resource_path(kernel_params, "bcd")
         if not os.path.isfile(bcd_template):
-            raise BootMethodError(
-                "Failed to find bcd template: %s" % bcd_template
-            )
+            raise BootMethodError("Failed to find bcd template: %s" % bcd_template)
         with tempdir() as tmp:
             bcd_tmp = os.path.join(tmp, "bcd")
             shutil.copyfile(bcd_template, bcd_tmp)

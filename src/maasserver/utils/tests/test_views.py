@@ -79,9 +79,7 @@ class TestLogFunctions(MAASTestCase):
         pause = random()
 
         with self.capture_logs() as logger:
-            views.log_failed_attempt(
-                request, attempt, elapsed, remaining, pause
-            )
+            views.log_failed_attempt(request, attempt, elapsed, remaining, pause)
 
         self.assertEqual(
             "debug: Attempt #%d for %s failed; will retry in %.0fms (%.1fs "
@@ -187,15 +185,11 @@ class TestWebApplicationHandler(SerializationFailureTestCase):
     def test_init_attempts_can_be_set(self):
         attempts = randint(1, 100)
         handler = views.WebApplicationHandler(attempts)
-        self.assertEqual(
-            handler._WebApplicationHandler__retry_attempts, attempts
-        )
+        self.assertEqual(handler._WebApplicationHandler__retry_attempts, attempts)
 
     def test_init_timeout_can_be_set(self):
         handler = views.WebApplicationHandler(timeout=sentinel.timeout)
-        self.assertIs(
-            handler._WebApplicationHandler__retry_timeout, sentinel.timeout
-        )
+        self.assertIs(handler._WebApplicationHandler__retry_timeout, sentinel.timeout)
 
     def test_handle_uncaught_exception_notes_serialization_failure(self):
         handler = views.WebApplicationHandler()
@@ -226,9 +220,7 @@ class TestWebApplicationHandler(SerializationFailureTestCase):
             reraise=False,
         )
         # HTTP 500 is returned...
-        self.assertEqual(
-            response.status_code, http.client.INTERNAL_SERVER_ERROR
-        )
+        self.assertEqual(response.status_code, http.client.INTERNAL_SERVER_ERROR)
         # ... but the response is NOT recorded as needing a retry.
         self.assertNotIn(response, handler._WebApplicationHandler__retry)
 
@@ -251,15 +243,11 @@ class TestWebApplicationHandler(SerializationFailureTestCase):
             exc_info=exc_info,
             reraise=False,
         )
-        self.assertEqual(
-            http.client.INTERNAL_SERVER_ERROR, response.status_code
-        )
+        self.assertEqual(http.client.INTERNAL_SERVER_ERROR, response.status_code)
 
     def test_get_response_catches_serialization_failures(self):
         get_response = self.patch(WSGIHandler, "get_response")
-        get_response.side_effect = (
-            lambda request: self.cause_serialization_failure()
-        )
+        get_response.side_effect = lambda request: self.cause_serialization_failure()
 
         handler = views.WebApplicationHandler(1)
         request = make_request()
@@ -283,9 +271,7 @@ class TestWebApplicationHandler(SerializationFailureTestCase):
 
     def test_get_response_sends_signal_on_serialization_failures(self):
         get_response = self.patch(WSGIHandler, "get_response")
-        get_response.side_effect = (
-            lambda request: self.cause_serialization_failure()
-        )
+        get_response.side_effect = lambda request: self.cause_serialization_failure()
 
         send_request_exception = self.patch_autospec(
             signals.got_request_exception, "send"
@@ -359,9 +345,7 @@ class TestWebApplicationHandler(SerializationFailureTestCase):
         request.path = factory.make_name("path")
         response = handler.get_response(request)
 
-        get_response.assert_has_calls(
-            (call(request), call(request), call(request))
-        )
+        get_response.assert_has_calls((call(request), call(request), call(request)))
         self.assertIsInstance(response, HttpResponseConflict)
         self.assertEqual(response["Retry-After"], "5")
         self.assertEqual(response.status_code, http.client.CONFLICT)
@@ -434,9 +418,7 @@ class TestWebApplicationHandler(SerializationFailureTestCase):
         request.path = factory.make_name("path")
         handler.get_response(request)
 
-        views.log_failed_attempt.assert_called_once_with(
-            request, 1, ANY, ANY, ANY
-        )
+        views.log_failed_attempt.assert_called_once_with(request, 1, ANY, ANY, ANY)
         views.log_final_failed_attempt.assert_called_once_with(
             request, 2, ANY, exc_info=None
         )
@@ -462,9 +444,7 @@ class TestWebApplicationHandler(SerializationFailureTestCase):
         request.path = factory.make_name("path")
         handler.get_response(request)
 
-        views.log_failed_attempt.assert_called_once_with(
-            request, 1, ANY, ANY, ANY
-        )
+        views.log_failed_attempt.assert_called_once_with(request, 1, ANY, ANY, ANY)
         views.log_final_failed_attempt.assert_called_once_with(
             request, 2, ANY, exc_info=sentinel.exc_info
         )
@@ -523,9 +503,7 @@ class TestWebApplicationHandler(SerializationFailureTestCase):
             handler._WebApplicationHandler__retry.add(response)
             return response
 
-        self.patch(
-            WSGIHandler, "get_response", get_response_read_content_files
-        )
+        self.patch(WSGIHandler, "get_response", get_response_read_content_files)
 
         body, headers = encode_multipart_data(
             [], [[file_name, io.BytesIO(file_content)]]
@@ -589,9 +567,7 @@ class TestWebApplicationHandlerAtomicViews(MAASServerTestCase):
 
         def view(*args, **kwargs):
             # We're one more savepoint in.
-            self.assertEqual(
-                len(connection.savepoint_ids), savepoint_level + 1
-            )
+            self.assertEqual(len(connection.savepoint_ids), savepoint_level + 1)
             # Post-commit hooks have been saved.
             self.assertIsNot(post_commit_hooks.hooks, hooks)
             # Return the args we were given.
@@ -621,12 +597,8 @@ class TestRequestHeaders(MAASTestCase):
 
     def test_non_http_headers_ignored(self):
         request = HttpRequest()
-        request.META.update(
-            {"HTTP_HOST": "www.example.com", "SERVER_NAME": "myserver"}
-        )
-        self.assertEqual(
-            views.request_headers(request), {"host": "www.example.com"}
-        )
+        request.META.update({"HTTP_HOST": "www.example.com", "SERVER_NAME": "myserver"})
+        self.assertEqual(views.request_headers(request), {"host": "www.example.com"})
 
     def test_case_insensitive(self):
         request = HttpRequest()

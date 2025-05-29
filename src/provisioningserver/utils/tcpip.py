@@ -87,7 +87,9 @@ class IPv4:
         self.invalid_reason = None
         if len(pkt_bytes) < IPV4_HEADER_MIN_LENGTH:
             self.valid = False
-            self.invalid_reason = f"Truncated IPv4 header; need at least {IPV4_HEADER_MIN_LENGTH} bytes."
+            self.invalid_reason = (
+                f"Truncated IPv4 header; need at least {IPV4_HEADER_MIN_LENGTH} bytes."
+            )
             return
         packet = IPv4Packet._make(
             struct.unpack(IPV4_PACKET, pkt_bytes[0:IPV4_HEADER_MIN_LENGTH])
@@ -169,7 +171,9 @@ class IPv6:
         self.protocol = None
         if len(pkt_bytes) < IPV6_HEADER_MIN_LENGTH:
             self.valid = False
-            self.invalid_reason = f"Truncated IPv6 header; need at least {IPV6_HEADER_MIN_LENGTH} bytes."
+            self.invalid_reason = (
+                f"Truncated IPv6 header; need at least {IPV6_HEADER_MIN_LENGTH} bytes."
+            )
             return
         packet = IPv6Packet._make(
             struct.unpack(IPV6_PACKET, pkt_bytes[0:IPV6_HEADER_MIN_LENGTH])
@@ -177,9 +181,7 @@ class IPv6:
         self.packet = packet
         # Mask out the version_ihl field to get the IP version and IHL
         # (Internet Header Length) separately.
-        self.version = (
-            packet.version__traffic_class__flow_label & 0xF0000000
-        ) >> 28
+        self.version = (packet.version__traffic_class__flow_label & 0xF0000000) >> 28
         if self.version != 6:
             self.valid = False
             self.invalid_reason = (
@@ -206,9 +208,7 @@ class IPv6:
 # Definitions for UDP packets used with `struct`.
 # https://tools.ietf.org/html/rfc768
 UDP_PACKET = "!HHHH"
-UDPPacket = namedtuple(
-    "IPPacket", ("src_port", "dst_port", "length", "checksum")
-)
+UDPPacket = namedtuple("IPPacket", ("src_port", "dst_port", "length", "checksum"))
 UDP_HEADER_LENGTH = 8
 
 
@@ -231,7 +231,9 @@ class UDP:
         self.invalid_reason = None
         if len(pkt_bytes) < UDP_HEADER_LENGTH:
             self.valid = False
-            self.invalid_reason = f"Truncated UDP header; need at least {UDP_HEADER_LENGTH} bytes."
+            self.invalid_reason = (
+                f"Truncated UDP header; need at least {UDP_HEADER_LENGTH} bytes."
+            )
             return
         packet = UDPPacket._make(
             struct.unpack(UDP_PACKET, pkt_bytes[0:UDP_HEADER_LENGTH])

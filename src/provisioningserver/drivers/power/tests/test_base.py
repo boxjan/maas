@@ -67,9 +67,7 @@ class FakePowerDriverBase(PowerDriverBase):
         return []
 
 
-def make_power_driver_base(
-    name=None, description=None, settings=None, chassis=False
-):
+def make_power_driver_base(name=None, description=None, settings=None, chassis=False):
     if name is None:
         name = factory.make_name("diskless")
     if description is None:
@@ -84,12 +82,8 @@ class TestFakePowerDriverBase(MAASTestCase):
         fake_name = factory.make_name("name")
         fake_description = factory.make_name("description")
         fake_setting = factory.make_name("setting")
-        fake_settings = [
-            make_setting_field(fake_setting, fake_setting.title())
-        ]
-        fake_driver = FakePowerDriverBase(
-            fake_name, fake_description, fake_settings
-        )
+        fake_settings = [make_setting_field(fake_setting, fake_setting.title())]
+        fake_driver = FakePowerDriverBase(fake_name, fake_description, fake_settings)
         self.assertEqual(fake_driver.name, fake_name)
         self.assertEqual(fake_driver.description, fake_description)
         self.assertEqual(fake_driver.settings, fake_settings)
@@ -98,9 +92,7 @@ class TestFakePowerDriverBase(MAASTestCase):
         fake_name = factory.make_name("name")
         fake_description = factory.make_name("description")
         fake_setting = factory.make_name("setting")
-        fake_settings = [
-            make_setting_field(fake_setting, fake_setting.title())
-        ]
+        fake_settings = [make_setting_field(fake_setting, fake_setting.title())]
         fake_driver = make_power_driver_base(
             name=fake_name,
             description=fake_description,
@@ -168,9 +160,7 @@ class TestPowerDriverBase(MAASTestCase):
         fake_description = factory.make_name("description")
         fake_setting = factory.make_name("setting")
         fake_chassis = factory.pick_bool()
-        fake_settings = [
-            make_setting_field(fake_setting, fake_setting.title())
-        ]
+        fake_settings = [make_setting_field(fake_setting, fake_setting.title())]
         fake_driver = make_power_driver_base(
             name=fake_name,
             description=fake_description,
@@ -257,9 +247,7 @@ class FakePowerDriver(PowerDriver):
     ip_extractor = None
     queryable = True
 
-    def __init__(
-        self, name, description, settings, wait_time=None, clock=reactor
-    ):
+    def __init__(self, name, description, settings, wait_time=None, clock=reactor):
         self.name = name
         self.description = description
         self.settings = settings
@@ -304,9 +292,7 @@ class AsyncFakePowerDriver(FakePowerDriver):
         clock=reactor,
         query_result=None,
     ):
-        super().__init__(
-            name, description, settings, wait_time=None, clock=reactor
-        )
+        super().__init__(name, description, settings, wait_time=None, clock=reactor)
         self.power_query_result = query_result
         self.power_on_called = 0
         self.power_off_called = 0
@@ -379,9 +365,7 @@ class TestPowerDriverPowerAction(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = {"context": factory.make_name("context")}
         mock_deferToThread = self.patch(power, "deferToThread")
-        driver = make_async_power_driver(
-            wait_time=[0], query_result=self.action
-        )
+        driver = make_async_power_driver(wait_time=[0], query_result=self.action)
         method = getattr(driver, self.action)
         result = yield method(system_id, context)
         self.assertIsNone(result)
@@ -547,6 +531,4 @@ class TestPowerDriverQuery(MAASTestCase):
         self.patch(driver, "power_query").side_effect = PowerError
         with self.assertRaisesRegex(PowerError, "^$"):
             yield driver.query(sentinel.system_id, sentinel.context)
-        power.pause.assert_has_calls(
-            [call(wait, reactor) for wait in wait_time]
-        )
+        power.pause.assert_has_calls([call(wait, reactor) for wait in wait_time])

@@ -230,9 +230,7 @@ def parse_legacy_tags(values):
     # Support old-method to pass a list of strings using a
     # comma-separated or space-separated list.
     # 'values' is assumed to be a list of strings.
-    result = chain.from_iterable(
-        re.findall(r"[^\s,]+", value) for value in values
-    )
+    result = chain.from_iterable(re.findall(r"[^\s,]+", value) for value in values)
     return list(result)
 
 
@@ -262,9 +260,7 @@ def detect_nonexistent_names(model_class, names, name_field="name"):
     assert isinstance(names, (list, tuple, set))
     if len(names) == 0:
         return []
-    existing_names = set(
-        model_class.objects.all().values_list(name_field, flat=True)
-    )
+    existing_names = set(model_class.objects.all().values_list(name_field, flat=True))
     return sorted(set(names) - existing_names)
 
 
@@ -294,8 +290,7 @@ def describe_multi_constraint_value(values):
         if isinstance(values, (set, dict, frozenset)):
             # Order unordered containers for consistency.
             sequence = sorted(
-                value.pk if isinstance(value, Model) else value
-                for value in values
+                value.pk if isinstance(value, Model) else value for value in values
             )
         else:
             # Keep ordered containers in their original order.
@@ -379,9 +374,7 @@ def nodes_by_storage(storage, node_ids=None):
             # Use only block devices that are mounted as '/'. Either the
             # block device has root sitting on it or its on a partition on
             # that block device.
-            filesystems = Filesystem.objects.filter(
-                mount_point="/", acquired=False
-            )
+            filesystems = Filesystem.objects.filter(mount_point="/", acquired=False)
             if tags is not None and "partition" in tags:
                 part_match = True
                 part_tags = list(tags)
@@ -443,9 +436,7 @@ def nodes_by_storage(storage, node_ids=None):
             for filesystem in filesystems:
                 if part_match:
                     device = filesystem.partition
-                    node_id = (
-                        device.partition_table.block_device.node_config.node_id
-                    )
+                    node_id = device.partition_table.block_device.node_config.node_id
                 elif filesystem.block_device is not None:
                     device = filesystem.block_device
                     node_id = device.node_config.node_id
@@ -464,9 +455,7 @@ def nodes_by_storage(storage, node_ids=None):
             matched_devices = Partition.objects.filter(size__gte=size)
             matched_devices = matched_devices.filter(filesystem__isnull=True)
             if part_tags:
-                matched_devices = matched_devices.filter(
-                    tags__contains=part_tags
-                )
+                matched_devices = matched_devices.filter(tags__contains=part_tags)
             if node_config_ids:
                 matched_devices = matched_devices.filter(
                     partition_table__block_device__node_config_id__in=node_config_ids
@@ -497,16 +486,12 @@ def nodes_by_storage(storage, node_ids=None):
             device_id = device.id
             if isinstance(device, Partition):
                 device_type = "partition"
-                device_node_id = (
-                    device.partition_table.block_device.node_config.node_id
-                )
+                device_node_id = device.partition_table.block_device.node_config.node_id
             elif isinstance(device, BlockDevice):
                 device_type = "blockdev"
                 device_node_id = device.node_config.node_id
             else:
-                raise TypeError(
-                    "Unknown device type: %s" % type(device).__name__
-                )
+                raise TypeError("Unknown device type: %s" % type(device).__name__)
 
             if device_node_id in matched_in_loop:
                 continue
@@ -528,9 +513,7 @@ def nodes_by_storage(storage, node_ids=None):
     return nodes
 
 
-def nodes_by_interface(
-    interfaces_label_map, include_filter=None, preconfigured=True
-):
+def nodes_by_interface(interfaces_label_map, include_filter=None, preconfigured=True):
     """Determines the set of nodes that match the specified
     LabeledConstraintMap (which must be a map of interface constraints.)
 
@@ -731,37 +714,27 @@ class FilterNodeForm(forms.Form):
 
     # This becomes a multiple-choice field during cleaning, to accommodate
     # architecture wildcards.
-    arch = UnconstrainedMultipleChoiceField(
-        label="Architecture", required=False
-    )
+    arch = UnconstrainedMultipleChoiceField(label="Architecture", required=False)
 
-    not_arch = UnconstrainedMultipleChoiceField(
-        label="Architecture", required=False
-    )
+    not_arch = UnconstrainedMultipleChoiceField(label="Architecture", required=False)
 
     tags = UnconstrainedMultipleChoiceField(label="Tags", required=False)
 
-    not_tags = UnconstrainedMultipleChoiceField(
-        label="Not having tags", required=False
-    )
+    not_tags = UnconstrainedMultipleChoiceField(label="Not having tags", required=False)
 
     # XXX mpontillo 2015-10-30 need validators for fabric constraints
     fabrics = ValidatorMultipleChoiceField(
         validator=lambda x: True,
         label="Attached to fabrics",
         required=False,
-        error_messages={
-            "invalid_list": "Invalid parameter: list of fabrics required."
-        },
+        error_messages={"invalid_list": "Invalid parameter: list of fabrics required."},
     )
 
     not_fabrics = ValidatorMultipleChoiceField(
         validator=lambda x: True,
         label="Not attached to fabrics",
         required=False,
-        error_messages={
-            "invalid_list": "Invalid parameter: list of fabrics required."
-        },
+        error_messages={"invalid_list": "Invalid parameter: list of fabrics required."},
     )
 
     fabric_classes = ValidatorMultipleChoiceField(
@@ -804,9 +777,7 @@ class FilterNodeForm(forms.Form):
         label="Link speed",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid link speed: number required."
-        },
+        error_messages={"invalid_choice": "Invalid link speed: number required."},
     )
 
     vlans = ValidatorMultipleChoiceField(
@@ -835,9 +806,7 @@ class FilterNodeForm(forms.Form):
         validator=MODEL_NAME_VALIDATOR,
         label="Not in zone",
         required=False,
-        error_messages={
-            "invalid_list": "Invalid parameter: must list physical zones."
-        },
+        error_messages={"invalid_list": "Invalid parameter: must list physical zones."},
     )
 
     system_id = UnconstrainedMultipleChoiceField(
@@ -853,9 +822,7 @@ class FilterNodeForm(forms.Form):
         validator=MODEL_NAME_VALIDATOR,
         label="Not in resource pool",
         required=False,
-        error_messages={
-            "invalid_list": "Invalid parameter: must list resource pools."
-        },
+        error_messages={"invalid_list": "Invalid parameter: must list resource pools."},
     )
 
     storage = forms.CharField(
@@ -874,27 +841,21 @@ class FilterNodeForm(forms.Form):
         label="CPU count",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid CPU count: number required."
-        },
+        error_messages={"invalid_choice": "Invalid CPU count: number required."},
     )
 
     cpu_speed = UnconstrainedTypedMultipleChoiceField(
         label="CPU speed",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid CPU speed: number required."
-        },
+        error_messages={"invalid_choice": "Invalid CPU speed: number required."},
     )
 
     mem = UnconstrainedTypedMultipleChoiceField(
         label="Memory",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid memory: number of MiB required."
-        },
+        error_messages={"invalid_choice": "Invalid memory: number of MiB required."},
     )
 
     pod = UnconstrainedMultipleChoiceField(
@@ -1035,9 +996,7 @@ class FilterNodeForm(forms.Form):
         # directly, so that patch_usable_architectures can easily patch it
         # for testing purposes.
         usable_architectures = maasserver_forms.list_all_usable_architectures()
-        architecture_wildcards = get_architecture_wildcards(
-            usable_architectures
-        )
+        architecture_wildcards = get_architecture_wildcards(usable_architectures)
         values = self.cleaned_data["arch"]
         arches = []
         for value in values:
@@ -1071,9 +1030,7 @@ class FilterNodeForm(forms.Form):
             # Validate tags.
             tag_names = set(tag_names)
             db_tag_names = set(
-                Tag.objects.filter(name__in=tag_names).values_list(
-                    "name", flat=True
-                )
+                Tag.objects.filter(name__in=tag_names).values_list("name", flat=True)
             )
             if len(tag_names) != len(db_tag_names):
                 self._set_clean_tags_error(tag_names, db_tag_names)
@@ -1157,9 +1114,7 @@ class FilterNodeForm(forms.Form):
         values = self.cleaned_data["owner"]
         nonexistent_names = detect_nonexistent_names(User, values, "username")
         if nonexistent_names:
-            set_form_error(
-                self, "owner", "No such owner: '%s'." % nonexistent_names[0]
-            )
+            set_form_error(self, "owner", "No such owner: '%s'." % nonexistent_names[0])
             return None
         return values
 
@@ -1180,17 +1135,11 @@ class FilterNodeForm(forms.Form):
 
     def clean_deployment_target(self):
         values = self.cleaned_data["deployment_target"]
-        return [
-            self._convert_deployment_target_to_ephemeral_deploy(a)
-            for a in values
-        ]
+        return [self._convert_deployment_target_to_ephemeral_deploy(a) for a in values]
 
     def clean_not_deployment_target(self):
         values = self.cleaned_data["not_deployment_target"]
-        return [
-            self._convert_deployment_target_to_ephemeral_deploy(a)
-            for a in values
-        ]
+        return [self._convert_deployment_target_to_ephemeral_deploy(a) for a in values]
 
     def clean(self):
         if not self.ignore_unknown_constraints:
@@ -1234,8 +1183,7 @@ class FilterNodeForm(forms.Form):
         Constraints are listed in alphabetical order.
         """
         constraints = (
-            self.describe_constraint(name)
-            for name in sorted(self.fields.keys())
+            self.describe_constraint(name) for name in sorted(self.fields.keys())
         )
         return " ".join(
             constraint for constraint in constraints if constraint is not None
@@ -1251,9 +1199,7 @@ class FilterNodeForm(forms.Form):
         :rtype: `django.db.models.query.QuerySet`
         """
         filtered_nodes = self._apply_filters(nodes)
-        compatible_nodes, filtered_nodes = self.filter_by_storage(
-            filtered_nodes
-        )
+        compatible_nodes, filtered_nodes = self.filter_by_storage(filtered_nodes)
         compatible_interfaces, filtered_nodes = self.filter_by_interfaces(
             filtered_nodes
         )
@@ -1546,72 +1492,56 @@ class FreeTextFilterNodeForm(ReadNodesForm):
         label="Link speed",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid link speed: number required."
-        },
+        error_messages={"invalid_choice": "Invalid link speed: number required."},
     )
 
     not_cpu_count = UnconstrainedTypedMultipleChoiceField(
         label="CPU count",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid CPU count: number required."
-        },
+        error_messages={"invalid_choice": "Invalid CPU count: number required."},
     )
 
     not_cpu_speed = UnconstrainedTypedMultipleChoiceField(
         label="CPU speed",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid CPU speed: number required."
-        },
+        error_messages={"invalid_choice": "Invalid CPU speed: number required."},
     )
 
     not_mem = UnconstrainedTypedMultipleChoiceField(
         label="Memory",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid memory: number of MiB required."
-        },
+        error_messages={"invalid_choice": "Invalid memory: number of MiB required."},
     )
 
     physical_disk_count = UnconstrainedTypedMultipleChoiceField(
         label="Physical disk Count",
         coerce=int,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid memory: number of disks required."
-        },
+        error_messages={"invalid_choice": "Invalid memory: number of disks required."},
     )
 
     not_physical_disk_count = UnconstrainedTypedMultipleChoiceField(
         label="Physical disk Count",
         coerce=int,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid memory: number of disks required."
-        },
+        error_messages={"invalid_choice": "Invalid memory: number of disks required."},
     )
 
     total_storage = UnconstrainedTypedMultipleChoiceField(
         label="Total storage",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid memory: number of MiB required."
-        },
+        error_messages={"invalid_choice": "Invalid memory: number of MiB required."},
     )
 
     not_total_storage = UnconstrainedTypedMultipleChoiceField(
         label="Total storage",
         coerce=float,
         required=False,
-        error_messages={
-            "invalid_choice": "Invalid memory: number of MiB required."
-        },
+        error_messages={"invalid_choice": "Invalid memory: number of MiB required."},
     )
 
     pxe_mac = UnconstrainedMultipleChoiceField(
@@ -1632,13 +1562,9 @@ class FreeTextFilterNodeForm(ReadNodesForm):
 
     fqdn = UnconstrainedMultipleChoiceField(label="Node FQDN", required=False)
 
-    not_fqdn = UnconstrainedMultipleChoiceField(
-        label="Node FQDN", required=False
-    )
+    not_fqdn = UnconstrainedMultipleChoiceField(label="Node FQDN", required=False)
 
-    interfaces = UnconstrainedMultipleChoiceField(
-        label="Interfaces", required=False
-    )
+    interfaces = UnconstrainedMultipleChoiceField(label="Interfaces", required=False)
 
     devices = UnconstrainedMultipleChoiceField(label="Devices", required=False)
 
@@ -1840,9 +1766,7 @@ class FreeTextFilterNodeForm(ReadNodesForm):
             for constraint in val.split(","):
                 key, val = constraint.split("=", 1)
                 if key not in NETWORKING_CONSTRAINT_NAMES:
-                    raise ValidationError(
-                        "Unknown interfaces constraint: '%s" % key
-                    )
+                    raise ValidationError("Unknown interfaces constraint: '%s" % key)
                 opts.append(f"{key}:{val}")
             specifiers.append("&&".join(opts))
         return specifiers
@@ -1865,9 +1789,7 @@ class FreeTextFilterNodeForm(ReadNodesForm):
             for constraint in val.split(","):
                 key, val = constraint.split("=", 1)
                 if key not in DEVICE_CONSTRAINT_NAMES:
-                    raise ValidationError(
-                        "Unknown devices constraint: '%s" % key
-                    )
+                    raise ValidationError("Unknown devices constraint: '%s" % key)
                 opts.append(tuple((key, val)))
             specifiers.append(opts)
         return specifiers
@@ -1925,11 +1847,7 @@ class FreeTextFilterNodeForm(ReadNodesForm):
                 if tags is not None:
                     devs = devs.filter(tags__contains=tags)
                 node_ids.extend(
-                    list(
-                        devs.order_by().values_list(
-                            "node_config__node_id", flat=True
-                        )
-                    )
+                    list(devs.order_by().values_list("node_config__node_id", flat=True))
                 )
         if node_ids:
             filtered_nodes = filtered_nodes.filter(id__in=node_ids)

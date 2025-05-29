@@ -91,9 +91,7 @@ class TestUtils(MAASServerTestCase):
         self.assertEqual(["a", "b"], parse_legacy_tags(["a, b"]))
         self.assertEqual(["a", "b", "c"], parse_legacy_tags(["a, b c"]))
         self.assertEqual(["a", "b"], parse_legacy_tags(["a,b"]))
-        self.assertEqual(
-            ["a", "b", "c", "d"], parse_legacy_tags(["a,b", "c d"])
-        )
+        self.assertEqual(["a", "b", "c", "d"], parse_legacy_tags(["a,b", "c d"]))
 
     def test_JUJU_ACQUIRE_FORM_FIELDS_MAPPING_fields(self):
         self.assertGreaterEqual(
@@ -112,9 +110,7 @@ class TestUtils(MAASServerTestCase):
 
     def test_detect_nonexistent_names_reports_unknown_names(self):
         non_zone = factory.make_name("nonzone")
-        self.assertEqual(
-            [non_zone], detect_nonexistent_names(Zone, [non_zone])
-        )
+        self.assertEqual([non_zone], detect_nonexistent_names(Zone, [non_zone]))
 
     def test_detect_nonexistent_names_is_consistent(self):
         names = [factory.make_name("nonzone") for _ in range(3)]
@@ -126,14 +122,10 @@ class TestUtils(MAASServerTestCase):
     def test_detect_nonexistent_names_combines_good_and_bad_names(self):
         zone = factory.make_Zone().name
         non_zone = factory.make_name("nonzone")
-        self.assertEqual(
-            [non_zone], detect_nonexistent_names(Zone, [zone, non_zone])
-        )
+        self.assertEqual([non_zone], detect_nonexistent_names(Zone, [zone, non_zone]))
 
     def test_detect_nonexistent_names_asserts_parameter_type(self):
-        self.assertRaises(
-            AssertionError, detect_nonexistent_names, Zone, "text"
-        )
+        self.assertRaises(AssertionError, detect_nonexistent_names, Zone, "text")
 
     def test_get_storage_constraints_from_string_returns_None_for_empty(self):
         self.assertIsNone(get_storage_constraints_from_string(""))
@@ -141,21 +133,13 @@ class TestUtils(MAASServerTestCase):
     def test_get_storage_constraints_from_string_None_for_empty_tags(self):
         self.assertEqual(
             [None, None, None],
-            [
-                tags
-                for _, _, tags in get_storage_constraints_from_string("0,0,0")
-            ],
+            [tags for _, _, tags in get_storage_constraints_from_string("0,0,0")],
         )
 
     def test_get_storage_constraints_from_string_returns_size_in_bytes(self):
         self.assertEqual(
             [int(1.5 * (1000**3)), 3 * (1000**3), int(6.75 * (1000**3))],
-            [
-                size
-                for _, size, _ in get_storage_constraints_from_string(
-                    "1.5,3,6.75"
-                )
-            ],
+            [size for _, size, _ in get_storage_constraints_from_string("1.5,3,6.75")],
         )
 
     def test_get_storage_constraints_from_string_sorts_more_tags_first(self):
@@ -180,9 +164,7 @@ class FilterConstraintsMixin:
     def assertConstrainedNodes(self, nodes, data):
         form = self.form_class(data=data)
         self.assertTrue(form.is_valid(), dict(form.errors))
-        filtered_nodes, storage, interfaces = form.filter_nodes(
-            Machine.objects.all()
-        )
+        filtered_nodes, storage, interfaces = form.filter_nodes(Machine.objects.all())
         self.assertCountEqual(nodes, filtered_nodes)
         return (filtered_nodes, storage, interfaces)
 
@@ -200,9 +182,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def set_usable_arch(self):
         """Produce an arbitrary, valid, architecture name."""
-        arch = "{}/{}".format(
-            factory.make_name("arch"), factory.make_name("sub")
-        )
+        arch = "{}/{}".format(factory.make_name("arch"), factory.make_name("sub"))
         patch_usable_architectures(self, [arch])
         return arch
 
@@ -246,9 +226,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         # Filter for this subnet.  Take one in the middle to avoid
         # coincidental success based on ordering.
         pick = 1
-        self.assertConstrainedNodes(
-            {nodes[pick]}, {"subnets": [subnets[pick].name]}
-        )
+        self.assertConstrainedNodes({nodes[pick]}, {"subnets": [subnets[pick].name]})
 
     def test_rejects_space_not_connected_to_anything(self):
         space1 = factory.make_Space("foo")
@@ -286,11 +264,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         del subnets[expected_selection]
         self.assertConstrainedNodes(
             {expected_node},
-            {
-                "not_subnets": [
-                    "space:%s" % subnet.space.name for subnet in subnets
-                ]
-            },
+            {"not_subnets": ["space:%s" % subnet.space.name for subnet in subnets]},
         )
 
     def test_vlans_filters_by_space(self):
@@ -328,9 +302,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
     def test_fails_validation_for_no_matching_vlans(self):
         form = FilterNodeForm(data={"vlans": ["space:foo"]})
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            ["No matching VLANs found."], dict(form.errors)["vlans"]
-        )
+        self.assertEqual(["No matching VLANs found."], dict(form.errors)["vlans"])
 
     def test_fails_validation_for_no_matching_not_vlans(self):
         form = FilterNodeForm(data={"not_vlans": ["space:foo"]})
@@ -369,8 +341,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
             {nodes[pick]},
             {
                 "subnets": [
-                    "ip:%s"
-                    % factory.pick_ip_in_network(subnets[pick].get_ipnetwork())
+                    "ip:%s" % factory.pick_ip_in_network(subnets[pick].get_ipnetwork())
                 ]
             },
         )
@@ -378,8 +349,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
     def test_subnets_filters_by_vlan_tag(self):
         vlan_tags = list(range(1, 6))
         subnets = [
-            factory.make_Subnet(vlan=factory.make_VLAN(vid=tag))
-            for tag in vlan_tags
+            factory.make_Subnet(vlan=factory.make_VLAN(vid=tag)) for tag in vlan_tags
         ]
         nodes = [
             factory.make_Node_with_Interface_on_Subnet(
@@ -420,8 +390,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
                 False,
                 {
                     "subnets": [
-                        "Invalid parameter: "
-                        "list of subnet specifiers required."
+                        "Invalid parameter: " "list of subnet specifiers required."
                     ]
                 },
             ),
@@ -434,11 +403,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         self.assertEqual(
             (
                 False,
-                {
-                    "subnets": [
-                        "VLAN tag (VID) out of range (0-4094; 0 for untagged.)"
-                    ]
-                },
+                {"subnets": ["VLAN tag (VID) out of range (0-4094; 0 for untagged.)"]},
             ),
             (form.is_valid(), form.errors),
         )
@@ -460,8 +425,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
             {
                 "subnets": [
                     subnet_by_name.name,
-                    "ip:%s"
-                    % factory.pick_ip_in_network(subnet_by_ip.get_ipnetwork()),
+                    "ip:%s" % factory.pick_ip_in_network(subnet_by_ip.get_ipnetwork()),
                     "vlan:%d" % subnet_by_vlan.vlan.vid,
                 ]
             },
@@ -484,8 +448,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
             {node},
             {
                 "not_subnets": [
-                    "ip:%s"
-                    % factory.pick_ip_in_network(not_subnet.get_ipnetwork())
+                    "ip:%s" % factory.pick_ip_in_network(not_subnet.get_ipnetwork())
                 ]
             },
         )
@@ -493,8 +456,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
     def test_not_subnets_filters_by_vlan_tag(self):
         vlan_tags = list(range(1, 3))
         subnets = [
-            factory.make_Subnet(vlan=factory.make_VLAN(vid=tag))
-            for tag in vlan_tags
+            factory.make_Subnet(vlan=factory.make_VLAN(vid=tag)) for tag in vlan_tags
         ]
         nodes = [
             factory.make_Node_with_Interface_on_Subnet(subnet=subnet)
@@ -539,8 +501,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
                 False,
                 {
                     "not_subnets": [
-                        "Invalid parameter: "
-                        "list of subnet specifiers required."
+                        "Invalid parameter: " "list of subnet specifiers required."
                     ]
                 },
             ),
@@ -584,8 +545,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
             {
                 "not_subnets": [
                     subnet_by_name.name,
-                    "ip:%s"
-                    % factory.pick_ip_in_network(subnet_by_ip.get_ipnetwork()),
+                    "ip:%s" % factory.pick_ip_in_network(subnet_by_ip.get_ipnetwork()),
                     "vlan:%d" % subnet_by_vlan.vlan.vid,
                 ]
             },
@@ -697,16 +657,12 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
         factory.make_ResourcePool(nodes=[node1, node2])
         pool2 = factory.make_ResourcePool(nodes=[node3, node4])
-        self.assertConstrainedNodes(
-            [node1, node2], {"not_in_pool": [pool2.name]}
-        )
+        self.assertConstrainedNodes([node1, node2], {"not_in_pool": [pool2.name]})
 
     def test_not_in_pool_with_required_pool_yields_no_nodes(self):
         node = factory.make_Node()
         pool = factory.make_ResourcePool(nodes=[node])
-        self.assertConstrainedNodes(
-            [], {"pool": pool.name, "not_in_pool": [pool.name]}
-        )
+        self.assertConstrainedNodes([], {"pool": pool.name, "not_in_pool": [pool.name]})
 
     def test_validates_not_in_pool(self):
         bad_pool_name = "#$&*!"
@@ -733,9 +689,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         node3 = factory.make_Node()
         factory.make_ResourcePool(nodes=[node3])
 
-        self.assertConstrainedNodes(
-            [node3], {"not_in_pool": [pool1.name, pool2.name]}
-        )
+        self.assertConstrainedNodes([node3], {"not_in_pool": [pool1.name, pool2.name]})
 
     def test_tags(self):
         tag_big = factory.make_Tag(name="big")
@@ -747,15 +701,9 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         node_bignburly = factory.make_Node()
         node_bignburly.tags.add(tag_big)
         node_bignburly.tags.add(tag_burly)
-        self.assertConstrainedNodes(
-            [node_big, node_bignburly], {"tags": ["big"]}
-        )
-        self.assertConstrainedNodes(
-            [node_burly, node_bignburly], {"tags": ["burly"]}
-        )
-        self.assertConstrainedNodes(
-            [node_bignburly], {"tags": ["big", "burly"]}
-        )
+        self.assertConstrainedNodes([node_big, node_bignburly], {"tags": ["big"]})
+        self.assertConstrainedNodes([node_burly, node_bignburly], {"tags": ["burly"]})
+        self.assertConstrainedNodes([node_bignburly], {"tags": ["big", "burly"]})
 
     def test_not_tags_negates_individual_tags(self):
         tag = factory.make_Tag()
@@ -820,45 +768,29 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_storage_matches_disk_with_root_mount_on_partition(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node1, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node1, formatted_root=True, bootable=True)
         node2 = factory.make_Node(with_boot_disk=False)
-        block_device = factory.make_PhysicalBlockDevice(
-            node=node2, bootable=True
-        )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        block_device = factory.make_PhysicalBlockDevice(node=node2, bootable=True)
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         factory.make_Filesystem(mount_point="/srv", partition=partition)
         self.assertConstrainedNodes([node1], {"storage": "0"})
 
     def test_storage_matches_partition_with_root_mount(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        block_device = factory.make_PhysicalBlockDevice(
-            node=node1, bootable=True
-        )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        block_device = factory.make_PhysicalBlockDevice(node=node1, bootable=True)
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         factory.make_Filesystem(mount_point="/", partition=partition)
         node2 = factory.make_Node(with_boot_disk=False)
-        block_device2 = factory.make_PhysicalBlockDevice(
-            node=node2, bootable=True
-        )
-        partition_table2 = factory.make_PartitionTable(
-            block_device=block_device2
-        )
+        block_device2 = factory.make_PhysicalBlockDevice(node=node2, bootable=True)
+        partition_table2 = factory.make_PartitionTable(block_device=block_device2)
         partition2 = factory.make_Partition(partition_table=partition_table2)
         factory.make_Filesystem(mount_point="/srv", partition=partition2)
         _, storage, _ = self.assertConstrainedNodes(
             [node1], {"storage": "part:0(partition)"}
         )
-        self.assertEqual(
-            {node1.id: {"partition:%d" % partition.id: "part"}}, storage
-        )
+        self.assertEqual({node1.id: {"partition:%d" % partition.id: "part"}}, storage)
 
     def test_storage_single_contraint_matches_all_sizes_larger(self):
         node1 = factory.make_Node(with_boot_disk=False)
@@ -892,23 +824,15 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_storage_single_constraint_matches_with_tags(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        block_device = factory.make_PhysicalBlockDevice(
-            node=node1, bootable=True
-        )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        block_device = factory.make_PhysicalBlockDevice(node=node1, bootable=True)
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(
             partition_table=partition_table, tags=["ssd-part"]
         )
         factory.make_Filesystem(mount_point="/", partition=partition)
         node2 = factory.make_Node(with_boot_disk=False)
-        block_device2 = factory.make_PhysicalBlockDevice(
-            node=node2, bootable=True
-        )
-        partition_table2 = factory.make_PartitionTable(
-            block_device=block_device2
-        )
+        block_device2 = factory.make_PhysicalBlockDevice(node=node2, bootable=True)
+        partition_table2 = factory.make_PartitionTable(block_device=block_device2)
         partition2 = factory.make_Partition(
             partition_table=partition_table2, tags=["rotary-part"]
         )
@@ -916,9 +840,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         _, storage, _ = self.assertConstrainedNodes(
             [node1], {"storage": "part:0(partition,ssd-part)"}
         )
-        self.assertEqual(
-            {node1.id: {"partition:%d" % partition.id: "part"}}, storage
-        )
+        self.assertEqual({node1.id: {"partition:%d" % partition.id: "part"}}, storage)
 
     def test_storage_single_contraint_matches_decimal_size(self):
         node1 = factory.make_Node(with_boot_disk=False)
@@ -936,37 +858,27 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_storage_single_contraint_allows_root_on_virtual(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        physical = factory.make_PhysicalBlockDevice(
-            node=node1, size=(6 * (1000**3))
-        )
+        physical = factory.make_PhysicalBlockDevice(node=node1, size=(6 * (1000**3)))
         partition_table = factory.make_PartitionTable(block_device=physical)
         partition = factory.make_Partition(
             partition_table=partition_table, size=5 * (1000**3)
         )
-        pv = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.LVM_PV, partition=partition
-        )
+        pv = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.LVM_PV, partition=partition)
         vg = factory.make_FilesystemGroup(
             filesystems=[pv], group_type=FILESYSTEM_GROUP_TYPE.LVM_VG
         )
-        virtual = factory.make_VirtualBlockDevice(
-            filesystem_group=vg, node=node1
-        )
+        virtual = factory.make_VirtualBlockDevice(filesystem_group=vg, node=node1)
         factory.make_Filesystem(mount_point="/", block_device=virtual)
         self.assertConstrainedNodes([node1], {"storage": "0"})
 
     def test_storage_single_contraint_size_on_virtual(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        physical = factory.make_PhysicalBlockDevice(
-            node=node1, size=(6 * (1000**3))
-        )
+        physical = factory.make_PhysicalBlockDevice(node=node1, size=(6 * (1000**3)))
         partition_table = factory.make_PartitionTable(block_device=physical)
         partition = factory.make_Partition(
             partition_table=partition_table, size=(5.5 * (1000**3))
         )
-        pv = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.LVM_PV, partition=partition
-        )
+        pv = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.LVM_PV, partition=partition)
         vg = factory.make_FilesystemGroup(
             filesystems=[pv], group_type=FILESYSTEM_GROUP_TYPE.LVM_VG
         )
@@ -978,9 +890,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_storage_multi_contraint_matches_physical_and_unused(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node1, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node1, formatted_root=True, bootable=True)
         # 1gb, 2gb, 3gb block device
         factory.make_PhysicalBlockDevice(node=node1, size=1 * (1000**3))
         factory.make_PhysicalBlockDevice(node=node1, size=2 * (1000**3))
@@ -1002,25 +912,19 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_storage_multi_contraint_matches_virtual_and_unused(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node1, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node1, formatted_root=True, bootable=True)
         # 1gb, 2gb, 3gb block device
         factory.make_VirtualBlockDevice(node=node1, size=1 * (1000**3))
         factory.make_VirtualBlockDevice(node=node1, size=2 * (1000**3))
         factory.make_VirtualBlockDevice(node=node1, size=3 * (1000**3))
         node2 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node2, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node2, formatted_root=True, bootable=True)
         # 5gb, 6gb, 7gb block device
         factory.make_VirtualBlockDevice(node=node2, size=5 * (1000**3))
         factory.make_VirtualBlockDevice(node=node2, size=6 * (1000**3))
         factory.make_VirtualBlockDevice(node=node2, size=7 * (1000**3))
         node3 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node3, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node3, formatted_root=True, bootable=True)
         # 8gb, 9gb, 10gb block device
         factory.make_VirtualBlockDevice(node=node3, size=8 * (1000**3))
         factory.make_VirtualBlockDevice(node=node3, size=9 * (1000**3))
@@ -1030,17 +934,13 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_storage_multi_contraint_matches_partition_unused(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node1, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node1, formatted_root=True, bootable=True)
         # 1gb, 2gb, 3gb block device
         factory.make_PhysicalBlockDevice(node=node1, size=1 * (1000**3))
         factory.make_PhysicalBlockDevice(node=node1, size=2 * (1000**3))
         factory.make_PhysicalBlockDevice(node=node1, size=3 * (1000**3))
         node2 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node2, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node2, formatted_root=True, bootable=True)
         # 5gb, 6gb, 7gb block device
         factory.make_PhysicalBlockDevice(node=node2, size=5 * (1000**3))
         factory.make_PhysicalBlockDevice(node=node2, size=6 * (1000**3))
@@ -1053,28 +953,20 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         )
         factory.make_Filesystem(mount_point="/srv", partition=used_partition)
         node3 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node3, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node3, formatted_root=True, bootable=True)
         # 8gb, 9gb, 10gb block device
         factory.make_PhysicalBlockDevice(node=node3, size=8 * (1000**3))
         factory.make_PhysicalBlockDevice(node=node3, size=9 * (1000**3))
         factory.make_PhysicalBlockDevice(node=node3, size=10 * (1000**3))
         # node3: un-used partition on block device
-        block_device = factory.make_PhysicalBlockDevice(
-            node=node3, bootable=True
-        )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        block_device = factory.make_PhysicalBlockDevice(node=node3, bootable=True)
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         # all nodes with physical devices larger than 2gb
         _, storage, _ = self.assertConstrainedNodes(
             [node3], {"storage": "0,4,4,4,part:0(partition)"}
         )
-        self.assertEqual(
-            {node3.id: {"partition:%d" % partition.id: "part"}}, storage
-        )
+        self.assertEqual({node3.id: {"partition:%d" % partition.id: "part"}}, storage)
 
     def test_storage_multi_contraint_matches_on_tags(self):
         node1 = factory.make_Node(with_boot_disk=False)
@@ -1083,13 +975,9 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         )
         factory.make_PhysicalBlockDevice(node=node1, tags=["ssd", "removable"])
         node2 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node2, tags=["ssd"], formatted_root=True
-        )
+        factory.make_PhysicalBlockDevice(node=node2, tags=["ssd"], formatted_root=True)
         factory.make_PhysicalBlockDevice(node=node2, tags=["ssd", "sata"])
-        self.assertConstrainedNodes(
-            [node1], {"storage": "0(ssd),0(ssd,removable)"}
-        )
+        self.assertConstrainedNodes([node1], {"storage": "0(ssd),0(ssd,removable)"})
 
     def test_storage_multi_contraint_matches_on_size_and_tags(self):
         node1 = factory.make_Node(with_boot_disk=False)
@@ -1097,17 +985,13 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         factory.make_PhysicalBlockDevice(
             node=node1, size=1 * (1000**3), tags=["ssd"], formatted_root=True
         )
-        factory.make_PhysicalBlockDevice(
-            node=node1, size=2 * (1000**3), tags=["ssd"]
-        )
+        factory.make_PhysicalBlockDevice(node=node1, size=2 * (1000**3), tags=["ssd"])
         node2 = factory.make_Node(with_boot_disk=False)
         # 4gb, 5gb block device
         factory.make_PhysicalBlockDevice(
             node=node2, size=4 * (1000**3), tags=["ssd"], formatted_root=True
         )
-        factory.make_PhysicalBlockDevice(
-            node=node2, size=5 * (1000**3), tags=["ssd"]
-        )
+        factory.make_PhysicalBlockDevice(node=node2, size=5 * (1000**3), tags=["ssd"])
         self.assertConstrainedNodes([node2], {"storage": "3(ssd),3(ssd)"})
 
     def test_storage_first_constraint_matches_blockdevice_with_root(self):
@@ -1137,33 +1021,23 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_storage_multi_contraint_matches_large_disk_count(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node1, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node1, formatted_root=True, bootable=True)
         for _ in range(10):
             factory.make_PhysicalBlockDevice(node=node1)
         node2 = factory.make_Node(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=node2, formatted_root=True, bootable=True
-        )
+        factory.make_PhysicalBlockDevice(node=node2, formatted_root=True, bootable=True)
         for _ in range(5):
             factory.make_PhysicalBlockDevice(node=node2)
-        self.assertConstrainedNodes(
-            [node1], {"storage": "0,0,0,0,0,0,0,0,0,0"}
-        )
+        self.assertConstrainedNodes([node1], {"storage": "0,0,0,0,0,0,0,0,0,0"})
 
     def test_storage_with_named_constraints(self):
         node1 = factory.make_Node(with_boot_disk=False)
-        physical = factory.make_PhysicalBlockDevice(
-            node=node1, size=11 * (1000**3)
-        )
+        physical = factory.make_PhysicalBlockDevice(node=node1, size=11 * (1000**3))
         partition_table = factory.make_PartitionTable(block_device=physical)
         partition = factory.make_Partition(
             partition_table=partition_table, size=10 * (1000**3)
         )
-        pv = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.LVM_PV, partition=partition
-        )
+        pv = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.LVM_PV, partition=partition)
         vg = factory.make_FilesystemGroup(
             filesystems=[pv], group_type=FILESYSTEM_GROUP_TYPE.LVM_VG
         )
@@ -1174,29 +1048,19 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         physical = factory.make_PhysicalBlockDevice(
             node=node1, size=6 * (1000**3), tags=["rotary", "5400rpm"]
         )
-        other = factory.make_PhysicalBlockDevice(
-            node=node1, size=21 * (1000**3)
-        )
+        other = factory.make_PhysicalBlockDevice(node=node1, size=21 * (1000**3))
         form = FilterNodeForm(
             {"storage": "root:8(lvm),physical:5(rotary,5400rpm),other:20"}
         )
         self.assertTrue(form.is_valid(), form.errors)
-        filtered_nodes, constraint_map, _ = form.filter_nodes(
-            Machine.objects.all()
-        )
+        filtered_nodes, constraint_map, _ = form.filter_nodes(Machine.objects.all())
         node = filtered_nodes[0]
-        constraints = {
-            value: key for key, value in constraint_map[node.id].items()
-        }
+        constraints = {value: key for key, value in constraint_map[node.id].items()}
         disk0 = node.current_config.blockdevice_set.get(id=constraints["root"])
         self.assertEqual(virtual.id, disk0.id)
-        disk1 = node.current_config.blockdevice_set.get(
-            id=constraints["physical"]
-        )
+        disk1 = node.current_config.blockdevice_set.get(id=constraints["physical"])
         self.assertEqual(physical.id, disk1.id)
-        disk2 = node.current_config.blockdevice_set.get(
-            id=constraints["other"]
-        )
+        disk2 = node.current_config.blockdevice_set.get(id=constraints["other"])
         self.assertEqual(other.id, disk2.id)
 
     def test_fabrics_constraint(self):
@@ -1247,9 +1111,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_interfaces_constraint_rejected_if_key_is_invalid(self):
         factory.make_Node_with_Interface_on_Subnet()
-        form = FilterNodeForm(
-            {"interfaces": "label:chirp_chirp_thing=silenced"}
-        )
+        form = FilterNodeForm({"interfaces": "label:chirp_chirp_thing=silenced"})
         self.assertFalse(form.is_valid(), dict(form.errors))
         self.assertIn("interfaces", form.errors)
 
@@ -1269,11 +1131,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         subnet = factory.make_Subnet()
         factory.make_Node_with_Interface_on_Subnet(subnet=subnet)
         form = FilterNodeForm(
-            {
-                "interfaces": LabeledConstraintMap(
-                    "eth0:subnet=%s" % subnet.cidr
-                )
-            }
+            {"interfaces": LabeledConstraintMap("eth0:subnet=%s" % subnet.cidr)}
         )
         self.assertTrue(form.is_valid(), dict(form.errors))
 
@@ -1330,23 +1188,15 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         fabric2 = factory.make_Fabric(class_type="10g")
         vlan1 = factory.make_VLAN(vid=1, fabric=fabric1)
         vlan2 = factory.make_VLAN(vid=2, fabric=fabric2)
-        node1 = factory.make_Node_with_Interface_on_Subnet(
-            fabric=fabric1, vlan=vlan1
-        )
-        node2 = factory.make_Node_with_Interface_on_Subnet(
-            fabric=fabric2, vlan=vlan2
-        )
+        node1 = factory.make_Node_with_Interface_on_Subnet(fabric=fabric1, vlan=vlan1)
+        node2 = factory.make_Node_with_Interface_on_Subnet(fabric=fabric2, vlan=vlan2)
 
-        form = FilterNodeForm(
-            {"interfaces": "fabric:fabric_class=1g;vlan:vid=1"}
-        )
+        form = FilterNodeForm({"interfaces": "fabric:fabric_class=1g;vlan:vid=1"})
         self.assertTrue(form.is_valid(), dict(form.errors))
         filtered_nodes, _, _ = form.filter_nodes(Machine.objects)
         self.assertCountEqual([node1], filtered_nodes)
 
-        form = FilterNodeForm(
-            {"interfaces": "label:fabric_class=10g;vlan:vid=2"}
-        )
+        form = FilterNodeForm({"interfaces": "label:fabric_class=10g;vlan:vid=2"})
         self.assertTrue(form.is_valid(), dict(form.errors))
         filtered_nodes, _, _ = form.filter_nodes(Machine.objects)
         self.assertCountEqual([node2], filtered_nodes)
@@ -1356,17 +1206,11 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         fabric2 = factory.make_Fabric(class_type="10g")
         vlan1 = factory.make_VLAN(vid=1, fabric=fabric1)
         vlan2 = factory.make_VLAN(vid=2, fabric=fabric2)
-        node1 = factory.make_Node_with_Interface_on_Subnet(
-            fabric=fabric1, vlan=vlan1
-        )
-        node2 = factory.make_Node_with_Interface_on_Subnet(
-            fabric=fabric2, vlan=vlan2
-        )
+        node1 = factory.make_Node_with_Interface_on_Subnet(fabric=fabric1, vlan=vlan1)
+        node2 = factory.make_Node_with_Interface_on_Subnet(fabric=fabric2, vlan=vlan2)
 
         form = FilterNodeForm(
-            {
-                "interfaces": "fabric:fabric_class=1g,fabric_class=10g;vlan:vid=1"
-            }
+            {"interfaces": "fabric:fabric_class=1g,fabric_class=10g;vlan:vid=1"}
         )
         self.assertTrue(form.is_valid(), dict(form.errors))
         filtered_nodes, _, _ = form.filter_nodes(Machine.objects)
@@ -1384,12 +1228,8 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         fabric2 = factory.make_Fabric(class_type="10g")
         vlan1 = factory.make_VLAN(vid=1, fabric=fabric1)
         vlan2 = factory.make_VLAN(vid=2, fabric=fabric2)
-        node1 = factory.make_Node_with_Interface_on_Subnet(
-            fabric=fabric1, vlan=vlan1
-        )
-        node2 = factory.make_Node_with_Interface_on_Subnet(
-            fabric=fabric2, vlan=vlan2
-        )
+        node1 = factory.make_Node_with_Interface_on_Subnet(fabric=fabric1, vlan=vlan1)
+        node2 = factory.make_Node_with_Interface_on_Subnet(fabric=fabric2, vlan=vlan2)
 
         form = FilterNodeForm({"interfaces": "none:fabric_class=1g,vid=2"})
         self.assertTrue(form.is_valid(), dict(form.errors))
@@ -1431,12 +1271,8 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         factory.make_Node(architecture=arch)
         node_big_other_arch = factory.make_Node(architecture=wrong_arch)
         node_big_other_arch.tags.add(tag_big)
-        self.assertConstrainedNodes(
-            [node_big, node_big_other_arch], {"tags": ["big"]}
-        )
-        self.assertConstrainedNodes(
-            [node_big], {"arch": arch, "tags": ["big"]}
-        )
+        self.assertConstrainedNodes([node_big, node_big_other_arch], {"tags": ["big"]})
+        self.assertConstrainedNodes([node_big], {"arch": arch, "tags": ["big"]})
 
     def test_wildcard_arch_constraint(self):
         patch_usable_architectures(self, ["foo/bar", "foo/baz"])
@@ -1499,9 +1335,7 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         pool = factory.make_ResourcePool()
         form = FilterNodeForm(data={"pool": pool, "zone": zone})
         self.assertTrue(form.is_valid(), form.errors)
-        self.assertEqual(
-            f"pool={pool} zone={zone}", form.describe_constraints()
-        )
+        self.assertEqual(f"pool={pool} zone={zone}", form.describe_constraints())
 
     def test_describe_constraints_combines_constraint_values(self):
         tag1 = factory.make_Tag()
@@ -1542,12 +1376,8 @@ class TestFilterNodeForm(MAASServerTestCase, FilterConstraintsMixin):
             "interfaces": "label:fabric=fabric-0",
             "fabrics": [factory.make_Fabric().name],
             "not_fabrics": [factory.make_Fabric().name],
-            "fabric_classes": [
-                factory.make_Fabric(class_type="10g").class_type
-            ],
-            "not_fabric_classes": [
-                factory.make_Fabric(class_type="1g").class_type
-            ],
+            "fabric_classes": [factory.make_Fabric(class_type="10g").class_type],
+            "not_fabric_classes": [factory.make_Fabric(class_type="1g").class_type],
             "owner": factory.make_User().username,
             "not_owner": factory.make_User().username,
             "power_state": POWER_STATE.ON,
@@ -1585,9 +1415,7 @@ class TestFreeTextFilterNodeForm(MAASServerTestCase):
     def assertConstrainedNodes(self, nodes, data):
         form = self.form_class(data=data)
         self.assertTrue(form.is_valid(), dict(form.errors))
-        filtered_nodes, storage, interfaces = form.filter_nodes(
-            self.get_queryset()
-        )
+        filtered_nodes, storage, interfaces = form.filter_nodes(self.get_queryset())
         self.assertCountEqual(nodes, filtered_nodes)
         return (filtered_nodes, storage, interfaces)
 
@@ -1597,9 +1425,7 @@ class TestFreeTextFilterNodeForm(MAASServerTestCase):
         node3 = factory.make_Node(status=NODE_STATUS.NEW)
         node4 = factory.make_Node(status=NODE_STATUS.FAILED_RELEASING)
         self.assertConstrainedNodes([node1, node3], {"simple_status": "new"})
-        self.assertConstrainedNodes(
-            [node2, node4], {"simple_status": "failed"}
-        )
+        self.assertConstrainedNodes([node2, node4], {"simple_status": "failed"})
 
     def test_match_none(self):
         node1 = factory.make_Node()
@@ -1637,9 +1463,7 @@ class TestFreeTextFilterNodeForm(MAASServerTestCase):
         self.assertConstrainedNodes([node1], constraints)
 
     def test_substring_tag_filter(self):
-        tags = [
-            factory.make_Tag(name=factory.make_name("tag")) for _ in range(3)
-        ]
+        tags = [factory.make_Tag(name=factory.make_name("tag")) for _ in range(3)]
         node1 = factory.make_Node()
         factory.make_Node()
         [node1.tags.add(tag) for tag in tags]
@@ -1805,9 +1629,7 @@ class TestFreeTextFilterNodeForm(MAASServerTestCase):
         subnet = factory.make_Subnet()
         ips = []
         for _ in range(3):
-            ips.append(
-                factory.pick_ip_in_network(subnet.get_ipnetwork(), but_not=ips)
-            )
+            ips.append(factory.pick_ip_in_network(subnet.get_ipnetwork(), but_not=ips))
         tags = [factory.make_name("tag") for _ in range(3)]
         nodes = [factory.make_Machine() for _ in range(3)]
         ifaces = [
@@ -1817,9 +1639,7 @@ class TestFreeTextFilterNodeForm(MAASServerTestCase):
         self.assertConstrainedNodes(
             [nodes[0]], {"interfaces": f"name={ifaces[0].name}"}
         )
-        self.assertConstrainedNodes(
-            [nodes[1]], {"interfaces": f"tag={tags[1]}"}
-        )
+        self.assertConstrainedNodes([nodes[1]], {"interfaces": f"tag={tags[1]}"})
         self.assertConstrainedNodes(
             [nodes[0], nodes[1]],
             {
@@ -1845,12 +1665,8 @@ class TestFreeTextFilterNodeForm(MAASServerTestCase):
     def test_substring_storage_filters(self):
         GIB = 1000**3
         nodes = [factory.make_Node(with_boot_disk=False) for _ in range(3)]
-        dev_tags = [
-            factory.make_Tag(name=factory.make_name("dev")) for _ in range(3)
-        ]
-        part_tags = [
-            factory.make_Tag(name=factory.make_name("part")) for _ in range(3)
-        ]
+        dev_tags = [factory.make_Tag(name=factory.make_name("dev")) for _ in range(3)]
+        part_tags = [factory.make_Tag(name=factory.make_name("part")) for _ in range(3)]
         for i in range(3):
             disk = factory.make_PhysicalBlockDevice(
                 node=nodes[i], size=(3 - i) * 10 * GIB, tags=[dev_tags[i]]
@@ -1861,9 +1677,7 @@ class TestFreeTextFilterNodeForm(MAASServerTestCase):
             )
         self.assertConstrainedNodes(nodes, {"storage": "0"})
         self.assertConstrainedNodes([nodes[0]], {"storage": "30"})
-        self.assertConstrainedNodes(
-            [nodes[0]], {"storage": f"0({dev_tags[0]})"}
-        )
+        self.assertConstrainedNodes([nodes[0]], {"storage": f"0({dev_tags[0]})"})
         self.assertConstrainedNodes(
             [nodes[0]], {"storage": f"0(partition,{part_tags[0]})"}
         )
@@ -1992,9 +1806,7 @@ class TestFreeTextFilterNodeForm(MAASServerTestCase):
             owner=self._owner,
             subnet=subnet,
         )
-        tags = [
-            factory.make_Tag(name=factory.make_name("tag")) for _ in range(3)
-        ]
+        tags = [factory.make_Tag(name=factory.make_name("tag")) for _ in range(3)]
         [node1.tags.add(tag) for tag in tags]
         factory.make_Interface(node=node1, mac_address=mac_address, vlan=vlan2)
         factory.make_Interface(node=node1, vlan=vlan1)
@@ -2020,9 +1832,7 @@ class TestAcquireNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def set_usable_arch(self):
         """Produce an arbitrary, valid, architecture name."""
-        arch = "{}/{}".format(
-            factory.make_name("arch"), factory.make_name("sub")
-        )
+        arch = "{}/{}".format(factory.make_name("arch"), factory.make_name("sub"))
         patch_usable_architectures(self, [arch])
         return arch
 
@@ -2033,9 +1843,7 @@ class TestAcquireNodeForm(MAASServerTestCase, FilterConstraintsMixin):
 
     def test_hostname_with_domain_part(self):
         Domain.objects.get_or_create(name="mydomain", authoritative=True)
-        nodes = [
-            factory.make_Node(domain=factory.make_Domain()) for _ in range(3)
-        ]
+        nodes = [factory.make_Node(domain=factory.make_Domain()) for _ in range(3)]
         self.assertConstrainedNodes(
             [nodes[0]],
             {"name": f"{nodes[0].hostname}.{nodes[0].domain.name}"},
@@ -2049,9 +1857,7 @@ class TestAcquireNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         node = factory.make_Node(hostname="host21.mydomain")
         self.assertConstrainedNodes([node], {"name": "host21.mydomain"})
 
-        self.assertConstrainedNodes(
-            [node], {"name": "host21.%s" % node.domain.name}
-        )
+        self.assertConstrainedNodes([node], {"name": "host21.%s" % node.domain.name})
 
     def test_cpu_count(self):
         node1 = factory.make_Node(cpu_count=1)
@@ -2121,12 +1927,8 @@ class TestAcquireNodeForm(MAASServerTestCase, FilterConstraintsMixin):
             "interfaces": "label:fabric=fabric-0",
             "fabrics": [factory.make_Fabric().name],
             "not_fabrics": [factory.make_Fabric().name],
-            "fabric_classes": [
-                factory.make_Fabric(class_type="10g").class_type
-            ],
-            "not_fabric_classes": [
-                factory.make_Fabric(class_type="1g").class_type
-            ],
+            "fabric_classes": [factory.make_Fabric(class_type="10g").class_type],
+            "not_fabric_classes": [factory.make_Fabric(class_type="1g").class_type],
             "owner": factory.make_User().username,
             "not_owner": factory.make_User().username,
             "power_state": POWER_STATE.ON,
@@ -2203,9 +2005,7 @@ class TestAcquireNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         node2.save()
         self.assertConstrainedNodes([node1], {"pod_type": pod1.power_type})
         self.assertConstrainedNodes([node2], {"pod_type": pod2.power_type})
-        self.assertConstrainedNodes(
-            [], {"pod_type": factory.make_name("pod_type")}
-        )
+        self.assertConstrainedNodes([], {"pod_type": factory.make_name("pod_type")})
 
     def test_pod_not_pod_pod_type_or_not_pod_type_for_not_pod_type(self):
         node1 = factory.make_Node(
@@ -2287,9 +2087,7 @@ class TestAcquireNodeForm(MAASServerTestCase, FilterConstraintsMixin):
         )
         self.assertConstrainedNodes(
             [node],
-            {
-                "devices": f"commissioning_driver={node_device.commissioning_driver}"
-            },
+            {"devices": f"commissioning_driver={node_device.commissioning_driver}"},
         )
 
     def test_device_filter_by_multiple_keys(self):
@@ -2327,9 +2125,7 @@ class TestAcquireNodeFormOrdersResults(MAASServerTestCase):
             )
             for _ in range(4)
         ]
-        sorted_nodes = sorted(
-            nodes, key=lambda n: n.cpu_count + n.memory / 1024
-        )
+        sorted_nodes = sorted(nodes, key=lambda n: n.cpu_count + n.memory / 1024)
         # The form should select all the nodes.  All we're interested
         # in here is the ordering.
         form = AcquireNodeForm(data={"cpu_count": 4})
@@ -2381,11 +2177,7 @@ class TestReadNodesForm(MAASServerTestCase, FilterConstraintsMixin):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors,
-            {
-                "mac_address": [
-                    "'AA:BB:CC:DD:EE:XX' is not a valid MAC address."
-                ]
-            },
+            {"mac_address": ["'AA:BB:CC:DD:EE:XX' is not a valid MAC address."]},
         )
 
     def test_agent_name(self):

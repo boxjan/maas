@@ -168,9 +168,7 @@ class TestBootResourceForm(MAASServerTestCase):
         self.assertFalse(form.is_valid())
 
     def test_prevents_unsupported_osystem(self):
-        reserved_name = (
-            f"{factory.make_name('osystem')}/{factory.make_name('series')}"
-        )
+        reserved_name = f"{factory.make_name('osystem')}/{factory.make_name('series')}"
         upload_type, _ = self.pick_filetype()
         size = random.randint(1024, 2048)
         content = factory.make_string(size).encode("utf-8")
@@ -492,9 +490,7 @@ class TestBootResourceForm(MAASServerTestCase):
         form.save()
         self.assertEqual(
             1,
-            BootResourceFile.objects.filter(
-                resource_set__resource=resource
-            ).count(),
+            BootResourceFile.objects.filter(resource_set__resource=resource).count(),
         )
 
     def test_clean_base_image_sets_commissioning_osystem_and_distro_series_where_none_is_given(

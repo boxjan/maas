@@ -18,9 +18,7 @@ class TestSubnetForm(MAASServerTestCase):
     def test_requires_cidr(self):
         form = SubnetForm({})
         self.assertFalse(form.is_valid(), dict(form.errors))
-        self.assertEqual(
-            {"cidr": ["This field is required."]}, dict(form.errors)
-        )
+        self.assertEqual({"cidr": ["This field is required."]}, dict(form.errors))
 
     def test_rejects_provided_space_on_update(self):
         space = factory.make_Space()
@@ -39,9 +37,7 @@ class TestSubnetForm(MAASServerTestCase):
 
     def test_rejects_space_on_create(self):
         space = factory.make_Space()
-        form = SubnetForm(
-            {"space": space.id, "cidr": factory._make_random_network()}
-        )
+        form = SubnetForm({"space": space.id, "cidr": factory._make_random_network()})
         self.assertFalse(form.is_valid(), dict(form.errors))
         self.assertEqual(
             {
@@ -54,9 +50,7 @@ class TestSubnetForm(MAASServerTestCase):
         )
 
     def test_rejects_invalid_cidr(self):
-        form = SubnetForm(
-            {"cidr": "ten dot zero dot zero dot zero slash zero"}
-        )
+        form = SubnetForm({"cidr": "ten dot zero dot zero dot zero slash zero"})
         self.assertFalse(form.is_valid(), dict(form.errors))
         self.assertEqual(
             {"cidr": ["Required format: <network>/<prefixlen>."]},
@@ -89,9 +83,7 @@ class TestSubnetForm(MAASServerTestCase):
         dns_servers = []
         for _ in range(2):
             dns_servers.append(
-                factory.pick_ip_in_network(
-                    network, but_not=[gateway_ip] + dns_servers
-                )
+                factory.pick_ip_in_network(network, but_not=[gateway_ip] + dns_servers)
             )
         form = SubnetForm(
             {
@@ -274,13 +266,9 @@ class TestSubnetForm(MAASServerTestCase):
 
     def test_updates_subnet_name_doesnt_remove_dns_server(self):
         # Regression test for lp:1521833
-        dns_servers = [
-            factory.make_ip_address() for _ in range(random.randint(2, 10))
-        ]
+        dns_servers = [factory.make_ip_address() for _ in range(random.randint(2, 10))]
         subnet = factory.make_Subnet(dns_servers=dns_servers)
-        form = SubnetForm(
-            instance=subnet, data={"name": factory.make_name("subnet")}
-        )
+        form = SubnetForm(instance=subnet, data={"name": factory.make_name("subnet")})
         self.assertTrue(form.is_valid(), dict(form.errors))
         form.save()
         subnet = reload_object(subnet)
@@ -301,9 +289,7 @@ class TestSubnetForm(MAASServerTestCase):
 
     def test_clears_gateway_and_dns_ervers(self):
         subnet = factory.make_Subnet()
-        form = SubnetForm(
-            instance=subnet, data={"gateway_ip": "", "dns_servers": ""}
-        )
+        form = SubnetForm(instance=subnet, data={"gateway_ip": "", "dns_servers": ""})
         self.assertTrue(form.is_valid(), dict(form.errors))
         form.save()
         subnet = reload_object(subnet)
@@ -312,12 +298,8 @@ class TestSubnetForm(MAASServerTestCase):
 
     def test_clean_dns_servers_accepts_comma_separated_list(self):
         subnet = factory.make_Subnet()
-        dns_servers = [
-            factory.make_ip_address() for _ in range(random.randint(2, 10))
-        ]
-        form = SubnetForm(
-            instance=subnet, data={"dns_servers": ",".join(dns_servers)}
-        )
+        dns_servers = [factory.make_ip_address() for _ in range(random.randint(2, 10))]
+        form = SubnetForm(instance=subnet, data={"dns_servers": ",".join(dns_servers)})
         self.assertTrue(form.is_valid(), dict(form.errors))
         form.save()
         subnet = reload_object(subnet)
@@ -325,12 +307,8 @@ class TestSubnetForm(MAASServerTestCase):
 
     def test_clean_dns_servers_accepts_space_separated_list(self):
         subnet = factory.make_Subnet()
-        dns_servers = [
-            factory.make_ip_address() for _ in range(random.randint(2, 10))
-        ]
-        form = SubnetForm(
-            instance=subnet, data={"dns_servers": " ".join(dns_servers)}
-        )
+        dns_servers = [factory.make_ip_address() for _ in range(random.randint(2, 10))]
+        form = SubnetForm(instance=subnet, data={"dns_servers": " ".join(dns_servers)})
         self.assertTrue(form.is_valid(), dict(form.errors))
         form.save()
         subnet = reload_object(subnet)
@@ -354,9 +332,7 @@ class TestSubnetForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), dict(form.errors))
         form.save()
         subnet = reload_object(subnet)
-        self.assertCountEqual(
-            disabled_arches, subnet.disabled_boot_architectures
-        )
+        self.assertCountEqual(disabled_arches, subnet.disabled_boot_architectures)
 
     def test_clean_disabled_boot_arches_name_space_seperated_list(self):
         subnet = factory.make_Subnet()
@@ -376,9 +352,7 @@ class TestSubnetForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), dict(form.errors))
         form.save()
         subnet = reload_object(subnet)
-        self.assertCountEqual(
-            disabled_arches, subnet.disabled_boot_architectures
-        )
+        self.assertCountEqual(disabled_arches, subnet.disabled_boot_architectures)
 
     def test_clean_disabled_boot_arches_octet(self):
         subnet = factory.make_Subnet()
@@ -420,10 +394,7 @@ class TestSubnetForm(MAASServerTestCase):
             instance=subnet,
             data={
                 "disabled_boot_architectures": ",".join(
-                    [
-                        bm.arch_octet.replace("00:", "0x")
-                        for bm in disabled_arches
-                    ]
+                    [bm.arch_octet.replace("00:", "0x") for bm in disabled_arches]
                 )
             },
         )
@@ -458,9 +429,7 @@ class TestSubnetForm(MAASServerTestCase):
         subnet = factory.make_Subnet(disabled_boot_architectures=[])
         form = SubnetForm(
             instance=subnet,
-            data={
-                "disabled_boot_architectures": factory.make_name("boot_arch")
-            },
+            data={"disabled_boot_architectures": factory.make_name("boot_arch")},
         )
         self.assertFalse(form.is_valid())
         subnet = reload_object(subnet)

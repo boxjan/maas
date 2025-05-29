@@ -74,9 +74,7 @@ class CurtinStorageGenerator:
 
         # Render the resulting YAML.
         storage_config = {
-            "partitioning_commands": {
-                "builtin": ["curtin", "block-meta", "custom"]
-            },
+            "partitioning_commands": {"builtin": ["curtin", "block-meta", "custom"]},
             "storage": {"version": 1, "config": self.storage_config},
         }
         return yaml.safe_dump(storage_config)
@@ -116,9 +114,7 @@ class CurtinStorageGenerator:
         for filesystem_group in filesystem_groups:
             self._add_filesystem_group_operation(filesystem_group)
 
-    def _add_filesystem_group_operation(
-        self, filesystem_group, block_device=None
-    ):
+    def _add_filesystem_group_operation(self, filesystem_group, block_device=None):
         operations_map = (
             (filesystem_group.is_lvm, "lvm_volgroup"),
             (filesystem_group.is_raid, "raid"),
@@ -161,9 +157,7 @@ class CurtinStorageGenerator:
         """
         for block_device in self.node_config.blockdevice_set.order_by("id"):
             requires_prep = self._requires_prep_partition(block_device)
-            requires_bios_grub = self._requires_bios_grub_partition(
-                block_device
-            )
+            requires_bios_grub = self._requires_bios_grub_partition(block_device)
             partition_table = block_device.get_partitiontable()
             if partition_table is not None:
                 partitions = list(partition_table.partitions.order_by("id"))
@@ -196,23 +190,13 @@ class CurtinStorageGenerator:
                 partition_table = block_device.get_partitiontable()
                 if partition_table is not None:
                     for partition in partition_table.partitions.order_by("id"):
-                        partition_filesystem = (
-                            partition.get_effective_filesystem()
-                        )
-                        if self._requires_format_operation(
-                            partition_filesystem
-                        ):
-                            self.operations["format"].append(
-                                partition_filesystem
-                            )
+                        partition_filesystem = partition.get_effective_filesystem()
+                        if self._requires_format_operation(partition_filesystem):
+                            self.operations["format"].append(partition_filesystem)
                             if partition_filesystem.is_mounted:
-                                self.operations["mount"].append(
-                                    partition_filesystem
-                                )
+                                self.operations["mount"].append(partition_filesystem)
 
-        for filesystem in self.node_config.special_filesystems.filter(
-            acquired=True
-        ):
+        for filesystem in self.node_config.special_filesystems.filter(acquired=True):
             self.operations["mount"].append(filesystem)
 
     def _requires_format_operation(self, filesystem):
@@ -284,9 +268,10 @@ class CurtinStorageGenerator:
                 "powerkvm",
             ] or (bios_boot_method != "uefi" and node_arch == "amd64")
             disk_operation["ptable"] = "gpt" if gpt_table else "msdos"
-            add_prep_partition = (
-                node_arch == "ppc64el"
-                and bios_boot_method in ("uefi", "powernv", "powerkvm")
+            add_prep_partition = node_arch == "ppc64el" and bios_boot_method in (
+                "uefi",
+                "powernv",
+                "powerkvm",
             )
 
         # always add a boot partition for GPT without UEFI. ESXi doesn't
@@ -325,8 +310,7 @@ class CurtinStorageGenerator:
             return "gpt"
         else:
             raise ValueError(
-                "Unknown partition table type: %s"
-                % (partition_table.table_type)
+                "Unknown partition table type: %s" % (partition_table.table_type)
             )
 
     def _generate_prep_partition(self, device_name):
@@ -371,13 +355,9 @@ class CurtinStorageGenerator:
                     partition.partition_table.block_device
                 ):
                     self._generate_prep_partition(device_name)
-                self._generate_partition_operation(
-                    partition, include_initial=False
-                )
+                self._generate_partition_operation(partition, include_initial=False)
             else:
-                self._generate_partition_operation(
-                    partition, include_initial=True
-                )
+                self._generate_partition_operation(partition, include_initial=True)
 
     def _generate_partition_operation(self, partition, include_initial):
         """Generate partition operation for `partition` and place in
@@ -432,17 +412,13 @@ class CurtinStorageGenerator:
                     }
                 )
                 partition_operation["flag"] = "logical"
-                partition_operation["size"] = "%sB" % (
-                    partition.size - (1 << 20)
-                )
+                partition_operation["size"] = "%sB" % (partition.size - (1 << 20))
             elif partition.index > 5:
                 # Curtin adds 1MiB between each logical partition. We subtract
                 # the 1MiB from the size of the partition so all the partitions
                 # fit within the extended partition.
                 partition_operation["flag"] = "logical"
-                partition_operation["size"] = "%sB" % (
-                    partition.size - (1 << 20)
-                )
+                partition_operation["size"] = "%sB" % (partition.size - (1 << 20))
         self.storage_config.append(partition_operation)
 
     def _generate_format_operations(self):
@@ -499,12 +475,8 @@ class CurtinStorageGenerator:
         }
         for filesystem in filesystem_group.filesystems.all():
             block_or_partition = filesystem.get_device()
-            volume_group_operation["devices"].append(
-                block_or_partition.get_name()
-            )
-        volume_group_operation["devices"] = sorted(
-            volume_group_operation["devices"]
-        )
+            volume_group_operation["devices"].append(block_or_partition.get_name())
+        volume_group_operation["devices"] = sorted(volume_group_operation["devices"])
         self.storage_config.append(volume_group_operation)
 
     def _generate_logical_volume_operations(self):
@@ -521,9 +493,7 @@ class CurtinStorageGenerator:
             # physical block devices are not directly linked to a filesystem
             # group, but through a filesystem. This is the case for instance
             # for LVM VGs created directly on a physical disk
-            filesystem_group = (
-                block_device.get_effective_filesystem().filesystem_group
-            )
+            filesystem_group = block_device.get_effective_filesystem().filesystem_group
         self.storage_config.append(
             {
                 "id": block_device.get_name(),
@@ -558,9 +528,7 @@ class CurtinStorageGenerator:
             elif filesystem.fstype == FILESYSTEM_TYPE.RAID_SPARE:
                 raid_operation["spare_devices"].append(name)
         raid_operation["devices"] = sorted(raid_operation["devices"])
-        raid_operation["spare_devices"] = sorted(
-            raid_operation["spare_devices"]
-        )
+        raid_operation["spare_devices"] = sorted(raid_operation["spare_devices"])
         block_device = filesystem_group.virtual_device
         partition_table = block_device.get_partitiontable()
         if partition_table is not None:
@@ -677,9 +645,7 @@ class CurtinStorageGenerator:
                     if self._reorder_devices(ids_above, operation):
                         break
                 else:
-                    raise ValueError(
-                        "Unknown operation type: %s" % operation_type
-                    )
+                    raise ValueError("Unknown operation type: %s" % operation_type)
                 ids_above.append(operation["id"])
 
             # If parsed the entire storage config without breaking out of the

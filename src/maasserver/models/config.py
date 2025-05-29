@@ -165,9 +165,7 @@ CONFIG_SECRETS = {
 }
 
 # Encapsulates the possible states for network discovery
-NetworkDiscoveryConfig = namedtuple(
-    "NetworkDiscoveryConfig", ("active", "passive")
-)
+NetworkDiscoveryConfig = namedtuple("NetworkDiscoveryConfig", ("active", "passive"))
 
 
 class ConfigManager(Manager):
@@ -224,9 +222,7 @@ class ConfigManager(Manager):
             secret_name = CONFIG_SECRETS.get(name)
             if secret_name:
                 with suppress(SecretNotFound):
-                    configs[name] = secret_manager.get_simple_secret(
-                        secret_name
-                    )
+                    configs[name] = secret_manager.get_simple_secret(secret_name)
             else:
                 regular_configs.append(name)
 
@@ -264,9 +260,7 @@ class ConfigManager(Manager):
                 endpoint,
                 request,
                 None,
-                description=(
-                    f"Updated configuration setting '{name}' to '{value}'."
-                ),
+                description=(f"Updated configuration setting '{name}' to '{value}'."),
             )
 
     def config_changed_connect(self, config_name, method):

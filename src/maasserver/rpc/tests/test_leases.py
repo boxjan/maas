@@ -283,12 +283,8 @@ class TestUpdateLease(MAASServerTestCase):
         )
         self.assertEqual(
             1,
-            StaticIPAddress.objects.filter_by_ip_family(
-                subnet.get_ipnetwork().version
-            )
-            .filter(
-                alloc_type=IPADDRESS_TYPE.DISCOVERED, interface=boot_interface
-            )
+            StaticIPAddress.objects.filter_by_ip_family(subnet.get_ipnetwork().version)
+            .filter(alloc_type=IPADDRESS_TYPE.DISCOVERED, interface=boot_interface)
             .count(),
             "Interface should only have one DISCOVERED IP address.",
         )
@@ -384,8 +380,7 @@ class TestUpdateLease(MAASServerTestCase):
         ).first()
         self.assertIsNotNone(
             sip,
-            "DISCOVERED IP address shold have been created without an "
-            "IP address.",
+            "DISCOVERED IP address shold have been created without an " "IP address.",
         )
         self.assertCountEqual(
             [boot_interface.id], sip.interface_set.values_list("id", flat=True)
@@ -412,8 +407,7 @@ class TestUpdateLease(MAASServerTestCase):
         ).first()
         self.assertIsNotNone(
             sip,
-            "DISCOVERED IP address shold have been created without an "
-            "IP address.",
+            "DISCOVERED IP address shold have been created without an " "IP address.",
         )
         self.assertCountEqual(
             [boot_interface.id], sip.interface_set.values_list("id", flat=True)

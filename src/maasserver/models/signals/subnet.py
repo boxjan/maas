@@ -21,9 +21,7 @@ def update_referenced_ip_addresses(subnet):
     remove_ips = StaticIPAddress.objects.filter(
         alloc_type=IPADDRESS_TYPE.USER_RESERVED, subnet_id=subnet.id
     )
-    remove_ips = remove_ips.extra(
-        where=["NOT(ip << %s)"], params=[subnet.cidr]
-    )
+    remove_ips = remove_ips.extra(where=["NOT(ip << %s)"], params=[subnet.cidr])
     remove_ips.update(subnet=None)
 
     # Add the IP addresses that now fall into CIDR.

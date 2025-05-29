@@ -94,9 +94,7 @@ class TestRegionNetworkTimeProtocolService(MAASTransactionServerTestCase):
         restartService.assert_not_called()
 
 
-class TestRegionNetworkTimeProtocolService_Errors(
-    MAASTransactionServerTestCase
-):
+class TestRegionNetworkTimeProtocolService_Errors(MAASTransactionServerTestCase):
     """Tests for error handing in `RegionNetworkTimeProtocolService`."""
 
     scenarios = (
@@ -115,9 +113,9 @@ class TestRegionNetworkTimeProtocolService_Errors(
 
         # Ensure that we never actually execute against systemd or write an
         # actual configuration file.
-        self.patch_autospec(
-            ntp, "deferToThread"
-        ).side_effect = always_succeed_with(None)
+        self.patch_autospec(ntp, "deferToThread").side_effect = always_succeed_with(
+            None
+        )
         self.patch_autospec(service_monitor, "restartService")
 
         with TwistedLoggerFixture() as logger:

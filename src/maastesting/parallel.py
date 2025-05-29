@@ -77,9 +77,7 @@ class TestScriptBase(metaclass=abc.ABCMeta):
                 )
             else:
                 if not okay:
-                    result.addError(
-                        self, None, {"log": content_from_file(log.name)}
-                    )
+                    result.addError(self, None, {"log": content_from_file(log.name)})
 
     def _run(self, result, log):
         # Build things first, which may do nothing (but is quick).
@@ -340,9 +338,7 @@ def make_argument_parser(scripts):
             raise argparse.ArgumentTypeError("%r is not an integer" % string)
         else:
             if processes < 1:
-                raise argparse.ArgumentTypeError(
-                    "%d is not 1 or greater" % processes
-                )
+                raise argparse.ArgumentTypeError("%d is not 1 or greater" % processes)
             else:
                 return processes
 
@@ -367,8 +363,7 @@ def make_argument_parser(scripts):
         const=core_count,
         help=(
             "Run one test process per core. On this machine that would mean "
-            "that up to %d testing subprocesses would run concurrently."
-            % core_count
+            "that up to %d testing subprocesses would run concurrently." % core_count
         ),
     )
 

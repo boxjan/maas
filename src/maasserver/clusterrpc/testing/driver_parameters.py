@@ -27,9 +27,7 @@ class StaticDriverTypesFixture(Fixture):
         self._interceptPowerTypesQuery()
 
     def _interceptPowerTypesQuery(self):
-        power_types = PowerDriverRegistry.get_schema(
-            detect_missing_packages=False
-        )
+        power_types = PowerDriverRegistry.get_schema(detect_missing_packages=False)
 
         @wraps(driver_parameters.get_all_power_types)
         def get_all_power_types():

@@ -100,9 +100,7 @@ class TestGetDebVersionsInfo(MAASTestCase):
         self.assertEqual(
             get_deb_versions_info(apt_pkg=apt_pkg),
             DebVersionsInfo(
-                current=DebVersion(
-                    version="3.0.0~alpha1-111-g.deadbeef", origin=""
-                ),
+                current=DebVersion(version="3.0.0~alpha1-111-g.deadbeef", origin=""),
                 update=None,
             ),
         )
@@ -114,9 +112,7 @@ class TestGetDebVersionsInfo(MAASTestCase):
         self.assertEqual(
             get_deb_versions_info(apt_pkg=apt_pkg),
             DebVersionsInfo(
-                current=DebVersion(
-                    version="3.0.0~alpha1-111-g.deadbeef", origin=""
-                ),
+                current=DebVersion(version="3.0.0~alpha1-111-g.deadbeef", origin=""),
                 update=None,
             ),
         )
@@ -169,9 +165,7 @@ class TestGetDebVersionsInfo(MAASTestCase):
     def test_no_update_if_candidate_same_as_installed(self):
         apt_pkg = MockAptPkg()
         current = apt_pkg._make_package_version("3.0.0~alpha1-111-g.deadbeef")
-        apt_pkg._add_package(
-            "maas-region-api", current=current, update=current
-        )
+        apt_pkg._add_package("maas-region-api", current=current, update=current)
         self.assertEqual(
             get_deb_versions_info(apt_pkg=apt_pkg),
             DebVersionsInfo(

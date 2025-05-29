@@ -52,9 +52,7 @@ class TestApiEndpoint(MAASServerTestCase):
         self.assertIsInstance(servers, list)
         maasserver = servers[0]
         maas_name = Config.objects.get_config("maas_name")
-        self.assertEqual(
-            maasserver["url"], "http://localhost:5240/MAAS/api/2.0/"
-        )
+        self.assertEqual(maasserver["url"], "http://localhost:5240/MAAS/api/2.0/")
         self.assertEqual(maasserver["description"], f"{maas_name} API")
 
 
@@ -85,9 +83,7 @@ class TestOAPISpec(MAASServerTestCase):
             for param in path["parameters"]:
                 self.assertIn("name", param)
                 self.assertIn("in", param)
-                self.assertIn(
-                    param["in"], ["cookie", "header", "path", "query"]
-                )
+                self.assertIn(param["in"], ["cookie", "header", "path", "query"])
                 self.assertTrue(param["required"])
                 if "schema" in param:
                     self.assertIn(param["schema"]["type"], self.oapi_types)

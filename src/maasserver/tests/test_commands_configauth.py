@@ -61,9 +61,7 @@ class TestConfigAuthCommand(MAASServerTestCase):
             "external-auth", {"url": "http://example.com/candid"}
         )
         call_command("configauth", candid_agent_file="")
-        self.assertEqual(
-            manager.get_composite_secret("external-auth")["url"], ""
-        )
+        self.assertEqual(manager.get_composite_secret("external-auth")["url"], "")
 
     def test_configauth_changes_auth_prompt_default(self):
         self.read_input.return_value = ""
@@ -131,9 +129,7 @@ class TestConfigAuthCommand(MAASServerTestCase):
     def test_configauth_interactive_domain(self):
         with self.agent_file() as agent_file_name:
             self.read_input.return_value = "mydomain"
-            call_command(
-                "configauth", rbac_url="", candid_agent_file=agent_file_name
-            )
+            call_command("configauth", rbac_url="", candid_agent_file=agent_file_name)
         self.assertEqual(
             SecretManager().get_composite_secret("external-auth")["domain"],
             "mydomain",
@@ -142,9 +138,7 @@ class TestConfigAuthCommand(MAASServerTestCase):
     def test_configauth_interactive_domain_empty(self):
         with self.agent_file() as agent_file_name:
             self.read_input.return_value = ""
-            call_command(
-                "configauth", rbac_url="", candid_agent_file=agent_file_name
-            )
+            call_command("configauth", rbac_url="", candid_agent_file=agent_file_name)
         self.assertEqual(
             SecretManager().get_composite_secret("external-auth")["domain"],
             "",
@@ -194,9 +188,7 @@ class TestConfigAuthCommand(MAASServerTestCase):
             rbac_url="",
             candid_agent_file="/not/here",
         )
-        self.assertEqual(
-            str(error), "[Errno 2] No such file or directory: '/not/here'"
-        )
+        self.assertEqual(str(error), "[Errno 2] No such file or directory: '/not/here'")
 
     def test_configauth_domain_none(self):
         with self.agent_file() as agent_file_name:
@@ -314,9 +306,7 @@ class TestConfigAuthCommand(MAASServerTestCase):
         self.assertEqual(str(error), "Registration with RBAC service canceled")
         patch_prompt.assert_called_once()
         self.assertIsNone(
-            SecretManager().get_composite_secret(
-                "external-auth", default=None
-            ),
+            SecretManager().get_composite_secret("external-auth", default=None),
         )
         self.assertEqual(self.rbac_user_client.registered_services, [])
 

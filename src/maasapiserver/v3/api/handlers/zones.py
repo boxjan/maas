@@ -61,9 +61,7 @@ class ZonesHandler(Handler):
         responses={
             201: {
                 "model": ZoneResponse,
-                "headers": {
-                    "ETag": {"description": "The ETag for the resource"}
-                },
+                "headers": {"ETag": {"description": "The ETag for the resource"}},
             },
             409: {"model": ConflictBodyResponse},
             422: {"model": ValidationErrorBodyResponse},
@@ -79,9 +77,7 @@ class ZonesHandler(Handler):
     ) -> Response:
         zone = await services.zones.create(zone_request)
         response.headers["ETag"] = zone.etag()
-        return zone.to_response(
-            self_base_hyperlink=f"{EXTERNAL_V3_API_PREFIX}/zones"
-        )
+        return zone.to_response(self_base_hyperlink=f"{EXTERNAL_V3_API_PREFIX}/zones")
 
     @handler(
         path="/zones/{zone_id}",
@@ -90,9 +86,7 @@ class ZonesHandler(Handler):
         responses={
             200: {
                 "model": ZoneResponse,
-                "headers": {
-                    "ETag": {"description": "The ETag for the resource"}
-                },
+                "headers": {"ETag": {"description": "The ETag for the resource"}},
             },
             404: {"model": NotFoundBodyResponse},
             422: {"model": ValidationErrorBodyResponse},
@@ -111,9 +105,7 @@ class ZonesHandler(Handler):
             return NotFoundResponse()
 
         response.headers["ETag"] = zone.etag()
-        return zone.to_response(
-            self_base_hyperlink=f"{EXTERNAL_V3_API_PREFIX}/zones"
-        )
+        return zone.to_response(self_base_hyperlink=f"{EXTERNAL_V3_API_PREFIX}/zones")
 
     # TODO: ensure authorization
     @handler(
@@ -131,9 +123,7 @@ class ZonesHandler(Handler):
     async def delete_zone(
         self,
         zone_id: int,
-        etag_if_match: Union[str, None] = Header(
-            alias="if-match", default=None
-        ),
+        etag_if_match: Union[str, None] = Header(alias="if-match", default=None),
         services: ServiceCollectionV3 = Depends(services),
     ) -> Response:
         await services.zones.delete(zone_id, etag_if_match)

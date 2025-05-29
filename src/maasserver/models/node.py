@@ -315,9 +315,7 @@ class NodeQueriesMixin(MAASQueriesMixin):
         """Return the set of nodes without any interfaces in the specified
         fabrics.
         """
-        return self.exclude(
-            current_config__interface__vlan__fabric__in=fabrics
-        )
+        return self.exclude(current_config__interface__vlan__fabric__in=fabrics)
 
     def filter_by_fabric_classes(self, fabric_classes):
         """Return the set of nodes with at least one interface in the specified
@@ -351,17 +349,13 @@ class NodeQueriesMixin(MAASQueriesMixin):
         """Return the set of nodes with at least one interface configured on
         one of the specified subnets.
         """
-        return self.filter(
-            current_config__interface__ip_addresses__subnet__in=subnets
-        )
+        return self.filter(current_config__interface__ip_addresses__subnet__in=subnets)
 
     def exclude_subnets(self, subnets):
         """Return the set of nodes without any interfaces configured on one of
         the specified subnets.
         """
-        return self.exclude(
-            current_config__interface__ip_addresses__subnet__in=subnets
-        )
+        return self.exclude(current_config__interface__ip_addresses__subnet__in=subnets)
 
     def filter_by_subnet_cidrs(self, subnet_cidrs):
         """Return the set of nodes with at least one interface configured on
@@ -500,8 +494,7 @@ class BaseNodeManager(Manager, NodeQueriesMixin):
             condition = Q(id__in=[])
         else:
             raise NotImplementedError(
-                "Invalid permission check (invalid permission name: %s)."
-                % perm
+                "Invalid permission check (invalid permission name: %s)." % perm
             )
         if rbac.is_enabled():
             # XXX blake_r 2018-12-12 - This should be cleaned up to only use
@@ -677,8 +670,7 @@ class RackControllerManager(ControllerManager):
             parsed_url = urlparse(url)
         # getaddrinfo can return duplicates
         ips = {
-            address[4][0]
-            for address in socket.getaddrinfo(parsed_url.hostname, None)
+            address[4][0] for address in socket.getaddrinfo(parsed_url.hostname, None)
         }
         subnets = {Subnet.objects.get_best_subnet_for_ip(ip) for ip in ips}
         usable_racks = set(
@@ -696,11 +688,7 @@ class RackControllerManager(ControllerManager):
 
         if with_connection:
             conn_rack_ids = [client.ident for client in getAllClients()]
-            return [
-                rack
-                for rack in usable_racks
-                if rack.system_id in conn_rack_ids
-            ]
+            return [rack for rack in usable_racks if rack.system_id in conn_rack_ids]
         else:
             return list(usable_racks)
 
@@ -767,9 +755,7 @@ class RegionControllerManager(ControllerManager):
         if node.current_commissioning_script_set is None:
             from maasserver.models import ScriptSet
 
-            script_set = ScriptSet.objects.create_commissioning_script_set(
-                node
-            )
+            script_set = ScriptSet.objects.create_commissioning_script_set(node)
             node.current_commissioning_script_set = script_set
             node.save()
 
@@ -801,9 +787,7 @@ class RegionControllerManager(ControllerManager):
         """
         hostname = gethostname()
         filter_hostname = Q(hostname=hostname)
-        filter_macs = Q(
-            current_config__interface__mac_address__in=get_mac_addresses()
-        )
+        filter_macs = Q(current_config__interface__mac_address__in=get_mac_addresses())
         # Look at all nodes, not just controllers; we might have to upgrade.
         nodes = Node.objects.filter(filter_hostname | filter_macs)
         # Select distinct because the join to MACs might yield duplicates.
@@ -998,9 +982,7 @@ class Node(CleanSave, TimestampedModel):
     # Set to time in the future when the node status should transition to
     # a failed status. This is used by the StatusMonitorService inside
     # the region processes. Each run periodically to update nodes.
-    status_expires = DateTimeField(
-        null=True, blank=False, default=None, editable=False
-    )
+    status_expires = DateTimeField(null=True, blank=False, default=None, editable=False)
 
     owner = ForeignKey(
         User,
@@ -1069,9 +1051,7 @@ class Node(CleanSave, TimestampedModel):
 
     # Power parameters specific to this node instance. Global power parameters
     # are stored in this node's BMC.
-    instance_power_parameters = JSONField(
-        max_length=(2**15), blank=True, default=str
-    )
+    instance_power_parameters = JSONField(max_length=(2**15), blank=True, default=str)
 
     power_state = CharField(
         max_length=10,
@@ -1307,9 +1287,7 @@ class Node(CleanSave, TimestampedModel):
             return
 
         if self.status not in (NODE_STATUS.DEPLOYED, NODE_STATUS.DEPLOYING):
-            raise NodeStateViolation(
-                "Can't lock, node is not deployed or deploying"
-            )
+            raise NodeStateViolation("Can't lock, node is not deployed or deploying")
 
         maaslog.info("%s: Node locked by %s", self.hostname, user)
         self.locked = True
@@ -1426,9 +1404,7 @@ class Node(CleanSave, TimestampedModel):
             self.bmc, _ = get_or_create_bmc(
                 power_type=power_type,
                 power_parameters=bmc_params,
-                defaults={
-                    "created_by_commissioning": created_by_commissioning
-                },
+                defaults={"created_by_commissioning": created_by_commissioning},
             )
         else:
             self.bmc = create_bmc(
@@ -1478,9 +1454,7 @@ class Node(CleanSave, TimestampedModel):
         if not instance_parameters:
             instance_parameters = {}
         bmc_parameters = {}
-        if self.bmc and (
-            bmc_power_parameters := self.bmc.get_power_parameters()
-        ):
+        if self.bmc and (bmc_power_parameters := self.bmc.get_power_parameters()):
             bmc_parameters = bmc_power_parameters
         return {**bmc_parameters, **instance_parameters}
 
@@ -1511,9 +1485,7 @@ class Node(CleanSave, TimestampedModel):
             if minutes is not None:
                 self.status_expires = now() + timedelta(minutes=minutes)
 
-    def _register_request_event(
-        self, user, type_name, action="", comment=None
-    ):
+    def _register_request_event(self, user, type_name, action="", comment=None):
         """Register a node request event.
 
         It registers events like start_commission (started by a user),
@@ -1573,9 +1545,7 @@ class Node(CleanSave, TimestampedModel):
             )
             return issues
         if not has_boot:
-            issues.append(
-                "Specify a storage device to be able to deploy this node."
-            )
+            issues.append("Specify a storage device to be able to deploy this node.")
         if self.osystem == "esxi":
             # MAAS 2.6 added VMware ESXi storage support. To be backwards
             # compatible with previous versions of MAAS deploying with a Linux
@@ -1592,8 +1562,7 @@ class Node(CleanSave, TimestampedModel):
                 )
                 if not fs_groups.exists():
                     issues.append(
-                        "A datastore must be defined when deploying "
-                        "VMware ESXi."
+                        "A datastore must be defined when deploying " "VMware ESXi."
                     )
                     return issues
         # The remaining storage issue checks are only for Ubuntu, CentOS, and
@@ -1603,8 +1572,7 @@ class Node(CleanSave, TimestampedModel):
             return issues
         if not root_mounted:
             issues.append(
-                "Mount the root '/' filesystem to be able to deploy this "
-                "node."
+                "Mount the root '/' filesystem to be able to deploy this " "node."
             )
         if root_mounted and root_on_bcache and not boot_mounted:
             issues.append(
@@ -1626,8 +1594,7 @@ class Node(CleanSave, TimestampedModel):
             if any_bcache:
                 issues.append(
                     "This node cannot be deployed because the selected "
-                    "deployment OS, %s, does not support Bcache."
-                    % self.osystem
+                    "deployment OS, %s, does not support Bcache." % self.osystem
                 )
             if any_zfs:
                 issues.append(
@@ -1695,9 +1662,7 @@ class Node(CleanSave, TimestampedModel):
                         root_mounted = True
                         if on_bcache(block_device):
                             root_on_bcache = True
-                    elif fs.mount_point == "/boot" and not on_bcache(
-                        block_device
-                    ):
+                    elif fs.mount_point == "/boot" and not on_bcache(block_device):
                         boot_mounted = True
                     any_bcache |= fs.fstype in (
                         FILESYSTEM_TYPE.BCACHE_CACHE,
@@ -1740,10 +1705,7 @@ class Node(CleanSave, TimestampedModel):
         """Return true if the node is connected to a managed network."""
         for interface in self.current_config.interface_set.all():
             for link in interface.get_links():
-                if (
-                    link["mode"] != INTERFACE_LINK_TYPE.LINK_UP
-                    and "subnet" in link
-                ):
+                if link["mode"] != INTERFACE_LINK_TYPE.LINK_UP and "subnet" in link:
                     return True
         return False
 
@@ -1841,17 +1803,12 @@ class Node(CleanSave, TimestampedModel):
             ip_address.ip
             for interface in ifaces
             for ip_address in interface.ip_addresses.all()
-            if (
-                ip_address.ip
-                and ip_address.alloc_type == IPADDRESS_TYPE.DISCOVERED
-            )
+            if (ip_address.ip and ip_address.alloc_type == IPADDRESS_TYPE.DISCOVERED)
         ]
 
     def get_interface_names(self):
         return list(
-            self.current_config.interface_set.all().values_list(
-                "name", flat=True
-            )
+            self.current_config.interface_set.all().values_list("name", flat=True)
         )
 
     def get_next_ifname(self, ifnames=None):
@@ -1875,9 +1832,7 @@ class Node(CleanSave, TimestampedModel):
 
     def get_block_device_names(self):
         return list(
-            self.current_config.blockdevice_set.all().values_list(
-                "name", flat=True
-            )
+            self.current_config.blockdevice_set.all().values_list("name", flat=True)
         )
 
     def get_next_block_device_name(self, block_device_names=None, prefix="sd"):
@@ -1931,8 +1886,7 @@ class Node(CleanSave, TimestampedModel):
                         {
                             "boot_disk": [
                                 "Cannot be set as the boot disk; already in-use "
-                                "in cache set '%s'."
-                                % (filesystem.cache_set.name,)
+                                "in cache set '%s'." % (filesystem.cache_set.name,)
                             ]
                         }
                     )
@@ -2010,9 +1964,7 @@ class Node(CleanSave, TimestampedModel):
             if not self.pool:
                 self.pool = ResourcePool.objects.get_default_resource_pool()
         elif self.pool:
-            raise ValidationError(
-                {"pool": ["Can't assign to a resource pool."]}
-            )
+            raise ValidationError({"pool": ["Can't assign to a resource pool."]})
 
     def clean(self, *args, **kwargs):
         super().clean(*args, **kwargs)
@@ -2047,9 +1999,7 @@ class Node(CleanSave, TimestampedModel):
     def _remove_orphaned_bmcs(self):
         from maasserver.models.bmc import BMC
 
-        BMC.objects.filter(node__isnull=True).exclude(
-            bmc_type=BMC_TYPE.POD
-        ).delete()
+        BMC.objects.filter(node__isnull=True).exclude(bmc_type=BMC_TYPE.POD).delete()
 
     def display_status(self):
         """Return status text as displayed to the user."""
@@ -2069,18 +2019,14 @@ class Node(CleanSave, TimestampedModel):
     @property
     def physicalblockdevice_set(self):
         """Return `QuerySet` for all `PhysicalBlockDevice` assigned to node."""
-        return PhysicalBlockDevice.objects.filter(
-            node_config=self.current_config
-        )
+        return PhysicalBlockDevice.objects.filter(node_config=self.current_config)
 
     @property
     def virtualblockdevice_set(self):
         """Return `QuerySet` for all `VirtualBlockDevice` assigned to node."""
         from maasserver.models.virtualblockdevice import VirtualBlockDevice
 
-        return VirtualBlockDevice.objects.filter(
-            node_config=self.current_config
-        )
+        return VirtualBlockDevice.objects.filter(node_config=self.current_config)
 
     @property
     def storage(self):
@@ -2106,9 +2052,7 @@ class Node(CleanSave, TimestampedModel):
                 (
                     block_device.actual_instance
                     for block_device in self.current_config.blockdevice_set.all()
-                    if isinstance(
-                        block_device.actual_instance, PhysicalBlockDevice
-                    )
+                    if isinstance(block_device.actual_instance, PhysicalBlockDevice)
                     and block_device.size >= MIN_BOOT_PARTITION_SIZE
                 ),
                 key=attrgetter("id"),
@@ -2478,10 +2422,7 @@ class Node(CleanSave, TimestampedModel):
 
         # If this is an enlisted node make sure commissioning during enlistment
         # finished successfully.
-        if (
-            self.status == NODE_STATUS.NEW
-            and not self.current_commissioning_script_set
-        ):
+        if self.status == NODE_STATUS.NEW and not self.current_commissioning_script_set:
             raise ValidationError(
                 "Unable to start machine testing; this node has never been "
                 "commissioned. Please use the 'Commission' action to "
@@ -2502,23 +2443,17 @@ class Node(CleanSave, TimestampedModel):
                 # If no interface is configured the ParametersForm sets a place
                 # holder, 'all'. This works when commissioning as the default
                 # network settings will be applied.
-                if (
-                    parameter["type"] == "interface"
-                    and parameter["value"] == "all"
-                ):
+                if parameter["type"] == "interface" and parameter["value"] == "all":
                     script_set.delete()
                     raise ValidationError(
-                        "An interface must be configured to run "
-                        "network testing!"
+                        "An interface must be configured to run " "network testing!"
                     )
             if (
                 NODE_STATUS.DEPLOYED in (self.status, self.previous_status)
                 and script_result.script.destructive
             ):
                 script_set.delete()
-                raise ValidationError(
-                    "Unable to run destructive test while deployed!"
-                )
+                raise ValidationError("Unable to run destructive test while deployed!")
             if (
                 commissioning_distro_series == "xenial"
                 and script_result.script
@@ -2620,8 +2555,7 @@ class Node(CleanSave, TimestampedModel):
             maaslog.info("%s: Testing starting", hostname)
         else:
             maaslog.warning(
-                "%s: Could not start testing the node; it "
-                "must be started manually",
+                "%s: Could not start testing the node; it " "must be started manually",
                 hostname,
             )
 
@@ -2667,9 +2601,7 @@ class Node(CleanSave, TimestampedModel):
             )
 
             # Create a status message for ABORTED_COMMISSIONING.
-            Event.objects.create_node_event(
-                self, EVENT_TYPES.ABORTED_COMMISSIONING
-            )
+            Event.objects.create_node_event(self, EVENT_TYPES.ABORTED_COMMISSIONING)
 
             # Don't permit naive mocking of stop(); it causes too much
             # confusion when testing. Return a Deferred from side_effect.
@@ -2736,9 +2668,7 @@ class Node(CleanSave, TimestampedModel):
             # Deferred it returns for the asynchronous (post-commit) bits.
             stopping = self._stop(user)
         except Exception as error:
-            maaslog.error(
-                "%s: Error when aborting testing: %s", self.hostname, error
-            )
+            maaslog.error("%s: Error when aborting testing: %s", self.hostname, error)
             raise
         else:
             # Avoid circular imports.
@@ -2839,9 +2769,7 @@ class Node(CleanSave, TimestampedModel):
             )
 
             # Create a status message for ABORTED_DEPLOYMENT.
-            Event.objects.create_node_event(
-                self, EVENT_TYPES.ABORTED_DEPLOYMENT
-            )
+            Event.objects.create_node_event(self, EVENT_TYPES.ABORTED_DEPLOYMENT)
 
             # Don't permit naive mocking of stop(); it causes too much
             # confusion when testing. Return a Deferred from side_effect.
@@ -2951,9 +2879,7 @@ class Node(CleanSave, TimestampedModel):
         :param hostname: The node's hostname, for logging.
         :param system_id: The system ID for the node.
         """
-        d = deferToDatabase(
-            cls._set_status, system_id, status=NODE_STATUS.ALLOCATED
-        )
+        d = deferToDatabase(cls._set_status, system_id, status=NODE_STATUS.ALLOCATED)
         if is_stopping:
             return d.addCallback(
                 callOut,
@@ -3000,9 +2926,7 @@ class Node(CleanSave, TimestampedModel):
                     # delete related VirtualMachine, if any
                     from maasserver.models.virtualmachine import VirtualMachine
 
-                    VirtualMachine.objects.filter(
-                        machine_id=machine_id
-                    ).delete()
+                    VirtualMachine.objects.filter(machine_id=machine_id).delete()
                     delete_node_secrets()
                     super(Node, machine).delete()
 
@@ -3027,11 +2951,7 @@ class Node(CleanSave, TimestampedModel):
                 pod_id=pod.id,
                 name=pod.name,
             )
-            d.addBoth(
-                lambda result: (
-                    deferToDatabase(_save, self.id, pod.id, result)
-                )
-            )
+            d.addBoth(lambda result: (deferToDatabase(_save, self.id, pod.id, result)))
         else:
             maaslog.info("%s: Deleting node", self.hostname)
 
@@ -3042,9 +2962,7 @@ class Node(CleanSave, TimestampedModel):
                 and self.bmc.node_set.count() == 1
             ):
                 # Delete my orphaned BMC.
-                maaslog.info(
-                    "%s: Deleting my BMC '%s'", self.hostname, self.bmc
-                )
+                maaslog.info("%s: Deleting my BMC '%s'", self.hostname, self.bmc)
                 self.bmc.delete()
 
             delete_node_secrets()
@@ -3110,16 +3028,12 @@ class Node(CleanSave, TimestampedModel):
         operating system does not require a license key, or the installation
         media already has the license key builtin.
         """
-        use_global_license_key = (
-            self.license_key is None or self.license_key == ""
-        )
+        use_global_license_key = self.license_key is None or self.license_key == ""
         if use_global_license_key:
             osystem = self.get_osystem()
             distro_series = self.get_distro_series()
             try:
-                return LicenseKey.objects.get_license_key(
-                    osystem, distro_series
-                )
+                return LicenseKey.objects.get_license_key(osystem, distro_series)
             except LicenseKey.DoesNotExist:
                 return ""
         else:
@@ -3195,10 +3109,7 @@ class Node(CleanSave, TimestampedModel):
         # incase the system is setup in redundency(RAID or multiple NICs
         # can route to MAAS).
         interfaces = sorted(
-            (
-                iface.serialize()
-                for iface in self.current_config.interface_set.all()
-            ),
+            (iface.serialize() for iface in self.current_config.interface_set.all()),
             key=lambda iface: (
                 iface["id"] != self.boot_interface_id,
                 iface["id"],
@@ -3252,9 +3163,7 @@ class Node(CleanSave, TimestampedModel):
 
         @asynchronous
         def configure_boot_order():
-            return self._power_control_node(
-                succeed(None), None, power_info, boot_order
-            )
+            return self._power_control_node(succeed(None), None, power_info, boot_order)
 
         configure_boot_order().wait(120)
 
@@ -3544,9 +3453,7 @@ class Node(CleanSave, TimestampedModel):
             )
 
             # Create a status message for ABORTED_DISK_ERASING.
-            Event.objects.create_node_event(
-                self, EVENT_TYPES.ABORTED_DISK_ERASING
-            )
+            Event.objects.create_node_event(self, EVENT_TYPES.ABORTED_DISK_ERASING)
 
             # Don't permit naive mocking of stop(); it causes too much
             # confusion when testing. Return a Deferred from side_effect.
@@ -3660,10 +3567,8 @@ class Node(CleanSave, TimestampedModel):
             self.release(user, comment)
             return
 
-        self.current_release_script_set = (
-            ScriptSet.objects.create_release_script_set(
-                self, scripts=scripts, script_input=script_input
-            )
+        self.current_release_script_set = ScriptSet.objects.create_release_script_set(
+            self, scripts=scripts, script_input=script_input
         )
         self.save()
 
@@ -3715,9 +3620,7 @@ class Node(CleanSave, TimestampedModel):
             # attention.
             self.update_status(failed_status)
             self.save()
-            maaslog.error(
-                f"{self.hostname}: Could not start node for release: {error}"
-            )
+            maaslog.error(f"{self.hostname}: Could not start node for release: {error}")
             # Let the exception bubble up, since the UI or API will have to
             # deal with it.
             raise
@@ -3887,13 +3790,10 @@ class Node(CleanSave, TimestampedModel):
             self.release_interface_config()
             has_commissioning_data = (
                 self.current_commissioning_script_set
-                and self.current_commissioning_script_set.status
-                == SCRIPT_STATUS.PASSED
+                and self.current_commissioning_script_set.status == SCRIPT_STATUS.PASSED
             )
             self.update_status(
-                NODE_STATUS.READY
-                if has_commissioning_data
-                else NODE_STATUS.NEW
+                NODE_STATUS.READY if has_commissioning_data else NODE_STATUS.NEW
             )
             self.owner = None
             self.save()
@@ -3911,9 +3811,7 @@ class Node(CleanSave, TimestampedModel):
         :param dry_run: If True, raises NodeActionError rather than deleting
             pods.
         """
-        hosted_pods = list(
-            self.get_hosted_pods().values_list("name", flat=True)
-        )
+        hosted_pods = list(self.get_hosted_pods().values_list("name", flat=True))
         if len(hosted_pods) > 0:
             if dry_run:
                 raise ValidationError(
@@ -3995,8 +3893,7 @@ class Node(CleanSave, TimestampedModel):
         else:
             raise NodeStateViolation(
                 "The status of the node is %s; this status cannot "
-                "be transitioned to a corresponding failed status."
-                % self.status
+                "be transitioned to a corresponding failed status." % self.status
             )
 
     def mark_broken(self, user, comment=None):
@@ -4036,9 +3933,7 @@ class Node(CleanSave, TimestampedModel):
         )
 
         if self.status != NODE_STATUS.BROKEN:
-            raise NodeStateViolation(
-                "Can't mark a non-broken node as 'Ready'."
-            )
+            raise NodeStateViolation("Can't mark a non-broken node as 'Ready'.")
         maaslog.info("%s: Marking node fixed", self.hostname)
         self.update_status(
             NODE_STATUS.DEPLOYED
@@ -4073,14 +3968,10 @@ class Node(CleanSave, TimestampedModel):
                 "physical_blockdevice_id",
                 "-id",
             )
-            .distinct(
-                "script_set__node_id", "script_name", "physical_blockdevice_id"
-            )
+            .distinct("script_set__node_id", "script_name", "physical_blockdevice_id")
         )
         node_script_results = [
-            s["id"]
-            for s in script_results
-            if s["status"] in SCRIPT_STATUS_FAILED
+            s["id"] for s in script_results if s["status"] in SCRIPT_STATUS_FAILED
         ]
         return node_script_results
 
@@ -4122,8 +4013,7 @@ class Node(CleanSave, TimestampedModel):
         self.power_state = power_state
         self.power_state_updated = now()
         mark_ready = (
-            self.status == NODE_STATUS.RELEASING
-            and power_state == POWER_STATE.OFF
+            self.status == NODE_STATUS.RELEASING and power_state == POWER_STATE.OFF
         )
         if mark_ready:
             # Ensure the node is released when it powers down.
@@ -4192,18 +4082,12 @@ class Node(CleanSave, TimestampedModel):
 
     def set_storage_layout(self, layout, params={}, allow_fallback=True):
         """Set storage layout for this node."""
-        storage_layout = get_storage_layout_for_node(
-            layout, self, params=params
-        )
+        storage_layout = get_storage_layout_for_node(layout, self, params=params)
         if storage_layout is not None:
-            used_layout = storage_layout.configure(
-                allow_fallback=allow_fallback
-            )
+            used_layout = storage_layout.configure(allow_fallback=allow_fallback)
             self.last_applied_storage_layout = used_layout
             self.save(update_fields=["last_applied_storage_layout"])
-            maaslog.info(
-                f"{self.hostname}: Storage layout was set to {used_layout}."
-            )
+            maaslog.info(f"{self.hostname}: Storage layout was set to {used_layout}.")
         else:
             raise StorageLayoutError(f"Unknown storage layout: {layout}")
 
@@ -4251,12 +4135,7 @@ class Node(CleanSave, TimestampedModel):
         ) = self._get_group_layers_for_copy(cacheset_groups, filesystem_map)
 
         cache_sets_mapping = {}
-        while (
-            fs_groups
-            or cacheset_groups
-            or fs_groups_layer
-            or cacheset_groups_layer
-        ):
+        while fs_groups or cacheset_groups or fs_groups_layer or cacheset_groups_layer:
             if not fs_groups_layer and not cacheset_groups_layer:
                 raise ValueError(
                     "Copying the next layer of filesystems groups or cache "
@@ -4286,15 +4165,11 @@ class Node(CleanSave, TimestampedModel):
             (
                 cacheset_groups,
                 cacheset_groups_layer,
-            ) = self._get_group_layers_for_copy(
-                cacheset_groups, filesystem_map
-            )
+            ) = self._get_group_layers_for_copy(cacheset_groups, filesystem_map)
 
         # Clone the special filesystems.
         for filesystem in source_node.current_config.special_filesystems.all():
-            _clone_object(
-                filesystem, uuid=None, node_config=self.current_config
-            )
+            _clone_object(filesystem, uuid=None, node_config=self.current_config)
 
     def _get_storage_mapping_between_nodes(self, source_node):
         """Return the mapping between which disks from this node map to disks
@@ -4317,9 +4192,7 @@ class Node(CleanSave, TimestampedModel):
 
         self_boot_disk = self.get_boot_disk()
         if self_boot_disk is None:
-            raise ValidationError(
-                "destination node has no physical block devices"
-            )
+            raise ValidationError("destination node has no physical block devices")
         source_boot_disk = source_node.get_boot_disk()
         if source_boot_disk is None:
             raise ValidationError("source node has no physical block devices")
@@ -4330,9 +4203,7 @@ class Node(CleanSave, TimestampedModel):
             )
 
         self_disks = list(
-            self.physicalblockdevice_set.exclude(
-                id=self_boot_disk.id
-            ).order_by("id")
+            self.physicalblockdevice_set.exclude(id=self_boot_disk.id).order_by("id")
         )
         source_disks = list(
             source_node.physicalblockdevice_set.exclude(
@@ -4350,9 +4221,9 @@ class Node(CleanSave, TimestampedModel):
         # First pass; match on identical size and tags.
         for self_disk in self_disks[:]:  # Iterate on copy
             for source_disk in source_disks[:]:  # Iterate on copy
-                if self_disk.size == source_disk.size and set(
-                    self_disk.tags
-                ) == set(source_disk.tags):
+                if self_disk.size == source_disk.size and set(self_disk.tags) == set(
+                    source_disk.tags
+                ):
                     mapping[self_disk] = source_disk
                     self_disks.remove(self_disk)
                     source_disks.remove(source_disk)
@@ -4367,9 +4238,9 @@ class Node(CleanSave, TimestampedModel):
         source_disks = sorted(source_disks, key=attrgetter("size"))
         for self_disk in self_disks[:]:  # Iterate on copy
             for source_disk in source_disks[:]:  # Iterate on copy
-                if self_disk.size >= source_disk.size and set(
-                    self_disk.tags
-                ) == set(source_disk.tags):
+                if self_disk.size >= source_disk.size and set(self_disk.tags) == set(
+                    source_disk.tags
+                ):
                     mapping[self_disk] = source_disk
                     self_disks.remove(self_disk)
                     source_disks.remove(source_disk)
@@ -4423,9 +4294,9 @@ class Node(CleanSave, TimestampedModel):
                             partition=partition,
                         )
                         filesystem_map[source_filesystem_id] = filesystem
-            filesystems = source_disk.filesystem_set.filter(
-                acquired=False
-            ).order_by("id")
+            filesystems = source_disk.filesystem_set.filter(acquired=False).order_by(
+                "id"
+            )
             for filesystem in filesystems:
                 source_filesystem_id = filesystem.id
                 _clone_object(
@@ -4463,9 +4334,7 @@ class Node(CleanSave, TimestampedModel):
         for dest_filesystem in dest_filesystems:
             cache_set.filesystems.add(dest_filesystem)
 
-    def _clone_filesystem_group(
-        self, fs_group, dest_filesystems, cache_sets_mapping
-    ):
+    def _clone_filesystem_group(self, fs_group, dest_filesystems, cache_sets_mapping):
         """Clone the `source_group` linking to the `dest_filesystems`."""
         # Get two copies of the devices since we need to pass the original ones
         # for the filesystem_map.
@@ -4508,12 +4377,8 @@ class Node(CleanSave, TimestampedModel):
         block_device_ids = list(
             self.physicalblockdevice_set.values_list("id", flat=True)
         )
-        PartitionTable.objects.filter(
-            block_device__id__in=block_device_ids
-        ).delete()
-        Filesystem.objects.filter(
-            block_device__id__in=block_device_ids
-        ).delete()
+        PartitionTable.objects.filter(block_device__id__in=block_device_ids).delete()
+        Filesystem.objects.filter(block_device__id__in=block_device_ids).delete()
         self.current_config.special_filesystems.all().delete()
         virtual_devices = list(reversed(self.virtualblockdevice_set.all()))
         for _ in range(10):  # 10 times gives enough tries to remove.
@@ -4539,10 +4404,7 @@ class Node(CleanSave, TimestampedModel):
                 % (
                     len(virtual_devices),
                     ", ".join(
-                        [
-                            virtual_bd.get_name()
-                            for virtual_bd in virtual_devices
-                        ]
+                        [virtual_bd.get_name() for virtual_bd in virtual_devices]
                     ),
                 )
             )
@@ -4569,9 +4431,7 @@ class Node(CleanSave, TimestampedModel):
 
     def _clear_acquired_filesystems(self):
         """Clear the filesystems that are created when the node is acquired."""
-        filesystems = Filesystem.objects.filter_by_node(self).filter(
-            acquired=True
-        )
+        filesystems = Filesystem.objects.filter_by_node(self).filter(acquired=True)
         filesystems.delete()
 
     def _create_acquired_bridges(
@@ -4592,16 +4452,12 @@ class Node(CleanSave, TimestampedModel):
 
     def claim_auto_ips(self, exclude_addresses=None, temp_expires_after=None):
         """Assign IP addresses to all interface links set to AUTO."""
-        exclude_addresses = (
-            exclude_addresses.copy() if exclude_addresses else set()
-        )
+        exclude_addresses = exclude_addresses.copy() if exclude_addresses else set()
         allocated_ips = set()
         # Query for the interfaces again here; if we use the cached
         # interface_set, we could skip a newly-created bridge if it was created
         # at deployment time.
-        for interface in Interface.objects.filter(
-            node_config=self.current_config
-        ):
+        for interface in Interface.objects.filter(node_config=self.current_config):
             maaslog.debug(f"Claiming IP for {self.system_id}:{interface.name}")
             claimed_ips = interface.claim_auto_ips(
                 temp_expires_after=temp_expires_after,
@@ -4609,8 +4465,7 @@ class Node(CleanSave, TimestampedModel):
             )
             for ip in claimed_ips:
                 maaslog.debug(
-                    f"Claimed IP for {self.system_id}:{interface.name}: "
-                    f"{ip.ip}"
+                    f"Claimed IP for {self.system_id}:{interface.name}: " f"{ip.ip}"
                 )
                 exclude_addresses.add(str(ip.ip))
                 allocated_ips.add(ip)
@@ -4645,9 +4500,7 @@ class Node(CleanSave, TimestampedModel):
 
             # Map the rack controllers that have an IP address on each subnet
             # and have an actual connection to this region controller.
-            racks_to_clients = {
-                client.ident: client for client in getAllClients()
-            }
+            racks_to_clients = {client.ident: client for client in getAllClients()}
             subnets_to_clients = {}
             for subnet_id in subnets_to_ips.keys():
                 usable_racks = set(
@@ -4682,9 +4535,7 @@ class Node(CleanSave, TimestampedModel):
                     def append_info(res, *, ident=None, ips=None):
                         return res, ident, ips
 
-                    d.addBoth(
-                        partial(append_info, ident=client.ident, ips=ips)
-                    )
+                    d.addBoth(partial(append_info, ident=client.ident, ips=ips))
                 else:
                     d = succeed((None, None, ips))
                 defers.append(d)
@@ -4692,9 +4543,7 @@ class Node(CleanSave, TimestampedModel):
 
         @transactional
         def process_results(results, do_cleanups):
-            maaslog.debug(
-                f"Processing IP allocation results for {self.system_id}"
-            )
+            maaslog.debug(f"Processing IP allocation results for {self.system_id}")
             check_failed, ips_in_use = False, False
             for _, (check_result, rack_id, ips) in results:
                 ip_ids = [ip.id for ip in ips]
@@ -4754,9 +4603,7 @@ class Node(CleanSave, TimestampedModel):
                 # no IPs to test (e.g. all IPs are statically assigned)
                 return
             # skip IPs that have been tested already
-            allocated_ips = {
-                ip for ip in allocated_ips if ip.ip not in attempted_ips
-            }
+            allocated_ips = {ip for ip in allocated_ips if ip.ip not in attempted_ips}
             if not allocated_ips:
                 raise StaticIPAddressExhaustion(
                     "Failed to allocate the required AUTO IP addresses"
@@ -4764,9 +4611,7 @@ class Node(CleanSave, TimestampedModel):
             subnets_to_ips, subnets_to_clients = yield deferToDatabase(
                 get_racks_to_check, allocated_ips
             )
-            results = yield perform_ip_checks(
-                subnets_to_ips, subnets_to_clients
-            )
+            results = yield perform_ip_checks(subnets_to_ips, subnets_to_clients)
             if not results:
                 return
 
@@ -4864,9 +4709,7 @@ class Node(CleanSave, TimestampedModel):
             )
         if self.enable_hw_sync:
             data = self._hw_sync_preserve_network_interfaces(data)
-        update_node_network_information(
-            self, data, NUMANode.objects.filter(node=self)
-        )
+        update_node_network_information(self, data, NUMANode.objects.filter(node=self))
         self.save()
 
     def get_commissioning_resources(self):
@@ -4908,9 +4751,7 @@ class Node(CleanSave, TimestampedModel):
         discovered_addresses = boot_interface.ip_addresses.filter(
             alloc_type=IPADDRESS_TYPE.DISCOVERED, subnet__isnull=False
         )
-        subnets_to_link = {
-            ip_address.subnet for ip_address in discovered_addresses
-        }
+        subnets_to_link = {ip_address.subnet for ip_address in discovered_addresses}
         for subnet in subnets_to_link:
             boot_interface.link_subnet(INTERFACE_LINK_TYPE.AUTO, subnet)
             auto_set = True
@@ -4968,9 +4809,7 @@ class Node(CleanSave, TimestampedModel):
         ) = self._get_interface_layers_for_copy(source_interfaces, mapping)
         while source_interfaces or layer_interfaces:
             if not layer_interfaces:
-                raise ValueError(
-                    "Copying the next layer of interfaces has failed."
-                )
+                raise ValueError("Copying the next layer of interfaces has failed.")
             for source_interface, dest_parents in layer_interfaces.items():
                 interface = interfaces_map.pop(source_interface.id)
                 self._clone_interface(interface, dest_parents)
@@ -4981,9 +4820,7 @@ class Node(CleanSave, TimestampedModel):
                 mapping.update(
                     {
                         source_interface.id: self_interface
-                        for self_interface, source_interface in (
-                            dest_mapping.items()
-                        )
+                        for self_interface, source_interface in (dest_mapping.items())
                     }
                 )
             # Load the next layer.
@@ -5022,9 +4859,7 @@ class Node(CleanSave, TimestampedModel):
             )
         return mapping
 
-    def _copy_between_interface_mappings(
-        self, mapping, exclude_addresses=None
-    ):
+    def _copy_between_interface_mappings(self, mapping, exclude_addresses=None):
         """Copy the source onto the destination interfaces in the mapping."""
         if exclude_addresses is None:
             exclude_addresses = []
@@ -5054,9 +4889,7 @@ class Node(CleanSave, TimestampedModel):
                     self_interface.ip_addresses.add(ip_address)
         return exclude_addresses
 
-    def _get_interface_layers_for_copy(
-        self, source_interfaces, interface_mapping
-    ):
+    def _get_interface_layers_for_copy(self, source_interfaces, interface_mapping):
         """Pops the interface from the `source_interfaces` when all interfaces
         that make it up exist in `interface_mapping`."""
         layer = {}
@@ -5064,9 +4897,7 @@ class Node(CleanSave, TimestampedModel):
             contains_all = True
             dest_parents = []
             for parent_interface in interface.parents.all():
-                dest_interface = interface_mapping.get(
-                    parent_interface.id, None
-                )
+                dest_interface = interface_mapping.get(parent_interface.id, None)
                 if dest_interface:
                     dest_parents.append(dest_interface)
                 else:
@@ -5085,9 +4916,7 @@ class Node(CleanSave, TimestampedModel):
             mac_address=dest_parents[0].mac_address,
         )
         for parent in dest_parents:
-            InterfaceRelationship.objects.create(
-                child=interface, parent=parent
-            )
+            InterfaceRelationship.objects.create(child=interface, parent=parent)
 
     def get_gateways_by_priority(self):
         """Return all possible default gateways for the Node, by priority.
@@ -5168,9 +4997,7 @@ class Node(CleanSave, TimestampedModel):
     def _get_best_interface_from_gateway_link(self, gateway_link):
         """Return the best interface for the `gateway_link` and this node."""
         return (
-            gateway_link.interface_set.filter(
-                node_config_id=self.current_config_id
-            )
+            gateway_link.interface_set.filter(node_config_id=self.current_config_id)
             .order_by("type", "id")
             .first()
             .id
@@ -5209,16 +5036,12 @@ class Node(CleanSave, TimestampedModel):
             subnet = self.gateway_link_ipv4.subnet
             if subnet is not None:
                 if subnet.gateway_ip:
-                    gateway_ipv4 = self._get_gateway_tuple(
-                        self.gateway_link_ipv4
-                    )
+                    gateway_ipv4 = self._get_gateway_tuple(self.gateway_link_ipv4)
         if self.gateway_link_ipv6 is not None:
             subnet = self.gateway_link_ipv6.subnet
             if subnet is not None:
                 if subnet.gateway_ip:
-                    gateway_ipv6 = self._get_gateway_tuple(
-                        self.gateway_link_ipv6
-                    )
+                    gateway_ipv6 = self._get_gateway_tuple(self.gateway_link_ipv6)
 
         # Early out if we already have both gateways.
         if gateway_ipv4 and gateway_ipv6:
@@ -5235,9 +5058,7 @@ class Node(CleanSave, TimestampedModel):
             )
         return DefaultGateways(gateway_ipv4, gateway_ipv6, all_gateways)
 
-    def get_default_dns_servers(
-        self, ipv4=True, ipv6=True, default_region_ip=None
-    ):
+    def get_default_dns_servers(self, ipv4=True, ipv6=True, default_region_ip=None):
         """Return the default DNS servers for this node."""
         # Circular imports.
         from maasserver.dns.zonegenerator import get_dns_server_addresses
@@ -5270,9 +5091,7 @@ class Node(CleanSave, TimestampedModel):
                     ]
                 # An IPv4 subnet is hosting the default gateway and has DNS
                 # servers defined. IPv4 DNS servers take first-priority.
-                return list(
-                    OrderedDict.fromkeys(rack_dns + subnet.dns_servers)
-                )
+                return list(OrderedDict.fromkeys(rack_dns + subnet.dns_servers))
         if ipv6 and gateways.ipv6 is not None:
             subnet = Subnet.objects.get(id=gateways.ipv6.subnet_id)
             if subnet.dns_servers:
@@ -5298,9 +5117,7 @@ class Node(CleanSave, TimestampedModel):
                     ]
                 # An IPv6 subnet is hosting the default gateway and has DNS
                 # servers defined. IPv6 DNS servers take second-priority.
-                return list(
-                    OrderedDict.fromkeys(rack_dns + subnet.dns_servers)
-                )
+                return list(OrderedDict.fromkeys(rack_dns + subnet.dns_servers))
 
         # Get the routable addresses between the node and all rack controllers,
         # when the rack proxy should be used (default).
@@ -5355,16 +5172,8 @@ class Node(CleanSave, TimestampedModel):
                     address
                     for address in addresses
                     if (
-                        (
-                            ipv4
-                            and gateways.ipv4 is not None
-                            and address.version == 4
-                        )
-                        or (
-                            ipv6
-                            and gateways.ipv6 is not None
-                            and address.version == 6
-                        )
+                        (ipv4 and gateways.ipv4 is not None and address.version == 4)
+                        or (ipv6 and gateways.ipv6 is not None and address.version == 6)
                     )
                 ]
                 for node, addresses in routable_addrs_map.items()
@@ -5377,8 +5186,7 @@ class Node(CleanSave, TimestampedModel):
         )
 
         routable_addrs = [
-            str(addr)
-            for addr in reduce_routable_address_map(routable_addrs_map)
+            str(addr) for addr in reduce_routable_address_map(routable_addrs_map)
         ]
         if routable_addrs:
             return routable_addrs + [
@@ -5406,10 +5214,7 @@ class Node(CleanSave, TimestampedModel):
                 return "xinstall"
             else:
                 return "local"
-        elif (
-            self.status == NODE_STATUS.DEPLOYED
-            or self.node_type != NODE_TYPE.MACHINE
-        ):
+        elif self.status == NODE_STATUS.DEPLOYED or self.node_type != NODE_TYPE.MACHINE:
             return "local"
         else:
             return "poweroff"
@@ -5517,9 +5322,7 @@ class Node(CleanSave, TimestampedModel):
 
             # Id's have a lower (non-zero under heavy load) chance of being out
             # of order than of two timestamps colliding.
-            event = Event.objects.filter(
-                node=self, type__level__gte=logging.INFO
-            )
+            event = Event.objects.filter(node=self, type__level__gte=logging.INFO)
             event = event.select_related("type")
             event = event.order_by("-created", "-id").first()
             if event is not None:
@@ -5622,9 +5425,7 @@ class Node(CleanSave, TimestampedModel):
                 staticipaddress__interface__node_config_id=boot_primary_rack_controller.current_config_id,
             )
             rack_cidrs = rack_subnets.values_list("cidr", flat=True)
-            rack_address_families = {
-                IPNetwork(cidr).version for cidr in rack_cidrs
-            }
+            rack_address_families = {IPNetwork(cidr).version for cidr in rack_cidrs}
             if my_address_families & rack_address_families == set():
                 # Node doesn't have any IP addresses in common with the rack
                 # controller, unless it has a DHCP assigned without a subnet.
@@ -5642,9 +5443,7 @@ class Node(CleanSave, TimestampedModel):
                             ]
                         }
                     )
-        if self.ephemeral_deploy and (
-            self.install_kvm or self.register_vmhost
-        ):
+        if self.ephemeral_deploy and (self.install_kvm or self.register_vmhost):
             raise ValidationError(
                 "A machine can not be a VM host if it is deployed to memory."
             )
@@ -5673,12 +5472,8 @@ class Node(CleanSave, TimestampedModel):
                     "Deployment to memory not supported for "
                     f"{self.osystem}/{self.distro_series} on {self.architecture}"
                 )
-        self._register_request_event(
-            user, event, action="start", comment=comment
-        )
-        return self._start(
-            user, user_data, allow_power_cycle=allow_power_cycle
-        )
+        self._register_request_event(user, event, action="start", comment=comment)
+        return self._start(user, user_data, allow_power_cycle=allow_power_cycle)
 
     def _get_bmc_client_connection_info(self, *args, **kwargs):
         """Return a tuple that list the rack controllers that can communicate
@@ -5697,9 +5492,7 @@ class Node(CleanSave, TimestampedModel):
             client_idents = []
         else:
             client_idents = self.bmc.get_client_identifiers()
-        fallback_idents = [
-            rack.system_id for rack in self.get_boot_rack_controllers()
-        ]
+        fallback_idents = [rack.system_id for rack in self.get_boot_rack_controllers()]
         if len(client_idents) == 0 and len(fallback_idents) == 0:
             err_msg = "No rack controllers can access the BMC of node %s" % (
                 self.hostname
@@ -5821,8 +5614,7 @@ class Node(CleanSave, TimestampedModel):
                     )
             # Non-Ubuntu deployments use the commissioning OS during deployment
             if self.status in COMMISSIONING_LIKE_STATUSES or (
-                self.status in deployment_like_status
-                and self.osystem != "ubuntu"
+                self.status in deployment_like_status and self.osystem != "ubuntu"
             ):
                 resource = BootResource.objects.get_resource_for(
                     config["commissioning_osystem"],
@@ -6016,14 +5808,11 @@ class Node(CleanSave, TimestampedModel):
         def cb_create_event(result):
             response, _ = result
             power_state = response["state"]
-            power_error = (
-                response["error_msg"] if "error_msg" in response else None
-            )
+            power_error = response["error_msg"] if "error_msg" in response else None
             node = Node.objects.get(id=self.id)
             if power_error is None:
                 log.debug(
-                    f"Power state queried for node {node.system_id}: "
-                    f"{power_state}"
+                    f"Power state queried for node {node.system_id}: " f"{power_state}"
                 )
             else:
                 Event.objects.create_node_event(
@@ -6062,24 +5851,18 @@ class Node(CleanSave, TimestampedModel):
         d.addCallback(cb_update_power)
         return d
 
-    def _power_control_node(
-        self, defer, power_method_name, power_info, order=None
-    ):
+    def _power_control_node(self, defer, power_method_name, power_info, order=None):
         # Check if the BMC is accessible. If not we need to do some work to
         # make sure we can determine which rack controller can power
         # control this node.
         def is_bmc_accessible():
             node = Node.objects.get(id=self.id)
             if node.bmc is None:
-                raise PowerProblem(
-                    "No BMC is defined.  Cannot power control node."
-                )
+                raise PowerProblem("No BMC is defined.  Cannot power control node.")
             else:
                 return node.bmc.is_accessible()
 
-        defer.addCallback(
-            lambda _: deferToDatabase(transactional(is_bmc_accessible))
-        )
+        defer.addCallback(lambda _: deferToDatabase(transactional(is_bmc_accessible)))
 
         def cb_update_routable_racks(accessible):
             if not accessible:
@@ -6091,17 +5874,12 @@ class Node(CleanSave, TimestampedModel):
                 def cb_update_routable(result):
                     node = Node.objects.get(id=self.id)
                     power_state, routable_racks, non_routable_racks = result
-                    if (
-                        power_info.can_be_queried
-                        and node.power_state != power_state
-                    ):
+                    if power_info.can_be_queried and node.power_state != power_state:
                         # MAAS will query power types that even say they don't
                         # support query. But we only update the power_state on
                         # those we are saying MAAS reports on.
                         node.update_power_state(power_state)
-                    node.bmc.update_routable_racks(
-                        routable_racks, non_routable_racks
-                    )
+                    node.bmc.update_routable_racks(routable_racks, non_routable_racks)
 
                 # Update the routable information for the BMC.
                 d.addCallback(
@@ -6191,9 +5969,7 @@ class Node(CleanSave, TimestampedModel):
                     return result
 
                 d.addCallback(
-                    lambda result: deferToDatabase(
-                        _update_node_power_state, result
-                    )
+                    lambda result: deferToDatabase(_update_node_power_state, result)
                 )
 
             return d
@@ -6442,9 +6218,7 @@ class Node(CleanSave, TimestampedModel):
         qs = qs.order_by(
             "script_name", "physical_blockdevice_id", "interface_id", "-id"
         )
-        qs = qs.distinct(
-            "script_name", "physical_blockdevice_id", "interface_id"
-        )
+        qs = qs.distinct("script_name", "physical_blockdevice_id", "interface_id")
         return qs
 
     @property
@@ -6478,10 +6252,7 @@ class Node(CleanSave, TimestampedModel):
         script_result = script_set.find_script_result(
             script_name=LIST_MODALIASES_OUTPUT_NAME
         )
-        if (
-            script_result is None
-            or script_result.status != SCRIPT_STATUS.PASSED
-        ):
+        if script_result is None or script_result.status != SCRIPT_STATUS.PASSED:
             return []
         else:
             return script_result.stdout.decode("utf-8").splitlines()
@@ -6604,8 +6375,7 @@ class Controller(Node):
         """
         interfaces = self.current_config.interface_set.all()
         return {
-            interface.name: interface.get_discovery_state()
-            for interface in interfaces
+            interface.name: interface.get_discovery_state() for interface in interfaces
         }
 
     @transactional
@@ -6648,9 +6418,7 @@ class Controller(Node):
         Returns the `interfaces` dictionary used during processing.
         """
         # Get the interfaces in the [rough] format of the region/rack contract.
-        interfaces = Interface.objects.get_all_interfaces_definition_for_node(
-            self
-        )
+        interfaces = Interface.objects.get_all_interfaces_definition_for_node(self)
         # Use the data to calculate which interfaces should be monitored by
         # default on this controller, then update each interface.
         monitored_interfaces = get_default_monitored_interfaces(interfaces)
@@ -6793,9 +6561,7 @@ class RackController(Controller):
                             new_rack,
                         )
                     )
-                    controlled_vlan.primary_rack = (
-                        controlled_vlan.secondary_rack
-                    )
+                    controlled_vlan.primary_rack = controlled_vlan.secondary_rack
                     controlled_vlan.secondary_rack = new_rack
                 else:
                     new_rack, new_racks = (
@@ -6912,9 +6678,7 @@ class RackController(Controller):
             # Not connected to any regions so the rackd is considered dead.
             Service.objects.mark_dead(self, dead_rack=True)
         else:
-            connected_to_processes = {
-                conn.endpoint.process for conn in connections
-            }
+            connected_to_processes = {conn.endpoint.process for conn in connections}
             all_processes = set(RegionControllerProcess.objects.all())
             dead_regions = RegionController.objects.exclude(
                 processes__in=all_processes
@@ -6934,9 +6698,7 @@ class RackController(Controller):
                     self,
                     "rackd",
                     SERVICE_STATUS.DEGRADED,
-                    "{:.0%} connected to region controllers.".format(
-                        1.0 - percentage
-                    ),
+                    "{:.0%} connected to region controllers.".format(1.0 - percentage),
                 )
 
 
@@ -6949,9 +6711,7 @@ class RegionController(Controller):
         proxy = True
 
     def __init__(self, *args, **kwargs):
-        super().__init__(
-            node_type=NODE_TYPE.REGION_CONTROLLER, *args, **kwargs
-        )
+        super().__init__(node_type=NODE_TYPE.REGION_CONTROLLER, *args, **kwargs)
 
     def delete(self, force=False):
         """Delete this region controller."""
@@ -6963,8 +6723,7 @@ class RegionController(Controller):
 
         if len(connections) != 0:
             raise ValidationError(
-                "Unable to delete %s as it's currently running."
-                % self.hostname
+                "Unable to delete %s as it's currently running." % self.hostname
             )
 
         if self.node_type == NODE_TYPE.REGION_AND_RACK_CONTROLLER:

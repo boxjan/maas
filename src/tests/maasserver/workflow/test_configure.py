@@ -31,9 +31,7 @@ class TestConfigureAgentActivity:
     async def test_get_rack_contorller_vlans_no_rack_controller(
         self, db: Database, db_connection: AsyncConnection
     ):
-        configure_activities = ConfigureAgentActivity(
-            db, connection=db_connection
-        )
+        configure_activities = ConfigureAgentActivity(db, connection=db_connection)
 
         result = await configure_activities.get_rack_controller_vlans(
             GetRackControllerVLANsInput(system_id="abc")
@@ -46,12 +44,8 @@ class TestConfigureAgentActivity:
         subnet = await create_test_subnet_entry(fixture)
         rack_controller = await create_test_rack_controller_entry(fixture)
         ip = await create_test_staticipaddress_entry(fixture, subnet=subnet)
-        await create_test_interface_entry(
-            fixture, node=rack_controller, ips=[ip]
-        )
-        configure_activities = ConfigureAgentActivity(
-            db, connection=db_connection
-        )
+        await create_test_interface_entry(fixture, node=rack_controller, ips=[ip])
+        configure_activities = ConfigureAgentActivity(db, connection=db_connection)
 
         result = await configure_activities.get_rack_controller_vlans(
             GetRackControllerVLANsInput(system_id=rack_controller["system_id"])
@@ -70,16 +64,10 @@ class TestConfigureAgentActivity:
         self, db: Database, db_connection: AsyncConnection, fixture: Fixture
     ):
         subnet = await create_test_subnet_entry(fixture)
-        rack_controller = await create_test_rack_and_region_controller_entry(
-            fixture
-        )
+        rack_controller = await create_test_rack_and_region_controller_entry(fixture)
         ip = await create_test_staticipaddress_entry(fixture, subnet=subnet)
-        await create_test_interface_entry(
-            fixture, node=rack_controller, ips=[ip]
-        )
-        configure_activities = ConfigureAgentActivity(
-            db, connection=db_connection
-        )
+        await create_test_interface_entry(fixture, node=rack_controller, ips=[ip])
+        configure_activities = ConfigureAgentActivity(db, connection=db_connection)
 
         result = await configure_activities.get_rack_controller_vlans(
             GetRackControllerVLANsInput(system_id=rack_controller["system_id"])
@@ -108,28 +96,18 @@ class TestConfigureAgentActivity:
         rack_controller["current_config_id"] = current_node_config["id"]
         ip1 = await create_test_staticipaddress_entry(fixture, subnet=subnet1)
         ip2 = await create_test_staticipaddress_entry(fixture, subnet=subnet2)
-        await create_test_interface_entry(
-            fixture, node=rack_controller, ips=[ip1]
-        )
-        await create_test_interface_entry(
-            fixture, node=rack_controller, ips=[ip2]
-        )
-        configure_activities = ConfigureAgentActivity(
-            db, connection=db_connection
-        )
+        await create_test_interface_entry(fixture, node=rack_controller, ips=[ip1])
+        await create_test_interface_entry(fixture, node=rack_controller, ips=[ip2])
+        configure_activities = ConfigureAgentActivity(db, connection=db_connection)
         result = await configure_activities.get_rack_controller_vlans(
             GetRackControllerVLANsInput(system_id=rack_controller["system_id"])
         )
-        assert result == GetRackControllerVLANsResult(
-            [vlan1["id"], vlan2["id"]]
-        )
+        assert result == GetRackControllerVLANsResult([vlan1["id"], vlan2["id"]])
 
     async def test_get_region_controller_endpoints_no_region_controller(
         self, db: Database, db_connection: AsyncConnection
     ):
-        configure_activities = ConfigureAgentActivity(
-            db, connection=db_connection
-        )
+        configure_activities = ConfigureAgentActivity(db, connection=db_connection)
 
         result = await configure_activities.get_region_controller_endpoints()
         assert result == GetRegionControllerEndpointsResult([])
@@ -140,12 +118,8 @@ class TestConfigureAgentActivity:
         subnet = await create_test_subnet_entry(fixture)
         region_controller = await create_test_region_controller_entry(fixture)
         ip = await create_test_staticipaddress_entry(fixture, subnet=subnet)
-        await create_test_interface_entry(
-            fixture, node=region_controller, ips=[ip]
-        )
-        configure_activities = ConfigureAgentActivity(
-            db, connection=db_connection
-        )
+        await create_test_interface_entry(fixture, node=region_controller, ips=[ip])
+        configure_activities = ConfigureAgentActivity(db, connection=db_connection)
 
         result = await configure_activities.get_region_controller_endpoints()
 
@@ -161,15 +135,9 @@ class TestConfigureAgentActivity:
         subnet = await create_test_subnet_entry(fixture)
         region_controller = await create_test_region_controller_entry(fixture)
         ip = await create_test_staticipaddress_entry(fixture, subnet=subnet)
-        await create_test_interface_entry(
-            fixture, node=region_controller, ips=[ip]
-        )
-        await create_test_interface_entry(
-            fixture, node=region_controller, ips=[]
-        )
-        configure_activities = ConfigureAgentActivity(
-            db, connection=db_connection
-        )
+        await create_test_interface_entry(fixture, node=region_controller, ips=[ip])
+        await create_test_interface_entry(fixture, node=region_controller, ips=[])
+        configure_activities = ConfigureAgentActivity(db, connection=db_connection)
 
         result = await configure_activities.get_region_controller_endpoints()
 
@@ -191,15 +159,9 @@ class TestConfigureAgentActivity:
         region_controller["current_config_id"] = current_node_config["id"]
         ip1 = await create_test_staticipaddress_entry(fixture, subnet=subnet1)
         ip2 = await create_test_staticipaddress_entry(fixture, subnet=subnet2)
-        await create_test_interface_entry(
-            fixture, node=region_controller, ips=[ip1]
-        )
-        await create_test_interface_entry(
-            fixture, node=region_controller, ips=[ip2]
-        )
-        configure_activities = ConfigureAgentActivity(
-            db, connection=db_connection
-        )
+        await create_test_interface_entry(fixture, node=region_controller, ips=[ip1])
+        await create_test_interface_entry(fixture, node=region_controller, ips=[ip2])
+        configure_activities = ConfigureAgentActivity(db, connection=db_connection)
 
         result = await configure_activities.get_region_controller_endpoints()
 
@@ -211,6 +173,4 @@ class TestConfigureAgentActivity:
         if ip2["ip"].version == 6:
             endpoint2 = f"http://[{ip2['ip']}]:5240/MAAS/"
 
-        assert result == GetRegionControllerEndpointsResult(
-            [endpoint1, endpoint2]
-        )
+        assert result == GetRegionControllerEndpointsResult([endpoint1, endpoint2])

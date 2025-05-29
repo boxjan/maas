@@ -277,9 +277,7 @@ def probe_virsh_and_enlist(
         params = {"power_address": poweraddr, "power_id": machine}
         if password is not None:
             params["power_pass"] = password
-        system_id = create_node(
-            macs, arch, "virsh", params, domain, machine
-        ).wait(30)
+        system_id = create_node(macs, arch, "virsh", params, domain, machine).wait(30)
 
         # If the system_id is None an error occured when creating the machine.
         # Most likely the error is the node already exists.

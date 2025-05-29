@@ -244,9 +244,7 @@ class TestLocalBootResourceFile:
                 with f.store() as mm:
                     mm.write(file_content[s : s + FILE_SLICE])
 
-    def test_store_corrupt_file(
-        self, image_store_dir: Path, file_content: bytes
-    ):
+    def test_store_corrupt_file(self, image_store_dir: Path, file_content: bytes):
         f = LocalBootResourceFile(
             sha256="invalidhash",
             filename_on_disk="cadecafe",
@@ -266,9 +264,11 @@ class TestLocalBootResourceFile:
         file_sha256: str,
         file_filename_on_disk: str,
     ):
-        with LocalBootResourceFile.create_from_content(
-            BytesIO(file_content)
-        ) as (tmpname, size, sha256):
+        with LocalBootResourceFile.create_from_content(BytesIO(file_content)) as (
+            tmpname,
+            size,
+            sha256,
+        ):
             localfile = LocalBootResourceFile(sha256, sha256[:7], size)
             if not localfile.path.exists():
                 os.link(tmpname, localfile.path)

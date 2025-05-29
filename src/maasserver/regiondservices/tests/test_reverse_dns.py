@@ -20,9 +20,7 @@ from provisioningserver.utils.testing import callWithServiceRunning
 from provisioningserver.utils.tests.test_network import TestReverseResolveMixIn
 
 
-class TestReverseDNSService(
-    TestReverseResolveMixIn, MAASTransactionServerTestCase
-):
+class TestReverseDNSService(TestReverseResolveMixIn, MAASTransactionServerTestCase):
     """Tests for `RegionNetworksMonitoringService`."""
 
     def setUp(self):
@@ -32,9 +30,7 @@ class TestReverseDNSService(
         RegionController = self.patch(reverse_dns_module, "RegionController")
         RegionController.objects = Mock()
         RegionController.objects.get_running_controller = Mock()
-        RegionController.objects.get_running_controller.return_value = (
-            self.region
-        )
+        RegionController.objects.get_running_controller.return_value = self.region
 
     @wait_for()
     @inlineCallbacks

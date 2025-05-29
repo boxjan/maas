@@ -27,9 +27,7 @@ class TestZonesAPI(APITestCase.ForUser):
             reverse("zones_handler"),
             {"name": name, "description": description},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         zone = Zone.objects.get(name=name)
         self.assertEqual(name, zone.name)
         self.assertEqual(description, zone.description)
@@ -41,20 +39,14 @@ class TestZonesAPI(APITestCase.ForUser):
             reverse("zones_handler"),
             {"name": name, "description": description},
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_list_returns_zone_list(self):
         [factory.make_Zone(sortable_name=True) for _ in range(3)]
         zones = Zone.objects.all()
         response = self.client.get(reverse("zones_handler"), {})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertCountEqual(
             [
                 (
@@ -78,12 +70,8 @@ class TestZonesAPI(APITestCase.ForUser):
         [factory.make_Zone(sortable_name=True) for _ in range(10)]
         zones = Zone.objects.all()
         response = self.client.get(reverse("zones_handler"), {})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         # Sorting is case-insensitive.
         self.assertEqual(
             sorted((zone.name for zone in zones), key=lambda s: s.lower()),

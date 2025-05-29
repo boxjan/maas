@@ -62,20 +62,13 @@ class HMCPowerDriver(PowerDriver):
         return []
 
     def run_hmc_command(
-        self,
-        command,
-        power_address=None,
-        power_user=None,
-        power_pass=None,
-        **extra
+        self, command, power_address=None, power_user=None, power_pass=None, **extra
     ):
         """Run a single command on HMC via SSH and return output."""
         try:
             ssh_client = SSHClient()
             ssh_client.set_missing_host_key_policy(AutoAddPolicy())
-            ssh_client.connect(
-                power_address, username=power_user, password=power_pass
-            )
+            ssh_client.connect(power_address, username=power_user, password=power_pass)
             _, stdout, _ = ssh_client.exec_command(command)
             output = stdout.read().decode("utf-8").strip()
         except (SSHException, EOFError, SOCKETError) as e:
@@ -101,8 +94,7 @@ class HMCPowerDriver(PowerDriver):
             )
         except PowerConnError as e:
             raise PowerActionError(
-                "HMC Power Driver unable to power on lpar %s: %s"
-                % (context["lpar"], e)
+                "HMC Power Driver unable to power on lpar %s: %s" % (context["lpar"], e)
             )
 
     def power_off(self, system_id, context):

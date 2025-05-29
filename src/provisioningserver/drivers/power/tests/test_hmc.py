@@ -77,9 +77,7 @@ class TestHMCPowerDriver(MAASTestCase):
         SSHClient = self.patch(hmc_module, "SSHClient")
         ssh_client = SSHClient.return_value
         ssh_client.connect.side_effect = error
-        self.assertRaises(
-            PowerConnError, driver.run_hmc_command, command, **context
-        )
+        self.assertRaises(PowerConnError, driver.run_hmc_command, command, **context)
 
     def test_power_on_calls_run_hmc_command(self):
         driver = HMCPowerDriver()
@@ -103,9 +101,7 @@ class TestHMCPowerDriver(MAASTestCase):
         power_query.return_value = "off"
         run_hmc_command = self.patch(driver, "run_hmc_command")
         run_hmc_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_on, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_on, system_id, context)
 
     def test_power_off_calls_run_hmc_command(self):
         driver = HMCPowerDriver()
@@ -124,9 +120,7 @@ class TestHMCPowerDriver(MAASTestCase):
         context = make_context()
         run_hmc_command = self.patch(driver, "run_hmc_command")
         run_hmc_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_off, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_off, system_id, context)
 
     @given(sampled_from(HMCState.ON + HMCState.OFF))
     @settings(deadline=None)
@@ -151,9 +145,7 @@ class TestHMCPowerDriver(MAASTestCase):
         context = make_context()
         run_hmc_command = self.patch(driver, "run_hmc_command")
         run_hmc_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_query, system_id, context)
 
     def test_power_query_crashes_when_unable_to_find_match(self):
         driver = HMCPowerDriver()
@@ -161,6 +153,4 @@ class TestHMCPowerDriver(MAASTestCase):
         context = make_context()
         run_hmc_command = self.patch(driver, "run_hmc_command")
         run_hmc_command.return_value = "Rubbish"
-        self.assertRaises(
-            PowerFatalError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerFatalError, driver.power_query, system_id, context)

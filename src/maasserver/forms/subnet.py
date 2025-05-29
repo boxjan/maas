@@ -22,9 +22,7 @@ from provisioningserver.boot import BootMethodRegistry
 class SubnetForm(MAASModelForm):
     """Subnet creation/edition form."""
 
-    fabric = forms.ModelChoiceField(
-        queryset=Fabric.objects.all(), required=False
-    )
+    fabric = forms.ModelChoiceField(queryset=Fabric.objects.all(), required=False)
 
     vlan = forms.ModelChoiceField(queryset=VLAN.objects.all(), required=False)
 
@@ -161,8 +159,7 @@ class SubnetForm(MAASModelForm):
                         set_form_error(
                             self,
                             "vid",
-                            "No VLAN with vid %s in fabric %s."
-                            % (vid, fabric),
+                            "No VLAN with vid %s in fabric %s." % (vid, fabric),
                         )
                     else:
                         cleaned_data["vlan"] = vlan
@@ -188,9 +185,7 @@ class SubnetForm(MAASModelForm):
         return cleaned_data
 
     def _clean_disabled_boot_architectures(self, cleaned_data: dict) -> dict:
-        disabled_boot_architectures = cleaned_data.get(
-            "disabled_boot_architectures"
-        )
+        disabled_boot_architectures = cleaned_data.get("disabled_boot_architectures")
         if disabled_boot_architectures is None:
             return cleaned_data
         disabled_arches = []

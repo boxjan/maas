@@ -11,9 +11,7 @@ from maasserver.djangosettings import import_settings, settings
 import_settings(settings)
 
 # Override path to static root.
-STATIC_ROOT = os.path.join(
-    os.environ["SNAP"], "usr", "share", "maas", "web", "static"
-)
+STATIC_ROOT = os.path.join(os.environ["SNAP"], "usr", "share", "maas", "web", "static")
 
 # Override the preseed locations.
 PRESEED_TEMPLATE_LOCATIONS = (

@@ -177,9 +177,7 @@ RANDOM_OR_NONE = object()
 
 
 class Factory(maastesting.factory.Factory):
-    def make_fake_request(
-        self, path="/", method="GET", cookies=None, data=None
-    ):
+    def make_fake_request(self, path="/", method="GET", cookies=None, data=None):
         """Create a fake request.
 
         :param path: The path to which to make the request.
@@ -253,9 +251,7 @@ class Factory(maastesting.factory.Factory):
         :type but_not: Sequence
         """
         ubuntu_releases = UbuntuDistroInfo()
-        supported_releases = ubuntu_releases.all[
-            ubuntu_releases.all.index("precise") :
-        ]
+        supported_releases = ubuntu_releases.all[ubuntu_releases.all.index("precise") :]
         if but_not is None:
             but_not = []
         return random.choice(
@@ -273,9 +269,7 @@ class Factory(maastesting.factory.Factory):
         if yaml_content is not None:
             script += "# --- Start MAAS %s script metadata ---\n" % version
             if isinstance(yaml_content, dict):
-                script += "# %s" % yaml.safe_dump(yaml_content).replace(
-                    "\n", "\n# "
-                )
+                script += "# %s" % yaml.safe_dump(yaml_content).replace("\n", "\n# ")
             else:
                 script += yaml_content
             script += "\n# --- End MAAS %s script metadata ---\n" % version
@@ -326,16 +320,12 @@ class Factory(maastesting.factory.Factory):
     # cycle(range(...)) is not used because it gradually consumes all memory.
     _rcp_pids = chain.from_iterable(repeat(range(PID_MAX)))
 
-    def make_RegionControllerProcess(
-        self, region=None, pid=None, updated=None
-    ):
+    def make_RegionControllerProcess(self, region=None, pid=None, updated=None):
         if region is None:
             region = self.make_RegionController()
         if pid is None:
             pid = next(self._rcp_pids)
-        process = RegionControllerProcess(
-            region=region, pid=pid, updated=updated
-        )
+        process = RegionControllerProcess(region=region, pid=pid, updated=updated)
         process.save()
         return process
 
@@ -359,9 +349,7 @@ class Factory(maastesting.factory.Factory):
         endpoint.save()
         return endpoint
 
-    def make_RegionRackRPCConnection(
-        self, rack_controller=None, endpoint=None
-    ):
+    def make_RegionRackRPCConnection(self, rack_controller=None, endpoint=None):
         if rack_controller is None:
             rack_controller = self.make_RackController()
         if endpoint is None:
@@ -563,14 +551,12 @@ class Factory(maastesting.factory.Factory):
             )
             node.current_testing_script_set = testing_script_set
 
-            installation_script_set = (
-                ScriptSet.objects.create_installation_script_set(node)
+            installation_script_set = ScriptSet.objects.create_installation_script_set(
+                node
             )
             node.current_installation_script_set = installation_script_set
 
-            release_script_set = ScriptSet.objects.create_release_script_set(
-                node
-            )
+            release_script_set = ScriptSet.objects.create_release_script_set(node)
             release_script_set.save()
             node.current_release_script_set = release_script_set
 
@@ -723,9 +709,7 @@ class Factory(maastesting.factory.Factory):
     def make_NodeMetadata(self, node=None, key=None, value=None, **kwargs):
         if node is None:
             owner = get_worker_user()
-            node = self.make_Node(
-                owner=owner, node_type=NODE_TYPE.MACHINE, **kwargs
-            )
+            node = self.make_Node(owner=owner, node_type=NODE_TYPE.MACHINE, **kwargs)
             node.save()
 
         if key is None:
@@ -945,9 +929,7 @@ class Factory(maastesting.factory.Factory):
         else:
             recommission = False
         if script is None:
-            script = VersionedTextFile.objects.create(
-                data=self.make_script_content()
-            )
+            script = VersionedTextFile.objects.create(data=self.make_script_content())
         return Script.objects.create(
             name=name,
             title=title,
@@ -1007,9 +989,7 @@ class Factory(maastesting.factory.Factory):
             script_set = self.make_ScriptSet(result_type=script_set_type)
         if script is None and script_name is None:
             if script_set.result_type == RESULT_TYPE.COMMISSIONING:
-                script = self.make_Script(
-                    script_type=SCRIPT_TYPE.COMMISSIONING
-                )
+                script = self.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING)
             else:
                 script = self.make_Script(script_type=SCRIPT_TYPE.TESTING)
         if script is not None:
@@ -1037,18 +1017,12 @@ class Factory(maastesting.factory.Factory):
                 stderr = self.make_string().encode("utf-8")
             if result is None:
                 result = yaml.safe_dump(
-                    {
-                        "results": {
-                            self.make_name("key"): self.make_name("value")
-                        }
-                    }
+                    {"results": {self.make_name("key"): self.make_name("value")}}
                 ).encode("utf-8")
             if script_version is None and script_name is None:
                 script_version = script.script
             if started is None:
-                started = datetime.now() - timedelta(
-                    seconds=random.randint(1, 500)
-                )
+                started = datetime.now() - timedelta(seconds=random.randint(1, 500))
             if ended is None and status not in SCRIPT_STATUS_RUNNING:
                 ended = datetime.now()
         return ScriptResult.objects.create(
@@ -1148,9 +1122,7 @@ class Factory(maastesting.factory.Factory):
         if should_have_default_link_configuration:
             self.make_StaticIPAddress(
                 alloc_type=(
-                    IPADDRESS_TYPE.STICKY
-                    if ip_address
-                    else IPADDRESS_TYPE.AUTO
+                    IPADDRESS_TYPE.STICKY if ip_address else IPADDRESS_TYPE.AUTO
                 ),
                 ip=ip_address if ip_address else "",
                 subnet=subnet,
@@ -1186,9 +1158,7 @@ class Factory(maastesting.factory.Factory):
         if with_dhcp_rack_primary:
             if primary_rack is None:
                 if vlan.primary_rack is None:
-                    primary_rack = self.make_RackController(
-                        vlan=vlan, subnet=subnet
-                    )
+                    primary_rack = self.make_RackController(vlan=vlan, subnet=subnet)
                 else:
                     primary_rack = vlan.primary_rack
             vlan.primary_rack = primary_rack
@@ -1196,9 +1166,7 @@ class Factory(maastesting.factory.Factory):
         if with_dhcp_rack_secondary:
             if secondary_rack is None:
                 if vlan.secondary_rack is None:
-                    secondary_rack = self.make_RackController(
-                        vlan=vlan, subnet=subnet
-                    )
+                    secondary_rack = self.make_RackController(vlan=vlan, subnet=subnet)
                 else:
                     secondary_rack = vlan.secondary_rack
             vlan.secondary_rack = secondary_rack
@@ -1214,9 +1182,9 @@ class Factory(maastesting.factory.Factory):
     def _get_exclude_list(self, subnet):
         ip_addresses = [
             IPAddress(ip)
-            for ip in StaticIPAddress.objects.filter(
-                subnet=subnet
-            ).values_list("ip", flat=True)
+            for ip in StaticIPAddress.objects.filter(subnet=subnet).values_list(
+                "ip", flat=True
+            )
             if ip is not None
         ]
         if subnet.gateway_ip is not None:
@@ -1372,9 +1340,7 @@ class Factory(maastesting.factory.Factory):
 
     def make_KeySource(self, protocol=None, auth_id=None, auto_update=False):
         if protocol is None:
-            protocol = random.choice(
-                [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-            )
+            protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         if auth_id is None:
             auth_id = factory.make_name("auth_id")
         keysource = KeySource(
@@ -1388,9 +1354,7 @@ class Factory(maastesting.factory.Factory):
             key_string = get_data("data/test_rsa0.pub")
         if keysource is None:
             keysource = self.make_KeySource(
-                protocol=random.choice(
-                    [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-                )
+                protocol=random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
             )
         key = SSHKey(key=key_string, user=user, keysource=keysource)
         key.save()
@@ -1466,9 +1430,7 @@ class Factory(maastesting.factory.Factory):
             network = IPNetwork(cidr) if network is None else network
             gateway_ip = inet_ntop(network.first + 1)
         if dns_servers is None:
-            dns_servers = [
-                self.make_ip_address() for _ in range(random.randint(1, 3))
-            ]
+            dns_servers = [self.make_ip_address() for _ in range(random.randint(1, 3))]
         if disabled_boot_architectures is None and factory.pick_bool():
             disabled_boot_architectures = random.sample(
                 [
@@ -1612,9 +1574,7 @@ class Factory(maastesting.factory.Factory):
             hostnames = [hostname]
         if ip is None:
             ip = factory.make_ip_address()
-        rdns = RDNS(
-            hostname=hostname, hostnames=hostnames, ip=ip, observer=observer
-        )
+        rdns = RDNS(hostname=hostname, hostnames=hostnames, ip=ip, observer=observer)
         rdns.save(_updated=updated, _created=created)
         return rdns
 
@@ -1638,9 +1598,7 @@ class Factory(maastesting.factory.Factory):
         # If we search by the Neighbour ID we think we just created, there
         # might be no results, since the view might filter it.
         return get_one(
-            Discovery.objects.filter(
-                mac_address=neighbour.mac_address, ip=neighbour.ip
-            )
+            Discovery.objects.filter(mac_address=neighbour.mac_address, ip=neighbour.ip)
         )
 
     def make_Fabric(self, name=None, class_type=None):
@@ -1703,9 +1661,7 @@ class Factory(maastesting.factory.Factory):
             if rack is None:
                 continue
             if rack not in vlan.connected_rack_controllers():
-                self.make_Interface(
-                    INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan
-                )
+                self.make_Interface(INTERFACE_TYPE.PHYSICAL, node=rack, vlan=vlan)
         return vlan
 
     def make_Interface(
@@ -1811,21 +1767,13 @@ class Factory(maastesting.factory.Factory):
                 link_speed = 0
             else:
                 link_speed = random.choice(
-                    [
-                        speed
-                        for speed in link_speeds
-                        if speed <= interface_speed
-                    ]
+                    [speed for speed in link_speeds if speed <= interface_speed]
                 )
         if vendor is None:
             vendor = factory.make_name("vendor")
         if product is None:
             product = factory.make_name("product")
-        if (
-            iftype == INTERFACE_TYPE.PHYSICAL
-            and numa_node is None
-            and node.is_machine
-        ):
+        if iftype == INTERFACE_TYPE.PHYSICAL and numa_node is None and node.is_machine:
             numa_node = node_config.node.default_numanode
         interface = Interface(
             node_config=node_config,
@@ -1854,9 +1802,7 @@ class Factory(maastesting.factory.Factory):
             sip = StaticIPAddress.objects.create(
                 ip=ip,
                 alloc_type=(
-                    IPADDRESS_TYPE.DHCP
-                    if ip is None
-                    else IPADDRESS_TYPE.STICKY
+                    IPADDRESS_TYPE.DHCP if ip is None else IPADDRESS_TYPE.STICKY
                 ),
                 subnet=subnet,
             )
@@ -1885,9 +1831,7 @@ class Factory(maastesting.factory.Factory):
         alloc_type=None,
     ):
         if alloc_type is None:
-            alloc_type = (
-                IPRANGE_TYPE.RESERVED if user else IPRANGE_TYPE.DYNAMIC
-            )
+            alloc_type = IPRANGE_TYPE.RESERVED if user else IPRANGE_TYPE.DYNAMIC
 
         if subnet is None and start_ip is None and end_ip is None:
             subnet = self.make_ipv4_Subnet_with_IPRanges()
@@ -1927,9 +1871,7 @@ class Factory(maastesting.factory.Factory):
             network = IPNetwork(cidr)
             slash = network.prefixlen
         else:
-            slash = random.choice(
-                [16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28]
-            )
+            slash = random.choice([16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28])
             network = factory.make_ipv4_network(slash=slash)
         host_bits = 32 - slash
         # Use at most 25% of the subnet per range type.
@@ -2044,9 +1986,7 @@ class Factory(maastesting.factory.Factory):
             tag._populate_nodes_now()
         return tag
 
-    def make_user_with_keys(
-        self, n_keys=2, user=None, keysource=None, **kwargs
-    ):
+    def make_user_with_keys(self, n_keys=2, user=None, keysource=None, **kwargs):
         """Create a user with n `SSHKey`.  If user is not None, use this user
         instead of creating one.  If keysource is not None, use this keysource
         instaed of creating one.
@@ -2056,8 +1996,7 @@ class Factory(maastesting.factory.Factory):
         if n_keys > MAX_PUBLIC_KEYS:
             raise RuntimeError(
                 "Cannot create more than %d public keys.  If you need more: "
-                "add more keys in src/maasserver/tests/data/."
-                % MAX_PUBLIC_KEYS
+                "add more keys in src/maasserver/tests/data/." % MAX_PUBLIC_KEYS
             )
         if user is None:
             user = self.make_User(**kwargs)
@@ -2082,8 +2021,7 @@ class Factory(maastesting.factory.Factory):
         if n_keys > MAX_PUBLIC_KEYS:
             raise RuntimeError(
                 "Cannot create more than %d public keys.  If you need more: "
-                "add more keys in src/maasserver/tests/data/."
-                % MAX_PUBLIC_KEYS
+                "add more keys in src/maasserver/tests/data/." % MAX_PUBLIC_KEYS
             )
         if user is None:
             user = self.make_User(**kwargs)
@@ -2102,9 +2040,7 @@ class Factory(maastesting.factory.Factory):
             username = self.make_username()
         if email is None:
             email = self.make_email()
-        user = User.objects.create_superuser(
-            username, password=password, email=email
-        )
+        user = User.objects.create_superuser(username, password=password, email=email)
         user.userprofile.completed_intro = completed_intro
         user.userprofile.save()
         return user
@@ -2144,9 +2080,7 @@ class Factory(maastesting.factory.Factory):
             [f'{key}="{value}"' for key, value in items.items()]
         )
 
-    def make_Zone(
-        self, name=None, description=None, nodes=None, sortable_name=False
-    ):
+    def make_Zone(self, name=None, description=None, nodes=None, sortable_name=False):
         """Create a physical `Zone`.
 
         :param sortable_name: If `True`, use a that will sort consistently
@@ -2169,9 +2103,7 @@ class Factory(maastesting.factory.Factory):
 
     make_zone = make_Zone
 
-    def make_BootSource(
-        self, url=None, keyring_filename=None, keyring_data=None
-    ):
+    def make_BootSource(self, url=None, keyring_filename=None, keyring_data=None):
         """Create a new `BootSource`."""
         if url is None:
             url = "http://%s.com/" % self.make_name("source-url")
@@ -2180,9 +2112,7 @@ class Factory(maastesting.factory.Factory):
             keyring_filename = self.make_name("keyring")
         boot_source = BootSource(
             url=url,
-            keyring_filename=(
-                "" if keyring_filename is None else keyring_filename
-            ),
+            keyring_filename=("" if keyring_filename is None else keyring_filename),
             keyring_data=(b"" if keyring_data is None else keyring_data),
         )
         boot_source.save()
@@ -2256,9 +2186,7 @@ class Factory(maastesting.factory.Factory):
             arches = [self.make_name("arch") for _ in range(arch_count)]
         if subarches is None:
             subarch_count = random.randint(1, 10)
-            subarches = [
-                self.make_name("subarch") for _ in range(subarch_count)
-            ]
+            subarches = [self.make_name("subarch") for _ in range(subarch_count)]
         if labels is None:
             label_count = random.randint(1, 10)
             labels = [self.make_name("label") for _ in range(label_count)]
@@ -2273,9 +2201,7 @@ class Factory(maastesting.factory.Factory):
         boot_source_selection.save()
         return boot_source_selection
 
-    def make_LicenseKey(
-        self, osystem=None, distro_series=None, license_key=None
-    ):
+    def make_LicenseKey(self, osystem=None, distro_series=None, license_key=None):
         if osystem is None:
             osystem = factory.make_name("osystem")
         if distro_series is None:
@@ -2297,9 +2223,7 @@ class Factory(maastesting.factory.Factory):
             level = random.choice(
                 [logging.ERROR, logging.WARNING, logging.INFO, logging.DEBUG]
             )
-        return EventType.objects.create(
-            name=name, description=description, level=level
-        )
+        return EventType.objects.create(name=name, description=description, level=level)
 
     def make_Event(
         self,
@@ -2367,9 +2291,7 @@ class Factory(maastesting.factory.Factory):
         sha256 = hashlib.sha256()
         sha256.update(content)
         filehash = sha256.hexdigest()
-        filename_on_disk = BootResourceFile.objects.calculate_filename_on_disk(
-            filehash
-        )
+        filename_on_disk = BootResourceFile.objects.calculate_filename_on_disk(filehash)
         lf = LocalBootResourceFile(
             sha256=filehash, filename_on_disk=filename_on_disk, total_size=size
         )
@@ -2415,10 +2337,7 @@ class Factory(maastesting.factory.Factory):
             subarch = self.make_name("subarch")
             architecture = f"{arch}/{subarch}"
         if extra is None:
-            extra = {
-                self.make_name("key"): self.make_name("value")
-                for _ in range(3)
-            }
+            extra = {self.make_name("key"): self.make_name("value") for _ in range(3)}
 
         if "platform" in extra and platform is None:
             del extra["platform"]
@@ -2472,9 +2391,7 @@ class Factory(maastesting.factory.Factory):
         synced: Iterable[tuple[RegionController, int]] | None = None,
     ) -> BootResourceFile:
         if sha256 is None:
-            sha256 = (
-                largefile.sha256 if largefile else factory.make_hex_string(64)
-            )
+            sha256 = largefile.sha256 if largefile else factory.make_hex_string(64)
         if filename_on_disk is None:
             filename_on_disk = sha256[:7]
         if filename is None:
@@ -2482,10 +2399,7 @@ class Factory(maastesting.factory.Factory):
         if filetype is None:
             filetype = self.pick_enum(BOOT_RESOURCE_FILE_TYPE)
         if extra is None:
-            extra = {
-                self.make_name("key"): self.make_name("value")
-                for _ in range(3)
-            }
+            extra = {self.make_name("key"): self.make_name("value") for _ in range(3)}
         rfile = BootResourceFile.objects.create(
             resource_set=resource_set,
             filename=filename,
@@ -2692,12 +2606,8 @@ class Factory(maastesting.factory.Factory):
     def make_default_ubuntu_release_bootable(self, arch=None, extra=None):
         if arch is None:
             arch = "i386"  # default test node architecture
-        default_osystem = Config.objects.get_config(
-            name="commissioning_osystem"
-        )
-        default_series = Config.objects.get_config(
-            name="commissioning_distro_series"
-        )
+        default_osystem = Config.objects.get_config(name="commissioning_osystem")
+        default_series = Config.objects.get_config(name="commissioning_distro_series")
         default_name = f"{default_osystem}/{default_series}"
         if "/" not in arch:
             release = get_release_from_distro_info(default_series)
@@ -2744,9 +2654,7 @@ class Factory(maastesting.factory.Factory):
             block_size = random.choice([512, 1024, 4096])
         if size is None:
             size = round_size_to_nearest_block(
-                random.randint(
-                    MIN_BLOCK_DEVICE_SIZE * 4, MIN_BLOCK_DEVICE_SIZE * 1024
-                ),
+                random.randint(MIN_BLOCK_DEVICE_SIZE * 4, MIN_BLOCK_DEVICE_SIZE * 1024),
                 block_size,
             )
         if tags is None:
@@ -2840,9 +2748,7 @@ class Factory(maastesting.factory.Factory):
             )
         if formatted_root:
             partition = self.make_Partition(
-                partition_table=(
-                    self.make_PartitionTable(block_device=block_device)
-                )
+                partition_table=(self.make_PartitionTable(block_device=block_device))
             )
             self.make_Filesystem(mount_point="/", partition=partition)
         return block_device
@@ -2917,15 +2823,11 @@ class Factory(maastesting.factory.Factory):
             FILESYSTEM_TYPE.RAMFS,
             FILESYSTEM_TYPE.TMPFS,
         }.union(but_not)
-        return factory.pick_choice(
-            FILESYSTEM_FORMAT_TYPE_CHOICES, but_not=but_not
-        )
+        return factory.pick_choice(FILESYSTEM_FORMAT_TYPE_CHOICES, but_not=but_not)
 
     def pick_any_filesystem_type(self, but_not=()):
         """Pick any filesystem type, including swap, ramfs, or tmpfs."""
-        return factory.pick_choice(
-            FILESYSTEM_FORMAT_TYPE_CHOICES, but_not=but_not
-        )
+        return factory.pick_choice(FILESYSTEM_FORMAT_TYPE_CHOICES, but_not=but_not)
 
     def make_Filesystem(
         self,
@@ -2956,9 +2858,7 @@ class Factory(maastesting.factory.Factory):
                 if self.pick_bool():
                     partition = self.make_Partition()
                 else:
-                    block_device = self.make_PhysicalBlockDevice(
-                        size=block_device_size
-                    )
+                    block_device = self.make_PhysicalBlockDevice(size=block_device_size)
         else:
             if mount_point is None:
                 mount_point = factory.make_absolute_path()
@@ -3002,9 +2902,7 @@ class Factory(maastesting.factory.Factory):
                 block_device
             )
         else:
-            return CacheSet.objects.get_or_create_cache_set_for_partition(
-                partition
-            )
+            return CacheSet.objects.get_or_create_cache_set_for_partition(partition)
 
     def make_FilesystemGroup(
         self,
@@ -3041,9 +2939,7 @@ class Factory(maastesting.factory.Factory):
             node_config = node.current_config
             if not node.physicalblockdevice_set.exists():
                 # Add the boot disk and leave it as is.
-                self.make_PhysicalBlockDevice(
-                    node_config=node_config, bootable=True
-                )
+                self.make_PhysicalBlockDevice(node_config=node_config, bootable=True)
             if group_type == FILESYSTEM_GROUP_TYPE.LVM_VG:
                 for _ in range(num_lvm_devices):
                     block_device = self.make_PhysicalBlockDevice(
@@ -3208,9 +3104,7 @@ class Factory(maastesting.factory.Factory):
                     bmc=pod,
                     project=project,
                 )
-                self.make_VirtualMachineDisk(
-                    vm=vm, backing_pool=pool, size=disk_size
-                )
+                self.make_VirtualMachineDisk(vm=vm, backing_pool=pool, size=disk_size)
 
         return cluster
 
@@ -3400,9 +3294,7 @@ class Factory(maastesting.factory.Factory):
         if expiration is None:
             expiration = datetime.now() + timedelta(days=1)
         key = RootKey.objects.create(expiration=expiration)
-        SecretManager().set_simple_secret(
-            "material", to_hex(material), obj=key
-        )
+        SecretManager().set_simple_secret("material", to_hex(material), obj=key)
         return key
 
     def make_PodStoragePool(
@@ -3447,9 +3339,7 @@ class Factory(maastesting.factory.Factory):
             node=node, index=index, cores=cores, memory=memory
         )
 
-    def make_NUMANodeHugepages(
-        self, numa_node=None, page_size=None, total=None
-    ):
+    def make_NUMANodeHugepages(self, numa_node=None, page_size=None, total=None):
         if numa_node is None:
             numa_node = self.make_NUMANode()
         if page_size is None:
@@ -3616,14 +3506,10 @@ class Factory(maastesting.factory.Factory):
             **kwargs,
         )
 
-    def make_NodeDeviceVPD(
-        self, node_device=None, key=None, value=None, **kwargs
-    ):
+    def make_NodeDeviceVPD(self, node_device=None, key=None, value=None, **kwargs):
         if node_device is None:
             owner = get_worker_user()
-            node = self.make_Node(
-                owner=owner, node_type=NODE_TYPE.MACHINE, **kwargs
-            )
+            node = self.make_Node(owner=owner, node_type=NODE_TYPE.MACHINE, **kwargs)
             node.save()
             node_device = self.make_NodeDevice(
                 bus=NODE_DEVICE_BUS.PCIE,

@@ -105,15 +105,9 @@ class TestDiscoveriesAPI(APITestCase.ForUser):
         iface = rack.current_config.interface_set.first()
         make_discoveries(interface=iface)
         results = self.get_api_results()
-        self.assertGreaterEqual(
-            results[0]["last_seen"], results[2]["last_seen"]
-        )
-        self.assertGreaterEqual(
-            results[0]["last_seen"], results[1]["last_seen"]
-        )
-        self.assertGreaterEqual(
-            results[1]["last_seen"], results[2]["last_seen"]
-        )
+        self.assertGreaterEqual(results[0]["last_seen"], results[2]["last_seen"])
+        self.assertGreaterEqual(results[0]["last_seen"], results[1]["last_seen"])
+        self.assertGreaterEqual(results[1]["last_seen"], results[2]["last_seen"])
 
     def test_by_unknown_mac(self):
         rack = factory.make_RackController()
@@ -216,9 +210,7 @@ class TestDiscoveriesScanAPI(APITestCase.ForUser):
         )
 
     def test_scan__passes_threads(self):
-        self.post_api_results(
-            {"op": "scan", "force": "true", "threads": "3.14"}
-        )
+        self.post_api_results({"op": "scan", "force": "true", "threads": "3.14"})
         self.scan_all_rack_networks_mock.assert_called_once_with(
             scan_all=True, ping=False, slow=False, threads=3
         )
@@ -242,9 +234,7 @@ class TestDiscoveriesScanAPI(APITestCase.ForUser):
         )
 
     def test_scan__with_invalid_cidrs_fails(self):
-        response = self.post_api_response(
-            {"op": "scan", "cidr": ["x.x.x.x/y"]}
-        )
+        response = self.post_api_response({"op": "scan", "cidr": ["x.x.x.x/y"]})
         self.assertEqual(response.status_code, http.client.BAD_REQUEST)
 
     def test_scan__with_no_cidrs_does_not_call_scan_all_networks(self):
@@ -257,9 +247,7 @@ class TestDiscoveriesScanAPI(APITestCase.ForUser):
         make_discoveries(interface=iface, count=3)
         uri = get_discoveries_uri()
         response = self.client.post(uri, {"op": "clear"})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_clear_requires_parameters(self):
         self.become_admin()
@@ -314,9 +302,7 @@ class TestDiscoveriesClearByMACandIP(APITestCase.ForUser):
                 "mac": "00:01:02:03:04:05",
             },
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_clear_by_mac_and_ip_requires_parameters(self):
         self.become_admin()
@@ -383,9 +369,7 @@ class TestDiscoveryAPI(APITestCase.ForUser):
         self.assertEqual(discovery.ip, result["ip"])
         self.assertEqual(discovery.mac_address, result["mac_address"])
         self.assertEqual(discovery.hostname, result["hostname"])
-        self.assertEqual(
-            timestamp_format(discovery.last_seen), result["last_seen"]
-        )
+        self.assertEqual(timestamp_format(discovery.last_seen), result["last_seen"])
 
     def test_read_by_specifiers(self):
         rack = factory.make_RackController()
@@ -448,13 +432,9 @@ class TestInterpretsScanAllRackNetworksRPCResults(MAASTestCase):
         )
 
     def test_scan_not_started_on_at_least_one_rack(self):
-        results = make_RPCResults(
-            available=["x"], unavailable=["y", "z"], failed=[]
-        )
+        results = make_RPCResults(available=["x"], unavailable=["y", "z"], failed=[])
         result = get_scan_result_string_for_humans(results)
-        self.assertTrue(
-            result.startswith("Scanning could not be started on 2 rack")
-        )
+        self.assertTrue(result.startswith("Scanning could not be started on 2 rack"))
 
     def test_scan_in_progress(self):
         results = make_RPCResults(available=["x"], unavailable=[], failed=[])
@@ -473,13 +453,9 @@ class TestInterpretsScanAllRackNetworksRPCResults(MAASTestCase):
         )
 
     def test_failed_rack(self):
-        results = make_RPCResults(
-            available=["w"], failed=["w"], unavailable=[]
-        )
+        results = make_RPCResults(available=["w"], failed=["w"], unavailable=[])
         result = get_scan_result_string_for_humans(results)
-        self.assertTrue(
-            result.startswith("A scan was already in-progress on 1 rack")
-        )
+        self.assertTrue(result.startswith("A scan was already in-progress on 1 rack"))
 
 
 class TestScanAllRackNetworksInterpretsRPCResults(MAASServerTestCase):
@@ -521,12 +497,8 @@ class TestScanAllRackNetworksInterpretsRPCResults(MAASServerTestCase):
                 "scan_started_on": get_controller_summary(self.started),
                 "scan_failed_on": get_controller_summary(self.failed),
                 "scan_attempted_on": get_controller_summary(self.available),
-                "failed_to_connect_to": get_controller_summary(
-                    self.unavailable
-                ),
-                "rpc_call_timed_out_on": get_controller_summary(
-                    self.timed_out
-                ),
+                "failed_to_connect_to": get_controller_summary(self.unavailable),
+                "rpc_call_timed_out_on": get_controller_summary(self.timed_out),
                 "failures": get_failure_summary(self.failures),
             },
             result,
@@ -556,8 +528,7 @@ class TestScanAllRackNetworksInterpretsRPCResults(MAASServerTestCase):
             staticipaddress__interface__node_config__node__in=self.started
         )
         cidrs = [
-            IPNetwork(cidr)
-            for cidr in subnet_query.values_list("cidr", flat=True)
+            IPNetwork(cidr) for cidr in subnet_query.values_list("cidr", flat=True)
         ]
         scan_all_rack_networks(cidrs=cidrs)
         self.call_racks_sync_mock.assert_called_once_with(

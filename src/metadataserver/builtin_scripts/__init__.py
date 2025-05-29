@@ -76,15 +76,9 @@ BUILTIN_SCRIPTS = [
     ),
     BuiltinScript(name=BMC_DETECTION, filename="bmc_config.py"),
     BuiltinScript(name=RUN_MACHINE_RESOURCES, filename=RUN_MACHINE_RESOURCES),
-    BuiltinScript(
-        name=MACHINE_CONFIG_HINTS_NAME, filename=MACHINE_CONFIG_HINTS_NAME
-    ),
-    BuiltinScript(
-        name=COMMISSIONING_OUTPUT_NAME, filename=COMMISSIONING_OUTPUT_NAME
-    ),
-    BuiltinScript(
-        name=SUPPORT_INFO_OUTPUT_NAME, filename=SUPPORT_INFO_OUTPUT_NAME
-    ),
+    BuiltinScript(name=MACHINE_CONFIG_HINTS_NAME, filename=MACHINE_CONFIG_HINTS_NAME),
+    BuiltinScript(name=COMMISSIONING_OUTPUT_NAME, filename=COMMISSIONING_OUTPUT_NAME),
+    BuiltinScript(name=SUPPORT_INFO_OUTPUT_NAME, filename=SUPPORT_INFO_OUTPUT_NAME),
     BuiltinScript(name=LSHW_OUTPUT_NAME, filename=LSHW_OUTPUT_NAME),
     BuiltinScript(
         name=LIST_MODALIASES_OUTPUT_NAME,
@@ -98,9 +92,7 @@ BUILTIN_SCRIPTS = [
         name=KERNEL_CMDLINE_OUTPUT_NAME,
         filename=KERNEL_CMDLINE_OUTPUT_NAME,
     ),
-    BuiltinScript(
-        name=SERIAL_PORTS_OUTPUT_NAME, filename=SERIAL_PORTS_OUTPUT_NAME
-    ),
+    BuiltinScript(name=SERIAL_PORTS_OUTPUT_NAME, filename=SERIAL_PORTS_OUTPUT_NAME),
     BuiltinScript(name=LLDP_OUTPUT_NAME, filename="capture_lldpd.py"),
     # Testing scripts
     BuiltinScript(
@@ -150,15 +142,9 @@ BUILTIN_SCRIPTS = [
     ),
     BuiltinScript(name="memtester", filename="memtester.sh"),
     BuiltinScript(name="stress-ng-cpu-long", filename="stress-ng-cpu-long.sh"),
-    BuiltinScript(
-        name="stress-ng-cpu-short", filename="stress-ng-cpu-short.sh"
-    ),
-    BuiltinScript(
-        name="stress-ng-memory-long", filename="stress-ng-memory-long.sh"
-    ),
-    BuiltinScript(
-        name="stress-ng-memory-short", filename="stress-ng-memory-short.sh"
-    ),
+    BuiltinScript(name="stress-ng-cpu-short", filename="stress-ng-cpu-short.sh"),
+    BuiltinScript(name="stress-ng-memory-long", filename="stress-ng-memory-long.sh"),
+    BuiltinScript(name="stress-ng-memory-short", filename="stress-ng-memory-short.sh"),
     BuiltinScript(name="ntp", filename="ntp.sh"),
     BuiltinScript(
         name="badblocks",
@@ -169,9 +155,7 @@ BUILTIN_SCRIPTS = [
         name="badblocks-destructive",
         filename="badblocks.py",
         substitutes={
-            "description": (
-                "Run badblocks on a disk in read/write destructive mode."
-            )
+            "description": ("Run badblocks on a disk in read/write destructive mode.")
         },
     ),
     BuiltinScript(name="7z", filename="seven_z.py"),

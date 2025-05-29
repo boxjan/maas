@@ -60,9 +60,7 @@ class FileBackedValue:
                 if not self.path.exists():
                     return None
 
-                value = self._normalise_value(
-                    self.path.read_text(encoding="ascii")
-                )
+                value = self._normalise_value(self.path.read_text(encoding="ascii"))
                 self._value = value
             return self._value
 

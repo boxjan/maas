@@ -76,9 +76,7 @@ class TestPartitions(APITestCase.ForUser):
             block_size,
         )
         response = self.client.post(uri, {"size": size})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_create_returns_409_if_not_ready(self):
         self.become_admin()
@@ -100,9 +98,7 @@ class TestPartitions(APITestCase.ForUser):
             block_size,
         )
         response = self.client.post(uri, {"size": size})
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_create_partition(self):
         self.become_admin()
@@ -122,9 +118,7 @@ class TestPartitions(APITestCase.ForUser):
             block_size,
         )
         response = self.client.post(uri, {"size": size})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
     def test_list_partitions(self):
         device = factory.make_PhysicalBlockDevice(
@@ -139,13 +133,9 @@ class TestPartitions(APITestCase.ForUser):
         )
         uri = get_partitions_uri(device)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
-        partitions = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        partitions = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         p1 = [p for p in partitions if p["id"] == partition1.id][0]
         p2 = [p for p in partitions if p["id"] == partition2.id][0]
         self.assertEqual(partition1.size, p1["size"])
@@ -165,13 +155,9 @@ class TestPartitions(APITestCase.ForUser):
         )
         uri = get_partition_uri(partition)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
-        parsed_partition = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_partition = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(parsed_partition.get("bootable"), True)
         self.assertEqual(parsed_partition.get("id"), partition.id)
         self.assertEqual(parsed_partition.get("size"), partition.size)
@@ -193,13 +179,9 @@ class TestPartitions(APITestCase.ForUser):
         )
         uri = get_partition_uri(partition, by_name=True)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
-        parsed_partition = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_partition = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertTrue(parsed_partition["bootable"])
         self.assertEqual(partition.id, parsed_partition["id"])
         self.assertEqual(partition.size, parsed_partition["size"])
@@ -223,9 +205,7 @@ class TestPartitions(APITestCase.ForUser):
 
         uri = get_partition_uri(partition, by_name=True)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         parsed_partition = response.json()
         self.assertEqual(partition.id, parsed_partition["id"])
@@ -235,9 +215,7 @@ class TestPartitions(APITestCase.ForUser):
         partition = self.make_partition(node)
         uri = get_partition_uri(partition)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_delete_returns_409_for_not_ready_node(self):
         self.become_admin()
@@ -247,9 +225,7 @@ class TestPartitions(APITestCase.ForUser):
         partition = self.make_partition(node)
         uri = get_partition_uri(partition)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_delete_partition(self):
         self.become_admin()
@@ -259,9 +235,7 @@ class TestPartitions(APITestCase.ForUser):
         response = self.client.delete(uri)
 
         # Returns no content and a 204 status_code.
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(partition))
 
     def test_delete_renumbers_others(self):
@@ -274,9 +248,7 @@ class TestPartitions(APITestCase.ForUser):
         p3 = partition_table.add_partition(size=MIN_PARTITION_SIZE)
         uri = get_partition_uri(p1)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertEqual(reload_object(p2).index, 1)
         self.assertEqual(reload_object(p3).index, 2)
 
@@ -299,9 +271,7 @@ class TestPartitions(APITestCase.ForUser):
                 "label": "mylabel",
             },
         )
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_format_returns_403_if_ready_and_not_admin(self):
         node = factory.make_Node(status=NODE_STATUS.READY)
@@ -318,9 +288,7 @@ class TestPartitions(APITestCase.ForUser):
                 "label": "mylabel",
             },
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_format_partition_as_admin(self):
         self.become_admin()
@@ -338,12 +306,10 @@ class TestPartitions(APITestCase.ForUser):
                 "label": "mylabel",
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        filesystem = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )["filesystem"]
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        filesystem = json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
+            "filesystem"
+        ]
         self.assertEqual(fstype, filesystem["fstype"])
         self.assertEqual("mylabel", filesystem["label"])
         self.assertEqual(fs_uuid, filesystem["uuid"])
@@ -363,21 +329,17 @@ class TestPartitions(APITestCase.ForUser):
                 "label": "mylabel",
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        filesystem = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )["filesystem"]
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        filesystem = json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
+            "filesystem"
+        ]
         self.assertEqual(fstype, filesystem["fstype"])
         self.assertEqual("mylabel", filesystem["label"])
         self.assertEqual(fs_uuid, filesystem["uuid"])
 
     def test_format_missing_partition(self):
         self.become_admin()
-        node = factory.make_Node(
-            status=NODE_STATUS.READY, with_boot_disk=False
-        )
+        node = factory.make_Node(status=NODE_STATUS.READY, with_boot_disk=False)
         device = factory.make_PhysicalBlockDevice(
             node=node,
             size=(MIN_PARTITION_SIZE * 4) + PARTITION_TABLE_EXTRA_SPACE,
@@ -399,9 +361,7 @@ class TestPartitions(APITestCase.ForUser):
             },
         )
         # Fails with a NOT_FOUND status.
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_format_partition_with_invalid_parameters(self):
         self.become_admin()
@@ -432,9 +392,7 @@ class TestPartitions(APITestCase.ForUser):
         factory.make_Filesystem(partition=partition)
         uri = get_partition_uri(partition)
         response = self.client.post(uri, {"op": "unformat"})
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_unformat_returns_403_if_ready_and_not_admin(self):
         node = factory.make_Node(status=NODE_STATUS.READY)
@@ -442,9 +400,7 @@ class TestPartitions(APITestCase.ForUser):
         factory.make_Filesystem(partition=partition)
         uri = get_partition_uri(partition)
         response = self.client.post(uri, {"op": "unformat"})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_unformat_partition_as_admin(self):
         self.become_admin()
@@ -454,12 +410,8 @@ class TestPartitions(APITestCase.ForUser):
         uri = get_partition_uri(partition)
         response = self.client.post(uri, {"op": "unformat"})
         # Returns the partition without the filesystem.
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        partition = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        partition = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertIsNone(
             partition.get("filesystem"), "Partition still has a filesystem."
         )
@@ -471,12 +423,8 @@ class TestPartitions(APITestCase.ForUser):
         uri = get_partition_uri(partition)
         response = self.client.post(uri, {"op": "unformat"})
         # Returns the partition without the filesystem.
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        partition = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        partition = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertIsNone(
             partition.get("filesystem"), "Partition still has a filesystem."
         )
@@ -493,9 +441,7 @@ class TestPartitions(APITestCase.ForUser):
 
     def test_unformat_missing_partition(self):
         self.become_admin()
-        node = factory.make_Node(
-            status=NODE_STATUS.READY, with_boot_disk=False
-        )
+        node = factory.make_Node(status=NODE_STATUS.READY, with_boot_disk=False)
         device = factory.make_PhysicalBlockDevice(
             node=node,
             size=(MIN_PARTITION_SIZE * 4) + PARTITION_TABLE_EXTRA_SPACE,
@@ -508,9 +454,7 @@ class TestPartitions(APITestCase.ForUser):
         )
         response = self.client.post(uri, {"op": "unformat"})
         # Returns nothing and a NOT_FOUND status.
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_mount_returns_409_if_not_allocated_or_ready(self):
         self.become_admin()
@@ -519,44 +463,30 @@ class TestPartitions(APITestCase.ForUser):
         )
         node = factory.make_Node(status=status, owner=self.user)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = partition_table.add_partition()
         factory.make_Filesystem(partition=partition)
         uri = get_partition_uri(partition)
         mount_point = "/mnt"
-        response = self.client.post(
-            uri, {"op": "mount", "mount_point": mount_point}
-        )
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        response = self.client.post(uri, {"op": "mount", "mount_point": mount_point})
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_mount_returns_403_if_ready_and_not_admin(self):
         node = factory.make_Node(status=NODE_STATUS.READY)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = partition_table.add_partition()
         factory.make_Filesystem(partition=partition)
         uri = get_partition_uri(partition)
         mount_point = "/mnt"
-        response = self.client.post(
-            uri, {"op": "mount", "mount_point": mount_point}
-        )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        response = self.client.post(uri, {"op": "mount", "mount_point": mount_point})
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_mount_sets_mount_path_on_filesystem_as_admin(self):
         self.become_admin()
         node = factory.make_Node(status=NODE_STATUS.READY)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = partition_table.add_partition()
         filesystem = factory.make_Filesystem(partition=partition)
         uri = get_partition_uri(partition)
@@ -570,13 +500,9 @@ class TestPartitions(APITestCase.ForUser):
                 "mount_options": mount_options,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_device = response.json()
-        self.assertEqual(
-            parsed_device["filesystem"].get("mount_point"), mount_point
-        )
+        self.assertEqual(parsed_device["filesystem"].get("mount_point"), mount_point)
         self.assertEqual(
             parsed_device["filesystem"].get("mount_options"), mount_options
         )
@@ -588,13 +514,9 @@ class TestPartitions(APITestCase.ForUser):
     def test_mount_sets_mount_path_on_filesystem_as_user(self):
         node = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = partition_table.add_partition()
-        filesystem = factory.make_Filesystem(
-            partition=partition, acquired=True
-        )
+        filesystem = factory.make_Filesystem(partition=partition, acquired=True)
         uri = get_partition_uri(partition)
         mount_point = "/mnt"
         mount_options = factory.make_name("mount-options")
@@ -606,15 +528,9 @@ class TestPartitions(APITestCase.ForUser):
                 "mount_options": mount_options,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_device = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            parsed_device["filesystem"].get("mount_point"), mount_point
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_device = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual(parsed_device["filesystem"].get("mount_point"), mount_point)
         self.assertEqual(
             parsed_device["filesystem"].get("mount_options"), mount_options
         )
@@ -633,12 +549,8 @@ class TestPartitions(APITestCase.ForUser):
         self.assertEqual(
             http.client.BAD_REQUEST, response.status_code, response.content
         )
-        parsed_error = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            {"mount_point": ["This field is required."]}, parsed_error
-        )
+        parsed_error = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual({"mount_point": ["This field is required."]}, parsed_error)
 
     def test_unmount_returns_409_if_not_allocated_or_ready(self):
         self.become_admin()
@@ -650,9 +562,7 @@ class TestPartitions(APITestCase.ForUser):
         factory.make_Filesystem(partition=partition, mount_point="/mnt")
         uri = get_partition_uri(partition)
         response = self.client.post(uri, {"op": "unmount"})
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_unmount_returns_403_if_ready_and_not_admin(self):
         node = factory.make_Node(status=NODE_STATUS.READY)
@@ -660,9 +570,7 @@ class TestPartitions(APITestCase.ForUser):
         factory.make_Filesystem(partition=partition, mount_point="/mnt")
         uri = get_partition_uri(partition)
         response = self.client.post(uri, {"op": "unmount"})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_unmount_returns_400_if_not_formatted(self):
         self.become_admin()
@@ -697,21 +605,13 @@ class TestPartitions(APITestCase.ForUser):
         self.become_admin()
         node = factory.make_Node(status=NODE_STATUS.READY)
         partition = self.make_partition(node)
-        filesystem = factory.make_Filesystem(
-            partition=partition, mount_point="/mnt"
-        )
+        filesystem = factory.make_Filesystem(partition=partition, mount_point="/mnt")
         uri = get_partition_uri(partition)
         response = self.client.post(uri, {"op": "unmount"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_device = response.json()
-        self.assertIsNone(
-            parsed_device["filesystem"].get("mount_point", object())
-        )
-        self.assertIsNone(
-            parsed_device["filesystem"].get("mount_options", object())
-        )
+        self.assertIsNone(parsed_device["filesystem"].get("mount_point", object()))
+        self.assertIsNone(parsed_device["filesystem"].get("mount_options", object()))
         fs = reload_object(filesystem)
         self.assertIsNone(fs.mount_point)
         self.assertIsNone(fs.mount_options)
@@ -725,16 +625,10 @@ class TestPartitions(APITestCase.ForUser):
         )
         uri = get_partition_uri(partition)
         response = self.client.post(uri, {"op": "unmount"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_device = response.json()
-        self.assertIsNone(
-            parsed_device["filesystem"].get("mount_point", object())
-        )
-        self.assertIsNone(
-            parsed_device["filesystem"].get("mount_options", object())
-        )
+        self.assertIsNone(parsed_device["filesystem"].get("mount_point", object()))
+        self.assertIsNone(parsed_device["filesystem"].get("mount_options", object()))
         fs = reload_object(filesystem)
         self.assertIsNone(fs.mount_point)
         self.assertIsNone(fs.mount_options)
@@ -747,9 +641,7 @@ class TestPartitions(APITestCase.ForUser):
         response = self.client.post(
             uri, {"op": "add_tag", "tag": factory.make_name("tag")}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_add_tag_to_partition(self):
         self.become_admin()
@@ -757,13 +649,9 @@ class TestPartitions(APITestCase.ForUser):
         partition = self.make_partition(node)
         uri = get_partition_uri(partition)
         tag_to_be_added = factory.make_name("tag")
-        response = self.client.post(
-            uri, {"op": "add_tag", "tag": tag_to_be_added}
-        )
+        response = self.client.post(uri, {"op": "add_tag", "tag": tag_to_be_added})
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_partition = json_load_bytes(response.content)
         self.assertIn(tag_to_be_added, parsed_partition["tags"])
         partition = reload_object(partition)
@@ -777,9 +665,7 @@ class TestPartitions(APITestCase.ForUser):
             uri, {"op": "remove_tag", "tag": factory.make_name("tag")}
         )
 
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_remove_tag_from_block_device(self):
         self.become_admin()
@@ -787,13 +673,9 @@ class TestPartitions(APITestCase.ForUser):
         partition = self.make_partition(node)
         uri = get_partition_uri(partition)
         tag_to_be_removed = partition.tags[0]
-        response = self.client.post(
-            uri, {"op": "remove_tag", "tag": tag_to_be_removed}
-        )
+        response = self.client.post(uri, {"op": "remove_tag", "tag": tag_to_be_removed})
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_partition = json_load_bytes(response.content)
         self.assertNotIn(tag_to_be_removed, parsed_partition["tags"])
         partition = reload_object(partition)

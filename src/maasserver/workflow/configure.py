@@ -45,9 +45,7 @@ class GetRegionControllerEndpointsResult:
 
 class ConfigureAgentActivity(ActivityBase):
     @activity.defn(name="get-rack-controller-vlans")
-    async def get_rack_controller_vlans(
-        self, input: GetRackControllerVLANsInput
-    ):
+    async def get_rack_controller_vlans(self, input: GetRackControllerVLANsInput):
         async with self.start_transaction() as tx:
             stmt = (
                 select(
@@ -65,8 +63,7 @@ class ConfigureAgentActivity(ActivityBase):
                 )
                 .join(
                     InterfaceIPAddressTable,
-                    InterfaceTable.c.id
-                    == InterfaceIPAddressTable.c.interface_id,
+                    InterfaceTable.c.id == InterfaceIPAddressTable.c.interface_id,
                     isouter=True,
                 )
                 .join(
@@ -91,16 +88,13 @@ class ConfigureAgentActivity(ActivityBase):
                     NodeTable.c.system_id == input.system_id,
                     or_(
                         NodeTable.c.node_type == NODE_TYPE.RACK_CONTROLLER,
-                        NodeTable.c.node_type
-                        == NODE_TYPE.REGION_AND_RACK_CONTROLLER,
+                        NodeTable.c.node_type == NODE_TYPE.REGION_AND_RACK_CONTROLLER,
                     ),
                 )
             )
             result = (await tx.execute(stmt)).all()
             if result:
-                return GetRackControllerVLANsResult(
-                    [vlan_id[0] for vlan_id in result]
-                )
+                return GetRackControllerVLANsResult([vlan_id[0] for vlan_id in result])
             return GetRackControllerVLANsResult([])
 
     @activity.defn(name="get-region-controller-endpoints")
@@ -122,8 +116,7 @@ class ConfigureAgentActivity(ActivityBase):
                 )
                 .join(
                     InterfaceIPAddressTable,
-                    InterfaceTable.c.id
-                    == InterfaceIPAddressTable.c.interface_id,
+                    InterfaceTable.c.id == InterfaceIPAddressTable.c.interface_id,
                 )
                 .join(
                     StaticIPAddressTable,
@@ -137,8 +130,7 @@ class ConfigureAgentActivity(ActivityBase):
                 .filter(
                     or_(
                         NodeTable.c.node_type == NODE_TYPE.REGION_CONTROLLER,
-                        NodeTable.c.node_type
-                        == NODE_TYPE.REGION_AND_RACK_CONTROLLER,
+                        NodeTable.c.node_type == NODE_TYPE.REGION_AND_RACK_CONTROLLER,
                     ),
                 )
             )

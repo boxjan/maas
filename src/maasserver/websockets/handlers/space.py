@@ -36,10 +36,7 @@ class SpaceHandler(TimestampedModelHandler):
         data["vlan_ids"] = sorted(vlan.id for vlan in vlans)
         data["subnet_ids"] = sorted(
             itertools.chain(
-                *[
-                    [subnet.id for subnet in vlan.subnet_set.all()]
-                    for vlan in vlans
-                ]
+                *[[subnet.id for subnet in vlan.subnet_set.all()] for vlan in vlans]
             )
         )
         return data
@@ -47,7 +44,5 @@ class SpaceHandler(TimestampedModelHandler):
     def delete(self, parameters):
         """Delete this Space."""
         space = self.get_object(parameters)
-        assert self.user.has_perm(
-            NodePermission.admin, space
-        ), "Permission denied."
+        assert self.user.has_perm(NodePermission.admin, space), "Permission denied."
         space.delete()

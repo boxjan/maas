@@ -161,9 +161,7 @@ class CaptureStandardIO(fixtures.Fixture):
         self.patcher.patch()
 
     def _wrapStream(self, stream):
-        return TextIOWrapper(
-            stream, encoding=self.encoding, write_through=True
-        )
+        return TextIOWrapper(stream, encoding=self.encoding, write_through=True)
 
     def _addStream(self, name, stream):
         self.patcher.add_patch(self, name, stream)
@@ -270,9 +268,7 @@ class DetectLeakedFileDescriptors(fixtures.Fixture):
 
         if len(fds_new) != 0:
             message = ["File descriptor(s) leaked:"]
-            message.extend(
-                f"* {fd} --> {desc}" for (fd, desc) in fds_new.items()
-            )
+            message.extend(f"* {fd} --> {desc}" for (fd, desc) in fds_new.items())
             raise AssertionError("\n".join(message))
 
 

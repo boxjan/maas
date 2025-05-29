@@ -28,9 +28,7 @@ class TestMachineWithMACAddressesForm(MAASServerTestCase):
                 query_dict[k] = v
         return query_dict
 
-    def make_params(
-        self, mac_addresses=None, architecture=None, hostname=None
-    ):
+    def make_params(self, mac_addresses=None, architecture=None, hostname=None):
         if mac_addresses is None:
             mac_addresses = [factory.make_mac_address()]
         if architecture is None:
@@ -113,9 +111,7 @@ class TestMachineWithMACAddressesForm(MAASServerTestCase):
         )
 
     def test_mac_in_use_on_current_node_passes(self):
-        node = factory.make_Node_with_Interface_on_Subnet(
-            address="aa:bb:cc:dd:ee:ff"
-        )
+        node = factory.make_Node_with_Interface_on_Subnet(address="aa:bb:cc:dd:ee:ff")
         architecture = make_usable_architecture(self)
         form = MachineWithMACAddressesForm(
             data=self.make_params(
@@ -148,9 +144,7 @@ class TestMachineWithMACAddressesForm(MAASServerTestCase):
         self.assertIn("mac_addresses", dict(form.errors))
 
     def test_with_mac_in_use_on_uknown_interface_passes(self):
-        factory.make_Interface(
-            INTERFACE_TYPE.UNKNOWN, mac_address="aa:bb:cc:dd:ee:ff"
-        )
+        factory.make_Interface(INTERFACE_TYPE.UNKNOWN, mac_address="aa:bb:cc:dd:ee:ff")
         architecture = make_usable_architecture(self)
         form = MachineWithMACAddressesForm(
             data=self.make_params(
@@ -169,23 +163,17 @@ class TestMachineWithMACAddressesForm(MAASServerTestCase):
     def test_empty(self):
         # Empty values in the list of MAC addresses are simply ignored.
         form = MachineWithMACAddressesForm(
-            data=self.make_params(
-                mac_addresses=[factory.make_mac_address(), ""]
-            )
+            data=self.make_params(mac_addresses=[factory.make_mac_address(), ""])
         )
 
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_mac_address_is_required(self):
-        form = MachineWithMACAddressesForm(
-            data=self.make_params(mac_addresses=[])
-        )
+        form = MachineWithMACAddressesForm(data=self.make_params(mac_addresses=[]))
 
         self.assertFalse(form.is_valid())
         self.assertEqual(["mac_addresses"], list(form.errors))
-        self.assertEqual(
-            ["This field is required."], form.errors["mac_addresses"]
-        )
+        self.assertEqual(["This field is required."], form.errors["mac_addresses"])
 
     def test_no_architecture_or_mac_addresses_is_ok_for_ipmi(self):
         # No architecture or MAC addresses is okay for IPMI power types.
@@ -204,9 +192,7 @@ class TestMachineWithMACAddressesForm(MAASServerTestCase):
 
     def test_save(self):
         macs = ["aa:bb:cc:dd:ee:ff", "9a:bb:c3:33:e5:7f"]
-        form = MachineWithMACAddressesForm(
-            data=self.make_params(mac_addresses=macs)
-        )
+        form = MachineWithMACAddressesForm(data=self.make_params(mac_addresses=macs))
         self.assertTrue(form.is_valid(), form.errors)
         node = form.save()
 
@@ -214,10 +200,7 @@ class TestMachineWithMACAddressesForm(MAASServerTestCase):
         self.assertEqual(NODE_STATUS.NEW, node.status)
         self.assertCountEqual(
             macs,
-            [
-                nic.mac_address
-                for nic in node.current_config.interface_set.all()
-            ],
+            [nic.mac_address for nic in node.current_config.interface_set.all()],
         )
 
     def test_form_without_hostname_generates_hostname(self):

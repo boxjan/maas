@@ -111,9 +111,7 @@ def _parse_key_value_pairs(kvps, exception_type=ValueError):
     for kvp in kvps:
         tokens = kvp.split("=", 1)
         if len(tokens) != 2:
-            raise exception_type(
-                "Malformed key/value pair in constraint: '%s'" % kvp
-            )
+            raise exception_type("Malformed key/value pair in constraint: '%s'" % kvp)
         key, value = tokens
         value_list = key_value_pairs.get(key, [])
         value_list.append(value)

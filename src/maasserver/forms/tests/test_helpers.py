@@ -53,8 +53,7 @@ class TestHelpers(MAASServerTestCase):
 
     def test_list_all_usable_architectures_combines(self):
         arches = [
-            (factory.make_name("arch"), factory.make_name("subarch"))
-            for _ in range(3)
+            (factory.make_name("arch"), factory.make_name("subarch")) for _ in range(3)
         ]
         expected = []
         for arch, subarch in arches:
@@ -65,8 +64,7 @@ class TestHelpers(MAASServerTestCase):
 
     def test_list_all_usable_architectures_sorts_output(self):
         arches = [
-            (factory.make_name("arch"), factory.make_name("subarch"))
-            for _ in range(3)
+            (factory.make_name("arch"), factory.make_name("subarch")) for _ in range(3)
         ]
         expected = []
         for arch, subarch in arches:

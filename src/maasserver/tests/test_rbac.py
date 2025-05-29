@@ -31,9 +31,7 @@ from maastesting.djangotestcase import count_queries
 class TestRBACClient(MAASServerTestCase):
     def setUp(self):
         super().setUp()
-        key = PrivateKey.deserialize(
-            "x0NeASLPFhOFfq3Q9M0joMveI4HjGwEuJ9dtX/HTSRY="
-        )
+        key = PrivateKey.deserialize("x0NeASLPFhOFfq3Q9M0joMveI4HjGwEuJ9dtX/HTSRY=")
         agent = Agent(url="https://auth.example.com", username="user@candid")
         auth_info = AuthInfo(key=key, agents=[agent])
         url = "https://rbac.example.com/"
@@ -55,9 +53,7 @@ class TestRBACClient(MAASServerTestCase):
         self.assertEqual(client._url, "https://rbac.example.com")
         self.assertEqual(
             client._auth_info.key,
-            PrivateKey.deserialize(
-                "x0NeASLPFhOFfq3Q9M0joMveI4HjGwEuJ9dtX/HTSRY="
-            ),
+            PrivateKey.deserialize("x0NeASLPFhOFfq3Q9M0joMveI4HjGwEuJ9dtX/HTSRY="),
         )
         [agent] = client._auth_info.agents
         self.assertEqual(agent.url, "https://auth.example.com")
@@ -100,8 +96,7 @@ class TestRBACClient(MAASServerTestCase):
         )
         self.mock_request.assert_called_once_with(
             "GET",
-            "https://rbac.example.com/api/"
-            "service/v1/resources/resource-pool",
+            "https://rbac.example.com/api/" "service/v1/resources/resource-pool",
             auth=mock.ANY,
             cookies=mock.ANY,
             json=None,
@@ -133,8 +128,7 @@ class TestRBACClient(MAASServerTestCase):
         self.assertEqual(sync_id, "x-y-z")
         self.mock_request.assert_called_once_with(
             "POST",
-            "https://rbac.example.com/api/"
-            "service/v1/resources/resource-pool",
+            "https://rbac.example.com/api/" "service/v1/resources/resource-pool",
             auth=mock.ANY,
             cookies=mock.ANY,
             json=json,
@@ -164,8 +158,7 @@ class TestRBACClient(MAASServerTestCase):
         self.assertEqual(sync_id, "x-y-z")
         self.mock_request.assert_called_once_with(
             "POST",
-            "https://rbac.example.com/api/"
-            "service/v1/resources/resource-pool",
+            "https://rbac.example.com/api/" "service/v1/resources/resource-pool",
             auth=mock.ANY,
             cookies=mock.ANY,
             json=json,
@@ -555,9 +548,7 @@ class TestRBACUserClient(MAASServerTestCase):
             maas2,
         ]
         self.mock_responses(products, services)
-        self.assertEqual(
-            self.client.get_registerable_services(), [maas1, maas2]
-        )
+        self.assertEqual(self.client.get_registerable_services(), [maas1, maas2])
         self.mock_request.assert_any_call(
             "GET",
             "https://rbac.example.com/api/rbac/v1/product",
@@ -578,9 +569,7 @@ class TestRBACUserClient(MAASServerTestCase):
         response = {"url": self.url, "username": "a-123"}
         self.mock_responses(response)
         self.assertEqual(
-            self.client.register_service(
-                "/api/rbac/v1/service/3", "dead-beef"
-            ),
+            self.client.register_service("/api/rbac/v1/service/3", "dead-beef"),
             response,
         )
         json = {"public-key": "dead-beef"}
@@ -593,9 +582,7 @@ class TestRBACUserClient(MAASServerTestCase):
         )
 
     def test_create_service(self):
-        products = [
-            {"$uri": "/api/rbac/v1/product/1", "label": "maas", "name": "MAAS"}
-        ]
+        products = [{"$uri": "/api/rbac/v1/product/1", "label": "maas", "name": "MAAS"}]
         maas = {
             "$uri": "/api/rbac/v1/service/2",
             "name": "maas",

@@ -51,15 +51,11 @@ def bind_freeze_zone(zone=None, timeout=2):
     try:
         execute_rndc_command(cmd, timeout=timeout)
     except CalledProcessError as e:
-        maaslog.error(
-            f"Freezing {zone if zone else 'all zones'} for update failed"
-        )
+        maaslog.error(f"Freezing {zone if zone else 'all zones'} for update failed")
         ExternalProcessError.upgrade(e)
         raise
     except TimeoutExpired as e:
-        maaslog.error(
-            f"Freezing {zone if zone else 'all zones'} for update timed out"
-        )
+        maaslog.error(f"Freezing {zone if zone else 'all zones'} for update timed out")
         ExternalProcessError.upgrade(e)
         raise
 
@@ -72,15 +68,11 @@ def bind_thaw_zone(zone=None, timeout=2):
     try:
         execute_rndc_command(cmd, timeout=timeout)
     except CalledProcessError as e:
-        maaslog.error(
-            f"Thawing {zone if zone else 'all zones'} for update failed"
-        )
+        maaslog.error(f"Thawing {zone if zone else 'all zones'} for update failed")
         ExternalProcessError.upgrade(e)
         raise
     except TimeoutExpired as e:
-        maaslog.error(
-            f"Thawing {zone if zone else 'all zones'} for update timed out"
-        )
+        maaslog.error(f"Thawing {zone if zone else 'all zones'} for update timed out")
         ExternalProcessError.upgrade(e)
         raise
 
@@ -181,9 +173,7 @@ def bind_write_options(upstream_dns, dnssec_validation):
     assert not isinstance(upstream_dns, (bytes, str))
     assert isinstance(upstream_dns, Sequence)
 
-    set_up_options_conf(
-        upstream_dns=upstream_dns, dnssec_validation=dnssec_validation
-    )
+    set_up_options_conf(upstream_dns=upstream_dns, dnssec_validation=dnssec_validation)
 
 
 def bind_write_zones(zones):
@@ -213,9 +203,7 @@ class NSUpdateCommand:
         ttl = update.ttl
         if ttl is None:
             ttl = self._zone_ttl
-        return (
-            f"update add {update.name} {ttl} {update.rectype} {update.answer}"
-        )
+        return f"update add {update.name} {ttl} {update.rectype} {update.answer}"
 
     def update(self, server_address=MAAS_NSUPDATE_HOST):
         stdin = [f"zone {self._zone}"] + [

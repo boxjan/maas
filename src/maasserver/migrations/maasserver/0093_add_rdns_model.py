@@ -25,9 +25,7 @@ class Migration(migrations.Migration):
                 ("updated", models.DateTimeField(editable=False)),
                 (
                     "ip",
-                    models.GenericIPAddressField(
-                        editable=False, verbose_name="IP"
-                    ),
+                    models.GenericIPAddressField(editable=False, verbose_name="IP"),
                 ),
                 ("hostname", models.CharField(max_length=256, null=True)),
                 ("hostnames", maasserver.migrations.fields.JSONObjectField()),

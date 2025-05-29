@@ -18,8 +18,7 @@ class TestRBACSync(MAASServerTestCase):
     def test_changes(self):
         resource_type = "resource-pool"
         synced = [
-            RBACSync.objects.create(resource_type=resource_type)
-            for _ in range(3)
+            RBACSync.objects.create(resource_type=resource_type) for _ in range(3)
         ] + [RBACSync.objects.create(resource_type="")]
         self.assertEqual(synced, RBACSync.objects.changes(resource_type))
 

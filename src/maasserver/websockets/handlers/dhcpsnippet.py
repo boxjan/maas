@@ -119,9 +119,7 @@ class DHCPSnippetHandler(TimestampedModelHandler):
         try:
             revert_to = int(revert_to)
         except ValueError:
-            raise HandlerValidationError(
-                "%s is an invalid 'to' value" % revert_to
-            )
+            raise HandlerValidationError("%s is an invalid 'to' value" % revert_to)
         try:
 
             def gc_hook(value):

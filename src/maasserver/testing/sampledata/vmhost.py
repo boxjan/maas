@@ -13,9 +13,7 @@ def make_vmhosts(count: int):
         power_type = next(power_types)
         hostname = make_name()
         if power_type == "virsh":
-            power_parameters = {
-                "power_address": f"qemu+ssh://{hostname}/system"
-            }
+            power_parameters = {"power_address": f"qemu+ssh://{hostname}/system"}
         else:
             power_parameters = {
                 "power_address": f"{hostname}:8443",

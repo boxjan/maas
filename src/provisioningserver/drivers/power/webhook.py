@@ -40,12 +40,8 @@ class WebhookPowerDriver(PowerDriver):
     can_set_boot_order = False
     description = "Webhook"
     settings = [
-        make_setting_field(
-            "power_on_uri", "URI to power on the node", required=True
-        ),
-        make_setting_field(
-            "power_off_uri", "URI to power off the node", required=True
-        ),
+        make_setting_field("power_on_uri", "URI to power on the node", required=True),
+        make_setting_field("power_off_uri", "URI to power off the node", required=True),
         make_setting_field(
             "power_query_uri",
             "URI to query the nodes power status",
@@ -84,9 +80,7 @@ class WebhookPowerDriver(PowerDriver):
     ]
 
     # Use the power_query_uri as that is the URL MAAS uses the most.
-    ip_extractor = make_ip_extractor(
-        "power_query_uri", IP_EXTRACTOR_PATTERNS.URL
-    )
+    ip_extractor = make_ip_extractor("power_query_uri", IP_EXTRACTOR_PATTERNS.URL)
 
     def _make_auth_headers(self, system_id, context, extra_headers=None):
         """Return authentication headers."""
@@ -112,8 +106,7 @@ class WebhookPowerDriver(PowerDriver):
         elif power_user and power_pass:
             # Base64 encoded per RFC7617
             headers[b"Authorization"] = [
-                b"Basic "
-                + base64.b64encode(f"{power_user}:{power_pass}".encode())
+                b"Basic " + base64.b64encode(f"{power_user}:{power_pass}".encode())
             ]
         return Headers(headers)
 
@@ -214,10 +207,7 @@ class WebhookPowerDriver(PowerDriver):
         node_data = node_data.decode()
         if power_on_regex and re.search(power_on_regex, node_data) is not None:
             return "on"
-        elif (
-            power_off_regex
-            and re.search(power_off_regex, node_data) is not None
-        ):
+        elif power_off_regex and re.search(power_off_regex, node_data) is not None:
             return "off"
         else:
             return "unknown"

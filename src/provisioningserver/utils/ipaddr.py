@@ -124,9 +124,7 @@ def _update_interface_type(interfaces, sys_class_net=Path("/sys/class/net")):
         details["type"] = get_interface_type(name, details)
 
 
-def _annotate_with_proc_net_bonding_original_macs(
-    interfaces, proc_net="/proc/net"
-):
+def _annotate_with_proc_net_bonding_original_macs(interfaces, proc_net="/proc/net"):
     """Repairs the MAC addresses of bond members in the specified structure.
 
     Given the specified interfaces structure, uses the data in
@@ -140,9 +138,7 @@ def _annotate_with_proc_net_bonding_original_macs(
     if os.path.isdir(proc_net_bonding):
         bonds = os.listdir(proc_net_bonding)
         for bond in bonds:
-            parent_macs = _parse_proc_net_bonding(
-                os.path.join(proc_net_bonding, bond)
-            )
+            parent_macs = _parse_proc_net_bonding(os.path.join(proc_net_bonding, bond))
             for interface in parent_macs:
                 if interface in interfaces:
                     interfaces[interface]["mac"] = parent_macs[interface]

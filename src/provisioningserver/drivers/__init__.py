@@ -173,9 +173,7 @@ def make_setting_field(
 
 
 class Architecture:
-    def __init__(
-        self, name, description, pxealiases=None, kernel_options=None
-    ):
+    def __init__(self, name, description, pxealiases=None, kernel_options=None):
         """Represents an architecture in the driver context.
 
         :param name: The architecture name as used in MAAS.
@@ -210,9 +208,7 @@ class ArchitectureRegistry(Registry):
 builtin_architectures = [
     Architecture(name="i386/generic", description="i386"),
     Architecture(name="amd64/generic", description="amd64"),
-    Architecture(
-        name="arm64/generic", description="arm64/generic", pxealiases=["arm"]
-    ),
+    Architecture(name="arm64/generic", description="arm64/generic", pxealiases=["arm"]),
     Architecture(
         name="arm64/xgene-uboot",
         description="arm64/xgene-uboot",

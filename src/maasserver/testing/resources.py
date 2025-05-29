@@ -33,8 +33,7 @@ else:
     def debug(message, **args):
         """Write a debug message to stderr, delimiting for visibility."""
         args = {
-            name: value() if callable(value) else value
-            for name, value in args.items()
+            name: value() if callable(value) else value for name, value in args.items()
         }
         print(
             "<< " + message.format(**args) + " >>",
@@ -221,9 +220,7 @@ class DjangoDatabasesManager(TestResourceManager):
 
     resources = (("templates", DjangoPristineDatabaseManager()),)
 
-    DB_NAME_REGEX = re.compile(
-        r"^(?P<template>.+)_(?P<pid>\d+)_(?P<suffix>\d+)$"
-    )
+    DB_NAME_REGEX = re.compile(r"^(?P<template>.+)_(?P<pid>\d+)_(?P<suffix>\d+)$")
 
     def __init__(self, assume_dirty=True):
         super().__init__()

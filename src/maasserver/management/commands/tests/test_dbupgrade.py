@@ -30,9 +30,7 @@ def get_plpgsql_function_names(conn):
 
 def create_trigger_to_delete(conn, namespace):
     with closing(conn.cursor()) as cursor:
-        cursor.execute(
-            "CREATE TABLE %s__test_table(id integer NOT NULL);" % namespace
-        )
+        cursor.execute("CREATE TABLE %s__test_table(id integer NOT NULL);" % namespace)
         cursor.execute(
             "CREATE FUNCTION test_table_procedure() "
             "RETURNS trigger AS $$ "

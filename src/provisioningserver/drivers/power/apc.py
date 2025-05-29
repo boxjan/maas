@@ -125,8 +125,7 @@ class APCPowerDriver(PowerDriver):
             return "on"
         else:
             raise PowerActionError(
-                "APC Power Driver retrieved unknown power state: %r"
-                % power_state
+                "APC Power Driver retrieved unknown power state: %r" % power_state
             )
 
 

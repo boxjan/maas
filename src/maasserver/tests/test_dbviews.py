@@ -72,12 +72,8 @@ class TestRoutablePairs(MAASServerTestCase):
         vlan = factory.make_VLAN()
         network1 = factory.make_ip4_or_6_network()
         network2 = factory.make_ip4_or_6_network(version=network1.version)
-        node1, if1, sn1, sip1 = self.make_node_with_address(
-            network1, vlan=vlan
-        )
-        node2, if2, sn2, sip2 = self.make_node_with_address(
-            network2, vlan=vlan
-        )
+        node1, if1, sn1, sip1 = self.make_node_with_address(network1, vlan=vlan)
+        node2, if2, sn2, sip2 = self.make_node_with_address(network2, vlan=vlan)
 
         # Routes between all addresses are found, even back to themselves.
         left = node1.id, if1.id, sn1.id, sn1.vlan.id, sip1.ip

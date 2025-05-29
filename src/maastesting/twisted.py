@@ -73,9 +73,7 @@ class TwistedLoggerFixture(Fixture):
         *legacy* log machinery, which may or may not differ from the modern
         machinery.
         """
-        return "\n---\n".join(
-            log.textFromEventDict(event) for event in self.events
-        )
+        return "\n---\n".join(log.textFromEventDict(event) for event in self.events)
 
     # For compatibility with fixtures.FakeLogger.
     output = property(dump)

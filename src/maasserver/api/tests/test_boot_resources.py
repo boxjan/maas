@@ -86,9 +86,7 @@ class TestHelpers(APITestCase.ForUser):
         self.assertEqual(resource_set.label, dict_representation["label"])
         self.assertEqual(resource_set.total_size, dict_representation["size"])
         self.assertFalse(dict_representation["complete"])
-        self.assertEqual(
-            resource_set.sync_progress, dict_representation["progress"]
-        )
+        self.assertEqual(resource_set.sync_progress, dict_representation["progress"])
         self.assertEqual(
             boot_resource_file_to_dict(rfile),
             dict_representation["files"][rfile.filename],
@@ -104,9 +102,7 @@ class TestHelpers(APITestCase.ForUser):
             dict_representation["type"],
         )
         self.assertEqual(resource.name, dict_representation["name"])
-        self.assertEqual(
-            resource.architecture, dict_representation["architecture"]
-        )
+        self.assertEqual(resource.architecture, dict_representation["architecture"])
         self.assertEqual(
             get_boot_resource_uri(resource),
             dict_representation["resource_uri"],
@@ -141,9 +137,7 @@ class TestHelpers(APITestCase.ForUser):
         self.assertEqual(workflow, "sync-bootresources")
         self.assertEqual(wid, f"sync-boot-resources:upload:{bootres_file.id}")
         self.assertCountEqual(params.resources[0].rfile_ids, [bootres_file.id])
-        self.assertEqual(
-            exec_mock.call_args.kwargs["task_queue"], REGION_TASK_QUEUE
-        )
+        self.assertEqual(exec_mock.call_args.kwargs["task_queue"], REGION_TASK_QUEUE)
 
 
 class TestBootResourcesAPI(APITestCase.ForUser):
@@ -162,9 +156,7 @@ class TestBootResourcesAPI(APITestCase.ForUser):
     def test_GET_returns_boot_resources_list(self):
         resources = [factory.make_BootResource() for _ in range(3)]
         response = self.client.get(reverse("boot_resources_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertCountEqual(
             [resource.id for resource in resources],
@@ -173,16 +165,13 @@ class TestBootResourcesAPI(APITestCase.ForUser):
 
     def test_GET_synced_returns_synced_boot_resources(self):
         resources = [
-            factory.make_BootResource(rtype=BOOT_RESOURCE_TYPE.SYNCED)
-            for _ in range(3)
+            factory.make_BootResource(rtype=BOOT_RESOURCE_TYPE.SYNCED) for _ in range(3)
         ]
         factory.make_BootResource(rtype=BOOT_RESOURCE_TYPE.UPLOADED)
         response = self.client.get(
             reverse("boot_resources_handler"), {"type": "synced"}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertCountEqual(
             [resource.id for resource in resources],
@@ -198,9 +187,7 @@ class TestBootResourcesAPI(APITestCase.ForUser):
         response = self.client.get(
             reverse("boot_resources_handler"), {"type": "uploaded"}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertCountEqual(
             [resource.id for resource in resources],
@@ -210,9 +197,7 @@ class TestBootResourcesAPI(APITestCase.ForUser):
     def test_GET_doesnt_include_full_definition_of_boot_resource(self):
         factory.make_BootResource()
         response = self.client.get(reverse("boot_resources_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertNotIn("sets", parsed_result[0])
 
@@ -403,9 +388,7 @@ class TestBootResourcesAPI(APITestCase.ForUser):
         mock_filestore.assert_not_called()
 
     def test_import_requires_admin(self):
-        response = self.client.post(
-            reverse("boot_resources_handler"), {"op": "import"}
-        )
+        response = self.client.post(reverse("boot_resources_handler"), {"op": "import"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_stop_import_requires_admin(self):
@@ -424,17 +407,13 @@ class TestBootResourcesAPI(APITestCase.ForUser):
         mock_stop.assert_called_once_with()
 
     def test_is_importing_returns_import_status(self):
-        mock_running = self.patch(
-            boot_resources, "is_import_resources_running"
-        )
+        mock_running = self.patch(boot_resources, "is_import_resources_running")
         mock_running.return_value = factory.pick_bool()
         response = self.client.get(
             reverse("boot_resources_handler"), {"op": "is_importing"}
         )
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            mock_running.return_value, json_load_bytes(response.content)
-        )
+        self.assertEqual(mock_running.return_value, json_load_bytes(response.content))
 
 
 class TestBootResourceAPI(APITestCase.ForUser):
@@ -527,9 +506,7 @@ class TestBootResourceFileUploadAPI(APITestCase.ForUser):
         response = self.client.put(
             self.get_boot_resource_file_upload_uri(rfile), data=content
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(content, self.read_content(rfile))
         mock_filestore.assert_called_once()
 
@@ -538,37 +515,27 @@ class TestBootResourceFileUploadAPI(APITestCase.ForUser):
         response = self.client.put(
             self.get_boot_resource_file_upload_uri(rfile), data=content
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_PUT_returns_bad_request_when_no_content(self):
         self.become_admin()
         rfile, _ = self.make_empty_resource_file()
-        response = self.client.put(
-            self.get_boot_resource_file_upload_uri(rfile)
-        )
+        response = self.client.put(self.get_boot_resource_file_upload_uri(rfile))
         self.assertEqual(
             http.client.BAD_REQUEST, response.status_code, response.content
         )
 
     def test_PUT_returns_forbidden_when_resource_is_synced(self):
         self.become_admin()
-        rfile, content = self.make_empty_resource_file(
-            BOOT_RESOURCE_TYPE.SYNCED
-        )
+        rfile, content = self.make_empty_resource_file(BOOT_RESOURCE_TYPE.SYNCED)
         response = self.client.put(
             self.get_boot_resource_file_upload_uri(rfile), data=content
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_PUT_returns_bad_request_when_resource_file_is_complete(self):
         self.become_admin()
-        rfile, content = self.make_empty_resource_file(
-            synced=[(self.region, -1)]
-        )
+        rfile, content = self.make_empty_resource_file(synced=[(self.region, -1)])
 
         response = self.client.put(
             self.get_boot_resource_file_upload_uri(rfile), data=content
@@ -612,8 +579,6 @@ class TestBootResourceFileUploadAPI(APITestCase.ForUser):
                 self.get_boot_resource_file_upload_uri(rfile),
                 data=send_content,
             )
-            self.assertEqual(
-                http.client.OK, response.status_code, response.content
-            )
+            self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(content, self.read_content(rfile))
         mock_filestore.assert_called_once()

@@ -16,7 +16,5 @@ class Migration(migrations.Migration):
             WHERE (type = 'physical')
             """
         ),
-        migrations.RunSQL(
-            "DROP INDEX maasserver_interface_type_mac_address_idx"
-        ),
+        migrations.RunSQL("DROP INDEX maasserver_interface_type_mac_address_idx"),
     ]

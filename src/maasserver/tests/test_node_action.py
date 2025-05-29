@@ -117,9 +117,7 @@ class TestNodeAction(MAASServerTestCase):
             actionable_statuses = (NODE_STATUS.READY,)
 
         node = factory.make_Node(status=NODE_STATUS.NEW)
-        actions = compile_node_actions(
-            node, factory.make_admin(), classes=[MyAction]
-        )
+        actions = compile_node_actions(node, factory.make_admin(), classes=[MyAction])
         self.assertEqual({}, actions)
 
     def test_compile_node_actions_checks_permission(self):
@@ -129,9 +127,7 @@ class TestNodeAction(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, owner=factory.make_User()
         )
-        actions = compile_node_actions(
-            node, factory.make_User(), classes=[MyAction]
-        )
+        actions = compile_node_actions(node, factory.make_User(), classes=[MyAction])
         self.assertEqual({}, actions)
 
     def test_compile_node_actions_maps_names(self):
@@ -208,9 +204,7 @@ class TestNodeAction(MAASServerTestCase):
         owner = factory.make_User()
         request = factory.make_fake_request("/")
         request.user = owner
-        node = factory.make_Node(
-            owner=owner, status=status, node_type=NODE_TYPE.DEVICE
-        )
+        node = factory.make_Node(owner=owner, status=status, node_type=NODE_TYPE.DEVICE)
         action = FakeNodeAction(node, owner, request)
         action.node_only = True
         self.assertFalse(action.is_actionable())
@@ -255,9 +249,7 @@ class TestNodeAction(MAASServerTestCase):
 
     def test_is_actionable_no_requires_networking_by_default(self):
         node = factory.make_Node(status=NODE_STATUS.NEW)
-        self.assertTrue(
-            FakeNodeAction(node, factory.make_User()).is_actionable()
-        )
+        self.assertTrue(FakeNodeAction(node, factory.make_User()).is_actionable())
 
     def test_is_actionable_requires_networking(self):
         class MyAction(FakeNodeAction):
@@ -372,8 +364,7 @@ class TestCommissionAction(MAASServerTestCase):
             power_state=POWER_STATE.OFF,
         )
         testing_scripts = [
-            factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
-            for _ in range(3)
+            factory.make_Script(script_type=SCRIPT_TYPE.TESTING) for _ in range(3)
         ]
         script_input = {
             "smartctl-validate": {"storage": "sda"},
@@ -386,15 +377,11 @@ class TestCommissionAction(MAASServerTestCase):
         request.user = admin
         action = Commission(node, admin, request)
         with post_commit_hooks:
-            action.execute(
-                testing_scripts=testing_scripts, script_input=script_input
-            )
+            action.execute(testing_scripts=testing_scripts, script_input=script_input)
         script_sets = ScriptSet.objects.all().order_by("id")
         node = reload_object(node)
         self.assertEqual(2, len(script_sets))
-        self.assertEqual(
-            node.current_commissioning_script_set_id, script_sets[0].id
-        )
+        self.assertEqual(node.current_commissioning_script_set_id, script_sets[0].id)
         self.assertEqual(node.current_testing_script_set_id, script_sets[1].id)
         self.assertEqual(NODE_STATUS.COMMISSIONING, node.status)
         node_start.assert_called_once_with(
@@ -434,9 +421,7 @@ class TestTest(MAASServerTestCase):
         request.user = admin
         action = Test(node, admin, request)
         with post_commit_hooks:
-            action.execute(
-                enable_ssh=enable_ssh, testing_scripts=[script.name]
-            )
+            action.execute(enable_ssh=enable_ssh, testing_scripts=[script.name])
         node = reload_object(node)
         self.assertEqual(NODE_STATUS.TESTING, node.status)
         self.assertEqual(enable_ssh, node.enable_ssh)
@@ -455,9 +440,7 @@ class TestAbortAction(MAASTransactionServerTestCase):
         self.useFixture(SignalsDisabled("power"))
         with transaction.atomic():
             owner = factory.make_User()
-            node = factory.make_Node(
-                status=NODE_STATUS.DISK_ERASING, owner=owner
-            )
+            node = factory.make_Node(status=NODE_STATUS.DISK_ERASING, owner=owner)
             request = factory.make_fake_request("/")
             request.user = owner
 
@@ -617,9 +600,7 @@ class TestAcquireNodeAction(MAASServerTestCase):
         self.assertEqual(NODE_STATUS.ALLOCATED, node.status)
         self.assertEqual(user, node.owner)
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, "Acquired '%s'." % node.hostname
-        )
+        self.assertEqual(audit_event.description, "Acquired '%s'." % node.hostname)
 
     def test_Acquire_uses_node_acquire_lock(self):
         node = factory.make_Node(
@@ -733,18 +714,14 @@ class TestDeployAction(MAASServerTestCase):
             power_type="manual",
             owner=user,
         )
-        mock_get_curtin_config = self.patch(
-            node_action_module, "get_curtin_config"
-        )
+        mock_get_curtin_config = self.patch(node_action_module, "get_curtin_config")
         mock_get_curtin_config.side_effect = NodeActionError("error")
         osystem, releases = make_usable_osystem(self)
         os_name = osystem
         release_name = releases[0]
         Config.objects.set_config("default_osystem", os_name)
         Config.objects.set_config("default_distro_series", release_name)
-        error = self.assertRaises(
-            NodeActionError, Deploy(node, user, request).execute
-        )
+        error = self.assertRaises(NodeActionError, Deploy(node, user, request).execute)
         self.assertEqual("Failed to retrieve curtin config: error", str(error))
 
     def test_Deploy_raises_NodeActionError_for_invalid_os(self):
@@ -791,9 +768,8 @@ class TestDeployAction(MAASServerTestCase):
         }
         with pytest.raises(NodeActionError) as exception:
             Deploy(node, admin, request).execute(**extra)
-        assert (
-            "A machine can not be a VM host if it is deployed to memory."
-            == str(exception.value)
+        assert "A machine can not be a VM host if it is deployed to memory." == str(
+            exception.value
         )
 
         extra = {
@@ -804,9 +780,8 @@ class TestDeployAction(MAASServerTestCase):
         }
         with pytest.raises(NodeActionError) as exception:
             Deploy(node, admin, request).execute(**extra)
-        assert (
-            "A machine can not be a VM host if it is deployed to memory."
-            == str(exception.value)
+        assert "A machine can not be a VM host if it is deployed to memory." == str(
+            exception.value
         )
 
     def test_Deploy_sets_osystem_and_series_and_ephemeral_deploy(self):
@@ -933,9 +908,7 @@ class TestDeployAction(MAASServerTestCase):
         )
         self.patch(node, "start")
         extra = {"install_kvm": True}
-        self.assertRaises(
-            NodeActionError, Deploy(node, user, request).execute, **extra
-        )
+        self.assertRaises(NodeActionError, Deploy(node, user, request).execute, **extra)
 
     def test_Deploy_raises_NodeActionError_if_non_admin_install_kvm(self):
         user = factory.make_User()
@@ -949,9 +922,7 @@ class TestDeployAction(MAASServerTestCase):
         )
         self.patch(node, "start")
         extra = {"install_kvm": True}
-        self.assertRaises(
-            NodeActionError, Deploy(node, user, request).execute, **extra
-        )
+        self.assertRaises(NodeActionError, Deploy(node, user, request).execute, **extra)
 
     def test_Deploy_raises_NodeActionError_on_register_vmhost_if_os_missing(
         self,
@@ -967,9 +938,7 @@ class TestDeployAction(MAASServerTestCase):
         )
         self.patch(node, "start")
         extra = {"register_vmhost": True}
-        self.assertRaises(
-            NodeActionError, Deploy(node, user, request).execute, **extra
-        )
+        self.assertRaises(NodeActionError, Deploy(node, user, request).execute, **extra)
 
     def test_Deploy_raises_NodeActionError_if_non_admin_register_vmhost(self):
         user = factory.make_User()
@@ -983,9 +952,7 @@ class TestDeployAction(MAASServerTestCase):
         )
         self.patch(node, "start")
         extra = {"register_vmhost": True}
-        self.assertRaises(
-            NodeActionError, Deploy(node, user, request).execute, **extra
-        )
+        self.assertRaises(NodeActionError, Deploy(node, user, request).execute, **extra)
 
     def test_Deploy_sets_osystem_and_series_strips_license_key_token(self):
         user = factory.make_User()
@@ -1084,19 +1051,11 @@ class TestDeployActionTransactional(MAASTransactionServerTestCase):
 
         # Pre-claim the only addresses.
         with transaction.atomic():
-            StaticIPAddress.objects.allocate_new(
-                subnet, requested_address="10.0.0.1"
-            )
-            StaticIPAddress.objects.allocate_new(
-                subnet, requested_address="10.0.0.2"
-            )
-            StaticIPAddress.objects.allocate_new(
-                subnet, requested_address="10.0.0.3"
-            )
+            StaticIPAddress.objects.allocate_new(subnet, requested_address="10.0.0.1")
+            StaticIPAddress.objects.allocate_new(subnet, requested_address="10.0.0.2")
+            StaticIPAddress.objects.allocate_new(subnet, requested_address="10.0.0.3")
 
-        e = self.assertRaises(
-            NodeActionError, Deploy(node, user, request).execute
-        )
+        e = self.assertRaises(NodeActionError, Deploy(node, user, request).execute)
         self.assertEqual(
             str(e),
             f"{node.hostname}: Failed to start, static IP addresses are exhausted.",
@@ -1149,8 +1108,7 @@ class TestSetPoolAction(MAASServerTestCase):
         audit_event = Event.objects.get(type__level=AUDIT)
         self.assertEqual(
             audit_event.description,
-            "Set the resource pool to '%s' on '%s'."
-            % (node.pool.name, node.hostname),
+            "Set the resource pool to '%s' on '%s'." % (node.pool.name, node.hostname),
         )
 
 
@@ -1208,9 +1166,7 @@ class TestPowerOnAction(MAASServerTestCase):
         PowerOn(node, user, request).execute()
         node_start.assert_called_once_with(user)
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, "Powered on '%s'." % node.hostname
-        )
+        self.assertEqual(audit_event.description, "Powered on '%s'." % node.hostname)
 
     def test_PowerOn_requires_edit_permission(self):
         user = factory.make_User()
@@ -1265,9 +1221,7 @@ class TestPowerOffAction(MAASServerTestCase):
 
         node_stop.assert_called_once_with(user, stop_mode=None)
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, f"Powered off '{node.hostname}'."
-        )
+        self.assertEqual(audit_event.description, f"Powered off '{node.hostname}'.")
 
     def test_can_stop_with_soft_stop_mode(self):
         admin = factory.make_admin()
@@ -1386,9 +1340,7 @@ class TestLockAction(MAASServerTestCase):
         action.execute()
         self.assertTrue(reload_object(node).locked)
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, "Locked '%s'." % node.hostname
-        )
+        self.assertEqual(audit_event.description, "Locked '%s'." % node.hostname)
 
     def test_changes_locked_status_deploying(self):
         user = factory.make_User()
@@ -1400,9 +1352,7 @@ class TestLockAction(MAASServerTestCase):
         action.execute()
         self.assertTrue(reload_object(node).locked)
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, "Locked '%s'." % node.hostname
-        )
+        self.assertEqual(audit_event.description, "Locked '%s'." % node.hostname)
 
     def test_not_actionable_if_wrong_status(self):
         user = factory.make_User()
@@ -1416,9 +1366,7 @@ class TestLockAction(MAASServerTestCase):
         user = factory.make_User()
         request = factory.make_fake_request("/")
         request.user = user
-        node = factory.make_Node(
-            status=NODE_STATUS.DEPLOYED, owner=user, locked=True
-        )
+        node = factory.make_Node(status=NODE_STATUS.DEPLOYED, owner=user, locked=True)
         action = Lock(node, user, request)
         self.assertFalse(action.is_actionable())
 
@@ -1442,9 +1390,7 @@ class TestUnlockAction(MAASServerTestCase):
         action.execute()
         self.assertFalse(reload_object(node).locked)
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, "Unlocked '%s'." % node.hostname
-        )
+        self.assertEqual(audit_event.description, "Unlocked '%s'." % node.hostname)
 
     def test_not_actionable_if_not_locked(self):
         user = factory.make_User()
@@ -1565,9 +1511,7 @@ class TestReleaseAction(MAASServerTestCase):
         node_start_releasing.assert_called_once_with(
             user=user,
             scripts=["wipe-disks"],
-            script_input={
-                "wipe-disks": {"secure_erase": True, "quick_erase": True}
-            },
+            script_input={"wipe-disks": {"secure_erase": True, "quick_erase": True}},
         )
 
 
@@ -1582,9 +1526,7 @@ class TestMarkBrokenAction(MAASServerTestCase):
         action.execute()
         self.assertEqual(NODE_STATUS.BROKEN, reload_object(node).status)
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, "Marked '%s' broken." % node.hostname
-        )
+        self.assertEqual(audit_event.description, "Marked '%s' broken." % node.hostname)
 
     def test_updates_error_description(self):
         user = factory.make_User()
@@ -1637,9 +1579,7 @@ class TestMarkFixedAction(MAASServerTestCase):
         ]
 
     def test_changes_status(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.BROKEN, power_state=POWER_STATE.ON
-        )
+        node = factory.make_Node(status=NODE_STATUS.BROKEN, power_state=POWER_STATE.ON)
         self.make_commissioning_data(node)
         self.make_commissioning_data(node, result=-1)
         user = factory.make_admin()
@@ -1650,14 +1590,10 @@ class TestMarkFixedAction(MAASServerTestCase):
         action.execute()
         self.assertEqual(NODE_STATUS.READY, reload_object(node).status)
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, "Marked '%s' fixed." % node.hostname
-        )
+        self.assertEqual(audit_event.description, "Marked '%s' fixed." % node.hostname)
 
     def test_raise_NodeActionError_if_on(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.BROKEN, power_state=POWER_STATE.ON
-        )
+        node = factory.make_Node(status=NODE_STATUS.BROKEN, power_state=POWER_STATE.ON)
         user = factory.make_admin()
         request = factory.make_fake_request("/")
         request.user = user
@@ -1666,9 +1602,7 @@ class TestMarkFixedAction(MAASServerTestCase):
         self.assertRaises(NodeActionError, action.execute)
 
     def test_raise_NodeActionError_if_no_commissioning_results(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.BROKEN, power_state=POWER_STATE.OFF
-        )
+        node = factory.make_Node(status=NODE_STATUS.BROKEN, power_state=POWER_STATE.OFF)
         user = factory.make_admin()
         request = factory.make_fake_request("/")
         request.user = user
@@ -1677,9 +1611,7 @@ class TestMarkFixedAction(MAASServerTestCase):
         self.assertRaises(NodeActionError, action.execute)
 
     def test_raise_NodeActionError_if_one_commissioning_result_fails(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.BROKEN, power_state=POWER_STATE.OFF
-        )
+        node = factory.make_Node(status=NODE_STATUS.BROKEN, power_state=POWER_STATE.OFF)
         self.make_commissioning_data(node)
         self.make_commissioning_data(node, result=1, count=1)
         user = factory.make_admin()
@@ -1690,9 +1622,7 @@ class TestMarkFixedAction(MAASServerTestCase):
         self.assertRaises(NodeActionError, action.execute)
 
     def test_raise_NodeActionError_if_multi_commissioning_result_fails(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.BROKEN, power_state=POWER_STATE.OFF
-        )
+        node = factory.make_Node(status=NODE_STATUS.BROKEN, power_state=POWER_STATE.OFF)
         self.make_commissioning_data(node)
         self.make_commissioning_data(node, result=1)
         user = factory.make_admin()
@@ -1710,9 +1640,7 @@ class TestMarkFixedAction(MAASServerTestCase):
         self.assertFalse(MarkFixed(node, user, request).is_permitted())
 
     def test_not_enabled_if_not_broken(self):
-        status = factory.pick_choice(
-            NODE_STATUS_CHOICES, but_not=[NODE_STATUS.BROKEN]
-        )
+        status = factory.pick_choice(NODE_STATUS_CHOICES, but_not=[NODE_STATUS.BROKEN])
         node = factory.make_Node(status=status)
         user = factory.make_User()
         request = factory.make_fake_request("/")
@@ -1802,9 +1730,7 @@ class TestOverrideFailedTesting(MAASServerTestCase):
         owner = factory.make_User()
         request = factory.make_fake_request("/")
         request.user = owner
-        node = factory.make_Node(
-            status=NODE_STATUS.FAILED_TESTING, owner=owner
-        )
+        node = factory.make_Node(status=NODE_STATUS.FAILED_TESTING, owner=owner)
         action = OverrideFailedTesting(node, owner, request)
         self.assertFalse(action.is_permitted())
 
@@ -1957,9 +1883,7 @@ class TestCloneAction(MAASServerTestCase):
         request = factory.make_fake_request("/")
         request.user = user
         source = factory.make_Machine(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=source, size=8 * 1024**3, name="sda"
-        )
+        factory.make_PhysicalBlockDevice(node=source, size=8 * 1024**3, name="sda")
         factory.make_Interface(node=source, name="eth0")
         destination1 = factory.make_Machine(
             status=NODE_STATUS.READY,
@@ -1985,20 +1909,14 @@ class TestCloneAction(MAASServerTestCase):
             interfaces=True,
         )
         audit_event = Event.objects.get(type__level=AUDIT)
-        self.assertEqual(
-            audit_event.description, f"Cloning from '{source.hostname}'."
-        )
+        self.assertEqual(audit_event.description, f"Cloning from '{source.hostname}'.")
 
     def test_clone_errors_include_system_id(self):
         user = factory.make_admin()
         request = factory.make_fake_request("/")
         request.user = user
-        source = factory.make_Machine(
-            status=NODE_STATUS.READY, with_boot_disk=False
-        )
-        factory.make_PhysicalBlockDevice(
-            node=source, size=8 * 1024**3, name="sda"
-        )
+        source = factory.make_Machine(status=NODE_STATUS.READY, with_boot_disk=False)
+        factory.make_PhysicalBlockDevice(node=source, size=8 * 1024**3, name="sda")
         destination = factory.make_Machine(
             status=NODE_STATUS.READY, with_boot_disk=False
         )
@@ -2039,9 +1957,7 @@ class TestActionsErrorHandling(MAASServerTestCase):
 
     def make_exception(self):
         if self.exception_class is ExternalProcessError:
-            exception = self.exception_class(
-                1, ["cmd"], factory.make_name("exception")
-            )
+            exception = self.exception_class(1, ["cmd"], factory.make_name("exception"))
         else:
             exception = self.exception_class(factory.make_name("exception"))
         return exception
@@ -2074,9 +1990,7 @@ class TestActionsErrorHandling(MAASServerTestCase):
         self.addCleanup(signals.power.signals.enable)
         signals.power.signals.disable()
 
-        action = self.make_action(
-            Commission, NODE_STATUS.READY, POWER_STATE.OFF
-        )
+        action = self.make_action(Commission, NODE_STATUS.READY, POWER_STATE.OFF)
         self.patch_rpc_methods(action.node)
         exception = self.assertRaises(NodeActionError, action.execute)
         self.assertEqual(
@@ -2134,14 +2048,10 @@ class TestActionsErrorHandling(MAASServerTestCase):
                 ]
             ),
         )
-        self.patch(
-            action.node, "start_rescue_mode"
-        ).side_effect = self.make_exception()
+        self.patch(action.node, "start_rescue_mode").side_effect = self.make_exception()
         exception = self.assertRaises(NodeActionError, action.execute)
         self.assertEqual(
-            get_error_message_for_exception(
-                action.node.start_rescue_mode.side_effect
-            ),
+            get_error_message_for_exception(action.node.start_rescue_mode.side_effect),
             str(exception),
         )
 
@@ -2157,13 +2067,9 @@ class TestActionsErrorHandling(MAASServerTestCase):
                 ]
             ),
         )
-        self.patch(
-            action.node, "stop_rescue_mode"
-        ).side_effect = self.make_exception()
+        self.patch(action.node, "stop_rescue_mode").side_effect = self.make_exception()
         exception = self.assertRaises(NodeActionError, action.execute)
         self.assertEqual(
-            get_error_message_for_exception(
-                action.node.stop_rescue_mode.side_effect
-            ),
+            get_error_message_for_exception(action.node.stop_rescue_mode.side_effect),
             str(exception),
         )

@@ -36,10 +36,7 @@ STATE_TRANSITION_EVENT_CONNECT = True
 
 def emit_state_transition_event(instance, old_values, **kwargs):
     """Send a status transition event."""
-    if (
-        instance.node_type != NODE_TYPE.MACHINE
-        or not STATE_TRANSITION_EVENT_CONNECT
-    ):
+    if instance.node_type != NODE_TYPE.MACHINE or not STATE_TRANSITION_EVENT_CONNECT:
         return
     node = instance
     [old_status] = old_values
@@ -68,9 +65,7 @@ def emit_state_transition_event(instance, old_values, **kwargs):
 for klass in NODE_CLASSES:
     # Watch the status of all classes, as the node might switch types.
     # Only if its a machine will the handler care.
-    signals.watch_fields(
-        emit_state_transition_event, klass, ["status"], delete=False
-    )
+    signals.watch_fields(emit_state_transition_event, klass, ["status"], delete=False)
 
 # Enable all signals by default.
 signals.enable()

@@ -62,9 +62,7 @@ async def main() -> None:
     for sig in (signal.SIGINT, signal.SIGTERM):
         loop.add_signal_handler(
             sig,
-            lambda: asyncio.ensure_future(
-                _stop_temporal_workers(temporal_workers)
-            ),
+            lambda: asyncio.ensure_future(_stop_temporal_workers(temporal_workers)),
         )
 
     log.info("temporal-worker started")

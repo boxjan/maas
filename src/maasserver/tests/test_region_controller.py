@@ -179,9 +179,7 @@ class TestRegionControllerService(MAASServerTestCase):
     def test_process_doesnt_proxy_update_config_when_nothing_to_process(self):
         service = self.make_service(sentinel.listener, sentinel.dbtasks)
         service.needsProxyUpdate = False
-        mock_proxy_update_config = self.patch(
-            region_controller, "proxy_update_config"
-        )
+        mock_proxy_update_config = self.patch(region_controller, "proxy_update_config")
         service.startProcessing()
         yield service.processingDefer
         mock_proxy_update_config.assert_not_called()
@@ -228,9 +226,7 @@ class TestRegionControllerService(MAASServerTestCase):
             dynamic_updates=[], requires_reload=True
         )
         mock_check_serial.assert_called_once_with(dns_result)
-        mock_msg.assert_called_once_with(
-            "Reloaded DNS configuration; regiond started."
-        )
+        mock_msg.assert_called_once_with("Reloaded DNS configuration; regiond started.")
 
     @wait_for_reactor
     @inlineCallbacks
@@ -260,9 +256,7 @@ class TestRegionControllerService(MAASServerTestCase):
 
         mock_check_serial = self.patch(service, "_checkSerial")
         mock_check_serial.side_effect = _checkSerial
-        mock_killService = self.patch(
-            region_controller.service_monitor, "killService"
-        )
+        mock_killService = self.patch(region_controller.service_monitor, "killService")
         mock_killService.return_value = succeed(None)
         service.startProcessing()
         yield service.processingDefer
@@ -272,9 +266,7 @@ class TestRegionControllerService(MAASServerTestCase):
                 call(dynamic_updates=[], requires_reload=False),
             ]
         )
-        mock_check_serial.assert_has_calls(
-            [call(dns_result_0), call(dns_result_1)]
-        )
+        mock_check_serial.assert_has_calls([call(dns_result_0), call(dns_result_1)])
         mock_killService.assert_called_once_with("bind9")
 
     @wait_for_reactor
@@ -282,9 +274,7 @@ class TestRegionControllerService(MAASServerTestCase):
     def test_process_updates_proxy(self):
         service = self.make_service(sentinel.listener, sentinel.dbtasks)
         service.needsProxyUpdate = True
-        mock_proxy_update_config = self.patch(
-            region_controller, "proxy_update_config"
-        )
+        mock_proxy_update_config = self.patch(region_controller, "proxy_update_config")
         mock_proxy_update_config.return_value = succeed(None)
         mock_msg = self.patch(region_controller.log, "msg")
         service.startProcessing()
@@ -303,9 +293,7 @@ class TestRegionControllerService(MAASServerTestCase):
         service.startProcessing()
         yield service.processingDefer
         mock_rbacSync.assert_called_once_with()
-        mock_msg.assert_called_once_with(
-            "Synced RBAC service; regiond started."
-        )
+        mock_msg.assert_called_once_with("Synced RBAC service; regiond started.")
 
     @wait_for_reactor
     @inlineCallbacks
@@ -351,9 +339,7 @@ class TestRegionControllerService(MAASServerTestCase):
     def test_process_updates_proxy_logs_failure(self):
         service = self.make_service(sentinel.listener, sentinel.dbtasks)
         service.needsProxyUpdate = True
-        mock_proxy_update_config = self.patch(
-            region_controller, "proxy_update_config"
-        )
+        mock_proxy_update_config = self.patch(region_controller, "proxy_update_config")
         mock_proxy_update_config.return_value = fail(factory.make_exception())
         mock_err = self.patch(region_controller.log, "err")
         service.startProcessing()
@@ -371,9 +357,7 @@ class TestRegionControllerService(MAASServerTestCase):
         mock_err = self.patch(region_controller.log, "err")
         service.startProcessing()
         yield service.processingDefer
-        mock_err.assert_called_once_with(
-            ANY, "Failed syncing resources to RBAC."
-        )
+        mock_err.assert_called_once_with(ANY, "Failed syncing resources to RBAC.")
 
     @wait_for_reactor
     @inlineCallbacks
@@ -389,9 +373,7 @@ class TestRegionControllerService(MAASServerTestCase):
         mock_pause.return_value = succeed(None)
         service.startProcessing()
         yield service.processingDefer
-        mock_err.assert_called_once_with(
-            ANY, "Failed syncing resources to RBAC."
-        )
+        mock_err.assert_called_once_with(ANY, "Failed syncing resources to RBAC.")
         mock_pause.assert_called_once_with(service.rbacRetryOnFailureDelay)
 
     @wait_for_reactor
@@ -412,9 +394,7 @@ class TestRegionControllerService(MAASServerTestCase):
         mock_dns_update_all_zones.return_value = dns_result
         mock_check_serial = self.patch(service, "_checkSerial")
         mock_check_serial.return_value = succeed(dns_result)
-        mock_proxy_update_config = self.patch(
-            region_controller, "proxy_update_config"
-        )
+        mock_proxy_update_config = self.patch(region_controller, "proxy_update_config")
         mock_proxy_update_config.return_value = succeed(None)
         mock_rbacSync = self.patch(service, "_rbacSync")
         mock_rbacSync.return_value = None
@@ -427,9 +407,7 @@ class TestRegionControllerService(MAASServerTestCase):
         mock_rbacSync.assert_called_once()
 
     def make_soa_result(self, serial):
-        return RRHeader(
-            type=SOA, cls=A, ttl=30, payload=Record_SOA(serial=serial)
-        )
+        return RRHeader(type=SOA, cls=A, ttl=30, payload=Record_SOA(serial=serial))
 
     @wait_for_reactor
     def test_check_serial_doesnt_raise_error_on_successful_serial_match(self):
@@ -597,29 +575,17 @@ class TestRegionControllerService(MAASServerTestCase):
     def test_rbacDifference(self):
         service = self.make_service(sentinel.listener, sentinel.dbtasks)
         changes = [
-            RBACSync(
-                action=RBAC_ACTION.UPDATE, resource_id=1, resource_name="r-1"
-            ),
-            RBACSync(
-                action=RBAC_ACTION.ADD, resource_id=2, resource_name="r-2"
-            ),
-            RBACSync(
-                action=RBAC_ACTION.UPDATE, resource_id=3, resource_name="r-3"
-            ),
-            RBACSync(
-                action=RBAC_ACTION.REMOVE, resource_id=1, resource_name="r-1"
-            ),
+            RBACSync(action=RBAC_ACTION.UPDATE, resource_id=1, resource_name="r-1"),
+            RBACSync(action=RBAC_ACTION.ADD, resource_id=2, resource_name="r-2"),
+            RBACSync(action=RBAC_ACTION.UPDATE, resource_id=3, resource_name="r-3"),
+            RBACSync(action=RBAC_ACTION.REMOVE, resource_id=1, resource_name="r-1"),
             RBACSync(
                 action=RBAC_ACTION.UPDATE,
                 resource_id=3,
                 resource_name="r-3-updated",
             ),
-            RBACSync(
-                action=RBAC_ACTION.ADD, resource_id=4, resource_name="r-4"
-            ),
-            RBACSync(
-                action=RBAC_ACTION.REMOVE, resource_id=4, resource_name="r-4"
-            ),
+            RBACSync(action=RBAC_ACTION.ADD, resource_id=4, resource_name="r-4"),
+            RBACSync(action=RBAC_ACTION.REMOVE, resource_id=4, resource_name="r-4"),
         ]
         self.assertEqual(
             (
@@ -653,9 +619,7 @@ class TestRegionControllerServiceTransactional(MAASTransactionServerTestCase):
         # Create some fake serial updates with sources for the update.
         def _create_publications():
             return [
-                DNSPublication.objects.create(
-                    source=factory.make_name("reason")
-                )
+                DNSPublication.objects.create(source=factory.make_name("reason"))
                 for _ in range(2)
             ]
 
@@ -691,9 +655,7 @@ class TestRegionControllerServiceTransactional(MAASTransactionServerTestCase):
         # Create some fake serial updates with sources for the update.
         def _create_publications():
             return [
-                DNSPublication.objects.create(
-                    source=factory.make_name("reason")
-                )
+                DNSPublication.objects.create(source=factory.make_name("reason"))
                 for _ in range(3)
             ]
 
@@ -717,8 +679,7 @@ class TestRegionControllerServiceTransactional(MAASTransactionServerTestCase):
         yield service.processingDefer
         expected_msg = "Reloaded DNS configuration: \n"
         expected_msg += "\n".join(
-            " * %s" % publication.source
-            for publication in reversed(publications[1:])
+            " * %s" % publication.source for publication in reversed(publications[1:])
         )
         mock_dns_update_all_zones.assert_called_once_with(
             dynamic_updates=[], requires_reload=True
@@ -744,9 +705,7 @@ class TestRegionControllerServiceTransactional(MAASTransactionServerTestCase):
         _, resources = self.make_resource_pools()
         RBACSync.objects.clear("resource-pool")
         RBACSync.objects.clear("")
-        RBACSync.objects.create(
-            resource_type="", resource_name="", source="test"
-        )
+        RBACSync.objects.create(resource_type="", resource_name="", source="test")
 
         rbac_client = MagicMock()
         rbac_client.update_resources.return_value = "x-y-z"
@@ -781,14 +740,10 @@ class TestRegionControllerServiceTransactional(MAASTransactionServerTestCase):
         self.assertEqual(last_sync.sync_id, "x-y-z")
 
     def test_rbacSync_syncs_on_changes(self):
-        RBACLastSync.objects.create(
-            resource_type="resource-pool", sync_id="a-b-c"
-        )
+        RBACLastSync.objects.create(resource_type="resource-pool", sync_id="a-b-c")
         RBACSync.objects.clear("resource-pool")
         _, resources = self.make_resource_pools()
-        reasons = [
-            sync.source for sync in RBACSync.objects.changes("resource-pool")
-        ]
+        reasons = [sync.source for sync in RBACSync.objects.changes("resource-pool")]
 
         rbac_client = MagicMock()
         rbac_client.update_resources.return_value = "x-y-z"
@@ -809,14 +764,10 @@ class TestRegionControllerServiceTransactional(MAASTransactionServerTestCase):
         self.assertEqual(last_sync.sync_id, "x-y-z")
 
     def test_rbacSync_syncs_all_on_conflict(self):
-        RBACLastSync.objects.create(
-            resource_type="resource-pool", sync_id="a-b-c"
-        )
+        RBACLastSync.objects.create(resource_type="resource-pool", sync_id="a-b-c")
         RBACSync.objects.clear("resource-pool")
         _, resources = self.make_resource_pools()
-        reasons = [
-            sync.source for sync in RBACSync.objects.changes("resource-pool")
-        ]
+        reasons = [sync.source for sync in RBACSync.objects.changes("resource-pool")]
 
         rbac_client = MagicMock()
         rbac_client.update_resources.side_effect = [

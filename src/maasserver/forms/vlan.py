@@ -87,9 +87,7 @@ class VLANForm(MAASModelForm):
         # be itself or never set when dhcp_on is True.
         possible_relay_vlans = VLAN.objects.filter(relay_vlan__isnull=True)
         if self.instance is not None:
-            possible_relay_vlans = possible_relay_vlans.exclude(
-                id=self.instance.id
-            )
+            possible_relay_vlans = possible_relay_vlans.exclude(id=self.instance.id)
             if self.instance.dhcp_on:
                 possible_relay_vlans = VLAN.objects.none()
                 if self.instance.relay_vlan is not None:
@@ -128,12 +126,9 @@ class VLANForm(MAASModelForm):
         if (
             cleaned_data.get("primary_rack")
             and cleaned_data.get("secondary_rack")
-            and cleaned_data.get("primary_rack")
-            == cleaned_data.get("secondary_rack")
+            and cleaned_data.get("primary_rack") == cleaned_data.get("secondary_rack")
         ):
-            raise ValidationError(
-                "The primary and secondary rack must be different"
-            )
+            raise ValidationError("The primary and secondary rack must be different")
 
         # Fix LP: #1798476 - When setting the secondary rack and the primary
         # rack was originally set (and not being changed), require the primary
@@ -143,8 +138,7 @@ class VLANForm(MAASModelForm):
             primary_rack
             and primary_rack == self.instance.primary_rack
             and cleaned_data.get("secondary_rack")
-            and cleaned_data["secondary_rack"]
-            != (self.instance.secondary_rack)
+            and cleaned_data["secondary_rack"] != (self.instance.secondary_rack)
         ):
             # Uses the `rackd` service not `dhcpd` or `dhcpd6` because if
             # the rackd is on it will ensure those services make it to a good
@@ -168,8 +162,7 @@ class VLANForm(MAASModelForm):
             and not self.instance.primary_rack
         ):
             raise ValidationError(
-                "dhcp can only be turned on when a primary rack controller "
-                "is set."
+                "dhcp can only be turned on when a primary rack controller " "is set."
             )
         # XXX ltrager 2016-02-09 - Hack to get around
         # https://code.djangoproject.com/ticket/25349

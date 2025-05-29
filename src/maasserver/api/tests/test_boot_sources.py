@@ -54,16 +54,12 @@ class TestBootSourceAPI(APITestCase.ForUser):
             "keyring_data"
         ].encode("utf-8")
         # All the fields are present.
-        self.assertEqual(
-            set(DISPLAYED_BOOTSOURCE_FIELDS), returned_boot_source.keys()
-        )
+        self.assertEqual(set(DISPLAYED_BOOTSOURCE_FIELDS), returned_boot_source.keys())
         # Remove created and updated that is handled by django.
         del returned_boot_source["created"]
         del returned_boot_source["updated"]
 
-        self.assertGreater(
-            vars(boot_source).items(), returned_boot_source.items()
-        )
+        self.assertGreater(vars(boot_source).items(), returned_boot_source.items())
         self.assertNotIn(b"<memory at", returned_boot_source["keyring_data"])
 
     def test_GET_requires_admin(self):
@@ -90,15 +86,11 @@ class TestBootSourceAPI(APITestCase.ForUser):
             "url": "http://example.com/",
             "keyring_filename": factory.make_name("filename"),
         }
-        response = self.client.put(
-            get_boot_source_uri(boot_source), new_values
-        )
+        response = self.client.put(get_boot_source_uri(boot_source), new_values)
         self.assertEqual(http.client.OK, response.status_code)
         boot_source = reload_object(boot_source)
         self.assertEqual(boot_source.url, new_values["url"])
-        self.assertEqual(
-            boot_source.keyring_filename, new_values["keyring_filename"]
-        )
+        self.assertEqual(boot_source.keyring_filename, new_values["keyring_filename"])
 
     def test_PUT_requires_admin(self):
         boot_source = factory.make_BootSource()
@@ -106,9 +98,7 @@ class TestBootSourceAPI(APITestCase.ForUser):
             "url": "http://example.com/",
             "keyring_filename": factory.make_name("filename"),
         }
-        response = self.client.put(
-            get_boot_source_uri(boot_source), new_values
-        )
+        response = self.client.put(get_boot_source_uri(boot_source), new_values)
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
 
@@ -122,17 +112,13 @@ class TestBootSourcesAPI(APITestCase.ForUser):
         bootsources.signals.disable()
 
     def test_handler_path(self):
-        self.assertEqual(
-            "/MAAS/api/2.0/boot-sources/", reverse("boot_sources_handler")
-        )
+        self.assertEqual("/MAAS/api/2.0/boot-sources/", reverse("boot_sources_handler"))
 
     def test_GET_returns_boot_source_list(self):
         self.become_admin()
         sources = [factory.make_BootSource() for _ in range(3)]
         response = self.client.get(reverse("boot_sources_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertCountEqual(
             [boot_source.id for boot_source in sources],
@@ -157,9 +143,7 @@ class TestBootSourcesAPI(APITestCase.ForUser):
 
         boot_source = BootSource.objects.get(id=parsed_result["id"])
         self.assertEqual(boot_source.keyring_data, b"")
-        self.assertEqual(
-            boot_source.keyring_filename, params["keyring_filename"]
-        )
+        self.assertEqual(boot_source.keyring_filename, params["keyring_filename"])
         self.assertEqual(boot_source.url, params["url"])
 
     def test_POST_creates_boot_source_with_keyring_data(self):
@@ -168,9 +152,7 @@ class TestBootSourcesAPI(APITestCase.ForUser):
         params = {
             "url": "http://example.com/",
             "keyring_filename": "",
-            "keyring_data": (
-                factory.make_file_upload(content=sample_binary_data)
-            ),
+            "keyring_data": (factory.make_file_upload(content=sample_binary_data)),
         }
         response = self.client.post(reverse("boot_sources_handler"), params)
         self.assertEqual(http.client.CREATED, response.status_code)
@@ -180,9 +162,7 @@ class TestBootSourcesAPI(APITestCase.ForUser):
         # boot_source.keyring_data is returned as a read-only buffer, test
         # it separately from the rest of the attributes.
         self.assertEqual(sample_binary_data, bytes(boot_source.keyring_data))
-        self.assertEqual(
-            boot_source.keyring_filename, params["keyring_filename"]
-        )
+        self.assertEqual(boot_source.keyring_filename, params["keyring_filename"])
         self.assertEqual(boot_source.url, params["url"])
 
     def test_POST_validates_boot_source(self):
@@ -196,9 +176,7 @@ class TestBootSourcesAPI(APITestCase.ForUser):
         params = {
             "url": "http://example.com/",
             "keyring_filename": "",
-            "keyring_data": (
-                factory.make_file_upload(content=sample_binary_data)
-            ),
+            "keyring_data": (factory.make_file_upload(content=sample_binary_data)),
         }
         response = self.client.post(reverse("boot_sources_handler"), params)
         self.assertEqual(http.client.FORBIDDEN, response.status_code)

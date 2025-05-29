@@ -82,9 +82,7 @@ class TestUserProfile(MAASServerTestCase):
         self.assertTrue(FileStorage.objects.filter(id=filestorage_id).exists())
         self.assertTrue(UserProfile.objects.filter(id=profile_id).exists())
         profile.delete()
-        self.assertFalse(
-            FileStorage.objects.filter(id=filestorage_id).exists()
-        )
+        self.assertFalse(FileStorage.objects.filter(id=filestorage_id).exists())
         self.assertFalse(UserProfile.objects.filter(id=profile_id).exists())
 
     def test_delete_attached_nodes(self):

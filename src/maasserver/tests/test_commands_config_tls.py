@@ -62,9 +62,7 @@ class TestConfigTLSCommand(MAASServerTestCase):
         sample_cert = get_sample_cert()
         cert_path, key_path = sample_cert.tempfiles()
 
-        call_command(
-            "config_tls", "enable", key_path, cert_path, "-p=5234", "--yes"
-        )
+        call_command("config_tls", "enable", key_path, cert_path, "-p=5234", "--yes")
         # the command is not interactive
         self.read_input.assert_not_called()
         self.assertEqual(
@@ -210,9 +208,7 @@ class TestConfigTLSCommand(MAASServerTestCase):
         [event] = Event.objects.filter(type__level=AUDIT)
         self.assertEqual(EVENT_TYPES.SETTINGS, event.type.name)
         self.assertEqual(ENDPOINT.CLI, event.endpoint)
-        self.assertEqual(
-            event.description, "Updated TLS configuration settings"
-        )
+        self.assertEqual(event.description, "Updated TLS configuration settings")
 
     def test_config_tls_disable_removes_tls_notifications(self):
         factory.make_Notification(

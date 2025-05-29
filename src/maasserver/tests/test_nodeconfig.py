@@ -23,9 +23,7 @@ class TestDuplicateNodeConfig(MAASServerTestCase):
             iftype=INTERFACE_TYPE.VLAN, node_config=src_config, parents=[if1]
         )
 
-        new_config = duplicate_nodeconfig(
-            src_config, NODE_CONFIG_TYPE.DEPLOYMENT
-        )
+        new_config = duplicate_nodeconfig(src_config, NODE_CONFIG_TYPE.DEPLOYMENT)
         (
             new_if1,
             new_bridge,
@@ -44,9 +42,7 @@ class TestDuplicateNodeConfig(MAASServerTestCase):
         self.assertEqual(new_bridge.name, bridge.name)
         self.assertNotEqual(new_bridge.id, bridge.id)
         self.assertCountEqual(
-            new_bridge.parent_relationships.values_list(
-                "parent_id", flat=True
-            ),
+            new_bridge.parent_relationships.values_list("parent_id", flat=True),
             [new_if1.id],
         )
 
@@ -65,9 +61,7 @@ class TestDuplicateNodeConfig(MAASServerTestCase):
         ptable1 = factory.make_PartitionTable(block_device=disk1)
         disk2 = factory.make_PhysicalBlockDevice(node_config=src_config)
         ptable2 = factory.make_PartitionTable(block_device=disk2)
-        new_config = duplicate_nodeconfig(
-            src_config, NODE_CONFIG_TYPE.DEPLOYMENT
-        )
+        new_config = duplicate_nodeconfig(src_config, NODE_CONFIG_TYPE.DEPLOYMENT)
         new_disk1, new_disk2 = PhysicalBlockDevice.objects.filter(
             node_config=new_config
         ).order_by("id")
@@ -102,28 +96,18 @@ class TestDuplicateNodeConfig(MAASServerTestCase):
         vbdev1 = factory.make_VirtualBlockDevice(filesystem_group=fsgroup1)
         vbdev2 = factory.make_VirtualBlockDevice(filesystem_group=fsgroup2)
 
-        new_config = duplicate_nodeconfig(
-            src_config, NODE_CONFIG_TYPE.DEPLOYMENT
-        )
+        new_config = duplicate_nodeconfig(src_config, NODE_CONFIG_TYPE.DEPLOYMENT)
         new_vbdev1, new_vbdev2 = VirtualBlockDevice.objects.filter(
             node_config=new_config
         ).order_by("id")
         self.assertNotEqual(new_vbdev1.id, vbdev1.id)
         self.assertEqual(new_vbdev1.uuid, vbdev1.uuid)
-        self.assertEqual(
-            new_vbdev1.filesystem_group.uuid, vbdev1.filesystem_group.uuid
-        )
-        self.assertEqual(
-            new_vbdev1.filesystem_group.name, vbdev1.filesystem_group.name
-        )
+        self.assertEqual(new_vbdev1.filesystem_group.uuid, vbdev1.filesystem_group.uuid)
+        self.assertEqual(new_vbdev1.filesystem_group.name, vbdev1.filesystem_group.name)
         self.assertNotEqual(new_vbdev2.id, vbdev2.id)
         self.assertEqual(new_vbdev2.uuid, vbdev2.uuid)
-        self.assertEqual(
-            new_vbdev2.filesystem_group.uuid, vbdev2.filesystem_group.uuid
-        )
-        self.assertEqual(
-            new_vbdev2.filesystem_group.name, vbdev2.filesystem_group.name
-        )
+        self.assertEqual(new_vbdev2.filesystem_group.uuid, vbdev2.filesystem_group.uuid)
+        self.assertEqual(new_vbdev2.filesystem_group.name, vbdev2.filesystem_group.name)
 
     def test_partitions_filesystems(self):
         node = factory.make_Node(with_boot_disk=False)
@@ -135,9 +119,7 @@ class TestDuplicateNodeConfig(MAASServerTestCase):
         bdev2 = factory.make_PhysicalBlockDevice(node=node, size=bdev1.size)
         fs2 = factory.make_Filesystem(block_device=bdev2)
 
-        new_config = duplicate_nodeconfig(
-            src_config, NODE_CONFIG_TYPE.DEPLOYMENT
-        )
+        new_config = duplicate_nodeconfig(src_config, NODE_CONFIG_TYPE.DEPLOYMENT)
         new_fs1, new_fs2 = new_config.filesystem_set.order_by("id")
         self.assertNotEqual(new_fs1.id, fs1.id)
         self.assertEqual(new_fs1.fstype, fs1.fstype)
@@ -155,9 +137,7 @@ class TestDuplicateNodeConfig(MAASServerTestCase):
         nodedev1, nodedev2 = src_config.nodedevice_set.prefetch_related(
             "physical_blockdevice", "physical_interface"
         ).order_by("id")
-        new_config = duplicate_nodeconfig(
-            src_config, NODE_CONFIG_TYPE.DEPLOYMENT
-        )
+        new_config = duplicate_nodeconfig(src_config, NODE_CONFIG_TYPE.DEPLOYMENT)
         [new_disk] = new_config.blockdevice_set.all()
         [new_iface] = new_config.interface_set.all()
         new_nodedev1, new_nodedev2 = new_config.nodedevice_set.order_by("id")
@@ -171,16 +151,12 @@ class TestDuplicateNodeConfig(MAASServerTestCase):
     def test_virtualmachinedisks(self):
         node = factory.make_Node(with_boot_disk=False)
         src_config = node.current_config
-        disk = factory.make_PhysicalBlockDevice(
-            node_config=src_config, pcie=True
-        )
+        disk = factory.make_PhysicalBlockDevice(node_config=src_config, pcie=True)
         vm = factory.make_VirtualMachine(machine=node)
         vdisk = factory.make_VirtualMachineDisk(
             vm=vm, name=disk.name, block_device=disk
         )
-        new_config = duplicate_nodeconfig(
-            src_config, NODE_CONFIG_TYPE.DEPLOYMENT
-        )
+        new_config = duplicate_nodeconfig(src_config, NODE_CONFIG_TYPE.DEPLOYMENT)
         [new_disk] = new_config.blockdevice_set.all()
         new_vdisk = VirtualMachineDisk.objects.get(block_device=new_disk)
         self.assertNotEqual(new_vdisk.id, vdisk.id)
@@ -198,12 +174,8 @@ class TestDuplicateNodeConfig(MAASServerTestCase):
             host_interface=iface,
             attachment_type=InterfaceAttachType.BRIDGE,
         )
-        new_config = duplicate_nodeconfig(
-            src_config, NODE_CONFIG_TYPE.DEPLOYMENT
-        )
+        new_config = duplicate_nodeconfig(src_config, NODE_CONFIG_TYPE.DEPLOYMENT)
         [new_iface] = new_config.interface_set.all()
-        new_viface = VirtualMachineInterface.objects.get(
-            host_interface=new_iface
-        )
+        new_viface = VirtualMachineInterface.objects.get(host_interface=new_iface)
         self.assertNotEqual(new_viface.id, viface.id)
         self.assertEqual(new_viface.mac_address, mac_address)

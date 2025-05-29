@@ -116,9 +116,7 @@ class FabricHandler(OperationsHandler):
         @error-example "not-found"
             No Fabric matches the given query.
         """
-        return Fabric.objects.get_fabric_or_404(
-            id, request.user, NodePermission.view
-        )
+        return Fabric.objects.get_fabric_or_404(id, request.user, NodePermission.view)
 
     def update(self, request, id):
         """@description-title Update fabric

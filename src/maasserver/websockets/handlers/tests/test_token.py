@@ -30,9 +30,7 @@ class TestTokenHandler(MAASServerTestCase):
         user = factory.make_User()
         handler = TokenHandler(user, {}, None)
         token = create_auth_token(user)
-        self.assertEqual(
-            self.dehydrate_token(token), handler.get({"id": token.id})
-        )
+        self.assertEqual(self.dehydrate_token(token), handler.get({"id": token.id}))
 
     def test_get_doesnt_work_if_not_owned(self):
         user = factory.make_User()
@@ -78,9 +76,7 @@ class TestTokenHandler(MAASServerTestCase):
         token = create_auth_token(user, name)
         new_name = factory.make_name("name")
         updated_token = handler.update({"id": token.id, "name": new_name})
-        self.assertEqual(
-            updated_token.keys(), {"id", "key", "secret", "consumer"}
-        )
+        self.assertEqual(updated_token.keys(), {"id", "key", "secret", "consumer"})
         self.assertEqual(new_name, updated_token["consumer"]["name"])
         event = Event.objects.get(type__level=AUDIT)
         self.assertIsNotNone(event)

@@ -29,9 +29,7 @@ def get_notification_uri(notification):
 
 class TestURIs(MAASServerTestCase):
     def test_notifications_handler_path(self):
-        self.assertEqual(
-            "/MAAS/api/2.0/notifications/", get_notifications_uri()
-        )
+        self.assertEqual("/MAAS/api/2.0/notifications/", get_notifications_uri())
 
     def test_notification_handler_path(self):
         notification = factory.make_Notification()
@@ -53,21 +51,11 @@ class AssertNotificationsMixin:
                 parsed_notification.get("user").get("username"),
                 notification.user.username,
             )
-            self.assertEqual(
-                parsed_notification.get("users"), notification.users
-            )
-            self.assertEqual(
-                parsed_notification.get("admins"), notification.admins
-            )
-            self.assertEqual(
-                parsed_notification.get("message"), notification.message
-            )
-            self.assertEqual(
-                parsed_notification.get("context"), notification.context
-            )
-            self.assertEqual(
-                parsed_notification.get("category"), notification.category
-            )
+            self.assertEqual(parsed_notification.get("users"), notification.users)
+            self.assertEqual(parsed_notification.get("admins"), notification.admins)
+            self.assertEqual(parsed_notification.get("message"), notification.message)
+            self.assertEqual(parsed_notification.get("context"), notification.context)
+            self.assertEqual(parsed_notification.get("category"), notification.category)
             self.assertEqual(
                 parsed_notification.get("dismissable"),
                 notification.dismissable,
@@ -78,14 +66,10 @@ class AssertNotificationsMixin:
             )
 
 
-class TestNotificationsAPI(
-    AssertNotificationsMixin, APITestCase.ForUserAndAdmin
-):
+class TestNotificationsAPI(AssertNotificationsMixin, APITestCase.ForUserAndAdmin):
     def test_read(self):
         notifications = [
-            factory.make_Notification(
-                user=self.user, users=False, admins=False
-            ),
+            factory.make_Notification(user=self.user, users=False, admins=False),
             factory.make_Notification(user=None, users=True, admins=False),
             factory.make_Notification(user=None, users=False, admins=True),
         ]
@@ -97,9 +81,7 @@ class TestNotificationsAPI(
             notifications, parsed_notifications
         ):
             if notification.is_relevant_to(self.user):
-                self.assert_notification_matches(
-                    notification, parsed_notification
-                )
+                self.assert_notification_matches(notification, parsed_notification)
 
     def test_create_with_minimal_fields(self):
         message = factory.make_name("message")
@@ -136,12 +118,8 @@ class TestNotificationsAPI(
             self.assertEqual(
                 notification.get("user").get("username"), self.user.username
             )
-            self.assertEqual(
-                notification.get("users"), data["users"] == "true"
-            )
-            self.assertEqual(
-                notification.get("admins"), data["admins"] == "true"
-            )
+            self.assertEqual(notification.get("users"), data["users"] == "true")
+            self.assertEqual(notification.get("admins"), data["admins"] == "true")
             self.assertEqual(notification.get("message"), data["message"])
             self.assertEqual(notification.get("context"), context)
             self.assertEqual(notification.get("category"), data["category"])
@@ -164,9 +142,7 @@ class TestNotificationsAPI_Anonymous(APITestCase.ForAnonymous):
         self.assertEqual(response.status_code, http.client.UNAUTHORIZED)
 
 
-class TestNotificationAPI(
-    AssertNotificationsMixin, APITestCase.ForUserAndAdmin
-):
+class TestNotificationAPI(AssertNotificationsMixin, APITestCase.ForUserAndAdmin):
     def test_read_notification_for_self(self):
         notification = factory.make_Notification(user=self.user)
         uri = get_notification_uri(notification)

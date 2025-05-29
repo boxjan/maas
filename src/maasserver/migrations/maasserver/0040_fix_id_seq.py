@@ -2,9 +2,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0039_create_template_and_versionedtextfile_models")
-    ]
+    dependencies = [("maasserver", "0039_create_template_and_versionedtextfile_models")]
 
     operations = [
         migrations.RunSQL(

@@ -63,9 +63,7 @@ def unwrap_secret(url: str, wrapped_token: str) -> str:
     try:
         return client.sys.unwrap()["data"]["secret_id"]
     except KeyError:
-        raise WrappedSecretError(
-            "Unable to unwrap Secret ID with given token."
-        )
+        raise WrappedSecretError("Unable to unwrap Secret ID with given token.")
 
 
 class VaultClient:
@@ -131,8 +129,7 @@ class VaultClient:
     def _ensure_auth(self, force=False):
         if (
             not force
-            and self._token_expire - TOKEN_BEFORE_EXPIRY_LIMIT
-            >= self._utcnow()
+            and self._token_expire - TOKEN_BEFORE_EXPIRY_LIMIT >= self._utcnow()
         ):
             return
 
@@ -195,9 +192,7 @@ def _get_region_vault_client() -> Optional[VaultClient]:
     If configuration options for Vault are not set, None is returned.
     """
     with RegionConfiguration.open() as config:
-        if not all(
-            (config.vault_url, config.vault_approle_id, config.vault_secret_id)
-        ):
+        if not all((config.vault_url, config.vault_approle_id, config.vault_secret_id)):
             return None
         return VaultClient(
             url=config.vault_url,

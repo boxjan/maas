@@ -147,9 +147,7 @@ class TestPowerNVBootMethodRenderConfig(MAASTestCase):
         # Given the right configuration options, the PXE configuration is
         # correctly rendered.
         method = PowerNVBootMethod()
-        params = make_kernel_parameters(
-            self, arch="ppc64el", purpose="xinstall"
-        )
+        params = make_kernel_parameters(self, arch="ppc64el", purpose="xinstall")
         fs_host = re.escape(
             f"http://{convert_host_to_uri_str(params.fs_host)}:5248/images"
         )
@@ -181,8 +179,7 @@ class TestPowerNVBootMethodRenderConfig(MAASTestCase):
         output_before = method.get_reader(**options).read(10000)
         # Sprinkle some magic in.
         options.update(
-            (factory.make_name("name"), factory.make_name("value"))
-            for _ in range(10)
+            (factory.make_name("name"), factory.make_name("value")) for _ in range(10)
         )
         # Capture the output after sprinking in some random options.
         output_after = method.get_reader(**options).read(10000)
@@ -194,9 +191,7 @@ class TestPowerNVBootMethodRenderConfig(MAASTestCase):
         method = PowerNVBootMethod()
         options = {
             "backend": None,
-            "kernel_params": make_kernel_parameters(
-                arch="ppc64el", purpose="local"
-            ),
+            "kernel_params": make_kernel_parameters(arch="ppc64el", purpose="local"),
         }
         output = method.get_reader(**options).read(10000).decode("utf-8")
         self.assertIn("", output)

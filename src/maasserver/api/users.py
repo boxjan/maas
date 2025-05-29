@@ -94,9 +94,7 @@ class UsersHandler(OperationsHandler):
             password = request.data.get("password")
         else:
             password = get_mandatory_param(request.data, "password")
-        is_superuser = extract_bool(
-            get_mandatory_param(request.data, "is_superuser")
-        )
+        is_superuser = extract_bool(get_mandatory_param(request.data, "is_superuser"))
 
         create_audit_event(
             EVENT_TYPES.AUTHORISATION,
@@ -104,8 +102,7 @@ class UsersHandler(OperationsHandler):
             request,
             None,
             description=(
-                "Created %s '%s'."
-                % ("admin" if is_superuser else "user", username)
+                "Created %s '%s'." % ("admin" if is_superuser else "user", username)
             ),
         )
         if is_superuser:
@@ -176,9 +173,7 @@ class UserHandler(OperationsHandler):
         if user is not None:
             new_owner_username = form.cleaned_data["transfer_resources_to"]
             if new_owner_username:
-                new_owner = get_object_or_404(
-                    User, username=new_owner_username
-                )
+                new_owner = get_object_or_404(User, username=new_owner_username)
                 if new_owner is not None:
                     user.userprofile.transfer_resources(new_owner)
 

@@ -17,9 +17,7 @@ def forwards(apps, schema_editor):
         role.resource_pools.add(pool)
         if pool.id == 0:
             # assign existing users (except system ones) to the default pool.
-            users = User.objects.exclude(
-                username__in=("MAAS", "maas-init-node")
-            )
+            users = User.objects.exclude(username__in=("MAAS", "maas-init-node"))
             role.users.add(*users)
 
 

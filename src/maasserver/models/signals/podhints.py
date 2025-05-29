@@ -12,9 +12,7 @@ from maasserver.utils.signals import SignalsManager
 signals = SignalsManager()
 
 
-def pod_nodes_changed(
-    sender, instance, action, reverse, model, pk_set, **kwargs
-):
+def pod_nodes_changed(sender, instance, action, reverse, model, pk_set, **kwargs):
     if action == "post_remove":
         # Recalculate resources based on the remaining Nodes.
         instance.pod.sync_hints_from_nodes()

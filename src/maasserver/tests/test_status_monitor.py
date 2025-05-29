@@ -128,9 +128,7 @@ class TestMarkNodesFailedAfterMissingScriptTimeout(MAASServerTestCase):
         node, script_set = self.make_node()
         current_time = now()
         node_timeout = Config.objects.get_config("node_timeout")
-        script_set.last_ping = current_time - timedelta(
-            minutes=(node_timeout + 1)
-        )
+        script_set.last_ping = current_time - timedelta(minutes=(node_timeout + 1))
         script_set.save()
         script_results = [
             factory.make_ScriptResult(
@@ -139,15 +137,12 @@ class TestMarkNodesFailedAfterMissingScriptTimeout(MAASServerTestCase):
             for _ in range(3)
         ]
 
-        mark_nodes_failed_after_missing_script_timeout(
-            current_time, node_timeout
-        )
+        mark_nodes_failed_after_missing_script_timeout(current_time, node_timeout)
         node = reload_object(node)
 
         self.assertEqual(self.failed_status, node.status)
         self.assertEqual(
-            "Node has not been heard from for the last %s minutes"
-            % node_timeout,
+            "Node has not been heard from for the last %s minutes" % node_timeout,
             node.error_description,
         )
         self.assertIn(

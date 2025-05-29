@@ -165,9 +165,7 @@ class TestCopySSHKeys(MAASServerTestCase):
         user2 = factory.make_User()
         copy_ssh_keys(user1, user2)
         user2s_ssh_keys = SSHKey.objects.filter(user=user2)
-        self.assertEqual(
-            {key1.key}, {ssh_key.key for ssh_key in user2s_ssh_keys}
-        )
+        self.assertEqual({key1.key}, {ssh_key.key for ssh_key in user2s_ssh_keys})
 
     def test_copy_is_idempotent(self):
         # When the destination user already has a key, copy_ssh_keys() is a
@@ -178,9 +176,7 @@ class TestCopySSHKeys(MAASServerTestCase):
         key2 = factory.make_SSHKey(user2, key1.key)
         copy_ssh_keys(user1, user2)
         user2s_ssh_keys = SSHKey.objects.filter(user=user2)
-        self.assertEqual(
-            {key2.key}, {ssh_key.key for ssh_key in user2s_ssh_keys}
-        )
+        self.assertEqual({key2.key}, {ssh_key.key for ssh_key in user2s_ssh_keys})
 
     def test_copy_does_not_clobber(self):
         # When the destination user already has some keys, copy_ssh_keys()
@@ -255,9 +251,7 @@ class TestMigrateToUser(MAASServerTestCase):
         give_file_to_user = self.patch(migration, "give_file_to_user")
         # migrate_to_user() will copy all SSH keys and give all API
         # credentials belonging to node owners over to a specified user.
-        get_owned_nodes_owners = self.patch(
-            migration, "get_owned_nodes_owners"
-        )
+        get_owned_nodes_owners = self.patch(migration, "get_owned_nodes_owners")
         get_owned_nodes_owners.return_value = [
             sentinel.node_owner1,
             sentinel.node_owner2,

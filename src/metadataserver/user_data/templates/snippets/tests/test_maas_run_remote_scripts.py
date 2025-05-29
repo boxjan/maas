@@ -80,9 +80,7 @@ def make_script(
     SCRIPT_RESULT_ID += 1
     ret = {
         "name": name,
-        "path": "{}/{}".format(
-            random.choice(["commissioning", "testing"]), name
-        ),
+        "path": "{}/{}".format(random.choice(["commissioning", "testing"]), name),
         "script_result_id": script_result_id,
         "script_version_id": script_version_id,
         "timeout_seconds": timeout_seconds,
@@ -99,9 +97,7 @@ def make_script(
     if with_added_attribs:
         if scripts_dir is None:
             scripts_dir = factory.make_name("scripts_dir")
-        out_dir = os.path.join(
-            scripts_dir, "out", f"{name}.{script_result_id}"
-        )
+        out_dir = os.path.join(scripts_dir, "out", f"{name}.{script_result_id}")
 
         url = factory.make_url()
         creds = {"token_secret": factory.make_name("token_secret")}
@@ -132,9 +128,7 @@ def make_script(
         ret["stderr"] = f"{stderr}\n"
         ret["result_name"] = "%s.yaml" % name
         ret["result_path"] = os.path.join(out_dir, ret["result_name"])
-        ret["result"] = yaml.safe_dump(
-            {factory.make_string(): factory.make_string()}
-        )
+        ret["result"] = yaml.safe_dump({factory.make_string(): factory.make_string()})
         ret["download_path"] = os.path.join(scripts_dir, "downloads", name)
         ret["resources_file"] = factory.make_name("/tmp/")
 
@@ -191,9 +185,7 @@ def make_scripts(
                 timeout_seconds=script["timeout_seconds"],
                 parallel=script["parallel"],
                 hardware_type=script["hardware_type"],
-                apply_configured_networking=script[
-                    "apply_configured_networking"
-                ],
+                apply_configured_networking=script["apply_configured_networking"],
             )
             for _ in range(count - 1)
         ]
@@ -226,12 +218,8 @@ def make_fake_os_path_exists(testcase, exists=True):
 class TestOutputAndSend(MAASTestCase):
     def setUp(self):
         super().setUp()
-        self.stderr_write = self.patch(
-            maas_run_remote_scripts.sys.stderr, "write"
-        )
-        self.signal_wrapper = self.patch(
-            maas_run_remote_scripts, "signal_wrapper"
-        )
+        self.stderr_write = self.patch(maas_run_remote_scripts.sys.stderr, "write")
+        self.signal_wrapper = self.patch(maas_run_remote_scripts, "signal_wrapper")
 
     def test_output_and_send_outputs(self):
         error = factory.make_string()
@@ -279,9 +267,7 @@ class TestOutputAndSend(MAASTestCase):
         )
         for script in scripts:
             script_error = "%s\n" % error.format(**script)
-            self.assertEqual(
-                script_error, open(script["combined_path"]).read()
-            )
+            self.assertEqual(script_error, open(script["combined_path"]).read())
             self.assertEqual(script_error, open(script["stderr_path"]).read())
 
 
@@ -316,9 +302,7 @@ class TestInstallDependencies(MAASTestCase):
         )
         self.assertEqual(script["stdout"], open(script["stdout_path"]).read())
         self.assertEqual(script["stderr"], open(script["stderr_path"]).read())
-        self.assertEqual(
-            script["combined"], open(script["combined_path"]).read()
-        )
+        self.assertEqual(script["combined"], open(script["combined_path"]).read())
 
     def test_run_and_check_errors(self):
         scripts_dir = self.useFixture(TempDirectory()).path
@@ -341,9 +325,7 @@ class TestInstallDependencies(MAASTestCase):
         )
         self.assertEqual(script["stdout"], open(script["stdout_path"]).read())
         self.assertEqual(script["stderr"], open(script["stderr_path"]).read())
-        self.assertEqual(
-            script["combined"], open(script["combined_path"]).read()
-        )
+        self.assertEqual(script["combined"], open(script["combined_path"]).read())
         for script in scripts:
             self.mock_output_and_send.assert_any_call(
                 "Failed installing package(s) for %s" % script["msg_name"],
@@ -351,9 +333,7 @@ class TestInstallDependencies(MAASTestCase):
                 status=status,
                 **script["args"],
                 files={
-                    scripts[0]["combined_name"]: scripts[0][
-                        "combined"
-                    ].encode(),
+                    scripts[0]["combined_name"]: scripts[0]["combined"].encode(),
                     scripts[0]["stdout_name"]: scripts[0]["stdout"].encode(),
                     scripts[0]["stderr_name"]: scripts[0]["stderr"].encode(),
                 },
@@ -380,18 +360,14 @@ class TestInstallDependencies(MAASTestCase):
         )
         self.assertEqual(script["stdout"], open(script["stdout_path"]).read())
         self.assertEqual(script["stderr"], open(script["stderr_path"]).read())
-        self.assertEqual(
-            script["combined"], open(script["combined_path"]).read()
-        )
+        self.assertEqual(script["combined"], open(script["combined_path"]).read())
 
     def test_sudo_run_and_check(self):
         mock_popen = self.patch(maas_run_remote_scripts, "Popen")
         self.patch(maas_run_remote_scripts, "capture_script_output")
         cmd = factory.make_name("cmd")
 
-        run_and_check(
-            [cmd], MagicMock(), factory.make_name("status"), False, True
-        )
+        run_and_check([cmd], MagicMock(), factory.make_name("status"), False, True)
 
         mock_popen.assert_called_once_with(
             ["sudo", "-En", cmd], stdin=DEVNULL, stdout=PIPE, stderr=PIPE
@@ -409,8 +385,7 @@ class TestInstallDependencies(MAASTestCase):
                 [
                     "/bin/bash",
                     "-c",
-                    "echo %s;echo %s >&2;false"
-                    % (script["stdout"], script["stderr"]),
+                    "echo %s;echo %s >&2;false" % (script["stdout"], script["stderr"]),
                 ],
                 scripts,
                 status,
@@ -428,9 +403,7 @@ class TestInstallDependencies(MAASTestCase):
         self.mock_output_and_send.assert_not_called()
 
     def test_install_dependencies_apt(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         make_fake_os_path_exists(self)
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
@@ -447,8 +420,7 @@ class TestInstallDependencies(MAASTestCase):
                 status="INSTALLING",
             )
             mock_run_and_check.assert_called_once_with(
-                ["apt-get", "-qy", "--no-install-recommends", "install"]
-                + packages,
+                ["apt-get", "-qy", "--no-install-recommends", "install"] + packages,
                 scripts,
                 "INSTALLING",
                 True,
@@ -460,9 +432,7 @@ class TestInstallDependencies(MAASTestCase):
             self.assertFalse(os.path.exists(script["stderr_path"]))
 
     def test_install_dependencies_runs_apt_get_update_when_required(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         make_fake_os_path_exists(self, False)
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
@@ -482,8 +452,7 @@ class TestInstallDependencies(MAASTestCase):
                 status="INSTALLING",
             )
             mock_run_and_check.assert_any_call(
-                ["apt-get", "-qy", "--no-install-recommends", "install"]
-                + packages,
+                ["apt-get", "-qy", "--no-install-recommends", "install"] + packages,
                 scripts,
                 "INSTALLING",
                 True,
@@ -495,9 +464,7 @@ class TestInstallDependencies(MAASTestCase):
             self.assertFalse(os.path.exists(script["stderr_path"]))
 
     def test_install_dependencies_apt_errors(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         mock_run_and_check.return_value = False
         make_fake_os_path_exists(self)
         scripts_dir = self.useFixture(TempDirectory()).path
@@ -515,8 +482,7 @@ class TestInstallDependencies(MAASTestCase):
                 status="INSTALLING",
             )
             mock_run_and_check.assert_called_once_with(
-                ["apt-get", "-qy", "--no-install-recommends", "install"]
-                + packages,
+                ["apt-get", "-qy", "--no-install-recommends", "install"] + packages,
                 scripts,
                 "INSTALLING",
                 True,
@@ -524,9 +490,7 @@ class TestInstallDependencies(MAASTestCase):
             )
 
     def test_install_dependencies_snap_str_list(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
         packages = [factory.make_name("snap_pkg") for _ in range(3)]
@@ -556,31 +520,23 @@ class TestInstallDependencies(MAASTestCase):
             )
 
     def test_install_dependencies_snap_str_dict(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
         packages = [
             {"name": factory.make_name("pkg")},
             {
                 "name": factory.make_name("pkg"),
-                "channel": random.choice(
-                    ["edge", "beta", "candidate", "stable"]
-                ),
+                "channel": random.choice(["edge", "beta", "candidate", "stable"]),
             },
             {
                 "name": factory.make_name("pkg"),
-                "channel": random.choice(
-                    ["edge", "beta", "candidate", "stable"]
-                ),
+                "channel": random.choice(["edge", "beta", "candidate", "stable"]),
                 "mode": random.choice(["dev", "jail"]),
             },
             {
                 "name": factory.make_name("pkg"),
-                "channel": random.choice(
-                    ["edge", "beta", "candidate", "stable"]
-                ),
+                "channel": random.choice(["edge", "beta", "candidate", "stable"]),
                 "mode": random.choice(["dev", "jail"]),
             },
         ]
@@ -646,9 +602,7 @@ class TestInstallDependencies(MAASTestCase):
         )
 
     def test_install_dependencies_snap_errors(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         mock_run_and_check.return_value = False
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
@@ -674,9 +628,7 @@ class TestInstallDependencies(MAASTestCase):
         )
 
     def test_install_dependencies_url(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir)
         packages = [factory.make_name("url") for _ in range(3)]
@@ -704,9 +656,7 @@ class TestInstallDependencies(MAASTestCase):
         self.assertFalse(os.path.exists(scripts[0]["stderr_path"]))
 
     def test_install_dependencies_url_errors(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         mock_run_and_check.return_value = False
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir)
@@ -740,9 +690,7 @@ class TestInstallDependencies(MAASTestCase):
             script["packages"] = {"url": [tar_file]}
 
         self.assertTrue(install_dependencies(scripts))
-        with open(
-            os.path.join(scripts[0]["download_path"], "test-file"), "rb"
-        ) as f:
+        with open(os.path.join(scripts[0]["download_path"], "test-file"), "rb") as f:
             self.assertEqual(file_content, f.read())
 
     def test_install_dependencies_url_zip(self):
@@ -759,15 +707,11 @@ class TestInstallDependencies(MAASTestCase):
             script["packages"] = {"url": [zip_file]}
 
         self.assertTrue(install_dependencies(scripts))
-        with open(
-            os.path.join(scripts[0]["download_path"], "test-file"), "rb"
-        ) as f:
+        with open(os.path.join(scripts[0]["download_path"], "test-file"), "rb") as f:
             self.assertEqual(file_content, f.read())
 
     def test_install_dependencies_url_deb(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
         deb_file = os.path.join(scripts[0]["download_path"], "file.deb")
@@ -790,9 +734,7 @@ class TestInstallDependencies(MAASTestCase):
         )
 
     def test_install_dependencies_url_deb_errors(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         mock_run_and_check.side_effect = (True, True, False)
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
@@ -816,9 +758,7 @@ class TestInstallDependencies(MAASTestCase):
         )
 
     def test_install_dependencies_url_snap(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
         snap_file = os.path.join(scripts[0]["download_path"], "file.snap")
@@ -834,9 +774,7 @@ class TestInstallDependencies(MAASTestCase):
         )
 
     def test_install_dependencies_url_snap_errors(self):
-        mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
+        mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
         mock_run_and_check.side_effect = (True, False)
         scripts_dir = self.useFixture(TempDirectory()).path
         scripts = make_scripts(scripts_dir=scripts_dir, with_output=False)
@@ -867,24 +805,16 @@ class TestCustomNetworking(MAASTestCase):
         self.mock_output_and_send_scripts = self.patch(
             maas_run_remote_scripts, "output_and_send_scripts"
         )
-        self.mock_run_and_check = self.patch(
-            maas_run_remote_scripts, "run_and_check"
-        )
-        self.mock_get_interfaces = self.patch(
-            maas_run_remote_scripts, "get_interfaces"
-        )
-        self.mock_signal = self.patch_autospec(
-            maas_run_remote_scripts, "signal"
-        )
+        self.mock_run_and_check = self.patch(maas_run_remote_scripts, "run_and_check")
+        self.mock_get_interfaces = self.patch(maas_run_remote_scripts, "get_interfaces")
+        self.mock_signal = self.patch_autospec(maas_run_remote_scripts, "signal")
         self.patch(maas_run_remote_scripts.sys.stdout, "write")
         self.patch(maas_run_remote_scripts.sys.stderr, "write")
         self.patch(maas_run_remote_scripts.time, "sleep")
         # Mock out dbus so unit tests don't touch the running system.
         # This causes _wait_for_networkd to return False but doesn't
         # effect unit tests.
-        self.mock_systembus = self.patch(
-            maas_run_remote_scripts.dbus, "SystemBus"
-        )
+        self.mock_systembus = self.patch(maas_run_remote_scripts.dbus, "SystemBus")
 
     def tearDown(self):
         super().tearDown()
@@ -931,9 +861,7 @@ class TestCustomNetworking(MAASTestCase):
 
     def test_enter_applies_custom_networking(self):
         netplan_yaml_content = factory.make_string()
-        factory.make_file(
-            self.config_dir, "netplan.yaml", netplan_yaml_content
-        )
+        factory.make_file(self.config_dir, "netplan.yaml", netplan_yaml_content)
         ephemeral_config_content = factory.make_string()
         factory.make_file(
             self.netplan_dir, "50-cloud-init.yaml", ephemeral_config_content
@@ -953,16 +881,12 @@ class TestCustomNetworking(MAASTestCase):
                 open(os.path.join(self.netplan_dir, "netplan.yaml")).read(),
             )
             self.assertFalse(
-                os.path.exists(
-                    os.path.join(self.netplan_dir, "50-cloud-init.yaml")
-                )
+                os.path.exists(os.path.join(self.netplan_dir, "50-cloud-init.yaml"))
             )
             self.assertEqual(
                 ephemeral_config_content,
                 open(
-                    os.path.join(
-                        self.config_dir, "netplan.bak", "50-cloud-init.yaml"
-                    ),
+                    os.path.join(self.config_dir, "netplan.bak", "50-cloud-init.yaml"),
                 ).read(),
             )
             # Verify logs from netplan apply where removed
@@ -980,9 +904,7 @@ class TestCustomNetworking(MAASTestCase):
 
     def test_enter_applies_custom_networking_no_send(self):
         netplan_yaml_content = factory.make_string()
-        factory.make_file(
-            self.config_dir, "netplan.yaml", netplan_yaml_content
-        )
+        factory.make_file(self.config_dir, "netplan.yaml", netplan_yaml_content)
         ephemeral_config_content = factory.make_string()
         factory.make_file(
             self.netplan_dir, "50-cloud-init.yaml", ephemeral_config_content
@@ -1002,16 +924,12 @@ class TestCustomNetworking(MAASTestCase):
                 open(os.path.join(self.netplan_dir, "netplan.yaml")).read(),
             )
             self.assertFalse(
-                os.path.exists(
-                    os.path.join(self.netplan_dir, "50-cloud-init.yaml")
-                )
+                os.path.exists(os.path.join(self.netplan_dir, "50-cloud-init.yaml"))
             )
             self.assertEqual(
                 ephemeral_config_content,
                 open(
-                    os.path.join(
-                        self.config_dir, "netplan.bak", "50-cloud-init.yaml"
-                    ),
+                    os.path.join(self.config_dir, "netplan.bak", "50-cloud-init.yaml"),
                 ).read(),
             )
             # Verify logs from netplan apply where removed
@@ -1061,9 +979,7 @@ class TestCustomNetworking(MAASTestCase):
         mock_bring_down_networking = self.patch(
             custom_networking, "_bring_down_networking"
         )
-        self.mock_signal.side_effect = SignalException(
-            factory.make_name("error")
-        )
+        self.mock_signal.side_effect = SignalException(factory.make_name("error"))
         mock_clean_logs = self.patch(maas_run_remote_scripts, "_clean_logs")
 
         self.assertRaises(SignalException, custom_networking.__enter__)
@@ -1089,9 +1005,7 @@ class TestCustomNetworking(MAASTestCase):
 
     def test_apply_ephemeral_netplan_does_nothing_if_not_backup_config(self):
         mock_check_call = self.patch(maas_run_remote_scripts, "check_call")
-        mock_signal_wrapper = self.patch(
-            maas_run_remote_scripts, "signal_wrapper"
-        )
+        mock_signal_wrapper = self.patch(maas_run_remote_scripts, "signal_wrapper")
         scripts = make_scripts(
             scripts_dir=self.base_dir, apply_configured_networking=True
         )
@@ -1109,19 +1023,13 @@ class TestCustomNetworking(MAASTestCase):
 
     def test_apply_ephemeral_netplan(self):
         mock_check_call = self.patch(maas_run_remote_scripts, "check_call")
-        mock_signal_wrapper = self.patch(
-            maas_run_remote_scripts, "signal_wrapper"
-        )
+        mock_signal_wrapper = self.patch(maas_run_remote_scripts, "signal_wrapper")
         netplan_yaml_content = factory.make_string()
-        factory.make_file(
-            self.netplan_dir, "netplan.yaml", netplan_yaml_content
-        )
+        factory.make_file(self.netplan_dir, "netplan.yaml", netplan_yaml_content)
         backup_dir = os.path.join(self.config_dir, "netplan.bak")
         os.makedirs(backup_dir, exist_ok=True)
         ephemeral_config_content = factory.make_string()
-        factory.make_file(
-            backup_dir, "50-cloud-init.yaml", ephemeral_config_content
-        )
+        factory.make_file(backup_dir, "50-cloud-init.yaml", ephemeral_config_content)
         scripts = make_scripts(
             scripts_dir=self.base_dir, apply_configured_networking=True
         )
@@ -1144,19 +1052,13 @@ class TestCustomNetworking(MAASTestCase):
 
     def test_apply_ephemeral_netplan_no_send(self):
         mock_check_call = self.patch(maas_run_remote_scripts, "check_call")
-        mock_signal_wrapper = self.patch(
-            maas_run_remote_scripts, "signal_wrapper"
-        )
+        mock_signal_wrapper = self.patch(maas_run_remote_scripts, "signal_wrapper")
         netplan_yaml_content = factory.make_string()
-        factory.make_file(
-            self.netplan_dir, "netplan.yaml", netplan_yaml_content
-        )
+        factory.make_file(self.netplan_dir, "netplan.yaml", netplan_yaml_content)
         backup_dir = os.path.join(self.config_dir, "netplan.bak")
         os.makedirs(backup_dir, exist_ok=True)
         ephemeral_config_content = factory.make_string()
-        factory.make_file(
-            backup_dir, "50-cloud-init.yaml", ephemeral_config_content
-        )
+        factory.make_file(backup_dir, "50-cloud-init.yaml", ephemeral_config_content)
         scripts = make_scripts(
             scripts_dir=self.base_dir, apply_configured_networking=True
         )
@@ -1182,19 +1084,13 @@ class TestCustomNetworking(MAASTestCase):
         mock_check_call.side_effect = TimeoutExpired(
             ["netplan", "apply", "--debug"], 60
         )
-        mock_signal_wrapper = self.patch(
-            maas_run_remote_scripts, "signal_wrapper"
-        )
+        mock_signal_wrapper = self.patch(maas_run_remote_scripts, "signal_wrapper")
         netplan_yaml_content = factory.make_string()
-        factory.make_file(
-            self.netplan_dir, "netplan.yaml", netplan_yaml_content
-        )
+        factory.make_file(self.netplan_dir, "netplan.yaml", netplan_yaml_content)
         backup_dir = os.path.join(self.config_dir, "netplan.bak")
         os.makedirs(backup_dir, exist_ok=True)
         ephemeral_config_content = factory.make_string()
-        factory.make_file(
-            backup_dir, "50-cloud-init.yaml", ephemeral_config_content
-        )
+        factory.make_file(backup_dir, "50-cloud-init.yaml", ephemeral_config_content)
         scripts = make_scripts(
             scripts_dir=self.base_dir, apply_configured_networking=True
         )
@@ -1220,19 +1116,13 @@ class TestCustomNetworking(MAASTestCase):
         mock_check_call.side_effect = CalledProcessError(
             -1, ["netplan", "apply", "--debug"]
         )
-        mock_signal_wrapper = self.patch(
-            maas_run_remote_scripts, "signal_wrapper"
-        )
+        mock_signal_wrapper = self.patch(maas_run_remote_scripts, "signal_wrapper")
         netplan_yaml_content = factory.make_string()
-        factory.make_file(
-            self.netplan_dir, "netplan.yaml", netplan_yaml_content
-        )
+        factory.make_file(self.netplan_dir, "netplan.yaml", netplan_yaml_content)
         backup_dir = os.path.join(self.config_dir, "netplan.bak")
         os.makedirs(backup_dir, exist_ok=True)
         ephemeral_config_content = factory.make_string()
-        factory.make_file(
-            backup_dir, "50-cloud-init.yaml", ephemeral_config_content
-        )
+        factory.make_file(backup_dir, "50-cloud-init.yaml", ephemeral_config_content)
         scripts = make_scripts(
             scripts_dir=self.base_dir, apply_configured_networking=True
         )
@@ -1298,10 +1188,7 @@ class TestCustomNetworking(MAASTestCase):
         custom_networking._bring_down_networking()
 
         mock_check_call.assert_has_calls(
-            [
-                call(["ip", "link", "delete", dev], timeout=60)
-                for dev in virtual_devs
-            ]
+            [call(["ip", "link", "delete", dev], timeout=60) for dev in virtual_devs]
             + [
                 call(["ip", "link", "set", "down", dev], timeout=60)
                 for dev in physical_devs
@@ -1348,10 +1235,7 @@ class TestCustomNetworking(MAASTestCase):
         custom_networking._bring_down_networking()
 
         mock_check_call.assert_has_calls(
-            [
-                call(["ip", "link", "delete", dev], timeout=60)
-                for dev in virtual_devs
-            ]
+            [call(["ip", "link", "delete", dev], timeout=60) for dev in virtual_devs]
             + [
                 call(["ip", "link", "set", "down", dev], timeout=60)
                 for dev in physical_devs
@@ -1375,9 +1259,7 @@ class TestCustomNetworking(MAASTestCase):
         self.assertIsNotNone(maas_run_remote_scripts._dbus)
         self.assertIsNotNone(maas_run_remote_scripts._systemd_interface)
         self.assertIsNotNone(maas_run_remote_scripts._networkd_interface)
-        self.assertIsNotNone(
-            maas_run_remote_scripts._networkd_properties_interface
-        )
+        self.assertIsNotNone(maas_run_remote_scripts._networkd_properties_interface)
 
     def test_wait_for_networkd_loads_from_cache(self):
         scripts = make_scripts(
@@ -1505,14 +1387,10 @@ class TestParseParameters(MAASTestCase):
         self.assertRaises(KeyError, get_block_devices)
 
     def test_udev_decode(self):
-        self.assertEqual(
-            "QEMU HARDDISK", udev_decode("QEMU\x20HARDDISK\x20\x20\x20")
-        )
+        self.assertEqual("QEMU HARDDISK", udev_decode("QEMU\x20HARDDISK\x20\x20\x20"))
 
     def test_get_storage_model_from_udev(self):
-        self.patch(
-            maas_run_remote_scripts.os.path, "exists"
-        ).return_value = True
+        self.patch(maas_run_remote_scripts.os.path, "exists").return_value = True
         self.patch(
             maas_run_remote_scripts,
             "open",
@@ -1536,9 +1414,7 @@ class TestParseParameters(MAASTestCase):
         )
 
     def test_get_storage_model_from_udev_warns(self):
-        mock_stderr_write = self.patch(
-            maas_run_remote_scripts.sys.stderr, "write"
-        )
+        mock_stderr_write = self.patch(maas_run_remote_scripts.sys.stderr, "write")
         model = factory.make_name("model")
         block_dev = {"maj:min": factory.make_name("maj:min"), "model": model}
         self.assertEqual(
@@ -1626,9 +1502,7 @@ class TestParseParameters(MAASTestCase):
         )
         mock_sleep = self.patch(maas_run_remote_scripts.time, "sleep")
 
-        self.assertEqual(
-            {br0_mac: "bridge0", eth2_mac: "eth2"}, get_interfaces()
-        )
+        self.assertEqual({br0_mac: "bridge0", eth2_mac: "eth2"}, get_interfaces())
         # This should only be called once but sometimes unittest catches
         # sleeps from itself which cause the lander to fail.
         mock_sleep.assert_any_call(0.1)
@@ -1743,12 +1617,10 @@ class TestParseParameters(MAASTestCase):
                 "--url=%s" % script["parameters"]["url"]["value"],
                 "--storage=%s"
                 % script["parameters"]["storage_virtio"]["value"]["id_path"],
-                "--storage=/dev/%s"
-                % script["parameters"]["storage"]["value"]["name"],
+                "--storage=/dev/%s" % script["parameters"]["storage"]["value"]["name"],
                 "--interface=%s"
                 % script["parameters"]["interface_virtio"]["value"]["name"],
-                "--interface=%s"
-                % script["parameters"]["interface"]["value"]["name"],
+                "--interface=%s" % script["parameters"]["interface"]["value"]["name"],
             ],
             parse_parameters(script, scripts_dir),
         )
@@ -1781,9 +1653,7 @@ class TestParseParameters(MAASTestCase):
                         "serial": factory.make_name("serial"),
                         "id_path": "/dev/%s" % factory.make_name("id_path"),
                     },
-                    "argument_format": (
-                        "--bar {name} {model} {serial} {path} {input}"
-                    ),
+                    "argument_format": ("--bar {name} {model} {serial} {path} {input}"),
                 },
                 "interface": {
                     "type": "interface",
@@ -1928,9 +1798,7 @@ class TestCheckLinkConnected(MAASTestCase):
         mock_join.assert_not_called()
 
     def test_only_runs_when_network_settings_applied(self):
-        script = make_script(
-            hardware_type=4, apply_configured_networking=False
-        )
+        script = make_script(hardware_type=4, apply_configured_networking=False)
         mac_address = factory.make_mac_address()
         maas_run_remote_scripts._interfaces = {mac_address: "eth0"}
         script["parameters"] = {
@@ -1956,9 +1824,7 @@ class TestCheckLinkConnected(MAASTestCase):
     def test_does_nothing_when_interface_is_not_found(self):
         script = make_script(hardware_type=4, apply_configured_networking=True)
         mac_address = factory.make_mac_address()
-        maas_run_remote_scripts._interfaces = {
-            factory.make_mac_address(): "eth1"
-        }
+        maas_run_remote_scripts._interfaces = {factory.make_mac_address(): "eth1"}
         script["parameters"] = {
             "interface": {
                 "type": "interface",
@@ -2023,9 +1889,7 @@ class TestCheckLinkConnected(MAASTestCase):
         _check_link_connected(script)
 
         with open(script["result_path"]) as f:
-            self.assertEqual(
-                {"link_connected": False}, yaml.safe_load(f.read())
-            )
+            self.assertEqual({"link_connected": False}, yaml.safe_load(f.read()))
 
     def test_check_link_connected_does_nothing_on_pass(self):
         scripts_dir = self.useFixture(TempDirectory()).path
@@ -2113,9 +1977,7 @@ class TestCheckLinkConnected(MAASTestCase):
         _check_link_connected(script)
 
         with open(script["result_path"]) as f:
-            self.assertEqual(
-                {"link_connected": False}, yaml.safe_load(f.read())
-            )
+            self.assertEqual({"link_connected": False}, yaml.safe_load(f.read()))
 
     def test_check_link_connected_does_nothing_with_nondict_result(self):
         scripts_dir = self.useFixture(TempDirectory()).path
@@ -2176,9 +2038,7 @@ class TestCheckLinkConnected(MAASTestCase):
         _check_link_connected(script)
 
         with open(script["result_path"]) as f:
-            self.assertEqual(
-                {"link_connected": True}, yaml.safe_load(f.read())
-            )
+            self.assertEqual({"link_connected": True}, yaml.safe_load(f.read()))
 
     def test_check_link_connected_does_nothing_when_yaml_passed(self):
         scripts_dir = self.useFixture(TempDirectory()).path
@@ -2235,9 +2095,7 @@ class TestCheckLinkConnected(MAASTestCase):
         _check_link_connected(script)
 
         with open(script["result_path"]) as f:
-            self.assertEqual(
-                yaml.safe_load(script["result"]), yaml.safe_load(f.read())
-            )
+            self.assertEqual(yaml.safe_load(script["result"]), yaml.safe_load(f.read()))
 
     def test_check_link_connected_appends_yaml(self):
         scripts_dir = self.useFixture(TempDirectory()).path
@@ -2279,9 +2137,7 @@ class TestRunScript(MAASTestCase):
         self.mock_capture_script_output = self.patch(
             maas_run_remote_scripts, "capture_script_output"
         )
-        self.mock_capture_script_output.side_effect = (
-            lambda proc, *args: proc.wait()
-        )
+        self.mock_capture_script_output.side_effect = lambda proc, *args: proc.wait()
         self.mock_check_link_connected = self.patch(
             maas_run_remote_scripts, "_check_link_connected"
         )
@@ -2295,9 +2151,7 @@ class TestRunScript(MAASTestCase):
     def test_run_script(self):
         scripts_dir = self.useFixture(TempDirectory()).path
         script = make_script(scripts_dir=scripts_dir)
-        script["bmc_config_path"] = os.path.join(
-            scripts_dir, "bmc-config.yaml"
-        )
+        script["bmc_config_path"] = os.path.join(scripts_dir, "bmc-config.yaml")
 
         run_script(script, scripts_dir)
 
@@ -2335,9 +2189,7 @@ class TestRunScript(MAASTestCase):
     def test_run_script_sets_env(self):
         scripts_dir = self.useFixture(TempDirectory()).path
         script = make_script(scripts_dir=scripts_dir)
-        script["bmc_config_path"] = os.path.join(
-            scripts_dir, "bmc-config.yaml"
-        )
+        script["bmc_config_path"] = os.path.join(scripts_dir, "bmc-config.yaml")
         mock_popen = self.patch(maas_run_remote_scripts, "Popen")
 
         run_script(script, scripts_dir)
@@ -2349,9 +2201,7 @@ class TestRunScript(MAASTestCase):
         self.assertEqual(script["result_path"], env["RESULT_PATH"])
         self.assertEqual(script["download_path"], env["DOWNLOAD_PATH"])
         self.assertEqual(script["resources_file"], env["MAAS_RESOURCES_FILE"])
-        self.assertEqual(
-            env["MAAS_STORAGE_CONFIG_FILE"], "/storage-config.json"
-        )
+        self.assertEqual(env["MAAS_STORAGE_CONFIG_FILE"], "/storage-config.json")
         self.assertEqual(str(script["timeout_seconds"]), env["RUNTIME"])
         self.assertEqual(str(script["has_started"]), env["HAS_STARTED"])
         self.assertEqual(script["bmc_config_path"], env["BMC_CONFIG_PATH"])
@@ -2444,15 +2294,11 @@ class TestRunScript(MAASTestCase):
             }
             for _ in range(3)
         ]
-        fake_interfaces = [
-            {factory.make_mac_address(): "eth%s" % i for i in range(3)}
-        ]
+        fake_interfaces = [{factory.make_mac_address(): "eth%s" % i for i in range(3)}]
         mock_get_block_devices = self.patch(
             maas_run_remote_scripts, "get_block_devices"
         )
-        mock_get_interfaces = self.patch(
-            maas_run_remote_scripts, "get_interfaces"
-        )
+        mock_get_interfaces = self.patch(maas_run_remote_scripts, "get_interfaces")
         mock_get_interfaces.return_value = fake_interfaces
         mock_get_block_devices.return_value = fake_block_devices
         testing_block_device_model = factory.make_name("model")
@@ -2518,9 +2364,7 @@ class TestRunScript(MAASTestCase):
         # Regression test for LP:1669246
         scripts_dir = self.useFixture(TempDirectory()).path
         script = make_script(scripts_dir=scripts_dir)
-        self.mock_capture_script_output.side_effect = OSError(
-            8, "Exec format error"
-        )
+        self.mock_capture_script_output.side_effect = OSError(8, "Exec format error")
 
         self.assertFalse(run_script(script, scripts_dir))
 
@@ -2536,9 +2380,7 @@ class TestRunScript(MAASTestCase):
                     exit_status=8,
                     runtime=ANY,
                     files={
-                        script[
-                            "combined_name"
-                        ]: b"[Errno 8] Exec format error",
+                        script["combined_name"]: b"[Errno 8] Exec format error",
                         script["stderr_name"]: b"[Errno 8] Exec format error",
                         script["result_name"]: script["result"].encode(),
                     },
@@ -2588,9 +2430,7 @@ class TestRunScript(MAASTestCase):
         # Regression test for LP:1669246
         scripts_dir = self.useFixture(TempDirectory()).path
         script = make_script(scripts_dir=scripts_dir)
-        self.mock_capture_script_output.side_effect = OSError(
-            0, "Exec format error"
-        )
+        self.mock_capture_script_output.side_effect = OSError(0, "Exec format error")
 
         self.assertFalse(run_script(script, scripts_dir))
 
@@ -2606,9 +2446,7 @@ class TestRunScript(MAASTestCase):
                     exit_status=2,
                     runtime=ANY,
                     files={
-                        script[
-                            "combined_name"
-                        ]: b"[Errno 0] Exec format error",
+                        script["combined_name"]: b"[Errno 0] Exec format error",
                         script["stderr_name"]: b"[Errno 0] Exec format error",
                         script["result_name"]: script["result"].encode(),
                     },
@@ -2664,9 +2502,7 @@ class TestRunScript(MAASTestCase):
         scripts_dir = self.useFixture(TempDirectory()).path
         mock_bmc_config = self.patch(maas_run_remote_scripts, "bmc_config")
         script = make_script(scripts_dir=scripts_dir)
-        script["bmc_config_path"] = os.path.join(
-            scripts_dir, "bmc-config.yaml"
-        )
+        script["bmc_config_path"] = os.path.join(scripts_dir, "bmc-config.yaml")
         open(script["bmc_config_path"], "w").close()
 
         run_script(script, scripts_dir)
@@ -2707,9 +2543,7 @@ class TestRunScript(MAASTestCase):
         scripts_dir = self.useFixture(TempDirectory()).path
         mock_bmc_config = self.patch(maas_run_remote_scripts, "bmc_config")
         script = make_script(scripts_dir=scripts_dir, return_code=1)
-        script["bmc_config_path"] = os.path.join(
-            scripts_dir, "bmc-config.yaml"
-        )
+        script["bmc_config_path"] = os.path.join(scripts_dir, "bmc-config.yaml")
         open(script["bmc_config_path"], "w").close()
 
         run_script(script, scripts_dir)
@@ -2752,16 +2586,13 @@ class TestRunScript(MAASTestCase):
         exception_message = factory.make_string()
         mock_bmc_config.side_effect = factory.make_exception(exception_message)
         script = make_script(scripts_dir=scripts_dir)
-        script["bmc_config_path"] = os.path.join(
-            scripts_dir, "bmc-config.yaml"
-        )
+        script["bmc_config_path"] = os.path.join(scripts_dir, "bmc-config.yaml")
         open(script["bmc_config_path"], "w").close()
 
         run_script(script, scripts_dir)
 
         bmc_config_error = (
-            "\n\nError: Unable to send BMC config to MAAS - "
-            f"{exception_message}"
+            "\n\nError: Unable to send BMC config to MAAS - " f"{exception_message}"
         )
         script["combined"] += bmc_config_error
         script["stderr"] += bmc_config_error
@@ -2802,16 +2633,12 @@ class TestRunScript(MAASTestCase):
 class TestBMCConfig(MAASTestCase):
     def test_get_mac_addresses_for_enlistment(self):
         mac_addresses = [factory.make_mac_address() for _ in range(3)]
-        mock_get_interfaces = self.patch(
-            maas_run_remote_scripts, "get_interfaces"
-        )
+        mock_get_interfaces = self.patch(maas_run_remote_scripts, "get_interfaces")
         mock_get_interfaces.return_value = {
             "02:00:00:00:00:02": factory.make_name("iface"),
             **{mac: factory.make_name("iface") for mac in mac_addresses},
         }
-        self.assertEqual(
-            ",".join(mac_addresses), get_mac_addresses_for_enlistment()
-        )
+        self.assertEqual(",".join(mac_addresses), get_mac_addresses_for_enlistment())
 
     def test_enlist(self):
         cloud_cfg_dir = self.useFixture(TempDirectory()).path
@@ -2832,9 +2659,7 @@ class TestBMCConfig(MAASTestCase):
             },
         }
         mac_addresses = [factory.make_mac_address() for _ in range(3)]
-        mock_get_interfaces = self.patch(
-            maas_run_remote_scripts, "get_interfaces"
-        )
+        mock_get_interfaces = self.patch(maas_run_remote_scripts, "get_interfaces")
         mock_get_interfaces.return_value = {
             mac: factory.make_name("iface") for mac in mac_addresses
         }
@@ -2864,16 +2689,12 @@ class TestBMCConfig(MAASTestCase):
             "http://%s/MAAS/metadata/latest/by-id/%s/?op=get_preseed"
             % (netloc, system_id)
         )
-        self.assertEqual(
-            config.credentials.consumer_key, new_creds["consumer_key"]
-        )
+        self.assertEqual(config.credentials.consumer_key, new_creds["consumer_key"])
         self.assertEqual(
             config.credentials.consumer_secret, new_creds["consumer_secret"]
         )
         self.assertEqual(config.credentials.token_key, new_creds["token_key"])
-        self.assertEqual(
-            config.credentials.token_secret, new_creds["token_secret"]
-        )
+        self.assertEqual(config.credentials.token_secret, new_creds["token_secret"])
         self.assertEqual(yaml.safe_load(open(config_path)), preseed)
 
     def test_enlist_with_power_creds(self):
@@ -2895,9 +2716,7 @@ class TestBMCConfig(MAASTestCase):
             },
         }
         mac_addresses = [factory.make_mac_address() for _ in range(3)]
-        mock_get_interfaces = self.patch(
-            maas_run_remote_scripts, "get_interfaces"
-        )
+        mock_get_interfaces = self.patch(maas_run_remote_scripts, "get_interfaces")
         mock_get_interfaces.return_value = {
             mac: factory.make_name("iface") for mac in mac_addresses
         }
@@ -2912,8 +2731,7 @@ class TestBMCConfig(MAASTestCase):
         url = factory.make_url(scheme="http", netloc=netloc)
         power_type = factory.make_name("power_type")
         power_parameters = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         config = Config()
         config.update({"metadata_url": url, **creds})
@@ -2934,30 +2752,23 @@ class TestBMCConfig(MAASTestCase):
             "http://%s/MAAS/metadata/latest/by-id/%s/?op=get_preseed"
             % (netloc, system_id)
         )
-        self.assertEqual(
-            config.credentials.consumer_key, new_creds["consumer_key"]
-        )
+        self.assertEqual(config.credentials.consumer_key, new_creds["consumer_key"])
         self.assertEqual(
             config.credentials.consumer_secret, new_creds["consumer_secret"]
         )
         self.assertEqual(config.credentials.token_key, new_creds["token_key"])
-        self.assertEqual(
-            config.credentials.token_secret, new_creds["token_secret"]
-        )
+        self.assertEqual(config.credentials.token_secret, new_creds["token_secret"])
         self.assertEqual(yaml.safe_load(open(config_path)), preseed)
 
     def test_bmc_config_commissioning(self):
-        mock_output_and_send = self.patch(
-            maas_run_remote_scripts, "output_and_send"
-        )
+        mock_output_and_send = self.patch(maas_run_remote_scripts, "output_and_send")
         mock_output_and_send.return_value = True
         maas_run_remote_scripts._bmc_config_uploaded = False
         config_dir = self.useFixture(TempDirectory()).path
         bmc_config_path = os.path.join(config_dir, "bmc-config.yaml")
         power_type = factory.make_name("power_type")
         power_params = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         config = {
             "power_type": power_type,
@@ -2995,9 +2806,7 @@ class TestBMCConfig(MAASTestCase):
         self.assertTrue(maas_run_remote_scripts._bmc_config_uploaded)
 
     def test_bmc_config_enlist(self):
-        mock_output_and_send = self.patch(
-            maas_run_remote_scripts, "output_and_send"
-        )
+        mock_output_and_send = self.patch(maas_run_remote_scripts, "output_and_send")
         mock_output_and_send.return_value = False
         mock_enlist = self.patch(maas_run_remote_scripts, "enlist")
         maas_run_remote_scripts._bmc_config_uploaded = False
@@ -3005,8 +2814,7 @@ class TestBMCConfig(MAASTestCase):
         bmc_config_path = os.path.join(config_dir, "bmc-config.yaml")
         power_type = factory.make_name("power_type")
         power_params = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         config = {
             "power_type": power_type,
@@ -3048,9 +2856,7 @@ class TestBMCConfig(MAASTestCase):
         self.assertTrue(maas_run_remote_scripts._bmc_config_uploaded)
 
     def test_bmc_config_enlist_retry(self):
-        mock_output_and_send = self.patch(
-            maas_run_remote_scripts, "output_and_send"
-        )
+        mock_output_and_send = self.patch(maas_run_remote_scripts, "output_and_send")
         mock_output_and_send.return_value = False
         mock_enlist = self.patch(maas_run_remote_scripts, "enlist")
         exception = factory.make_exception_type()
@@ -3060,8 +2866,7 @@ class TestBMCConfig(MAASTestCase):
         bmc_config_path = os.path.join(config_dir, "bmc-config.yaml")
         power_type = factory.make_name("power_type")
         power_params = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         config = {
             "power_type": power_type,
@@ -3109,17 +2914,13 @@ class TestBMCConfig(MAASTestCase):
 
     def test_bmc_config_does_nothing_if_already_sent(self):
         maas_run_remote_scripts._bmc_config_uploaded = True
-        mock_output_and_send = self.patch(
-            maas_run_remote_scripts, "output_and_send"
-        )
+        mock_output_and_send = self.patch(maas_run_remote_scripts, "output_and_send")
         bmc_config({})
         mock_output_and_send.assert_not_called()
 
     def test_bmc_config_does_nothing_if_send_result_false(self):
         maas_run_remote_scripts._bmc_config_uploaded = False
-        mock_output_and_send = self.patch(
-            maas_run_remote_scripts, "output_and_send"
-        )
+        mock_output_and_send = self.patch(maas_run_remote_scripts, "output_and_send")
         bmc_config({}, False)
         mock_output_and_send.assert_not_called()
 
@@ -3214,9 +3015,7 @@ class TestRunScripts(MAASTestCase):
                 "parallel": script["parallel"],
                 "hardware_type": script["hardware_type"],
                 "has_started": script["has_started"],
-                "apply_configured_networking": script[
-                    "apply_configured_networking"
-                ],
+                "apply_configured_networking": script["apply_configured_networking"],
                 "args": script["args"],
                 "result_sent": True,
             }
@@ -3228,9 +3027,7 @@ class TestRunScripts(MAASTestCase):
 
     def test_run_scripts_sends_unsent_results_after_bmc_discovered(self):
         scripts_dir = self.useFixture(TempDirectory()).path
-        mock_output_and_send = self.patch(
-            maas_run_remote_scripts, "output_and_send"
-        )
+        mock_output_and_send = self.patch(maas_run_remote_scripts, "output_and_send")
         # Simulate the second script configures the BMC and allows the machine
         # to enlist
         mock_output_and_send.side_effect = (
@@ -3274,18 +3071,10 @@ class TestRunScripts(MAASTestCase):
                     send_result=True,
                     exit_status=scripts[0]["exit_status"],
                     files={
-                        scripts[0]["combined_name"]: scripts[0][
-                            "combined"
-                        ].encode(),
-                        scripts[0]["stdout_name"]: scripts[0][
-                            "stdout"
-                        ].encode(),
-                        scripts[0]["stderr_name"]: scripts[0][
-                            "stderr"
-                        ].encode(),
-                        scripts[0]["result_name"]: scripts[0][
-                            "result"
-                        ].encode(),
+                        scripts[0]["combined_name"]: scripts[0]["combined"].encode(),
+                        scripts[0]["stdout_name"]: scripts[0]["stdout"].encode(),
+                        scripts[0]["stderr_name"]: scripts[0]["stderr"].encode(),
+                        scripts[0]["result_name"]: scripts[0]["result"].encode(),
                     },
                     runtime=ANY,
                 ),
@@ -3306,18 +3095,10 @@ class TestRunScripts(MAASTestCase):
                     send_result=True,
                     exit_status=scripts[1]["exit_status"],
                     files={
-                        scripts[1]["combined_name"]: scripts[1][
-                            "combined"
-                        ].encode(),
-                        scripts[1]["stdout_name"]: scripts[1][
-                            "stdout"
-                        ].encode(),
-                        scripts[1]["stderr_name"]: scripts[1][
-                            "stderr"
-                        ].encode(),
-                        scripts[1]["result_name"]: scripts[1][
-                            "result"
-                        ].encode(),
+                        scripts[1]["combined_name"]: scripts[1]["combined"].encode(),
+                        scripts[1]["stdout_name"]: scripts[1]["stdout"].encode(),
+                        scripts[1]["stderr_name"]: scripts[1]["stderr"].encode(),
+                        scripts[1]["result_name"]: scripts[1]["result"].encode(),
                     },
                     runtime=ANY,
                 ),
@@ -3329,18 +3110,10 @@ class TestRunScripts(MAASTestCase):
                     status="WORKING",
                     exit_status=scripts[0]["exit_status"],
                     files={
-                        scripts[0]["combined_name"]: scripts[0][
-                            "combined"
-                        ].encode(),
-                        scripts[0]["stdout_name"]: scripts[0][
-                            "stdout"
-                        ].encode(),
-                        scripts[0]["stderr_name"]: scripts[0][
-                            "stderr"
-                        ].encode(),
-                        scripts[0]["result_name"]: scripts[0][
-                            "result"
-                        ].encode(),
+                        scripts[0]["combined_name"]: scripts[0]["combined"].encode(),
+                        scripts[0]["stdout_name"]: scripts[0]["stdout"].encode(),
+                        scripts[0]["stderr_name"]: scripts[0]["stderr"].encode(),
+                        scripts[0]["result_name"]: scripts[0]["result"].encode(),
                     },
                     runtime=ANY,
                 ),
@@ -3361,18 +3134,10 @@ class TestRunScripts(MAASTestCase):
                     send_result=True,
                     exit_status=scripts[2]["exit_status"],
                     files={
-                        scripts[2]["combined_name"]: scripts[2][
-                            "combined"
-                        ].encode(),
-                        scripts[2]["stdout_name"]: scripts[2][
-                            "stdout"
-                        ].encode(),
-                        scripts[2]["stderr_name"]: scripts[2][
-                            "stderr"
-                        ].encode(),
-                        scripts[2]["result_name"]: scripts[2][
-                            "result"
-                        ].encode(),
+                        scripts[2]["combined_name"]: scripts[2]["combined"].encode(),
+                        scripts[2]["stdout_name"]: scripts[2]["stdout"].encode(),
+                        scripts[2]["stderr_name"]: scripts[2]["stderr"].encode(),
+                        scripts[2]["result_name"]: scripts[2]["result"].encode(),
                     },
                     runtime=ANY,
                 ),
@@ -3381,9 +3146,7 @@ class TestRunScripts(MAASTestCase):
 
     def test_run_scripts_enlists(self):
         scripts_dir = self.useFixture(TempDirectory()).path
-        mock_output_and_send = self.patch(
-            maas_run_remote_scripts, "output_and_send"
-        )
+        mock_output_and_send = self.patch(maas_run_remote_scripts, "output_and_send")
         # Simulate no script configures the BMC, the machine is created after
         # serial scripts have finished running
         mock_output_and_send.side_effect = (
@@ -3398,9 +3161,7 @@ class TestRunScripts(MAASTestCase):
             True,
         )
         mock_enlist = self.patch(maas_run_remote_scripts, "enlist")
-        scripts = make_scripts(
-            scripts_dir=scripts_dir, instance=False, parallel=0
-        )
+        scripts = make_scripts(scripts_dir=scripts_dir, instance=False, parallel=0)
 
         run_serial_scripts(scripts, scripts_dir, scripts_dir)
 
@@ -3418,12 +3179,8 @@ class TestRunScriptsFromMetadata(MAASTestCase):
         self.mock_output_and_send = self.patch(
             maas_run_remote_scripts, "output_and_send"
         )
-        self.mock_signal = self.patch_autospec(
-            maas_run_remote_scripts, "signal"
-        )
-        self.mock_run_scripts = self.patch(
-            maas_run_remote_scripts, "run_scripts"
-        )
+        self.mock_signal = self.patch_autospec(maas_run_remote_scripts, "signal")
+        self.mock_run_scripts = self.patch(maas_run_remote_scripts, "run_scripts")
         self.patch(maas_run_remote_scripts.sys.stdout, "write")
 
     def make_index_json(
@@ -3471,9 +3228,7 @@ class TestRunScriptsFromMetadata(MAASTestCase):
         mock_download_and_extract_tar = self.patch(
             maas_run_remote_scripts, "download_and_extract_tar"
         )
-        mock_download_and_extract_tar.side_effect = (
-            self.mock_download_and_extract_tar
-        )
+        mock_download_and_extract_tar.side_effect = self.mock_download_and_extract_tar
         config = Config()
         config.update(
             {
@@ -3563,9 +3318,7 @@ class TestRunScriptsFromMetadata(MAASTestCase):
             )
 
         mock_download_and_extract_tar.side_effect = simple_dl_and_extract
-        index_json = self.make_index_json(
-            scripts_dir, testing_scripts=testing_scripts
-        )
+        index_json = self.make_index_json(scripts_dir, testing_scripts=testing_scripts)
         config = Config()
         config.update(
             {
@@ -3607,9 +3360,7 @@ class TestRunScriptsFromMetadata(MAASTestCase):
         mock_download_and_extract_tar = self.patch(
             maas_run_remote_scripts, "download_and_extract_tar"
         )
-        mock_download_and_extract_tar.side_effect = (
-            self.mock_download_and_extract_tar
-        )
+        mock_download_and_extract_tar.side_effect = self.mock_download_and_extract_tar
 
         config = Config()
         config.update(
@@ -3669,10 +3420,7 @@ class TestGetMaasMachines(MAASTestCase):
     def test_get_maas_machines_query(self):
         netloc = factory.make_hostname()
         url = factory.make_url(scheme="http", netloc=netloc)
-        query = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
-        }
+        query = {factory.make_name("key"): factory.make_name("value") for _ in range(3)}
         self.assertTrue(get_maas_machines(url, query))
         self.mock_geturl.assert_called_once_with(
             "http://%s/MAAS/api/2.0/machines/?%s"
@@ -3684,8 +3432,7 @@ class TestGetMaasMachines(MAASTestCase):
         netloc = factory.make_hostname()
         url = factory.make_url(scheme="http", netloc=netloc)
         post_data = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         self.assertTrue(get_maas_machines(url, post_data=post_data))
         self.mock_geturl.assert_called_once_with(
@@ -3718,9 +3465,7 @@ class TestMaasRunRemoteScripts(MAASTestCase):
         # geturl is mocked out so we don't need to give a url or creds.
         self.assertTrue(download_and_extract_tar(None, None, scripts_dir))
 
-        written_file_content = open(
-            os.path.join(scripts_dir, "test-file"), "rb"
-        ).read()
+        written_file_content = open(os.path.join(scripts_dir, "test-file"), "rb").read()
         self.assertEqual(file_content, written_file_content)
 
     def test_download_and_extract_tar_returns_false_on_no_content(self):
@@ -3788,9 +3533,7 @@ class TestMaasRunRemoteScripts(MAASTestCase):
         mock_sleep.assert_any_call(10)
 
     def test_main_signals_success(self):
-        self.patch(
-            maas_run_remote_scripts.argparse.ArgumentParser, "parse_args"
-        )
+        self.patch(maas_run_remote_scripts.argparse.ArgumentParser, "parse_args")
         self.patch(maas_run_remote_scripts, "Config")
         self.patch(maas_run_remote_scripts, "os")
         self.patch(maas_run_remote_scripts.Path, "open")
@@ -3801,9 +3544,7 @@ class TestMaasRunRemoteScripts(MAASTestCase):
             maas_run_remote_scripts, "run_scripts_from_metadata"
         ).return_value = 0
         self.patch(maas_run_remote_scripts, "signal")
-        mock_output_and_send = self.patch(
-            maas_run_remote_scripts, "output_and_send"
-        )
+        mock_output_and_send = self.patch(maas_run_remote_scripts, "output_and_send")
 
         maas_run_remote_scripts.main()
 

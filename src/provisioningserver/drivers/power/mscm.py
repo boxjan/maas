@@ -58,9 +58,7 @@ class MSCMPowerDriver(PowerDriver):
     can_set_boot_order = False
     description = "HP Moonshot - iLO Chassis Manager"
     settings = [
-        make_setting_field(
-            "power_address", "IP for MSCM CLI API", required=True
-        ),
+        make_setting_field("power_address", "IP for MSCM CLI API", required=True),
         make_setting_field("power_user", "MSCM CLI API user"),
         make_setting_field(
             "power_pass",
@@ -83,20 +81,13 @@ class MSCMPowerDriver(PowerDriver):
         return []
 
     def run_mscm_command(
-        self,
-        command,
-        power_address=None,
-        power_user=None,
-        power_pass=None,
-        **extra
+        self, command, power_address=None, power_user=None, power_pass=None, **extra
     ):
         """Run a single command on MSCM via SSH and return output."""
         try:
             ssh_client = SSHClient()
             ssh_client.set_missing_host_key_policy(AutoAddPolicy())
-            ssh_client.connect(
-                power_address, username=power_user, password=power_pass
-            )
+            ssh_client.connect(power_address, username=power_user, password=power_pass)
             _, stdout, _ = ssh_client.exec_command(command)
             output = stdout.read().decode("utf-8")
         except (SSHException, EOFError, SOCKETError) as e:
@@ -117,9 +108,7 @@ class MSCMPowerDriver(PowerDriver):
             self.power_off(system_id, context)
         try:
             # Configure node to boot once from PXE
-            self.run_mscm_command(
-                "set node bootonce pxe %s" % node_id, **context
-            )
+            self.run_mscm_command("set node bootonce pxe %s" % node_id, **context)
             # Power node on
             self.run_mscm_command("set node power on %s" % node_id, **context)
         except PowerConnError as e:
@@ -160,8 +149,7 @@ class MSCMPowerDriver(PowerDriver):
         match = re.search(r"Power State:\s*((O[\w]+|U[\w]+|P[\w]+))", output)
         if match is None:
             raise PowerFatalError(
-                "MSCM Power Driver unable to extract node power state from: %s"
-                % output
+                "MSCM Power Driver unable to extract node power state from: %s" % output
             )
         else:
             power_state = match.group(1)
@@ -201,13 +189,9 @@ def probe_and_enlist_mscm(
         power_pass=password,
     )
     if re.search(r"HPE Moonshot Chassis Manager 2.0", show_firmware):
-        probe_and_enlist_mscm_2(
-            user, host, username, password, accept_all, domain
-        )
+        probe_and_enlist_mscm_2(user, host, username, password, accept_all, domain)
     else:
-        probe_and_enlist_mscm_1(
-            user, host, username, password, accept_all, domain
-        )
+        probe_and_enlist_mscm_1(user, host, username, password, accept_all, domain)
 
 
 def probe_and_enlist_mscm_1(
@@ -247,9 +231,7 @@ def probe_and_enlist_mscm_1(
             "node_id": node_id,
         }
         # Set default boot to M.2
-        mscm_driver.run_mscm_command(
-            "set node boot M.2 %s" % node_id, **params
-        )
+        mscm_driver.run_mscm_command("set node boot M.2 %s" % node_id, **params)
         # Retrieve node architecture
         #
         # Example of output from running "show node info <node_id>":
@@ -355,9 +337,7 @@ def probe_and_enlist_mscm_2(
         #                         System ROM: H09 v1.34 (10/16/2020)\r\n
         #                         System Programmable Logic Device: 0x05\r\n
         #                         TPM: 73.64\r\n"
-        node_info = mscm_driver.run_mscm_command(
-            "show blades b%d" % blade_id, **params
-        )
+        node_info = mscm_driver.run_mscm_command("show blades b%d" % blade_id, **params)
         match = re.search(r"Model:\s*([A-Za-z0-9 ]+)", node_info)
         if match is None:
             raise PowerFatalError(

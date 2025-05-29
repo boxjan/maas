@@ -48,9 +48,7 @@ class TestStatusTransitionEvent(MAASServerTestCase):
     def test_running_or_installing_emits_event_with_storage_parameter(self):
         node = factory.make_Node()
         script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
-        script_set = factory.make_ScriptSet(
-            result_type=RESULT_TYPE.TESTING, node=node
-        )
+        script_set = factory.make_ScriptSet(result_type=RESULT_TYPE.TESTING, node=node)
         script_result = factory.make_ScriptResult(
             status=SCRIPT_STATUS.PENDING,
             script=script,
@@ -78,9 +76,7 @@ class TestStatusTransitionEvent(MAASServerTestCase):
     def test_running_or_installing_emits_event_with_interface_parameter(self):
         node = factory.make_Node_with_Interface_on_Subnet()
         script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
-        script_set = factory.make_ScriptSet(
-            result_type=RESULT_TYPE.TESTING, node=node
-        )
+        script_set = factory.make_ScriptSet(result_type=RESULT_TYPE.TESTING, node=node)
         script_result = factory.make_ScriptResult(
             status=SCRIPT_STATUS.PENDING,
             script=script,
@@ -108,9 +104,7 @@ class TestStatusTransitionEvent(MAASServerTestCase):
     def test_running_or_installing_emits_event_with_nic_disk_param(self):
         node = factory.make_Node_with_Interface_on_Subnet()
         script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
-        script_set = factory.make_ScriptSet(
-            result_type=RESULT_TYPE.TESTING, node=node
-        )
+        script_set = factory.make_ScriptSet(result_type=RESULT_TYPE.TESTING, node=node)
         script_result = factory.make_ScriptResult(
             status=SCRIPT_STATUS.PENDING,
             script=script,
@@ -174,9 +168,7 @@ class TestStatusTransitionEvent(MAASServerTestCase):
         old_status = SCRIPT_STATUS.RUNNING
         script_result = factory.make_ScriptResult(
             status=old_status,
-            script_set=factory.make_ScriptSet(
-                result_type=RESULT_TYPE.COMMISSIONING
-            ),
+            script_set=factory.make_ScriptSet(result_type=RESULT_TYPE.COMMISSIONING),
             script=factory.make_Script(),
         )
         new_status = SCRIPT_STATUS.PASSED
@@ -187,9 +179,7 @@ class TestStatusTransitionEvent(MAASServerTestCase):
         self.assertEqual(
             (
                 EVENT_TYPES.SCRIPT_RESULT_CHANGED_STATUS,
-                EVENT_DETAILS[
-                    EVENT_TYPES.SCRIPT_RESULT_CHANGED_STATUS
-                ].description,
+                EVENT_DETAILS[EVENT_TYPES.SCRIPT_RESULT_CHANGED_STATUS].description,
                 "%s changed status from '%s' to '%s'"
                 % (
                     script_result.name,
@@ -208,9 +198,7 @@ class TestStatusTransitionEvent(MAASServerTestCase):
         old_status = SCRIPT_STATUS.RUNNING
         script_result = factory.make_ScriptResult(
             status=old_status,
-            script_set=factory.make_ScriptSet(
-                result_type=RESULT_TYPE.COMMISSIONING
-            ),
+            script_set=factory.make_ScriptSet(result_type=RESULT_TYPE.COMMISSIONING),
             script=factory.make_Script(name=CURTIN_INSTALL_LOG),
         )
         script_result.status = SCRIPT_STATUS.PASSED

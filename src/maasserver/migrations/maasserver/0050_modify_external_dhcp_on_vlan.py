@@ -8,9 +8,7 @@ class Migration(migrations.Migration):
     dependencies = [("maasserver", "0049_add_external_dhcp_present_to_vlan")]
 
     operations = [
-        migrations.RemoveField(
-            model_name="vlan", name="external_dhcp_present"
-        ),
+        migrations.RemoveField(model_name="vlan", name="external_dhcp_present"),
         migrations.AddField(
             model_name="vlan",
             name="external_dhcp",

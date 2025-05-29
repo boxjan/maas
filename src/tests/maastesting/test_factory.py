@@ -66,9 +66,7 @@ class TestFactory(MAASTestCase):
         # Narrow down the range of randomness so we have a decent chance of
         # triggering a clash, but not so far that we'll loop for very long
         # trying to find a network we haven't seen already.
-        self.patch(
-            factory, "make_ipv4_address", lambda: "10.%d.0.0" % randint(1, 200)
-        )
+        self.patch(factory, "make_ipv4_address", lambda: "10.%d.0.0" % randint(1, 200))
         networks = []
         for _ in range(100):
             networks.append(factory.make_ipv4_network(but_not=networks))
@@ -84,9 +82,7 @@ class TestFactory(MAASTestCase):
         self.assertIsInstance(network, IPNetwork)
 
     def test_make_ipv4_network_respects_but_not(self):
-        self.patch(factory, "make_ipv4_address").return_value = IPAddress(
-            "10.1.1.0"
-        )
+        self.patch(factory, "make_ipv4_address").return_value = IPAddress("10.1.1.0")
         self.assertRaises(
             TooManyRandomRetries,
             factory.make_ipv4_network,
@@ -95,31 +91,21 @@ class TestFactory(MAASTestCase):
         )
 
     def test_make_ipv4_network_returns_network_not_in_but_not(self):
-        self.patch(factory, "make_ipv4_address").return_value = IPAddress(
-            "10.1.1.0"
-        )
+        self.patch(factory, "make_ipv4_address").return_value = IPAddress("10.1.1.0")
         self.assertEqual(
             IPNetwork("10.1.1.0/24"),
-            factory.make_ipv4_network(
-                slash=24, but_not=[IPNetwork("10.9.9.0/24")]
-            ),
+            factory.make_ipv4_network(slash=24, but_not=[IPNetwork("10.9.9.0/24")]),
         )
 
     def test_make_ipv4_network_may_overlap_but_not(self):
-        self.patch(factory, "make_ipv4_address").return_value = IPAddress(
-            "10.1.1.0"
-        )
+        self.patch(factory, "make_ipv4_address").return_value = IPAddress("10.1.1.0")
         self.assertEqual(
             IPNetwork("10.1.1.0/24"),
-            factory.make_ipv4_network(
-                slash=24, but_not=[IPNetwork("10.1.0.0/16")]
-            ),
+            factory.make_ipv4_network(slash=24, but_not=[IPNetwork("10.1.0.0/16")]),
         )
 
     def test_make_ipv4_network_avoids_network_in_disjoint_from(self):
-        self.patch(factory, "make_ipv4_address").return_value = IPAddress(
-            "10.1.1.0"
-        )
+        self.patch(factory, "make_ipv4_address").return_value = IPAddress("10.1.1.0")
         self.assertRaises(
             TooManyRandomRetries,
             factory.make_ipv4_network,
@@ -128,9 +114,7 @@ class TestFactory(MAASTestCase):
         )
 
     def test_make_ipv4_network_avoids_network_overlapping_disjoint_from(self):
-        self.patch(factory, "make_ipv4_address").return_value = IPAddress(
-            "10.1.1.0"
-        )
+        self.patch(factory, "make_ipv4_address").return_value = IPAddress("10.1.1.0")
         self.assertRaises(
             TooManyRandomRetries,
             factory.make_ipv4_network,
@@ -140,9 +124,7 @@ class TestFactory(MAASTestCase):
 
     def test_make_ipv4_network_returns_network_disjoint_from(self):
         existing_network = factory.make_ipv4_network()
-        new_network = factory.make_ipv4_network(
-            disjoint_from=[existing_network]
-        )
+        new_network = factory.make_ipv4_network(disjoint_from=[existing_network])
         self.assertNotEqual(existing_network, new_network)
         self.assertNotIn(new_network, existing_network)
         self.assertNotIn(existing_network, new_network)
@@ -206,9 +188,7 @@ class TestFactory(MAASTestCase):
 
     def test_make_random_leases_returns_requested_number_of_leases(self):
         num_leases = randint(0, 3)
-        self.assertEqual(
-            num_leases, len(factory.make_random_leases(num_leases))
-        )
+        self.assertEqual(num_leases, len(factory.make_random_leases(num_leases)))
 
     def test_make_file_creates_file(self):
         self.assertTrue(os.path.isfile(factory.make_file(self.make_dir())))
@@ -261,16 +241,12 @@ class TestFactory(MAASTestCase):
         )
 
     def test_make_name_includes_random_text(self):
-        self.assertNotEqual(
-            factory.make_name(size=100), factory.make_name(size=100)
-        )
+        self.assertNotEqual(factory.make_name(size=100), factory.make_name(size=100))
 
     def test_make_name_uses_configurable_separator(self):
         sep = "SEPARATOR"
         prefix = factory.make_string(3)
-        self.assertTrue(
-            factory.make_name(prefix, sep=sep).startswith(prefix + sep)
-        )
+        self.assertTrue(factory.make_name(prefix, sep=sep).startswith(prefix + sep))
 
     def test_make_name_does_not_require_prefix(self):
         size = randint(1, 99)
@@ -388,9 +364,7 @@ class TestMakeIPRange:
     too, which are each a thin wrapper around `make_ip_range`.
     """
 
-    def test_make_ip_range_returns_IPs(
-        self, version, make_network, make_range
-    ):
+    def test_make_ip_range_returns_IPs(self, version, make_network, make_range):
         network = make_network()
         low, high = factory.make_ip_range(network)
         assert isinstance(low, IPAddress)
@@ -399,9 +373,7 @@ class TestMakeIPRange:
         assert version == high.version
         assert low < high
 
-    def test_make_ip_range_obeys_network(
-        self, version, make_network, make_range
-    ):
+    def test_make_ip_range_obeys_network(self, version, make_network, make_range):
         network = make_network()
         low, high = factory.make_ip_range(network)
         assert low in network

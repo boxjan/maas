@@ -84,9 +84,7 @@ class TestPowerNode(MAASServerTestCase):
             PowerActionAlreadyInProgress("Houston, we have a problem.")
         )
 
-        with self.assertRaisesRegex(
-            PowerProblem, "Houston, we have a problem."
-        ):
+        with self.assertRaisesRegex(PowerProblem, "Houston, we have a problem."):
             wait_for_reactor(self.power_func)(
                 client,
                 node.system_id,
@@ -125,9 +123,7 @@ class TestPowerCycle(MAASServerTestCase):
             PowerActionAlreadyInProgress("Houston, we have a problem.")
         )
 
-        with self.assertRaisesRegex(
-            PowerProblem, "Houston, we have a problem."
-        ):
+        with self.assertRaisesRegex(PowerProblem, "Houston, we have a problem."):
             wait_for_reactor(power_cycle)(
                 client,
                 node.system_id,
@@ -183,9 +179,7 @@ class TestPowerQueryAll(MAASTransactionServerTestCase):
     def test_calls_PowerQuery_on_all_clients(self):
         node, power_info = yield deferToDatabase(make_node_with_power_info)
 
-        successful_rack_ids = [
-            factory.make_name("system_id") for _ in range(3)
-        ]
+        successful_rack_ids = [factory.make_name("system_id") for _ in range(3)]
         error_rack_ids = [factory.make_name("system_id") for _ in range(3)]
         failed_rack_ids = [factory.make_name("system_id") for _ in range(3)]
         clients = []
@@ -251,9 +245,7 @@ class TestSetBootOrder(MAASTransactionServerTestCase):
         node, power_info = yield deferToDatabase(make_node_with_power_info)
         order = list(range(5))
 
-        yield set_boot_order(
-            client, node.system_id, node.hostname, power_info, order
-        )
+        yield set_boot_order(client, node.system_id, node.hostname, power_info, order)
 
         client.assert_called_once_with(
             SetBootOrder,
@@ -270,8 +262,6 @@ class TestSetBootOrder(MAASTransactionServerTestCase):
         client = Mock()
         node, power_info = yield deferToDatabase(make_node_with_power_info)
 
-        yield set_boot_order(
-            client, node.system_id, node.hostname, power_info, []
-        )
+        yield set_boot_order(client, node.system_id, node.hostname, power_info, [])
 
         client.assert_not_called()

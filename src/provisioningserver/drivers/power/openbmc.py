@@ -112,18 +112,13 @@ class OpenBMCPowerDriver(PowerDriver):
         """
         # login to BMC
         login_uri = self.get_uri(context, "/login")
-        login_creds = {
-            "data": [context.get("power_user"), context.get("power_pass")]
-        }
-        login_data = FileBodyProducer(
-            BytesIO(json.dumps(login_creds).encode("utf-8"))
-        )
+        login_creds = {"data": [context.get("power_user"), context.get("power_pass")]}
+        login_data = FileBodyProducer(BytesIO(json.dumps(login_creds).encode("utf-8")))
         login = yield self.openbmc_request(b"POST", login_uri, login_data)
         login_status = login.get("status")
         if login_status.lower() != "ok":
             raise PowerFatalError(
-                "OpenBMC power driver received unexpected response"
-                " to login command"
+                "OpenBMC power driver received unexpected response" " to login command"
             )
         # issue command
         cmd_out = yield self.openbmc_request(method, uri, data)
@@ -137,8 +132,7 @@ class OpenBMCPowerDriver(PowerDriver):
         logout_status = logout.get("status")
         if logout_status.lower() != "ok":
             raise PowerFatalError(
-                "OpenBMC power driver received unexpected response"
-                " to logout command"
+                "OpenBMC power driver received unexpected response" " to logout command"
             )
         return cmd_out
 
@@ -176,9 +170,7 @@ class OpenBMCPowerDriver(PowerDriver):
         uri = self.get_uri(context, HOST_STATE + "RequestedHostTransition")
         # power off host if it is currently on.
         if cur_state == "on":
-            data = FileBodyProducer(
-                BytesIO(json.dumps(HOST_OFF).encode("utf-8"))
-            )
+            data = FileBodyProducer(BytesIO(json.dumps(HOST_OFF).encode("utf-8")))
             off_state = yield self.command(context, b"PUT", uri, data)
             status = off_state.get("status")
             if status.lower() != "ok":

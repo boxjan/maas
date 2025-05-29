@@ -197,9 +197,7 @@ class TestCallRacksSynchronously(MAASServerTestCase):
         # call_clusters returns with nothing because we patched out
         # asynchronous.gather, but we're interested in the side-effect:
         # getClientFor has been called for the accepted nodegroup.
-        self.assertEqual(
-            [], list(call_racks_synchronously(sentinel.command).results)
-        )
+        self.assertEqual([], list(call_racks_synchronously(sentinel.command).results))
         getClientFor.assert_called_once_with(rack.system_id)
 
 
@@ -216,8 +214,7 @@ class TestGetErrorMessageForException(MAASServerTestCase):
         error_message = (
             "Unexpected exception: %s. See "
             "/var/log/maas/regiond.log "
-            "on the region server for more information."
-            % exception_class.__name__
+            "on the region server for more information." % exception_class.__name__
         )
         self.assertEqual(
             error_message,
@@ -226,9 +223,7 @@ class TestGetErrorMessageForException(MAASServerTestCase):
 
     def test_returns_cluster_name_in_no_connections_error_message(self):
         rack = factory.make_RackController()
-        exception = NoConnectionsAvailable(
-            "Unable to connect!", uuid=rack.system_id
-        )
+        exception = NoConnectionsAvailable("Unable to connect!", uuid=rack.system_id)
         self.assertEqual(
             "Unable to connect to rack controller '%s' (%s); no connections "
             "available." % (rack.hostname, rack.system_id),
@@ -237,6 +232,4 @@ class TestGetErrorMessageForException(MAASServerTestCase):
 
     def test_ValidationError(self):
         exception = ValidationError({NON_FIELD_ERRORS: "Some error"})
-        self.assertEqual(
-            utils.get_error_message_for_exception(exception), "Some error"
-        )
+        self.assertEqual(utils.get_error_message_for_exception(exception), "Some error")

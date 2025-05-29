@@ -199,10 +199,7 @@ class NodeAction(metaclass=ABCMeta):
     @classmethod
     def get_permission(cls, node_type):
         """Return the permission value depending on if the node_type."""
-        if (
-            node_type == NODE_TYPE.MACHINE
-            and cls.machine_permission is not None
-        ):
+        if node_type == NODE_TYPE.MACHINE and cls.machine_permission is not None:
             return cls.machine_permission
         if (
             node_type
@@ -218,9 +215,7 @@ class NodeAction(metaclass=ABCMeta):
 
     def is_permitted(self):
         """Does the current user have the permission required?"""
-        return self.user.has_perm(
-            self.get_permission(self.node.node_type), self.node
-        )
+        return self.user.has_perm(self.get_permission(self.node.node_type), self.node)
 
 
 class Delete(NodeAction):
@@ -417,9 +412,7 @@ class Test(NodeAction):
         """Retrieve the node action audit description."""
         return self.audit_description % action.node.hostname
 
-    def _execute(
-        self, enable_ssh=False, testing_scripts=[], script_input=None
-    ):
+    def _execute(self, enable_ssh=False, testing_scripts=[], script_input=None):
         try:
             self.node.start_testing(
                 self.user,
@@ -588,8 +581,7 @@ class Deploy(NodeAction):
             raise NodeActionError("Failed to retrieve curtin config: %s" % e)
 
         if enable_hw_sync and (
-            self.node.osystem not in LINUX_OSYSTEMS
-            and self.node.osystem != "custom"
+            self.node.osystem not in LINUX_OSYSTEMS and self.node.osystem != "custom"
         ):
             raise NodeActionError(
                 "enable_hw_sync can only be set on Linux based deploys"
@@ -654,9 +646,7 @@ class PowerOn(NodeAction):
 
 
 FAILED_STATUSES = [
-    status
-    for status in map_enum(NODE_STATUS).values()
-    if is_failed_status(status)
+    status for status in map_enum(NODE_STATUS).values() if is_failed_status(status)
 ]
 
 
@@ -733,12 +723,8 @@ class Release(NodeAction):
             if form.cleaned_data["erase"]:
                 scripts.append("wipe-disks")
                 params["wipe-disks"] = {}
-                params["wipe-disks"]["secure_erase"] = form.cleaned_data[
-                    "secure_erase"
-                ]
-                params["wipe-disks"]["quick_erase"] = form.cleaned_data[
-                    "quick_erase"
-                ]
+                params["wipe-disks"]["secure_erase"] = form.cleaned_data["secure_erase"]
+                params["wipe-disks"]["quick_erase"] = form.cleaned_data["quick_erase"]
             params = params | form.get_script_param_dict(scripts)
             self.node.start_releasing(
                 user=self.user,
@@ -889,9 +875,7 @@ class OverrideFailedTesting(NodeAction):
     def _execute(self, suppress_failed_script_results=False):
         """See `NodeAction.execute`."""
         if suppress_failed_script_results:
-            script_result_ids = (
-                self.node.get_latest_failed_testing_script_results()
-            )
+            script_result_ids = self.node.get_latest_failed_testing_script_results()
             ScriptResult.objects.filter(
                 script_set__node__system_id=self.node.system_id,
                 id__in=script_result_ids,
@@ -1079,9 +1063,7 @@ class Clone(NodeAction):
         try:
             form.save()
         except ValidationError as exc:
-            raise NodeActionError(
-                self._format_errors_as_json(exc.message_dict)
-            )
+            raise NodeActionError(self._format_errors_as_json(exc.message_dict))
         if _error_data:
             for name, error_list in _error_data.items():
                 if name in form.errors:

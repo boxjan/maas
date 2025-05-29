@@ -111,9 +111,7 @@ class TestConfigHandler(MAASServerTestCase):
         ]
 
         handler = ConfigHandler(admin, {}, None)
-        self.assertCountEqual(
-            config_keys, [item["name"] for item in handler.list({})]
-        )
+        self.assertCountEqual(config_keys, [item["name"] for item in handler.list({})])
 
     def test_list_user_excludes_secret(self):
         user = factory.make_User()
@@ -121,9 +119,7 @@ class TestConfigHandler(MAASServerTestCase):
 
         handler = ConfigHandler(user, {}, None)
         self.assertNotIn("rpc_shared_secret", config_keys)
-        self.assertCountEqual(
-            config_keys, [item["name"] for item in handler.list({})]
-        )
+        self.assertCountEqual(config_keys, [item["name"] for item in handler.list({})])
 
     def test_list_admin_includes_rpc_secret(self):
         SecretManager().set_simple_secret("rpc-shared", "my-secret")
@@ -272,9 +268,7 @@ class TestConfigHandler(MAASServerTestCase):
             handler.bulk_update,
             {"items": {"http_proxy": factory.make_name("invalid")}},
         )
-        self.assertEqual(
-            {"http_proxy": ["Enter a valid URL."]}, error.message_dict
-        )
+        self.assertEqual({"http_proxy": ["Enter a valid URL."]}, error.message_dict)
 
     def test_on_listen_returns_None_if_excluded(self):
         user = factory.make_User()

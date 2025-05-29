@@ -45,9 +45,7 @@ class UseOnceIterator:
 
     def __next__(self):
         if self.has_run_once:
-            raise IteratorReusedError(
-                "It is not possible to reuse a UseOnceIterator."
-            )
+            raise IteratorReusedError("It is not possible to reuse a UseOnceIterator.")
         try:
             return next(self.iterable)
         except StopIteration:
@@ -262,9 +260,7 @@ def async_retry(retries=5, backoff_ms=1000):
                     if tries == retries:
                         raise e
                     else:
-                        sleep_ms = backoff_ms * (2**tries) + random.uniform(
-                            0, 1
-                        )
+                        sleep_ms = backoff_ms * (2**tries) + random.uniform(0, 1)
                         await asyncio.sleep(sleep_ms / 1000)
 
         return wrapped

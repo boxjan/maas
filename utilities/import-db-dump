@@ -45,9 +45,7 @@ def main(raw_args):
                 check=True,
             )
     print(f"Creating database '{args.db_name}'")
-    subprocess.run(
-        ["sudo", "-u", "postgres", "createdb", args.db_name], check=True
-    )
+    subprocess.run(["sudo", "-u", "postgres", "createdb", args.db_name], check=True)
     print(f"Importing dump into database '{args.db_name}'")
     subprocess.run(
         [

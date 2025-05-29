@@ -38,9 +38,7 @@ class FileStorageAPITestMixin:
         return self.client.get(reverse("files_handler"), params)
 
 
-class TestAnonymousFileStorageAPI(
-    FileStorageAPITestMixin, APITestCase.ForAnonymous
-):
+class TestAnonymousFileStorageAPI(FileStorageAPITestMixin, APITestCase.ForAnonymous):
     def test_get_does_not_work_anonymously(self):
         storage = factory.make_FileStorage()
         response = self.make_API_GET_request("get", storage.filename)
@@ -69,16 +67,12 @@ class TestAnonymousFileStorageAPI(
 
     def test_anon_cannot_get_file(self):
         storage = factory.make_FileStorage()
-        response = self.client.get(
-            reverse("file_handler", args=[storage.filename])
-        )
+        response = self.client.get(reverse("file_handler", args=[storage.filename]))
         self.assertEqual(http.client.UNAUTHORIZED, response.status_code)
 
     def test_anon_cannot_delete_file(self):
         storage = factory.make_FileStorage()
-        response = self.client.delete(
-            reverse("file_handler", args=[storage.filename])
-        )
+        response = self.client.delete(reverse("file_handler", args=[storage.filename]))
         self.assertEqual(http.client.UNAUTHORIZED, response.status_code)
 
 
@@ -112,9 +106,7 @@ class TestFileStorageAPI(FileStorageAPITestMixin, APITestCase.ForUser):
         )
 
     def test_add_file_fails_with_no_filename(self):
-        response = self.make_API_POST_request(
-            None, fileObj=factory.make_file_upload()
-        )
+        response = self.make_API_POST_request(None, fileObj=factory.make_file_upload())
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
         self.assertIn("text/plain", response["Content-Type"])
         self.assertEqual(b"Filename not supplied", response.content)
@@ -152,9 +144,7 @@ class TestFileStorageAPI(FileStorageAPITestMixin, APITestCase.ForUser):
 
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
         self.assertIn("text/plain", response["Content-Type"])
-        self.assertEqual(
-            b"Exactly one file must be supplied", response.content
-        )
+        self.assertEqual(b"Exactly one file must be supplied", response.content)
 
     def test_add_file_can_overwrite_existing_file_of_same_name(self):
         # Write file one.
@@ -243,9 +233,7 @@ class TestFileStorageAPI(FileStorageAPITestMixin, APITestCase.ForUser):
             factory.make_FileStorage(
                 filename=filename, content=b"test content", owner=self.user
             )
-        response = self.client.get(
-            reverse("files_handler"), {"prefix": "prefix-"}
-        )
+        response = self.client.get(reverse("files_handler"), {"prefix": "prefix-"})
         self.assertEqual(http.client.OK, response.status_code)
         parsed_results = json_load_bytes(response.content)
         filenames = [result["filename"] for result in parsed_results]
@@ -286,9 +274,7 @@ class TestFileStorageAPI(FileStorageAPITestMixin, APITestCase.ForUser):
     def test_get_file_returns_file_object_with_content_base64_encoded(self):
         filename = factory.make_name("file")
         content = sample_binary_data
-        factory.make_FileStorage(
-            filename=filename, content=content, owner=self.user
-        )
+        factory.make_FileStorage(filename=filename, content=content, owner=self.user)
         response = self.client.get(reverse("file_handler", args=[filename]))
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(
@@ -299,9 +285,7 @@ class TestFileStorageAPI(FileStorageAPITestMixin, APITestCase.ForUser):
     def test_get_file_returns_file_object_with_resource_uri(self):
         filename = factory.make_name("file")
         content = sample_binary_data
-        factory.make_FileStorage(
-            filename=filename, content=content, owner=self.user
-        )
+        factory.make_FileStorage(filename=filename, content=content, owner=self.user)
         response = self.client.get(reverse("file_handler", args=[filename]))
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(
@@ -342,9 +326,7 @@ class TestFileStorageAPI(FileStorageAPITestMixin, APITestCase.ForUser):
 
     def test_delete_filters_by_owner(self):
         storage = factory.make_FileStorage(owner=factory.make_User())
-        response = self.client.delete(
-            reverse("file_handler", args=[storage.filename])
-        )
+        response = self.client.delete(reverse("file_handler", args=[storage.filename]))
         self.assertEqual(http.client.NOT_FOUND, response.status_code)
         files = FileStorage.objects.filter(filename=storage.filename)
         self.assertEqual([storage], list(files))

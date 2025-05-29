@@ -111,9 +111,7 @@ def parse_lxd_networks(networks):
         elif details["bond"]:
             interface["type"] = "bond"
             interface["parents"] = details["bond"]["lower_devices"]
-        elif (
-            details.get("vlan") is not None
-        ):  # key could be missing for old versions
+        elif details.get("vlan") is not None:  # key could be missing for old versions
             interface["type"] = "vlan"
             interface["vid"] = details["vlan"]["vid"]
             interface["parents"] = [details["vlan"]["lower_device"]]

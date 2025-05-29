@@ -54,8 +54,7 @@ class TestScriptSetManager(MAASServerTestCase):
 
     def test_create_commissioning_script_set(self):
         custom_scripts = [
-            factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING)
-            for _ in range(3)
+            factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING) for _ in range(3)
         ]
         node = factory.make_Node()
 
@@ -68,9 +67,7 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.COMMISSIONING, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_commissioning_script_set_for_controller(self):
         for _ in range(3):
@@ -97,16 +94,12 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.COMMISSIONING, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_commissioning_script_set_adds_all_user_scripts(self):
         script = factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING)
         # Scripts tagged with noauto must be specified by name.
-        factory.make_Script(
-            script_type=SCRIPT_TYPE.COMMISSIONING, tags=["noauto"]
-        )
+        factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING, tags=["noauto"])
         node = factory.make_Node()
         expected_scripts = list(NODE_INFO_SCRIPTS)
         expected_scripts.append(script.name)
@@ -118,9 +111,7 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.COMMISSIONING, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_commissioning_script_set_adds_no_user_scripts(self):
         factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING)
@@ -135,9 +126,7 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.COMMISSIONING, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_commissioning_script_set_adds_for_hardware_matches_tag(
         self,
@@ -157,9 +146,7 @@ class TestScriptSetManager(MAASServerTestCase):
                 )
             ],
         )
-        to_mock = (
-            node.__module__ + "." + node.__class__.__qualname__ + ".modaliases"
-        )
+        to_mock = node.__module__ + "." + node.__class__.__qualname__ + ".modaliases"
         with mock.patch(to_mock, new_callable=PropertyMock) as mods:
             mods.return_value = [
                 "pci:v00008086d00001918sv000015D9sd00000888bc06sc00i00",
@@ -178,9 +165,7 @@ class TestScriptSetManager(MAASServerTestCase):
                 [script_result.name for script_result in script_set],
             )
             self.assertEqual(RESULT_TYPE.COMMISSIONING, script_set.result_type)
-            self.assertEqual(
-                node.power_state, script_set.power_state_before_transition
-            )
+            self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_commissioning_scripts_with_for_hardware_ignores_wo_tag(
         self,
@@ -200,9 +185,7 @@ class TestScriptSetManager(MAASServerTestCase):
                 )
             ],
         )
-        to_mock = (
-            node.__module__ + "." + node.__class__.__qualname__ + ".modaliases"
-        )
+        to_mock = node.__module__ + "." + node.__class__.__qualname__ + ".modaliases"
         with mock.patch(to_mock, new_callable=PropertyMock) as mods:
             mods.return_value = [
                 "pci:v00008086d00001918sv000015D9sd00000888bc06sc00i00",
@@ -211,9 +194,7 @@ class TestScriptSetManager(MAASServerTestCase):
             ]
             expected_scripts = list(NODE_INFO_SCRIPTS)
 
-            other_script = factory.make_Script(
-                script_type=SCRIPT_TYPE.COMMISSIONING
-            )
+            other_script = factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING)
             expected_scripts.append(other_script.name)
             script_set = ScriptSet.objects.create_commissioning_script_set(
                 node, [other_script.name]
@@ -224,9 +205,7 @@ class TestScriptSetManager(MAASServerTestCase):
                 [script_result.name for script_result in script_set],
             )
             self.assertEqual(RESULT_TYPE.COMMISSIONING, script_set.result_type)
-            self.assertEqual(
-                node.power_state, script_set.power_state_before_transition
-            )
+            self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_commissioning_script_set_skips_non_matching_for_hardware(
         self,
@@ -253,9 +232,7 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.COMMISSIONING, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_commissioning_script_set_adds_selected_scripts(self):
         scripts = [
@@ -275,11 +252,7 @@ class TestScriptSetManager(MAASServerTestCase):
             node,
             scripts=[
                 random.choice(
-                    [
-                        tag
-                        for tag in script_selected_by_tag.tags
-                        if "tag" in tag
-                    ]
+                    [tag for tag in script_selected_by_tag.tags if "tag" in tag]
                 ),
                 script_selected_by_name.name,
                 script_selected_by_id.id,
@@ -290,14 +263,10 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.COMMISSIONING, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_commissioning_script_set_enlisting(self):
-        factory.make_Script(
-            script_type=SCRIPT_TYPE.COMMISSIONING, tags=["enlisting"]
-        )
+        factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING, tags=["enlisting"])
         node = factory.make_Node()
 
         script_set = ScriptSet.objects.create_commissioning_script_set(
@@ -306,18 +275,16 @@ class TestScriptSetManager(MAASServerTestCase):
 
         self.assertCountEqual(
             list(
-                Script.objects.filter(
-                    script_type=SCRIPT_TYPE.COMMISSIONING
-                ).filter(Q(default=True) | Q(tags__contains=["enlisting"]))
+                Script.objects.filter(script_type=SCRIPT_TYPE.COMMISSIONING).filter(
+                    Q(default=True) | Q(tags__contains=["enlisting"])
+                )
             ),
             [script_result.script for script_result in script_set],
         )
 
     def test_create_commissioning_script_set_enlisting_no_commission(self):
         Config.objects.set_config("enlist_commissioning", False)
-        factory.make_Script(
-            script_type=SCRIPT_TYPE.COMMISSIONING, tags=["bmc-config"]
-        )
+        factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING, tags=["bmc-config"])
         node = factory.make_Node()
 
         script_set = ScriptSet.objects.create_commissioning_script_set(
@@ -389,9 +356,7 @@ class TestScriptSetManager(MAASServerTestCase):
     def test_create_commissioning_script_set_only_cleans_same_type(self):
         # Regression test for LP:1751946
         node = Node.objects.create()
-        script_set = ScriptSet.objects.create_commissioning_script_set(
-            node=node
-        )
+        script_set = ScriptSet.objects.create_commissioning_script_set(node=node)
         script_set.scriptresult_set.update(status=SCRIPT_STATUS.ABORTED)
         node.current_commissioning_script_set = script_set
         script = factory.make_Script(
@@ -401,14 +366,10 @@ class TestScriptSetManager(MAASServerTestCase):
         testing_script_set = ScriptSet.objects.create_testing_script_set(
             node=node, scripts=[script.id]
         )
-        testing_script_set.scriptresult_set.update(
-            status=SCRIPT_STATUS.ABORTED
-        )
+        testing_script_set.scriptresult_set.update(status=SCRIPT_STATUS.ABORTED)
         node.current_testing_script_set = testing_script_set
         node.save()
-        new_script_set = ScriptSet.objects.create_commissioning_script_set(
-            node=node
-        )
+        new_script_set = ScriptSet.objects.create_commissioning_script_set(node=node)
         node.current_commissioning_script_set = new_script_set
         node.save()
         self.assertIsNotNone(ScriptSet.objects.get(id=testing_script_set.id))
@@ -451,13 +412,9 @@ class TestScriptSetManager(MAASServerTestCase):
     def test_create_commissioning_script_set_cleans_up_empty_sets(self):
         Config.objects.set_config("max_node_commissioning_results", 10)
         node = factory.make_Node()
-        empty_installation = ScriptSet.objects.create_installation_script_set(
-            node
-        )
+        empty_installation = ScriptSet.objects.create_installation_script_set(node)
         empty_installation.scriptresult_set.all().delete()
-        empty_commissioning = (
-            ScriptSet.objects.create_commissioning_script_set(node)
-        )
+        empty_commissioning = ScriptSet.objects.create_commissioning_script_set(node)
         empty_commissioning.scriptresult_set.all().delete()
         empty_testing = ScriptSet.objects.create_testing_script_set(node)
         empty_testing.scriptresult_set.all().delete()
@@ -466,9 +423,7 @@ class TestScriptSetManager(MAASServerTestCase):
         # the first set is removed since it's empty
         self.assertCountEqual(
             [script_set],
-            ScriptSet.objects.filter(
-                result_type=RESULT_TYPE.COMMISSIONING
-            ).all(),
+            ScriptSet.objects.filter(result_type=RESULT_TYPE.COMMISSIONING).all(),
         )
         # Other types are still there, even though they are empty.
         self.assertCountEqual(
@@ -496,9 +451,7 @@ class TestScriptSetManager(MAASServerTestCase):
         # older sets for each node are removed
         self.assertCountEqual(
             [script_set1, script_set2],
-            ScriptSet.objects.filter(
-                result_type=RESULT_TYPE.COMMISSIONING
-            ).all(),
+            ScriptSet.objects.filter(result_type=RESULT_TYPE.COMMISSIONING).all(),
         )
 
     def test_create_commissioning_script_set_aborts_old_running_scripts(self):
@@ -558,9 +511,7 @@ class TestScriptSetManager(MAASServerTestCase):
             node, [script1.name, tag]
         )
         self.assertEqual(script_set.tags, [tag])
-        script_names = [
-            script_result.script.name for script_result in script_set
-        ]
+        script_names = [script_result.script.name for script_result in script_set]
         self.assertIn(script1.name, script_names)
         self.assertIn(script2.name, script_names)
 
@@ -584,9 +535,7 @@ class TestScriptSetManager(MAASServerTestCase):
         node = factory.make_Node()
         expected_scripts = [
             script.name
-            for script in Script.objects.filter(
-                tags__contains=["commissioning"]
-            )
+            for script in Script.objects.filter(tags__contains=["commissioning"])
         ] + [
             factory.make_Script(
                 script_type=SCRIPT_TYPE.TESTING, tags=["commissioning"]
@@ -601,14 +550,11 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.TESTING, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_testing_script_set_adds_selected_scripts(self):
         scripts = [
-            factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
-            for _ in range(10)
+            factory.make_Script(script_type=SCRIPT_TYPE.TESTING) for _ in range(10)
         ]
         script_selected_by_tag = random.choice(scripts)
         script_selected_by_name = random.choice(scripts)
@@ -624,11 +570,7 @@ class TestScriptSetManager(MAASServerTestCase):
             node,
             scripts=[
                 random.choice(
-                    [
-                        tag
-                        for tag in script_selected_by_tag.tags
-                        if "tag" in tag
-                    ]
+                    [tag for tag in script_selected_by_tag.tags if "tag" in tag]
                 ),
                 script_selected_by_name.name,
                 script_selected_by_id.id,
@@ -640,9 +582,7 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.TESTING, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_testing_script_raises_exception_when_none_found(self):
         node = factory.make_Node()
@@ -656,9 +596,7 @@ class TestScriptSetManager(MAASServerTestCase):
         node = factory.make_Node()
         script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
         for _ in range(limit + 2):
-            ScriptSet.objects.create_testing_script_set(
-                node, scripts=[script.name]
-            )
+            ScriptSet.objects.create_testing_script_set(node, scripts=[script.name])
         self.assertEqual(
             limit, ScriptResult.objects.filter(script_name=script.name).count()
         )
@@ -669,12 +607,8 @@ class TestScriptSetManager(MAASServerTestCase):
         node2 = factory.make_Node()
         script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
         for _ in range(limit + 2):
-            ScriptSet.objects.create_testing_script_set(
-                node1, scripts=[script.name]
-            )
-            ScriptSet.objects.create_testing_script_set(
-                node2, scripts=[script.name]
-            )
+            ScriptSet.objects.create_testing_script_set(node1, scripts=[script.name])
+            ScriptSet.objects.create_testing_script_set(node2, scripts=[script.name])
 
         self.assertEqual(
             limit,
@@ -718,16 +652,12 @@ class TestScriptSetManager(MAASServerTestCase):
         Config.objects.set_config("max_node_testing_results", 1)
         script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
         node = factory.make_Node()
-        node.current_testing_script_set = (
-            ScriptSet.objects.create_testing_script_set(
-                node, scripts=[script.name]
-            )
+        node.current_testing_script_set = ScriptSet.objects.create_testing_script_set(
+            node, scripts=[script.name]
         )
         node.save()
 
-        ScriptSet.objects.create_testing_script_set(
-            node, scripts=[script.name]
-        )
+        ScriptSet.objects.create_testing_script_set(node, scripts=[script.name])
 
         self.assertEqual(
             1, ScriptResult.objects.filter(script_name=script.name).count()
@@ -770,13 +700,9 @@ class TestScriptSetManager(MAASServerTestCase):
         Config.objects.set_config("max_node_testing_results", 10)
         script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
         node = factory.make_Node()
-        empty_installation = ScriptSet.objects.create_installation_script_set(
-            node
-        )
+        empty_installation = ScriptSet.objects.create_installation_script_set(node)
         empty_installation.scriptresult_set.all().delete()
-        empty_commissioning = (
-            ScriptSet.objects.create_commissioning_script_set(node)
-        )
+        empty_commissioning = ScriptSet.objects.create_commissioning_script_set(node)
         empty_commissioning.scriptresult_set.all().delete()
         empty_testing = ScriptSet.objects.create_testing_script_set(node)
         empty_testing.scriptresult_set.all().delete()
@@ -807,15 +733,11 @@ class TestScriptSetManager(MAASServerTestCase):
         script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
         node1 = factory.make_Node()
         node2 = factory.make_Node()
-        ScriptSet.objects.create_testing_script_set(
-            node1, scripts=[script.name]
-        )
+        ScriptSet.objects.create_testing_script_set(node1, scripts=[script.name])
         script_set1 = ScriptSet.objects.create_testing_script_set(
             node1, scripts=[script.name]
         )
-        ScriptSet.objects.create_testing_script_set(
-            node2, scripts=[script.name]
-        )
+        ScriptSet.objects.create_testing_script_set(node2, scripts=[script.name])
         script_set2 = ScriptSet.objects.create_testing_script_set(
             node2, scripts=[script.name]
         )
@@ -893,9 +815,7 @@ class TestScriptSetManager(MAASServerTestCase):
             [script_result.name for script_result in script_set],
         )
         self.assertEqual(RESULT_TYPE.INSTALLATION, script_set.result_type)
-        self.assertEqual(
-            node.power_state, script_set.power_state_before_transition
-        )
+        self.assertEqual(node.power_state, script_set.power_state_before_transition)
 
     def test_create_installation_script_set_cleans_up_past_limit(self):
         limit = Config.objects.get_config("max_node_installation_results")
@@ -905,9 +825,7 @@ class TestScriptSetManager(MAASServerTestCase):
 
         self.assertEqual(
             limit,
-            ScriptResult.objects.filter(
-                script_name=CURTIN_INSTALL_LOG
-            ).count(),
+            ScriptResult.objects.filter(script_name=CURTIN_INSTALL_LOG).count(),
         )
 
     def test_create_installation_script_set_cleans_up_by_node_and_type(self):
@@ -945,21 +863,15 @@ class TestScriptSetManager(MAASServerTestCase):
 
         self.assertEqual(
             1,
-            ScriptResult.objects.filter(
-                script_name=CURTIN_INSTALL_LOG
-            ).count(),
+            ScriptResult.objects.filter(script_name=CURTIN_INSTALL_LOG).count(),
         )
 
     def test_create_installation_script_set_cleans_up_empty_sets(self):
         Config.objects.set_config("max_node_installation_results", 10)
         node = factory.make_Node()
-        empty_installation = ScriptSet.objects.create_installation_script_set(
-            node
-        )
+        empty_installation = ScriptSet.objects.create_installation_script_set(node)
         empty_installation.scriptresult_set.all().delete()
-        empty_commissioning = (
-            ScriptSet.objects.create_commissioning_script_set(node)
-        )
+        empty_commissioning = ScriptSet.objects.create_commissioning_script_set(node)
         empty_commissioning.scriptresult_set.all().delete()
         empty_testing = ScriptSet.objects.create_testing_script_set(node)
         empty_testing.scriptresult_set.all().delete()
@@ -967,9 +879,7 @@ class TestScriptSetManager(MAASServerTestCase):
         # the first set is removed since it's empty
         self.assertCountEqual(
             [script_set],
-            ScriptSet.objects.filter(
-                result_type=RESULT_TYPE.INSTALLATION
-            ).all(),
+            ScriptSet.objects.filter(result_type=RESULT_TYPE.INSTALLATION).all(),
         )
         # Other types are still there, even though they are empty.
         self.assertCountEqual(
@@ -996,9 +906,7 @@ class TestScriptSetManager(MAASServerTestCase):
         # older results are deleted by node
         self.assertCountEqual(
             [script_set1, script_set2],
-            ScriptSet.objects.filter(
-                result_type=RESULT_TYPE.INSTALLATION
-            ).all(),
+            ScriptSet.objects.filter(result_type=RESULT_TYPE.INSTALLATION).all(),
         )
 
     def test_create_deployed_machine_script_set_scripts(self):
@@ -1175,23 +1083,17 @@ class TestScriptSet(MAASServerTestCase):
 
     def test_status_with_suppressed(self):
         script_set = factory.make_ScriptSet()
-        factory.make_ScriptResult(
-            script_set=script_set, status=SCRIPT_STATUS.PASSED
-        )
+        factory.make_ScriptResult(script_set=script_set, status=SCRIPT_STATUS.PASSED)
         factory.make_ScriptResult(
             script_set=script_set, status=SCRIPT_STATUS.FAILED, suppressed=True
         )
-        factory.make_ScriptResult(
-            status=SCRIPT_STATUS.TIMEDOUT, suppressed=True
-        )
+        factory.make_ScriptResult(status=SCRIPT_STATUS.TIMEDOUT, suppressed=True)
         factory.make_ScriptResult(
             script_set=script_set,
             status=SCRIPT_STATUS.FAILED_INSTALLING,
             suppressed=True,
         )
-        factory.make_ScriptResult(
-            script_set=script_set, status=SCRIPT_STATUS.SKIPPED
-        )
+        factory.make_ScriptResult(script_set=script_set, status=SCRIPT_STATUS.SKIPPED)
         self.assertEqual(SCRIPT_STATUS.PASSED, script_set.status)
 
     def test_empty_scriptset_has_no_status(self):
@@ -1209,9 +1111,7 @@ class TestScriptSet(MAASServerTestCase):
     def test_ended(self):
         script_set = factory.make_ScriptSet()
         ended = datetime.now() + timedelta(seconds=random.randint(1, 500))
-        factory.make_ScriptResult(
-            script_set=script_set, status=SCRIPT_STATUS.PASSED
-        )
+        factory.make_ScriptResult(script_set=script_set, status=SCRIPT_STATUS.PASSED)
         factory.make_ScriptResult(
             script_set=script_set, status=SCRIPT_STATUS.PASSED, ended=ended
         )
@@ -1219,12 +1119,8 @@ class TestScriptSet(MAASServerTestCase):
 
     def test_ended_returns_none_when_not_all_results_finished(self):
         script_set = factory.make_ScriptSet()
-        factory.make_ScriptResult(
-            script_set=script_set, status=SCRIPT_STATUS.PASSED
-        )
-        factory.make_ScriptResult(
-            script_set=script_set, status=SCRIPT_STATUS.RUNNING
-        )
+        factory.make_ScriptResult(script_set=script_set, status=SCRIPT_STATUS.PASSED)
+        factory.make_ScriptResult(script_set=script_set, status=SCRIPT_STATUS.RUNNING)
         self.assertIsNone(script_set.ended)
 
     def test_get_runtime(self):
@@ -1245,9 +1141,7 @@ class TestScriptSet(MAASServerTestCase):
 
     def test_get_runtime_blank_when_missing(self):
         script_set = factory.make_ScriptSet()
-        factory.make_ScriptResult(
-            script_set=script_set, status=SCRIPT_STATUS.PENDING
-        )
+        factory.make_ScriptResult(script_set=script_set, status=SCRIPT_STATUS.PENDING)
         self.assertEqual("", script_set.runtime)
 
     def test_select_for_hardware_scripts_removes_if_not_selected(self):
@@ -1294,9 +1188,7 @@ class TestScriptSet(MAASServerTestCase):
             node, [random.choice(script.tags)]
         )
 
-        to_mock = (
-            node.__module__ + "." + node.__class__.__qualname__ + ".modaliases"
-        )
+        to_mock = node.__module__ + "." + node.__class__.__qualname__ + ".modaliases"
         with mock.patch(to_mock, new_callable=PropertyMock) as mods:
             mods.return_value = [
                 "pci:v00008086d00001918sv000015D9sd00000888bc06sc00i00",
@@ -1414,9 +1306,7 @@ class TestScriptSet(MAASServerTestCase):
 
         script_set.regenerate()
 
-        passed_storage_script_result = reload_object(
-            passed_storage_script_result
-        )
+        passed_storage_script_result = reload_object(passed_storage_script_result)
         self.assertIsNotNone(passed_storage_script_result)
         self.assertDictEqual(
             passed_storage_parameters, passed_storage_script_result.parameters
@@ -1503,9 +1393,7 @@ class TestScriptSet(MAASServerTestCase):
         pending_storage_script = factory.make_Script(
             parameters={"storage": {"type": "storage"}}
         )
-        pending_storage_parameters = {
-            "storage": {"type": "storage", "value": "all"}
-        }
+        pending_storage_parameters = {"storage": {"type": "storage", "value": "all"}}
         factory.make_ScriptResult(
             script_set=script_set,
             status=SCRIPT_STATUS.PENDING,
@@ -1517,9 +1405,7 @@ class TestScriptSet(MAASServerTestCase):
 
         script_set.regenerate(storage=False, network=True)
 
-        passed_network_script_result = reload_object(
-            passed_network_script_result
-        )
+        passed_network_script_result = reload_object(passed_network_script_result)
         self.assertIsNotNone(passed_network_script_result)
         self.assertDictEqual(
             passed_network_parameters, passed_network_script_result.parameters
@@ -1661,12 +1547,9 @@ class TestScriptSet(MAASServerTestCase):
         self.assertEqual([], list(script_set))
         expected_msg = (
             "Removing Script %s from ScriptSet due to regeneration "
-            "error - {'runtime': ['Must be an int']}"
-            % pending_storage_script.name
+            "error - {'runtime': ['Must be an int']}" % pending_storage_script.name
         )
-        event_type = EventType.objects.get(
-            name=EVENT_TYPES.SCRIPT_RESULT_ERROR
-        )
+        event_type = EventType.objects.get(name=EVENT_TYPES.SCRIPT_RESULT_ERROR)
         event = Event.objects.get(node=node, type_id=event_type.id)
         self.assertEqual(expected_msg, event.description)
         mock_logger.assert_called_once_with(expected_msg)
@@ -1686,24 +1569,18 @@ class TestScriptSet(MAASServerTestCase):
             orig_commissioning_script_set,
             node.current_commissioning_script_set,
         )
-        self.assertEqual(
-            orig_testing_script_set, node.current_testing_script_set
-        )
+        self.assertEqual(orig_testing_script_set, node.current_testing_script_set)
         self.assertEqual(
             orig_installation_script_set, node.current_installation_script_set
         )
 
     def test_delete_prevents_del_of_current_commissioning_script_set(self):
         node = factory.make_Node(with_empty_script_sets=True)
-        self.assertRaises(
-            ValidationError, node.current_commissioning_script_set.delete
-        )
+        self.assertRaises(ValidationError, node.current_commissioning_script_set.delete)
 
     def test_delete_prevents_del_of_current_installation_script_set(self):
         node = factory.make_Node(with_empty_script_sets=True)
-        self.assertRaises(
-            ValidationError, node.current_installation_script_set.delete
-        )
+        self.assertRaises(ValidationError, node.current_installation_script_set.delete)
 
     def test_delete_sets_current_testing_script_set_to_older_version(self):
         node = factory.make_Node(with_empty_script_sets=True)

@@ -65,15 +65,11 @@ def proxy_update_config(reload_proxy=True):
             # Instead, we need to restart the service.
             if snap.running_in_snap():
                 d.addCallback(
-                    lambda _: service_monitor.restartService(
-                        "proxy", if_on=True
-                    )
+                    lambda _: service_monitor.restartService("proxy", if_on=True)
                 )
             else:
                 d.addCallback(
-                    lambda _: service_monitor.reloadService(
-                        "proxy", if_on=True
-                    )
+                    lambda _: service_monitor.reloadService("proxy", if_on=True)
                 )
         return d
     else:

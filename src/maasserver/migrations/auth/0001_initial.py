@@ -58,9 +58,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "name",
-                    models.CharField(
-                        unique=True, max_length=80, verbose_name="name"
-                    ),
+                    models.CharField(unique=True, max_length=80, verbose_name="name"),
                 ),
                 (
                     "permissions",

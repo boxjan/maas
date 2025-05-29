@@ -173,9 +173,7 @@ class BootResourceStore(ObjectStore):
         """
         self._resources_to_delete = {
             self.get_resource_identity(resource)
-            for resource in BootResource.objects.filter(
-                rtype=BOOT_RESOURCE_TYPE.SYNCED
-            )
+            for resource in BootResource.objects.filter(rtype=BOOT_RESOURCE_TYPE.SYNCED)
         }
         self._init_resources_to_delete = set(self._resources_to_delete)
 
@@ -296,9 +294,7 @@ class BootResourceStore(ObjectStore):
         if resource_set is None:
             resource_set = BootResourceSet(resource=resource, version=version)
         resource_set.label = product["label"]
-        log.debug(
-            f"Got boot resource set id={resource_set.id} {resource_set}."
-        )
+        log.debug(f"Got boot resource set id={resource_set.id} {resource_set}.")
         resource_set.save()
         return resource_set
 
@@ -349,9 +345,7 @@ class BootResourceStore(ObjectStore):
 
         return rfile, created
 
-    def get_resource_file_log_identifier(
-        self, rfile, resource_set=None, resource=None
-    ):
+    def get_resource_file_log_identifier(self, rfile, resource_set=None, resource=None):
         """Return identifier that is used for the maaslog."""
         resource_set = resource_set or rfile.resource_set
         resource = resource or resource_set.resource
@@ -373,21 +367,15 @@ class BootResourceStore(ObjectStore):
         """
         assert isinstance(source_list, list)
         resource = self.get_or_create_boot_resource(product)
-        is_resource_initially_complete = (
-            resource.get_latest_complete_set() is not None
-        )
+        is_resource_initially_complete = resource.get_latest_complete_set() is not None
         resource_set = self.get_or_create_boot_resource_set(resource, product)
-        rfile, new_rfile = self.get_or_create_boot_resource_file(
-            resource_set, product
-        )
+        rfile, new_rfile = self.get_or_create_boot_resource_file(resource_set, product)
 
         # A ROOT_IMAGE may already be downloaded for the release if the stream
         # switched from one not containg SquashFS images to one that does. We
         # want to use the SquashFS image so ignore the tgz.
         if product["ftype"] == BOOT_RESOURCE_FILE_TYPE.SQUASHFS_IMAGE:
-            qs = resource_set.files.filter(
-                filetype=BOOT_RESOURCE_FILE_TYPE.ROOT_IMAGE
-            )
+            qs = resource_set.files.filter(filetype=BOOT_RESOURCE_FILE_TYPE.ROOT_IMAGE)
             BootResourceFile.objects.filestore_remove_files(qs)
             qs.delete()
 
@@ -399,14 +387,12 @@ class BootResourceStore(ObjectStore):
             BootResourceFile.objects.filestore_remove_file(rfile)
             force_download = True
             msg = f"Hash mismatch for resourceset={resource_set} resource={resource}"
-            Event.objects.create_region_event(
-                EVENT_TYPES.REGION_IMPORT_WARNING, msg
-            )
+            Event.objects.create_region_event(EVENT_TYPES.REGION_IMPORT_WARNING, msg)
             maaslog.warning(msg)
 
         rfile.sha256 = sha256
-        rfile.filename_on_disk = (
-            BootResourceFile.objects.calculate_filename_on_disk(sha256)
+        rfile.filename_on_disk = BootResourceFile.objects.calculate_filename_on_disk(
+            sha256
         )
 
         rfile.size = int(product["size"])
@@ -418,14 +404,10 @@ class BootResourceStore(ObjectStore):
         )
         if is_resource_broken:
             msg = f"Resource {resource} has no complete resource set!"
-            Event.objects.create_region_event(
-                EVENT_TYPES.REGION_IMPORT_ERROR, msg
-            )
+            Event.objects.create_region_event(EVENT_TYPES.REGION_IMPORT_ERROR, msg)
             maaslog.error(msg)
 
-        ident = self.get_resource_file_log_identifier(
-            rfile, resource_set, resource
-        )
+        ident = self.get_resource_file_log_identifier(rfile, resource_set, resource)
         lfile = rfile.local_file()
         if lfile.complete and rfile.complete:
             log.debug(f"Boot image already up-to-date {ident}.")
@@ -440,9 +422,7 @@ class BootResourceStore(ObjectStore):
             and resource.bootloader_type
         ):
             arch = resource.architecture.split("/")[0]
-            extract_path = (
-                f"{BOOTLOADERS_DIR}/{resource.bootloader_type}/{arch}"
-            )
+            extract_path = f"{BOOTLOADERS_DIR}/{resource.bootloader_type}/{arch}"
 
         self.save_content_later(
             rfile,
@@ -488,8 +468,7 @@ class BootResourceStore(ObjectStore):
         """Removes all of the `BootResource`'s that were not synced."""
         # Grab all the current selections from the BootSourceSelection.
         selections = [
-            selection.to_dict()
-            for selection in BootSourceSelection.objects.all()
+            selection.to_dict() for selection in BootSourceSelection.objects.all()
         ]
         for ident in self._resources_to_delete:
             os, arch, subarch, series = ident.split("/")
@@ -519,9 +498,7 @@ class BootResourceStore(ObjectStore):
                         subarch,
                         series,
                         resource_set.label,
-                    ) or self._other_resources_exists(
-                        os, arch, subarch, series
-                    ):
+                    ) or self._other_resources_exists(os, arch, subarch, series):
                         # It was selected for removal.
                         BootResourceFile.objects.filestore_remove_resource(
                             delete_resource
@@ -551,9 +528,7 @@ class BootResourceStore(ObjectStore):
         """Removes all of the old `BootResourceSet`'s for the synced
         `BootResource`'s."""
         # Remove the sets that are incomplete and older versions.
-        for resource in BootResource.objects.filter(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED
-        ):
+        for resource in BootResource.objects.filter(rtype=BOOT_RESOURCE_TYPE.SYNCED):
             found_complete = False
             # Reverse order by id, so that we keep the newest completed set.
             for resource_set in resource.sets.order_by("id").reverse():
@@ -573,18 +548,14 @@ class BootResourceStore(ObjectStore):
                         log.debug(
                             f"Deleting obsolete resourceset {resource_set}.",
                         )
-                        BootResourceFile.objects.filestore_remove_set(
-                            resource_set
-                        )
+                        BootResourceFile.objects.filestore_remove_set(resource_set)
                         resource_set.delete()
 
         # Cleanup the resources that don't have sets. This is done because
         # it could be possible that the previous for loop removes all sets
         # from a boot resource, so the resource should be removed, instead
         # of being empty.
-        for resource in BootResource.objects.filter(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED
-        ):
+        for resource in BootResource.objects.filter(rtype=BOOT_RESOURCE_TYPE.SYNCED):
             if not resource.sets.exists():
                 log.debug(f"Deleting empty resource {resource}.")
                 resource.delete()
@@ -603,9 +574,7 @@ class BootResourceStore(ObjectStore):
     def calc_storage_size(self) -> int:
         """Calculate the required disk space to store all resources."""
         return sum(
-            BootResourceFile.objects.distinct("sha256").values_list(
-                "size", flat=True
-            ),
+            BootResourceFile.objects.distinct("sha256").values_list("size", flat=True),
             start=100 * 2**20,  # space to uncompress the bootloaders
         )
 
@@ -679,9 +648,7 @@ class BootResourceStore(ObjectStore):
                     )
             except WorkflowFailureError as ex:
                 if not self._cancel_finalize:
-                    log.warn(
-                        f"Failed to synchronise boot resources: {ex.cause}"
-                    )
+                    log.warn(f"Failed to synchronise boot resources: {ex.cause}")
                     register_persistent_error(
                         COMPONENT.REGION_IMAGE_SYNC,
                         f"Failed to synchronise boot resources: {ex.cause}",
@@ -742,9 +709,7 @@ class BootResourceRepoWriter(BasicMirrorWriter):
 
     def filter_version(self, data, src, target, pedigree):
         """Overridable from `BasicMirrorWriter`."""
-        return self.product_mapping.contains(
-            sutil.products_exdata(src, pedigree)
-        )
+        return self.product_mapping.contains(sutil.products_exdata(src, pedigree))
 
     def insert_item(self, data, src, target, pedigree, source_list):
         """Overridable from `BasicMirrorWriter`."""
@@ -801,15 +766,11 @@ def download_boot_resources(path, store, product_mapping, keyring_file=None):
     writer = BootResourceRepoWriter(store, product_mapping)
     (mirror, rpath) = sutil.path_from_mirror_url(path, None)
     policy = get_signing_policy(rpath, keyring_file)
-    reader = UrlMirrorReader(
-        mirror, policy=policy, user_agent=get_maas_user_agent()
-    )
+    reader = UrlMirrorReader(mirror, policy=policy, user_agent=get_maas_user_agent())
     writer.sync(reader, rpath)
 
 
-def download_all_boot_resources(
-    sources, product_mapping, store=None, notify=None
-):
+def download_all_boot_resources(sources, product_mapping, store=None, notify=None):
     """Downloads all of the boot resources from the sources.
 
     Boot resources are stored into the `BootResource` model.
@@ -859,9 +820,7 @@ def download_all_boot_resources(
     with listener.listen("sys_stop_import", stop_import):
         for source in sources:
             msg = f"Importing images from source: {source['url']}"
-            Event.objects.create_region_event(
-                EVENT_TYPES.REGION_IMPORT_INFO, msg
-            )
+            Event.objects.create_region_event(EVENT_TYPES.REGION_IMPORT_INFO, msg)
             maaslog.info(msg)
             download_boot_resources(
                 source["url"],
@@ -874,9 +833,7 @@ def download_all_boot_resources(
         with lock:
             stopped = stop
         if stopped:
-            log.debug(
-                "Finalizing BootResourceStore was cancelled before starting."
-            )
+            log.debug("Finalizing BootResourceStore was cancelled before starting.")
             store.cancel_finalize(notify=notify)
         else:
             log.debug("Finalizing BootResourceStore.")
@@ -996,10 +953,7 @@ def _import_resources_internal(notify=None):
     with tempdir("keyrings") as keyrings_path:
         sources = get_boot_sources()
         sources = write_all_keyrings(keyrings_path, sources)
-        msg = (
-            "Started importing of boot images from "
-            f"{len(sources)} source(s)."
-        )
+        msg = "Started importing of boot images from " f"{len(sources)} source(s)."
         Event.objects.create_region_event(EVENT_TYPES.REGION_IMPORT_INFO, msg)
         maaslog.info(msg)
 
@@ -1007,13 +961,8 @@ def _import_resources_internal(notify=None):
             sources, get_maas_user_agent()
         )
         if image_descriptions.is_empty():
-            msg = (
-                "Unable to import boot images, no image "
-                "descriptions avaliable."
-            )
-            Event.objects.create_region_event(
-                EVENT_TYPES.REGION_IMPORT_WARNING, msg
-            )
+            msg = "Unable to import boot images, no image " "descriptions avaliable."
+            Event.objects.create_region_event(EVENT_TYPES.REGION_IMPORT_WARNING, msg)
             maaslog.warning(msg)
             return
         product_mapping = map_products(image_descriptions)
@@ -1122,9 +1071,7 @@ def stop_import_resources():
     # Wait for the importing lock to be released, before saying it has
     # fully been stopped.
     while True:
-        running = yield deferToDatabase(
-            transactional(is_import_resources_running)
-        )
+        running = yield deferToDatabase(transactional(is_import_resources_running))
         if not running:
             break
         yield pause(1)
@@ -1170,8 +1117,7 @@ class ImportResourcesService(TimerService):
             return _import_resources_in_thread()
         else:
             maaslog.info(
-                "Skipping periodic import of boot resources; "
-                "it has been disabled."
+                "Skipping periodic import of boot resources; " "it has been disabled."
             )
 
 
@@ -1188,9 +1134,7 @@ class ImportResourcesProgressService(TimerService):
 
     @inlineCallbacks
     def check_boot_images(self):
-        if (
-            yield deferToDatabase(self.are_boot_images_available_in_the_region)
-        ):
+        if (yield deferToDatabase(self.are_boot_images_available_in_the_region)):
             # The region has boot resources. We are all set
             yield deferToDatabase(self.clear_import_warning)
         else:
@@ -1260,9 +1204,9 @@ def export_images_from_db(region: RegionController, target_dir: Path):
     largefile_ids_to_delete = set()
     oids_to_delete = set()
     with transaction.atomic():
-        files = BootResourceFile.objects.filter(
-            largefile__isnull=False
-        ).select_related("largefile")
+        files = BootResourceFile.objects.filter(largefile__isnull=False).select_related(
+            "largefile"
+        )
 
         for file in files:
             lfile = file.local_file()
@@ -1355,18 +1299,12 @@ def initialize_image_storage(region: RegionController):
             missing.add(res)
 
     if missing:
-        maaslog.warning(
-            f"{len(missing)} missing resources need to be downloaded again"
-        )
-        BootResourceFileSync.objects.filter(
-            file__in=missing, region=region
-        ).delete()
+        maaslog.warning(f"{len(missing)} missing resources need to be downloaded again")
+        BootResourceFileSync.objects.filter(file__in=missing, region=region).delete()
 
     existing_files = set(target_dir.iterdir())
     for file in existing_files - expected_files:
-        maaslog.warning(
-            f"removing unexpected {file} file from the image storage"
-        )
+        maaslog.warning(f"removing unexpected {file} file from the image storage")
         if file.is_symlink():
             file.unlink()
         elif file.is_dir():

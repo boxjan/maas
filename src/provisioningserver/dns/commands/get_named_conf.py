@@ -34,8 +34,7 @@ def add_arguments(parser):
         action="store_true",
         dest="edit",
         default=False,
-        help="Edit the configuration file instead of simply "
-        "printing the snippet.",
+        help="Edit the configuration file instead of simply " "printing the snippet.",
     )
     parser.add_argument(
         "--config-path",

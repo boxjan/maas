@@ -37,16 +37,12 @@ from provisioningserver.config import DEFAULT_IMAGES_URL, DEFAULT_KEYRINGS_PATH
 
 
 class PatchOSInfoMixin:
-    def patch_get_os_info_from_boot_sources(
-        self, sources, releases=None, arches=None
-    ):
+    def patch_get_os_info_from_boot_sources(self, sources, releases=None, arches=None):
         if releases is None:
             releases = [factory.make_name("release") for _ in range(3)]
         if arches is None:
             arches = [factory.make_name("arch") for _ in range(3)]
-        mock_get_os_info = self.patch(
-            bootresource, "get_os_info_from_boot_sources"
-        )
+        mock_get_os_info = self.patch(bootresource, "get_os_info_from_boot_sources")
         mock_get_os_info.return_value = (sources, releases, arches)
         return mock_get_os_info
 
@@ -85,9 +81,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
     def test_returns_connection_error_True(self):
         owner = factory.make_admin()
         handler = BootResourceHandler(owner, {}, None)
-        mock_get_os_info = self.patch(
-            bootresource, "get_os_info_from_boot_sources"
-        )
+        mock_get_os_info = self.patch(bootresource, "get_os_info_from_boot_sources")
         mock_get_os_info.side_effect = ConnectionError()
         response = handler.poll({})
         self.assertTrue(response["connection_error"])
@@ -155,9 +149,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
                 {
                     "name": release,
                     "title": release,
-                    "unsupported_arches": (
-                        ["i386"] if release == "20.04" else []
-                    ),
+                    "unsupported_arches": (["i386"] if release == "20.04" else []),
                     "checked": False,
                     "deleted": False,
                 }
@@ -279,18 +271,14 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
     def test_returns_region_import_running_True(self):
         owner = factory.make_admin()
         handler = BootResourceHandler(owner, {}, None)
-        self.patch(
-            bootresource, "is_import_resources_running"
-        ).return_value = True
+        self.patch(bootresource, "is_import_resources_running").return_value = True
         response = handler.poll({})
         self.assertTrue(response["region_import_running"])
 
     def test_returns_region_import_running_False(self):
         owner = factory.make_admin()
         handler = BootResourceHandler(owner, {}, None)
-        self.patch(
-            bootresource, "is_import_resources_running"
-        ).return_value = False
+        self.patch(bootresource, "is_import_resources_running").return_value = False
         response = handler.poll({})
         self.assertFalse(response["region_import_running"])
 
@@ -344,9 +332,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
         # Use trusty as known to map to "14.04 LTS"
         version = "14.04 LTS"
         name = "ubuntu/trusty"
-        factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name
-        )
+        factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name)
         response = handler.poll({})
         resource = response["resources"][0]
         self.assertEqual(version, resource["title"])
@@ -419,9 +405,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
     def test_shows_latest_deployment_time(self) -> None:
         owner = factory.make_admin()
         handler = BootResourceHandler(owner, {}, None)
-        resource = factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED
-        )
+        resource = factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED)
         os_name, series = resource.name.split("/")
         node = factory.make_Node(
             status=NODE_STATUS.DEPLOYED,
@@ -450,9 +434,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
     def test_shows_number_of_machines_deployed_at_current(self) -> None:
         owner = factory.make_admin()
         handler = BootResourceHandler(owner, {}, None)
-        resource = factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED
-        )
+        resource = factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED)
         os_name, series = resource.name.split("/")
         node = factory.make_Machine(
             status=NODE_STATUS.DEPLOYED,
@@ -476,9 +458,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
     def test_shows_number_of_nodes_deployed_for_resource(self):
         owner = factory.make_admin()
         handler = BootResourceHandler(owner, {}, None)
-        resource = factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED
-        )
+        resource = factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED)
         os_name, series = resource.name.split("/")
         number_of_nodes = random.randint(1, 4)
         for _ in range(number_of_nodes):
@@ -495,9 +475,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
     def test_shows_number_of_nodes_deployed_for_resource_with_defaults(self):
         owner = factory.make_admin()
         handler = BootResourceHandler(owner, {}, None)
-        resource = factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED
-        )
+        resource = factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED)
         os_name, series = resource.name.split("/")
         Config.objects.set_config("default_osystem", os_name)
         Config.objects.set_config("default_distro_series", series)
@@ -513,9 +491,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
     def test_shows_number_of_nodes_deployed_for_ubuntu_subarch_resource(self):
         owner = factory.make_admin()
         handler = BootResourceHandler(owner, {}, None)
-        resource = factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED
-        )
+        resource = factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED)
         arch, subarch = resource.split_arch()
         extra_subarch = factory.make_name("subarch")
         extra = resource.extra.copy()
@@ -575,9 +551,7 @@ class TestBootResourcePoll(MAASServerTestCase, PatchOSInfoMixin):
             )
         response = handler.poll({})
         resource = response["resources"][0]
-        self.assertEqual(
-            human_readable_bytes(lfile.total_size), resource["size"]
-        )
+        self.assertEqual(human_readable_bytes(lfile.total_size), resource["size"])
 
     def test_combined_subarch_resource_calculates_num_of_nodes_deployed(self):
         owner = factory.make_admin()
@@ -847,9 +821,7 @@ class TestBootResourceStopImport(MAASTransactionServerTestCase):
         self.assertEqual(handler.poll({}), result)
 
 
-class TestBootResourceSaveUbuntu(
-    MAASTransactionServerTestCase, PatchOSInfoMixin
-):
+class TestBootResourceSaveUbuntu(MAASTransactionServerTestCase, PatchOSInfoMixin):
     def setUp(self):
         super().setUp()
         # Disable boot source cache signals.
@@ -880,9 +852,7 @@ class TestBootResourceSaveUbuntu(
         self.patch_get_os_info_from_boot_sources(sources)
         mock_stop_import = self.patch_stop_import_resources()
         mock_import = self.patch_import_resources()
-        handler.save_ubuntu(
-            {"url": sources[0].url, "releases": [], "arches": []}
-        )
+        handler.save_ubuntu({"url": sources[0].url, "releases": [], "arches": []})
         mock_stop_import.assert_called_once_with()
         mock_import.assert_called_once_with(notify=ANY)
 
@@ -906,9 +876,7 @@ class TestBootResourceSaveUbuntu(
 
         selections = BootSourceSelection.objects.filter(boot_source=source)
         self.assertEqual(len(selections), len(releases))
-        self.assertCountEqual(
-            releases, [selection.release for selection in selections]
-        )
+        self.assertCountEqual(releases, [selection.release for selection in selections])
 
     def test_sets_arches_on_selections(self):
         owner = factory.make_admin()
@@ -958,9 +926,7 @@ class TestBootResourceSaveUbuntu(
         handler.save_ubuntu(
             {
                 "url": source.url,
-                "osystems": [
-                    {"osystem": "ubuntu", "release": release, "arches": []}
-                ],
+                "osystems": [{"osystem": "ubuntu", "release": release, "arches": []}],
             }
         )
         self.assertIsNone(reload_object(delete_selection))
@@ -1061,9 +1027,7 @@ class TestBootResourceSaveOther(MAASTransactionServerTestCase):
         self.addCleanup(bootsources.signals.enable)
         bootsources.signals.disable()
 
-    def make_other_resource(
-        self, os=None, arch=None, subarch=None, release=None
-    ):
+    def make_other_resource(self, os=None, arch=None, subarch=None, release=None):
         if os is None:
             os = factory.make_name("os")
         if arch is None:
@@ -1161,9 +1125,7 @@ class TestBootResourceFetch(MAASServerTestCase):
         mock_set_env = self.patch(bootresource, "set_simplestreams_env")
         mock_write_keyrings = self.patch(bootresource, "write_all_keyrings")
         mock_write_keyrings.side_effect = lambda _, sources: sources
-        mock_download = self.patch(
-            bootresource, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootresource, "download_all_image_descriptions")
         mock_download.return_value = BootImageMapping()
         url = factory.make_url(
             scheme=random.choice(["http", "https"]),
@@ -1196,9 +1158,7 @@ class TestBootResourceFetch(MAASServerTestCase):
         handler = BootResourceHandler(owner, {}, None)
         mock_write_keyrings = self.patch(bootresource, "write_all_keyrings")
         mock_write_keyrings.side_effect = lambda _, sources: sources
-        mock_download = self.patch(
-            bootresource, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootresource, "download_all_image_descriptions")
         mock_download.return_value = BootImageMapping()
         url = "http://example.com"
         keyring_data = "aGVsbG8gd29ybGQ="
@@ -1220,9 +1180,7 @@ class TestBootResourceFetch(MAASServerTestCase):
         self.patch(bootresource, "set_simplestreams_env")
         mock_write_keyrings = self.patch(bootresource, "write_all_keyrings")
         mock_write_keyrings.side_effect = lambda _, sources: sources
-        mock_download = self.patch(
-            bootresource, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootresource, "download_all_image_descriptions")
         exc = factory.make_exception()
         mock_download.side_effect = exc
         url = factory.make_url(scheme=random.choice(["http", "https"]))
@@ -1240,9 +1198,7 @@ class TestBootResourceFetch(MAASServerTestCase):
         self.patch(bootresource, "set_simplestreams_env")
         mock_write_keyrings = self.patch(bootresource, "write_all_keyrings")
         mock_write_keyrings.side_effect = lambda _, sources: sources
-        mock_download = self.patch(
-            bootresource, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootresource, "download_all_image_descriptions")
 
         # Only centos image is present.
         mapping = BootImageMapping()
@@ -1278,9 +1234,7 @@ class TestBootResourceFetch(MAASServerTestCase):
         self.patch(bootresource, "set_simplestreams_env")
         mock_write_keyrings = self.patch(bootresource, "write_all_keyrings")
         mock_write_keyrings.side_effect = lambda _, sources: sources
-        mock_download = self.patch(
-            bootresource, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootresource, "download_all_image_descriptions")
 
         # Make releases and arches.
         mapping = BootImageMapping()
@@ -1328,9 +1282,7 @@ class TestBootResourceFetch(MAASServerTestCase):
         self.patch(bootresource, "set_simplestreams_env")
         mock_write_keyrings = self.patch(bootresource, "write_all_keyrings")
         mock_write_keyrings.side_effect = lambda _, sources: sources
-        mock_download = self.patch(
-            bootresource, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootresource, "download_all_image_descriptions")
 
         # Make releases and arches.
         mapping = BootImageMapping()
@@ -1373,9 +1325,7 @@ class TestBootResourceFetch(MAASServerTestCase):
         self.patch(bootresource, "set_simplestreams_env")
         mock_write_keyrings = self.patch(bootresource, "write_all_keyrings")
         mock_write_keyrings.side_effect = lambda _, sources: sources
-        mock_download = self.patch(
-            bootresource, "download_all_image_descriptions"
-        )
+        mock_download = self.patch(bootresource, "download_all_image_descriptions")
 
         # Make releases and arches.
         mapping = BootImageMapping()

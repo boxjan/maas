@@ -48,9 +48,7 @@ class TestScriptHandler(MAASServerTestCase):
         parameters = {"interface": {"type": "interface"}}
         expected_scripts = sorted(
             (
-                self.dehydrate_script(
-                    factory.make_Script(parameters=parameters)
-                )
+                self.dehydrate_script(factory.make_Script(parameters=parameters))
                 for _ in range(3)
             ),
             key=lambda i: i["id"],
@@ -73,9 +71,7 @@ class TestScriptHandler(MAASServerTestCase):
         user = factory.make_User()
         handler = ScriptHandler(user, {}, None)
 
-        self.assertRaises(
-            HandlerPermissionError, handler.delete, {"id": script.id}
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete, {"id": script.id})
 
         self.assertIsNotNone(reload_object(script))
 
@@ -84,9 +80,7 @@ class TestScriptHandler(MAASServerTestCase):
         admin = factory.make_admin()
         handler = ScriptHandler(admin, {}, None)
 
-        self.assertRaises(
-            HandlerPermissionError, handler.delete, {"id": script.id}
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete, {"id": script.id})
 
         self.assertIsNotNone(reload_object(script))
 
@@ -95,9 +89,7 @@ class TestScriptHandler(MAASServerTestCase):
         user = factory.make_User()
         handler = ScriptHandler(user, {}, None)
 
-        self.assertEqual(
-            script.script.data, handler.get_script({"id": script.id})
-        )
+        self.assertEqual(script.script.data, handler.get_script({"id": script.id}))
 
     def test_get_script_not_found(self):
         user = factory.make_User()

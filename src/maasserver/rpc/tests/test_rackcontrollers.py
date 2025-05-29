@@ -30,9 +30,7 @@ class TestRegisterRackController(MAASServerTestCase):
     def setUp(self):
         super().setUp()
         self.this_region = factory.make_RegionController()
-        mock_running = self.patch(
-            RegionController.objects, "get_running_controller"
-        )
+        mock_running = self.patch(RegionController.objects, "get_running_controller")
         mock_running.return_value = self.this_region
 
     def test_sets_owner_to_worker_when_none(self):
@@ -85,8 +83,7 @@ class TestRegisterRackController(MAASServerTestCase):
         register(system_id=node.system_id)
         self.assertEqual(
             "Existing rack controller '%s' running version 2.2 or below has "
-            "connected to region '%s'."
-            % (node.hostname, self.this_region.hostname),
+            "connected to region '%s'." % (node.hostname, self.this_region.hostname),
             logger.output.strip(),
         )
 
@@ -96,8 +93,7 @@ class TestRegisterRackController(MAASServerTestCase):
         register(system_id=node.system_id, version="2.10.0")
         self.assertEqual(
             "Existing rack controller '%s' running version 2.10.0 has "
-            "connected to region '%s'."
-            % (node.hostname, self.this_region.hostname),
+            "connected to region '%s'." % (node.hostname, self.this_region.hostname),
             logger.output.strip(),
         )
 
@@ -152,8 +148,7 @@ class TestRegisterRackController(MAASServerTestCase):
         register(system_id=node.system_id, version="1.10.2")
         self.assertEqual(
             "Region controller '%s' converted '%s' running version 1.10.2 "
-            "into a rack controller.\n"
-            % (self.this_region.hostname, node.hostname),
+            "into a rack controller.\n" % (self.this_region.hostname, node.hostname),
             logger.output,
         )
 
@@ -170,9 +165,7 @@ class TestRegisterRackController(MAASServerTestCase):
             }
         }
         rack_controller = register(interfaces=interfaces)
-        self.assertNotEqual(
-            existing_machine.system_id, rack_controller.system_id
-        )
+        self.assertNotEqual(existing_machine.system_id, rack_controller.system_id)
         self.assertTrue(rack_controller.should_be_dynamically_deleted())
 
     def test_always_has_current_commissioning_script_set(self):
@@ -308,9 +301,7 @@ class TestUpdateForeignDHCP(MAASServerTestCase):
     def test_doesnt_fail_if_interface_missing(self):
         rack_controller = factory.make_RackController()
         # No error should be raised.
-        update_foreign_dhcp(
-            rack_controller.system_id, factory.make_name("eth"), None
-        )
+        update_foreign_dhcp(rack_controller.system_id, factory.make_name("eth"), None)
 
     def test_clears_external_dhcp_on_vlan(self):
         rack_controller = factory.make_RackController(interface=False)
@@ -372,9 +363,7 @@ class TestUpdateForeignDHCP(MAASServerTestCase):
 class TestReportNeighbours(MAASServerTestCase):
     def test_calls_report_neighbours_on_rack_controller(self):
         rack_controller = factory.make_RackController()
-        patched_report_neighbours = self.patch(
-            RackController, "report_neighbours"
-        )
+        patched_report_neighbours = self.patch(RackController, "report_neighbours")
         report_neighbours(rack_controller.system_id, sentinel.neighbours)
         patched_report_neighbours.assert_called_once_with(sentinel.neighbours)
 
@@ -398,15 +387,9 @@ class TestUpdateState(MAASServerTestCase):
         }
         update_state(rack.system_id, "versions", versions)
         controller_info = rack.controllerinfo
-        self.assertEqual(
-            controller_info.install_type, CONTROLLER_INSTALL_TYPE.SNAP
-        )
-        self.assertEqual(
-            controller_info.version, "3.0.0~alpha1-111-g.deadbeef"
-        )
-        self.assertEqual(
-            controller_info.update_version, "3.0.0~alpha2-222-g.cafecafe"
-        )
+        self.assertEqual(controller_info.install_type, CONTROLLER_INSTALL_TYPE.SNAP)
+        self.assertEqual(controller_info.version, "3.0.0~alpha1-111-g.deadbeef")
+        self.assertEqual(controller_info.update_version, "3.0.0~alpha2-222-g.cafecafe")
         self.assertEqual(controller_info.update_origin, "3.0/stable")
         self.assertEqual(controller_info.snap_revision, "1234")
         self.assertEqual(controller_info.snap_update_revision, "5678")
@@ -428,15 +411,9 @@ class TestUpdateState(MAASServerTestCase):
         }
         update_state(rack.system_id, "versions", versions)
         controller_info = rack.controllerinfo
-        self.assertEqual(
-            controller_info.install_type, CONTROLLER_INSTALL_TYPE.DEB
-        )
-        self.assertEqual(
-            controller_info.version, "3.0.0~alpha1-111-g.deadbeef"
-        )
-        self.assertEqual(
-            controller_info.update_version, "3.0.0~alpha2-222-g.cafecafe"
-        )
+        self.assertEqual(controller_info.install_type, CONTROLLER_INSTALL_TYPE.DEB)
+        self.assertEqual(controller_info.version, "3.0.0~alpha1-111-g.deadbeef")
+        self.assertEqual(controller_info.update_version, "3.0.0~alpha2-222-g.cafecafe")
         self.assertEqual(
             controller_info.update_origin,
             "http://archive.ubuntu.com/ focal/main",
@@ -453,6 +430,4 @@ class TestUpdateState(MAASServerTestCase):
 
     def test_scope_unhandled(self):
         rack = factory.make_RackController()
-        self.assertRaises(
-            NoSuchScope, update_state, rack.system_id, "other", {}
-        )
+        self.assertRaises(NoSuchScope, update_state, rack.system_id, "other", {})

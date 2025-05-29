@@ -19,17 +19,13 @@ from maasserver.workflow.power import (
 
 @pytest.mark.usefixtures("maasdb")
 class TestGetTemporalQueueForMachine:
-    def test_get_temporal_task_queue_for_bmc_machine_with_no_bmc(
-        self, factory
-    ):
+    def test_get_temporal_task_queue_for_bmc_machine_with_no_bmc(self, factory):
         machine = factory.make_Machine(bmc=None)
         machine.save()
         with pytest.raises(UnroutablePowerWorkflowException):
             get_temporal_task_queue_for_bmc(machine)
 
-    def test_get_temporal_task_queue_for_bmc_machine_with_bmc_with_vlan(
-        self, factory
-    ):
+    def test_get_temporal_task_queue_for_bmc_machine_with_bmc_with_vlan(self, factory):
         vlan = factory.make_VLAN()
         subnet = factory.make_Subnet(vlan=vlan)
         rack = factory.make_RackController()
@@ -54,16 +50,12 @@ class TestGetTemporalQueueForMachine:
             node=rack,
             ip=subnet.get_next_ip_for_allocation()[0],
         )
-        bmc_ip = factory.make_StaticIPAddress(
-            ip=subnet.get_next_ip_for_allocation()[0]
-        )
+        bmc_ip = factory.make_StaticIPAddress(ip=subnet.get_next_ip_for_allocation()[0])
         bmc = factory.make_BMC(ip_address=bmc_ip)
         machine = factory.make_Machine(bmc=bmc)
         factory.make_BMCRoutableRackControllerRelationship(bmc, rack)
 
-        mocked_get_all_clients = mocker.patch.object(
-            model_bmc, "getAllClients"
-        )
+        mocked_get_all_clients = mocker.patch.object(model_bmc, "getAllClients")
 
         client = Mock()
         client.ident = rack.system_id
@@ -81,16 +73,12 @@ class TestGetTemporalQueueForMachine:
             "power_cycle": PowerCycleParam,
         }
         machine = factory.make_Machine()
-        params = namedtuple("params", ["power_type", "power_parameters"])(
-            {}, {}
-        )
+        params = namedtuple("params", ["power_type", "power_parameters"])({}, {})
 
         mocked_get_temporal_task_queue_for_bmc = mocker.patch.object(
             power_workflow, "get_temporal_task_queue_for_bmc"
         )
-        mocked_get_temporal_task_queue_for_bmc.return_value = (
-            "agent:power@vlan-1"
-        )
+        mocked_get_temporal_task_queue_for_bmc.return_value = "agent:power@vlan-1"
 
         for power_action, param in power_actions.items():
             (
@@ -108,22 +96,14 @@ class TestGetTemporalQueueForMachine:
                 driver_opts=params.power_parameters,
             )
 
-    def test_convert_power_action_to_power_workflow_fail_unknown(
-        self, factory, mocker
-    ):
+    def test_convert_power_action_to_power_workflow_fail_unknown(self, factory, mocker):
         power_action = "unknown"
         machine = factory.make_Machine()
-        params = namedtuple("params", ["power_type", "power_parameters"])(
-            {}, {}
-        )
+        params = namedtuple("params", ["power_type", "power_parameters"])({}, {})
 
         mocked_get_temporal_task_queue_for_bmc = mocker.patch.object(
             power_workflow, "get_temporal_task_queue_for_bmc"
         )
-        mocked_get_temporal_task_queue_for_bmc.return_value = (
-            "agent:power@vlan-1"
-        )
+        mocked_get_temporal_task_queue_for_bmc.return_value = "agent:power@vlan-1"
         with pytest.raises(UnknownPowerActionException):
-            convert_power_action_to_power_workflow(
-                power_action, machine, params
-            )
+            convert_power_action_to_power_workflow(power_action, machine, params)

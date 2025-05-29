@@ -39,9 +39,7 @@ class Bin(bytes):
         # Those warnings would sometimes make their way into logs, breaking
         # tests that checked those logs.
         if not isinstance(initializer, bytes):
-            raise AssertionError(
-                "Not a binary string: '%s'" % repr(initializer)
-            )
+            raise AssertionError("Not a binary string: '%s'" % repr(initializer))
         return super().__new__(cls, initializer)
 
     def __emittable__(self):
@@ -77,8 +75,7 @@ class BinaryField(Field):
             return value
         else:
             raise AssertionError(
-                "Invalid BinaryField value (expected unicode): '%s'"
-                % repr(value)
+                "Invalid BinaryField value (expected unicode): '%s'" % repr(value)
             )
 
     def from_db_value(self, value, expression, connection):
@@ -107,9 +104,7 @@ class BinaryField(Field):
             if value == "":
                 return ""
             # Unicode here is almost certainly a sign of a mistake.
-            raise AssertionError(
-                "A unicode string is being mistaken for binary data."
-            )
+            raise AssertionError("A unicode string is being mistaken for binary data.")
         else:
             raise AssertionError(
                 "Invalid BinaryField value (expected Bin): '%s'" % repr(value)

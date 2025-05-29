@@ -67,9 +67,9 @@ def sync_deprecation_notifications():
     from maasserver.models import Notification
 
     notifications = set(
-        Notification.objects.filter(
-            ident__startswith="deprecation_"
-        ).values_list("ident", flat=True)
+        Notification.objects.filter(ident__startswith="deprecation_").values_list(
+            "ident", flat=True
+        )
     )
     for deprecation in get_deprecations():
         for kind in ("users", "admins"):

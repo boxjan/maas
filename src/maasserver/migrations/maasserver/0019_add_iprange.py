@@ -48,9 +48,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "end_ip",
-                    models.GenericIPAddressField(
-                        verbose_name="End IP", editable=False
-                    ),
+                    models.GenericIPAddressField(verbose_name="End IP", editable=False),
                 ),
                 (
                     "comment",
@@ -58,9 +56,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "subnet",
-                    models.ForeignKey(
-                        to="maasserver.Subnet", on_delete=models.CASCADE
-                    ),
+                    models.ForeignKey(to="maasserver.Subnet", on_delete=models.CASCADE),
                 ),
                 (
                     "user",

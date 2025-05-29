@@ -93,10 +93,7 @@ def get_requested_ips(requested_machine):
         requested_ips = {
             interface.ifname: interface.requested_ips
             for interface in requested_machine.interfaces
-            if (
-                interface.ifname is not None
-                and len(interface.requested_ips) > 0
-            )
+            if (interface.ifname is not None and len(interface.requested_ips) > 0)
         }
     else:
         requested_ips = {}
@@ -120,9 +117,7 @@ def create_bmc(**kwargs):
     power_type = kwargs.get("power_type", None)
     power_parameters = kwargs.get("power_parameters", {})
 
-    power_parameters, secrets = sanitise_power_parameters(
-        power_type, power_parameters
-    )
+    power_parameters, secrets = sanitise_power_parameters(power_type, power_parameters)
     kwargs["power_parameters"] = power_parameters
 
     bmc = BMC.objects.create(**kwargs)
@@ -140,9 +135,7 @@ def get_or_create_bmc(**kwargs):
     power_type = kwargs.get("power_type", None)
     power_parameters = kwargs.get("power_parameters", {})
 
-    power_parameters, secrets = sanitise_power_parameters(
-        power_type, power_parameters
-    )
+    power_parameters, secrets = sanitise_power_parameters(power_type, power_parameters)
     kwargs["power_parameters"] = power_parameters
 
     bmc, created = BMC.objects.get_or_create(**kwargs)
@@ -250,9 +243,7 @@ class BMC(CleanSave, TimestampedModel):
     version = TextField(default="", blank=True)
 
     # Architectures this pod supports.
-    architectures = ArrayField(
-        TextField(), blank=True, null=True, default=list
-    )
+    architectures = ArrayField(TextField(), blank=True, null=True, default=list)
 
     # Pod capabilities.
     capabilities = ArrayField(TextField(), blank=True, null=True, default=list)
@@ -293,14 +284,10 @@ class BMC(CleanSave, TimestampedModel):
     tags = ArrayField(TextField(), blank=True, null=True, default=list)
 
     # CPU over-commit ratio.
-    cpu_over_commit_ratio = FloatField(
-        default=1, validators=[MinValueValidator(0)]
-    )
+    cpu_over_commit_ratio = FloatField(default=1, validators=[MinValueValidator(0)])
 
     # Memory over-commit ratio.
-    memory_over_commit_ratio = FloatField(
-        default=1, validators=[MinValueValidator(0)]
-    )
+    memory_over_commit_ratio = FloatField(default=1, validators=[MinValueValidator(0)])
 
     # Default storage pool for the pod.
     default_storage_pool = ForeignKey(
@@ -433,9 +420,7 @@ class BMC(CleanSave, TimestampedModel):
     def clean(self):
         """Update our ip_address if the address extracted from our power
         parameters has changed."""
-        new_ip = BMC.extract_ip_address(
-            self.power_type, self.get_power_parameters()
-        )
+        new_ip = BMC.extract_ip_address(self.power_type, self.get_power_parameters())
         current_ip = None if self.ip_address is None else self.ip_address.ip
         if new_ip != current_ip:
             if not new_ip:
@@ -460,8 +445,7 @@ class BMC(CleanSave, TimestampedModel):
                         )
                 except Exception as error:
                     maaslog.info(
-                        "BMC could not save extracted IP "
-                        "address '%s': '%s'",
+                        "BMC could not save extracted IP " "address '%s': '%s'",
                         new_ip,
                         error,
                     )
@@ -506,9 +490,7 @@ class BMC(CleanSave, TimestampedModel):
             return None
         power_type_parameters = power_driver.settings
         if not power_type_parameters:
-            maaslog.warning(
-                "No power driver settings for power type %s" % power_type
-            )
+            maaslog.warning("No power driver settings for power type %s" % power_type)
             return None
         ip_extractor = power_driver.ip_extractor
         if not ip_extractor:
@@ -519,9 +501,7 @@ class BMC(CleanSave, TimestampedModel):
             return None
         field_value = power_parameters.get(ip_extractor.get("field_name"))
         if not field_value:
-            maaslog.warning(
-                "IP extractor field_value missing for %s" % power_type
-            )
+            maaslog.warning("IP extractor field_value missing for %s" % power_type)
             return None
         extraction_pattern = ip_extractor.get("pattern")
         if not extraction_pattern:
@@ -584,19 +564,13 @@ class BMC(CleanSave, TimestampedModel):
         routable_racks = [
             relationship.rack_controller
             for relationship in (
-                self.routable_rack_relationships.all().select_related(
-                    "rack_controller"
-                )
+                self.routable_rack_relationships.all().select_related("rack_controller")
             )
             if relationship.routable
         ]
         if with_connection:
             conn_rack_ids = [client.ident for client in getAllClients()]
-            return [
-                rack
-                for rack in routable_racks
-                if rack.system_id in conn_rack_ids
-            ]
+            return [rack for rack in routable_racks if rack.system_id in conn_rack_ids]
         else:
             return routable_racks
 
@@ -604,9 +578,7 @@ class BMC(CleanSave, TimestampedModel):
         """Return a list of `RackController`'s that have the ability to access
         this `BMC` either using layer2 or routable if no layer2 are available.
         """
-        racks = self.get_layer2_usable_rack_controllers(
-            with_connection=with_connection
-        )
+        racks = self.get_layer2_usable_rack_controllers(with_connection=with_connection)
         if len(racks) == 0:
             # No layer2 routable rack controllers. Use routable rack
             # controllers.
@@ -631,14 +603,10 @@ class BMC(CleanSave, TimestampedModel):
         racks = self.get_usable_rack_controllers(with_connection=True)
         return len(racks) > 0
 
-    def update_routable_racks(
-        self, routable_racks_ids, non_routable_racks_ids
-    ):
+    def update_routable_racks(self, routable_racks_ids, non_routable_racks_ids):
         """Set the `routable_rack_controllers` relationship to the new
         information."""
-        BMCRoutableRackControllerRelationship.objects.filter(
-            bmc=self.as_bmc()
-        ).delete()
+        BMCRoutableRackControllerRelationship.objects.filter(bmc=self.as_bmc()).delete()
         self._create_racks_relationship(routable_racks_ids, True)
         self._create_racks_relationship(non_routable_racks_ids, False)
 
@@ -683,9 +651,7 @@ class PodManager(BaseBMCManager):
 
         if rbac.is_enabled():
             if perm == PodPermission.view:
-                fetched = rbac.get_resource_pool_ids(
-                    user.username, "view", "view-all"
-                )
+                fetched = rbac.get_resource_pool_ids(user.username, "view", "view-all")
                 pool_ids = set(fetched["view"] + fetched["view-all"])
                 return self.filter(pool_id__in=pool_ids)
             elif perm == PodPermission.edit or perm == PodPermission.compose:
@@ -698,9 +664,7 @@ class PodManager(BaseBMCManager):
                 fetched = rbac.get_resource_pool_ids(
                     user.username, "deploy-machines", "admin-machines"
                 )
-                pool_ids = set(
-                    fetched["deploy-machines"] + fetched["admin-machines"]
-                )
+                pool_ids = set(fetched["deploy-machines"] + fetched["admin-machines"])
                 return self.filter(pool_id__in=pool_ids)
             else:
                 raise ValueError("Unknown perm: %s", perm)
@@ -736,9 +700,7 @@ def create_pod(**kwargs):
     power_type = kwargs.get("power_type", None)
     power_parameters = kwargs.get("power_parameters", {})
 
-    power_parameters, secrets = sanitise_power_parameters(
-        power_type, power_parameters
-    )
+    power_parameters, secrets = sanitise_power_parameters(power_type, power_parameters)
     kwargs["power_parameters"] = power_parameters
 
     pod = Pod.objects.create(**kwargs)
@@ -901,9 +863,7 @@ class Pod(BMC):
             serial = ""
         storage_pool = None
         if discovered_bd.storage_pool:
-            storage_pool = self._get_storage_pool_by_id(
-                discovered_bd.storage_pool
-            )
+            storage_pool = self._get_storage_pool_by_id(discovered_bd.storage_pool)
 
         block_device = PhysicalBlockDevice.objects.create(
             node_config=machine.current_config,
@@ -972,9 +932,7 @@ class Pod(BMC):
 
         # Check to see if discovered machine's hostname is legal and unique.
         if discovered_machine.hostname:
-            if Node.objects.filter(
-                hostname=discovered_machine.hostname
-            ).exists():
+            if Node.objects.filter(hostname=discovered_machine.hostname).exists():
                 discovered_machine.hostname = None
             elif not self._machine_name_re.match(discovered_machine.hostname):
                 discovered_machine.hostname = None
@@ -1012,9 +970,7 @@ class Pod(BMC):
             **kwargs,
         )
         machine.bmc = self
-        machine.set_instance_power_parameters(
-            discovered_machine.power_parameters
-        )
+        machine.set_instance_power_parameters(discovered_machine.power_parameters)
         if not machine.hostname:
             machine.set_random_hostname()
         machine.save()
@@ -1053,9 +1009,7 @@ class Pod(BMC):
         # We need a second pass here to configure interfaces that the above
         # function call would otherwise change.
         if self.host is not None:
-            self._update_vlans_based_on_pod_host(
-                created_interfaces, discovered_machine
-            )
+            self._update_vlans_based_on_pod_host(created_interfaces, discovered_machine)
         # Allocate any IP addresses the user requested.
         for interface in created_interfaces:
             if interface.name in allocated_ips:
@@ -1153,9 +1107,7 @@ class Pod(BMC):
             tags.append(tag)
         machine.tags.set(tags)
 
-    def _update_vlans_based_on_pod_host(
-        self, created_interfaces, discovered_machine
-    ):
+    def _update_vlans_based_on_pod_host(self, created_interfaces, discovered_machine):
         """Matches up newly-created interfaces with interfaces on the pod.host,
         given a list of interfaces that were created for the machine, and
         the DiscoveredMachine object.
@@ -1165,9 +1117,7 @@ class Pod(BMC):
 
         interfaces = {
             interface.name: interface
-            for interface in Interface.objects.all_interfaces_parents_first(
-                self.host
-            )
+            for interface in Interface.objects.all_interfaces_parents_first(self.host)
         }
         for idx, discovered_nic in enumerate(discovered_machine.interfaces):
             if discovered_nic.attach_type in (
@@ -1175,9 +1125,7 @@ class Pod(BMC):
                 InterfaceAttachType.MACVLAN,
                 InterfaceAttachType.SRIOV,
             ):
-                host_attach_interface = interfaces.get(
-                    discovered_nic.attach_name, None
-                )
+                host_attach_interface = interfaces.get(discovered_nic.attach_name, None)
                 if (
                     discovered_nic.attach_type == InterfaceAttachType.SRIOV
                     and discovered_nic.vid
@@ -1299,9 +1247,7 @@ class Pod(BMC):
         }
         for discovered_interface in discovered_machine.interfaces:
             if discovered_interface.mac_address:
-                iface = existing_vm_ifaces.get(
-                    discovered_interface.mac_address
-                )
+                iface = existing_vm_ifaces.get(discovered_interface.mac_address)
             else:
                 iface = None
             if iface is None:
@@ -1314,9 +1260,7 @@ class Pod(BMC):
             iface_ids.add(iface.id)
 
             iface.attachment_type = discovered_interface.attach_type
-            iface.host_interface = host_interfaces.get(
-                discovered_interface.attach_name
-            )
+            iface.host_interface = host_interfaces.get(discovered_interface.attach_name)
             iface.save()
         VirtualMachineInterface.objects_current_config.filter(vm=vm).exclude(
             id__in=iface_ids
@@ -1364,9 +1308,7 @@ class Pod(BMC):
                 if block_device.model and block_device.serial:
                     key = f"{block_device.model}/{block_device.serial}"
                     if key in model_mapping:
-                        self._sync_block_device(
-                            model_mapping.pop(key), block_device
-                        )
+                        self._sync_block_device(model_mapping.pop(key), block_device)
                     else:
                         disks_to_delete.append(block_device.id)
                 else:
@@ -1408,18 +1350,14 @@ class Pod(BMC):
 
         storage_pool = None
         if discovered_bd.storage_pool:
-            storage_pool = self._get_storage_pool_by_id(
-                discovered_bd.storage_pool
-            )
+            storage_pool = self._get_storage_pool_by_id(discovered_bd.storage_pool)
 
         self._sync_vm_disk(existing_bd, storage_pool=storage_pool)
         existing_bd.save()
 
     def _sync_interfaces(self, discovered_machine, existing_machine):
         """Sync the `interfaces` to the `existing_machine`."""
-        mac_mapping = {
-            nic.mac_address: nic for nic in discovered_machine.interfaces
-        }
+        mac_mapping = {nic.mac_address: nic for nic in discovered_machine.interfaces}
         # interface_set has been preloaded so filtering is done locally.
         physical_interfaces = [
             nic
@@ -1436,9 +1374,7 @@ class Pod(BMC):
             else:
                 existing_nic.delete()
         for _, discovered_nic in mac_mapping.items():
-            interface = self._create_interface(
-                discovered_nic, existing_machine
-            )
+            interface = self._create_interface(discovered_nic, existing_machine)
             if discovered_nic.boot:
                 existing_machine.boot_interface = interface
                 existing_machine.save(update_fields=["boot_interface"])
@@ -1474,12 +1410,8 @@ class Pod(BMC):
             for discovered_machine in discovered_machines:
                 if not self._cluster_location_match(discovered_machine):
                     continue
-                machine_project = discovered_machine.power_parameters.get(
-                    "project", ""
-                )
-                discovered_by_project[machine_project].append(
-                    discovered_machine
-                )
+                machine_project = discovered_machine.power_parameters.get("project", "")
+                discovered_by_project[machine_project].append(discovered_machine)
                 if machine_project == self.tracked_project:
                     tracked_machines.append(discovered_machine)
         else:
@@ -1516,9 +1448,7 @@ class Pod(BMC):
                         "hugepages_backed": discovered_vm.hugepages_backed,
                         "pinned_cores": discovered_vm.pinned_cores,
                         "unpinned_cores": (
-                            0
-                            if discovered_vm.pinned_cores
-                            else discovered_vm.cores
+                            0 if discovered_vm.pinned_cores else discovered_vm.cores
                         ),
                     },
                 )
@@ -1546,22 +1476,15 @@ class Pod(BMC):
             for interface in machine.interfaces
         ]
         existing_machines = list(
-            Node.objects.filter(
-                current_config__interface__mac_address__in=all_macs
-            )
+            Node.objects.filter(current_config__interface__mac_address__in=all_macs)
             .prefetch_related("current_config__interface_set")
-            .prefetch_related(
-                "current_config__blockdevice_set__physicalblockdevice"
-            )
-            .prefetch_related(
-                "current_config__blockdevice_set__virtualblockdevice"
-            )
+            .prefetch_related("current_config__blockdevice_set__physicalblockdevice")
+            .prefetch_related("current_config__blockdevice_set__virtualblockdevice")
             .prefetch_related("virtualmachine")
             .distinct()
         )
         machines = {
-            machine.id: machine
-            for machine in Node.objects.filter(bmc__id=self.id)
+            machine.id: machine for machine in Node.objects.filter(bmc__id=self.id)
         }
         mac_machine_map = {
             interface.mac_address: machine
@@ -1577,8 +1500,7 @@ class Pod(BMC):
                     discovered_machine, commissioning_user
                 )
                 podlog.info(
-                    "%s: discovered new machine: %s"
-                    % (self.name, new_machine.hostname)
+                    "%s: discovered new machine: %s" % (self.name, new_machine.hostname)
                 )
             else:
                 self._sync_machine(discovered_machine, existing_machine)
@@ -1593,13 +1515,9 @@ class Pod(BMC):
 
     def sync_storage_pools(self, discovered_storage_pools):
         """Sync the storage pools for the pod."""
-        storage_pools_by_id = {
-            pool.pool_id: pool for pool in self.storage_pools.all()
-        }
+        storage_pools_by_id = {pool.pool_id: pool for pool in self.storage_pools.all()}
         possible_default = None
-        upgrade_default_pool = self.get_power_parameters().get(
-            "default_storage_pool"
-        )
+        upgrade_default_pool = self.get_power_parameters().get("default_storage_pool")
         for discovered_pool in discovered_storage_pools:
             pool = storage_pools_by_id.pop(discovered_pool.id, None)
             if pool:
@@ -1623,10 +1541,7 @@ class Pod(BMC):
                 )
             if possible_default is None:
                 possible_default = pool
-            if (
-                upgrade_default_pool is not None
-                and upgrade_default_pool == pool.name
-            ):
+            if upgrade_default_pool is not None and upgrade_default_pool == pool.name:
                 possible_default = pool
         if not self.default_storage_pool and possible_default:
             self.default_storage_pool = possible_default
@@ -1706,9 +1621,7 @@ class Pod(BMC):
                 from maasserver.models import ScriptSet
 
                 # ScriptResults will be created on upload.
-                update[
-                    "current_commissioning_script_set"
-                ] = ScriptSet.objects.create(
+                update["current_commissioning_script_set"] = ScriptSet.objects.create(
                     node=node, result_type=RESULT_TYPE.COMMISSIONING
                 )
             if node.status != NODE_STATUS.DEPLOYED:
@@ -1741,9 +1654,7 @@ class Pod(BMC):
                 self.memory += numa.memory
             if node.cpu_speed != 0:
                 cpu_speeds.append(node.cpu_speed)
-        self.cpu_speed = hints.cpu_speed = (
-            mean(cpu_speeds) if cpu_speeds else 0
-        )
+        self.cpu_speed = hints.cpu_speed = mean(cpu_speeds) if cpu_speeds else 0
         hints.save()
         self.save()
 
@@ -1783,9 +1694,9 @@ class Pod(BMC):
         def gather_clients_and_machines(pod):
             machine_details = [
                 (machine.id, machine.get_power_parameters())
-                for machine in Machine.objects.filter(
-                    bmc__id=pod.id
-                ).select_related("bmc")
+                for machine in Machine.objects.filter(bmc__id=pod.id).select_related(
+                    "bmc"
+                )
             ]
             return (
                 pod.id,
@@ -1831,9 +1742,7 @@ class Pod(BMC):
                 client_idents,
                 machine_details,
             ) = result
-            return pod_id, [
-                machine_id for machine_id, parameters in machine_details
-            ]
+            return pod_id, [machine_id for machine_id, parameters in machine_details]
 
         @transactional
         def perform_deletion(result):
@@ -1879,9 +1788,7 @@ class Pod(BMC):
                 return self.cluster.async_delete(decompose)
             # Don't catch any errors here they are raised to the caller.
             d = deferToDatabase(gather_clients_and_machines, self)
-            d.addCallback(
-                decompose_machines if decompose else get_pod_and_machine_ids
-            )
+            d.addCallback(decompose_machines if decompose else get_pod_and_machine_ids)
             d.addCallback(partial(deferToDatabase, perform_deletion))
             return d
 
@@ -1905,9 +1812,7 @@ class BMCRoutableRackControllerRelationship(CleanSave, TimestampedModel):
     or not.
     """
 
-    bmc = ForeignKey(
-        BMC, related_name="routable_rack_relationships", on_delete=CASCADE
-    )
+    bmc = ForeignKey(BMC, related_name="routable_rack_relationships", on_delete=CASCADE)
     rack_controller = ForeignKey(
         "RackController",
         related_name="routable_bmc_relationships",

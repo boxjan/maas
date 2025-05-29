@@ -60,9 +60,7 @@ class TestDeviceForm(MAASServerTestCase):
     def test_has_perm_rbac_permission_on_pool(self):
         rbac = self.useFixture(RBACEnabled())
         user = factory.make_User()
-        rbac.store.allow(
-            user.username, factory.make_ResourcePool(), "admin-machines"
-        )
+        rbac.store.allow(user.username, factory.make_ResourcePool(), "admin-machines")
         form = DeviceForm()
         self.assertTrue(form.has_perm(user))
 
@@ -105,9 +103,7 @@ class TestDeviceWithMACsForm(MAASServerTestCase):
         mac1 = factory.make_mac_address()
         mac2 = factory.make_mac_address()
         form = DeviceWithMACsForm(
-            data=get_QueryDict(
-                {"hostname": hostname, "mac_addresses": [mac1, mac2]}
-            ),
+            data=get_QueryDict({"hostname": hostname, "mac_addresses": [mac1, mac2]}),
             request=self.make_request(),
         )
         self.assertTrue(form.is_valid(), dict(form.errors))

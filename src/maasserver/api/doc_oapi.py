@@ -136,9 +136,7 @@ def _get_maas_servers() -> list[dict[str, str]]:
 
     :return: An object describing the MAAS public-facing server.
     """
-    maas_url = (
-        Config.objects.get_config("maas_url").rstrip("/").removesuffix("/MAAS")
-    )
+    maas_url = Config.objects.get_config("maas_url").rstrip("/").removesuffix("/MAAS")
     maas_name = Config.objects.get_config("maas_name")
     return [
         {
@@ -192,9 +190,7 @@ def _parse_enumerable(doc: str) -> tuple[str, list[str]]:
         for idx, var in enumerate(variables):
             start_pos = doc.find(var) + len(var)
             end_pos = (
-                len(doc)
-                if idx >= len(variables) - 1
-                else doc.find(variables[idx + 1])
+                len(doc) if idx >= len(variables) - 1 else doc.find(variables[idx + 1])
             )
             var_string = doc[start_pos:end_pos]
             doc = doc.replace(var + var_string, "")
@@ -297,14 +293,9 @@ def _oapi_item_from_docstring(
             description = _parse_enumerable(param["description_stripped"])[0]
             # LP 2009140
             stripped_name = PARAM_RE.match(param["name"])
-            name = (
-                param["name"]
-                if stripped_name is None
-                else stripped_name.group(1)
-            )
+            name = param["name"] if stripped_name is None else stripped_name.group(1)
             required = (
-                param["options"]["required"].lower() == "true"
-                or name != param["name"]
+                param["options"]["required"].lower() == "true" or name != param["name"]
             )
             # params with special charcters in names don't form part of the request body
             if http_method in ["GET", "DELETE"] or name != param["name"]:
@@ -330,9 +321,7 @@ def _oapi_item_from_docstring(
         for status, content in _response_pair(ap_dict):
             response = {
                 "description": _prettify(
-                    content.get(
-                        "description_stripped", status["description_stripped"]
-                    )
+                    content.get("description_stripped", status["description_stripped"])
                 ),
             }
             match content.get("type", "").lower():
@@ -363,9 +352,7 @@ def _oapi_item_from_docstring(
 
             status_code = status["name"]
             if not status_code.isdigit():
-                status_code = (
-                    "200" if "success" in status_code.lower() else "404"
-                )
+                status_code = "200" if "success" in status_code.lower() else "404"
             oper_obj.setdefault("responses", {}).update(
                 {status_code: response},
             )
@@ -418,9 +405,7 @@ def _render_oapi_paths() -> dict[str, str | Any]:
     def _resource_key(resource: Resource) -> str:
         return resource.handler.__class__.__name__
 
-    def _export_key(
-        export: tuple[tuple[str, str], object]
-    ) -> tuple[str, object]:
+    def _export_key(export: tuple[tuple[str, str], object]) -> tuple[str, object]:
         (http_method, op), function = export
         return http_method, op or "", function
 

@@ -30,9 +30,7 @@ class TestGetPathFunctions(MAASTestCase):
             {
                 "get_path_function": get_path,
                 "ensures_directory": False,
-                "fixture": lambda path: EnvironmentVariableFixture(
-                    "MAAS_PATH", path
-                ),
+                "fixture": lambda path: EnvironmentVariableFixture("MAAS_PATH", path),
             },
         ),
         (
@@ -40,9 +38,7 @@ class TestGetPathFunctions(MAASTestCase):
             {
                 "get_path_function": get_data_path,
                 "ensures_directory": True,
-                "fixture": lambda path: EnvironmentVariableFixture(
-                    "MAAS_ROOT", path
-                ),
+                "fixture": lambda path: EnvironmentVariableFixture("MAAS_ROOT", path),
             },
         ),
         (
@@ -50,9 +46,7 @@ class TestGetPathFunctions(MAASTestCase):
             {
                 "get_path_function": get_tentative_data_path,
                 "ensures_directory": False,
-                "fixture": lambda path: EnvironmentVariableFixture(
-                    "MAAS_ROOT", path
-                ),
+                "fixture": lambda path: EnvironmentVariableFixture("MAAS_ROOT", path),
             },
         ),
     )
@@ -81,9 +75,7 @@ class TestGetPathFunctions(MAASTestCase):
         self.set_root(root)
         self.patch(provisioningserver.path, "makedirs")
         path = factory.make_name("path")
-        self.assertEqual(
-            os.path.join(root, path), self.get_path_function(path)
-        )
+        self.assertEqual(os.path.join(root, path), self.get_path_function(path))
 
     def test_assumes_MAAS_ROOT_is_unset_if_empty(self):
         self.set_root("")
@@ -110,9 +102,7 @@ class TestGetPathFunctions(MAASTestCase):
     def test_normalises(self):
         self.set_root()
         self.patch(provisioningserver.path, "makedirs")
-        self.assertEqual(
-            "/foo/bar", self.get_path_function("foo///szut//..///bar//")
-        )
+        self.assertEqual("/foo/bar", self.get_path_function("foo///szut//..///bar//"))
 
     def test_maybe_creates_dirpath_if_not_exists(self):
         root_path = self.make_dir()
@@ -133,9 +123,7 @@ class TestGetMAASDataPath(MAASTestCase):
 
     def test_get_maas_data_path_no_env(self):
         del os.environ["MAAS_DATA"]
-        self.assertEqual(
-            get_maas_data_path("some/path"), "/var/lib/maas/some/path"
-        )
+        self.assertEqual(get_maas_data_path("some/path"), "/var/lib/maas/some/path")
 
 
 class TestGetMAASCachePath(MAASTestCase):
@@ -145,6 +133,4 @@ class TestGetMAASCachePath(MAASTestCase):
 
     def test_get_maas_cache_path_no_env(self):
         del os.environ["MAAS_CACHE"]
-        self.assertEqual(
-            get_maas_cache_path("some/path"), "/var/cache/maas/some/path"
-        )
+        self.assertEqual(get_maas_cache_path("some/path"), "/var/cache/maas/some/path")

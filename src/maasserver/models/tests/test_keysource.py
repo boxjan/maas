@@ -20,14 +20,10 @@ class TestKeySource(MAASServerTestCase):
 
     def test_import_keys_with_no_keys(self):
         user = factory.make_User()
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         keysource = factory.make_KeySource(protocol, auth_id)
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.return_value = []
         keysource.import_keys(user)
         mock_get_protocol_keys.assert_called_once_with(protocol, auth_id)
@@ -35,15 +31,11 @@ class TestKeySource(MAASServerTestCase):
 
     def test_import_keys_with_keys(self):
         user = factory.make_User()
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         keysource = factory.make_KeySource(protocol, auth_id)
         keys = get_data("data/test_rsa0.pub") + get_data("data/test_rsa1.pub")
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.return_value = keys.strip().split("\n")
         returned_sshkeys = keysource.import_keys(user)
         mock_get_protocol_keys.assert_called_once_with(protocol, auth_id)
@@ -54,15 +46,11 @@ class TestKeySource(MAASServerTestCase):
 
     def test_import_keys_source_exists_adds_new_keys(self):
         user = factory.make_User()
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         keysource = factory.make_KeySource(protocol, auth_id)
         keys = get_data("data/test_rsa0.pub") + get_data("data/test_rsa1.pub")
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.return_value = keys.strip().split("\n")
         keysource.import_keys(user)
         # Add a new key
@@ -76,15 +64,11 @@ class TestKeySource(MAASServerTestCase):
 
     def test_import_keys_source_exists_doesnt_remove_keys(self):
         user = factory.make_User()
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         keysource = factory.make_KeySource(protocol, auth_id)
         keys = get_data("data/test_rsa0.pub") + get_data("data/test_rsa1.pub")
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.return_value = keys.strip().split("\n")
         returned_sshkeys = keysource.import_keys(user)
         # only return one key
@@ -103,9 +87,7 @@ class TestKeySourceManager(MAASServerTestCase):
 
     def test_save_keys_for_user_imports_keys(self):
         user = factory.make_User()
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         mock_import_keys = self.patch(KeySource, "import_keys")
         KeySource.objects.save_keys_for_user(user, protocol, auth_id)
@@ -114,9 +96,7 @@ class TestKeySourceManager(MAASServerTestCase):
 
     def test_save_keys_for_user_does_not_create_duplicate_keysource(self):
         user = factory.make_User()
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         factory.make_KeySource(protocol=protocol, auth_id=auth_id)
         mock_import_keys = self.patch(KeySource, "import_keys")

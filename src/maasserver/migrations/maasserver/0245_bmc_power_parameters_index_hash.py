@@ -27,9 +27,7 @@ class Migration(migrations.Migration):
         # replace the unique index with one that uses an hash since the size of
         # power_parameters content might exceed the supported size for the
         # index
-        migrations.RunSQL(
-            "DROP INDEX maasserver_bmc_power_type_parameters_idx"
-        ),
+        migrations.RunSQL("DROP INDEX maasserver_bmc_power_type_parameters_idx"),
         migrations.RunSQL(
             """
             CREATE UNIQUE INDEX maasserver_bmc_power_type_parameters_idx

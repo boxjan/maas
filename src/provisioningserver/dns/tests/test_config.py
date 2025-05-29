@@ -150,23 +150,17 @@ class TestHelpers(MAASTestCase):
 
     def test_get_zone_file_config_dir_defaults_to_var_lib_bind_maas(self):
         self.useFixture(EnvironmentVariable("MAAS_ZONE_FILE_CONFIG_DIR"))
-        self.assertEqual(
-            str(config.get_zone_file_config_dir()), "/var/lib/bind/maas"
-        )
+        self.assertEqual(str(config.get_zone_file_config_dir()), "/var/lib/bind/maas")
 
     def test_get_zone_file_config_dir_check_environ_first(self):
         directory = self.make_dir()
-        self.useFixture(
-            EnvironmentVariable("MAAS_ZONE_FILE_CONFIG_DIR", directory)
-        )
+        self.useFixture(EnvironmentVariable("MAAS_ZONE_FILE_CONFIG_DIR", directory))
         self.assertEqual(str(config.get_zone_file_config_dir()), directory)
 
 
 class TestRNDCUtilities(MAASTestCase):
     def test_generate_rndc_returns_configurations(self):
-        rndc_content, named_content = generate_rndc(
-            include_default_controls=False
-        )
+        rndc_content, named_content = generate_rndc(include_default_controls=False)
         # rndc_content and named_content look right.
         self.assertIn("# Start of rndc.conf", rndc_content)
         self.assertIn("controls {", named_content)
@@ -190,9 +184,7 @@ class TestRNDCUtilities(MAASTestCase):
         dns_conf_dir = patch_dns_config_path(self)
         fake_dns = [factory.make_ipv4_address(), factory.make_ipv4_address()]
         set_up_options_conf(upstream_dns=fake_dns)
-        target_file = os.path.join(
-            dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME
-        )
+        target_file = os.path.join(dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME)
         with open(target_file, "r") as fh:
             contents = fh.read()
 
@@ -202,9 +194,7 @@ class TestRNDCUtilities(MAASTestCase):
     def test_set_up_options_conf_write_config_assumes_no_overrides(self):
         dns_conf_dir = patch_dns_config_path(self)
         set_up_options_conf()
-        target_file = os.path.join(
-            dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME
-        )
+        target_file = os.path.join(dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME)
         target = read_isc_file(target_file)
         self.assertTrue(target["allow-query"]["any"])
         self.assertTrue(target["allow-recursion"]["trusted"])
@@ -218,9 +208,7 @@ class TestRNDCUtilities(MAASTestCase):
             contents=NAMED_CONF_OPTIONS_CONTENTS,
         )
         set_up_options_conf()
-        target_file = os.path.join(
-            dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME
-        )
+        target_file = os.path.join(dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME)
         target = read_isc_file(target_file)
         self.assertIsNone(target.get("allow-query"))
         self.assertIsNone(target.get("allow-recursion"))
@@ -234,9 +222,7 @@ class TestRNDCUtilities(MAASTestCase):
             contents=NAMED_CONF_OPTIONS_NO_ALLOW_CONTENTS,
         )
         set_up_options_conf()
-        target_file = os.path.join(
-            dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME
-        )
+        target_file = os.path.join(dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME)
         target = read_isc_file(target_file)
         self.assertTrue(target["allow-query"]["any"])
         self.assertTrue(target["allow-recursion"]["trusted"])
@@ -250,26 +236,21 @@ class TestRNDCUtilities(MAASTestCase):
             contents=NAMED_CONF_OPTIONS_WITH_ALLOW_QUERY_CONTENTS,
         )
         set_up_options_conf()
-        target_file = os.path.join(
-            dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME
-        )
+        target_file = os.path.join(dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME)
         target = read_isc_file(target_file)
         self.assertIsNone(target.get("allow-query"))
 
     def test_set_up_options_conf_handles_no_upstream_dns(self):
         dns_conf_dir = patch_dns_config_path(self)
         set_up_options_conf()
-        target_file = os.path.join(
-            dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME
-        )
+        target_file = os.path.join(dns_conf_dir, MAAS_NAMED_CONF_OPTIONS_INSIDE_NAME)
         self.assertTrue(os.path.exists(target_file))
 
     def test_clean_old_zone_files(self):
         zone_file_dir = patch_zone_file_config_path(self)
 
         zonefiles = [
-            os.path.join(zone_file_dir, f"zone.{i}")
-            for i, _ in enumerate(range(2))
+            os.path.join(zone_file_dir, f"zone.{i}") for i, _ in enumerate(range(2))
         ]
         for zonefile in zonefiles:
             with open(zonefile, "w+"):
@@ -283,8 +264,7 @@ class TestRNDCUtilities(MAASTestCase):
         zone_file_dir = patch_zone_file_config_path(self)
 
         zonefiles = [
-            os.path.join(zone_file_dir, f"zone.{i}")
-            for i, _ in enumerate(range(2))
+            os.path.join(zone_file_dir, f"zone.{i}") for i, _ in enumerate(range(2))
         ]
         for zonefile in zonefiles:
             with open(zonefile, "w+"):
@@ -344,9 +324,7 @@ class TestRNDCUtilities(MAASTestCase):
         )
         # What you get is just the suggested named.conf that's embedded in
         # the rndc-confgen output, not including its header and footer.
-        self.assertEqual(
-            named_part + "\n", extract_suggested_named_conf(rndc_config)
-        )
+        self.assertEqual(named_part + "\n", extract_suggested_named_conf(rndc_config))
 
     def test_extract_suggested_named_conf_notices_missing_boundary(self):
         # extract_suggested_named_conf raises an exception if it does not
@@ -364,9 +342,7 @@ class TestRNDCUtilities(MAASTestCase):
             )
             % (factory.make_string(), factory.make_string())
         )
-        self.assertRaises(
-            ValueError, extract_suggested_named_conf, rndc_config
-        )
+        self.assertRaises(ValueError, extract_suggested_named_conf, rndc_config)
 
     def test_uncomment_named_conf_uncomments(self):
         rndc_conf = 'key "rndc_key" {}'
@@ -404,9 +380,7 @@ class TestComposeConfigPath(MAASTestCase):
     def test_returns_filename_in_dns_config_dir(self):
         dns_dir = patch_dns_config_path(self)
         filename = factory.make_name("config")
-        self.assertEqual(
-            os.path.join(dns_dir, filename), compose_config_path(filename)
-        )
+        self.assertEqual(os.path.join(dns_dir, filename), compose_config_path(filename))
 
 
 class TestRenderDNSTemplate(MAASTestCase):
@@ -530,18 +504,14 @@ class TestDNSConfig(MAASTestCase):
         target_dir = patch_dns_config_path(self)
         dnsconfig = DNSConfig()
         dnsconfig.write_config(overwrite=False)
-        self.assertTrue(
-            os.path.exists(os.path.join(target_dir, MAAS_NAMED_CONF_NAME))
-        )
+        self.assertTrue(os.path.exists(os.path.join(target_dir, MAAS_NAMED_CONF_NAME)))
 
     def test_write_config_writes_config(self):
         target_dir = patch_dns_config_path(self)
         domain = factory.make_string()
         network = IPNetwork("192.168.0.3/24")
         ip = factory.pick_ip_in_network(network)
-        forward_zone = DNSForwardZoneConfig(
-            domain, mapping={factory.make_string(): ip}
-        )
+        forward_zone = DNSForwardZoneConfig(domain, mapping={factory.make_string(): ip})
         reverse_zone = DNSReverseZoneConfig(domain, network=network)
         dnsconfig = DNSConfig((forward_zone, reverse_zone))
         dnsconfig.write_config()
@@ -613,9 +583,7 @@ class TestDNSConfig(MAASTestCase):
         self.assertFalse(snippet.startswith("\n"))
         self.assertTrue(snippet.endswith("\n"))
         self.assertIn(target_dir, snippet)
-        self.assertIn(
-            f'include "{config_dir}/{DNSConfig.target_file_name}"', snippet
-        )
+        self.assertIn(f'include "{config_dir}/{DNSConfig.target_file_name}"', snippet)
 
 
 class TestDynamicDNSUpdate(MAASTestCase):
@@ -688,14 +656,8 @@ class TestDynamicDNSUpdate(MAASTestCase):
     def test_as_reverse_record_update(self):
         domain = factory.make_name()
         ip_version = random.choice([4, 6])
-        host_bits = (
-            random.randint(8, 24)
-            if ip_version == 4
-            else random.randint(8, 124)
-        )
-        subnet = factory.make_ip4_or_6_network(
-            version=ip_version, host_bits=host_bits
-        )
+        host_bits = random.randint(8, 24) if ip_version == 4 else random.randint(8, 124)
+        subnet = factory.make_ip4_or_6_network(version=ip_version, host_bits=host_bits)
         ip_answer = factory.pick_ip_in_network(subnet)
         fwd_update = DynamicDNSUpdate(
             operation="INSERT",
@@ -713,9 +675,7 @@ class TestDynamicDNSUpdate(MAASTestCase):
             subnet=str(subnet),
             answer=fwd_update.name,
         )
-        rev_update = DynamicDNSUpdate.as_reverse_record_update(
-            fwd_update, subnet
-        )
+        rev_update = DynamicDNSUpdate.as_reverse_record_update(fwd_update, subnet)
         self.assertEqual(expected_rev_update.name, rev_update.name)
         self.assertEqual(expected_rev_update.rectype, rev_update.rectype)
         self.assertEqual(expected_rev_update.answer, rev_update.answer)
@@ -739,9 +699,7 @@ class TestDynamicDNSUpdate(MAASTestCase):
             subnet=str(subnet),
             answer=fwd_update.name,
         )
-        rev_update = DynamicDNSUpdate.as_reverse_record_update(
-            fwd_update, subnet
-        )
+        rev_update = DynamicDNSUpdate.as_reverse_record_update(fwd_update, subnet)
         self.assertEqual(expected_rev_update.name, rev_update.name)
         self.assertEqual(expected_rev_update.rectype, rev_update.rectype)
         self.assertEqual(expected_rev_update.answer, rev_update.answer)
@@ -765,9 +723,7 @@ class TestDynamicDNSUpdate(MAASTestCase):
             subnet=str(subnet),
             answer=fwd_update.name,
         )
-        rev_update = DynamicDNSUpdate.as_reverse_record_update(
-            fwd_update, subnet
-        )
+        rev_update = DynamicDNSUpdate.as_reverse_record_update(fwd_update, subnet)
         self.assertEqual(expected_rev_update.name, rev_update.name)
         self.assertEqual(expected_rev_update.rectype, rev_update.rectype)
         self.assertEqual(expected_rev_update.answer, rev_update.answer)
@@ -791,9 +747,7 @@ class TestDynamicDNSUpdate(MAASTestCase):
             subnet=str(subnet),
             answer=fwd_update.name,
         )
-        rev_update = DynamicDNSUpdate.as_reverse_record_update(
-            fwd_update, subnet
-        )
+        rev_update = DynamicDNSUpdate.as_reverse_record_update(fwd_update, subnet)
         self.assertEqual(expected_rev_update.name, rev_update.name)
         self.assertEqual(expected_rev_update.rectype, rev_update.rectype)
         self.assertEqual(expected_rev_update.answer, rev_update.answer)

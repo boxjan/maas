@@ -167,6 +167,4 @@ class TestRegionSyslogService_Database(MAASServerTestCase):
         observed = service._getConfiguration()
         self.assertIsInstance(observed, syslog._Configuration)
 
-        self.assertEqual(
-            observed.peers, {(peer.hostname, IPAddress(addr4.ip))}
-        )
+        self.assertEqual(observed.peers, {(peer.hostname, IPAddress(addr4.ip))})

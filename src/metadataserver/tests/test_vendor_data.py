@@ -53,9 +53,7 @@ class TestGetVendorData(MAASServerTestCase):
         ControllerInfo.objects.set_version(controller, "3.0.0-123-g.abc")
         secret = factory.make_string()
         SecretManager().set_simple_secret("rpc-shared", secret)
-        node = factory.make_Node(
-            netboot=False, install_rackd=True, osystem="ubuntu"
-        )
+        node = factory.make_Node(netboot=False, install_rackd=True, osystem="ubuntu")
         config = get_vendor_data(node, None)
         self.assertEqual(
             config["runcmd"],
@@ -237,18 +235,14 @@ class TestGenerateRackControllerConfiguration(MAASServerTestCase):
         self.assertEqual(list(configuration), [])
 
     def test_yields_nothing_when_node_is_not_ubuntu(self):
-        node = factory.make_Node(
-            osystem="centos", netboot=False, install_rackd=True
-        )
+        node = factory.make_Node(osystem="centos", netboot=False, install_rackd=True)
         configuration = generate_rack_controller_configuration(node)
         self.assertEqual(list(configuration), [])
 
     def test_yields_configuration_with_ubuntu(self):
         controller = factory.make_RackController()
         ControllerInfo.objects.set_version(controller, "3.0.0-123-g.abc")
-        node = factory.make_Node(
-            osystem="ubuntu", netboot=False, install_rackd=True
-        )
+        node = factory.make_Node(osystem="ubuntu", netboot=False, install_rackd=True)
         configuration = generate_rack_controller_configuration(node)
         secret = "1234"
         SecretManager().set_simple_secret("rpc-shared", secret)
@@ -269,18 +263,14 @@ class TestGenerateRackControllerConfiguration(MAASServerTestCase):
         )
 
     def test_yields_nothing_when_machine_install_rackd_false(self):
-        node = factory.make_Node(
-            osystem="ubuntu", netboot=False, install_rackd=False
-        )
+        node = factory.make_Node(osystem="ubuntu", netboot=False, install_rackd=False)
         configuration = generate_rack_controller_configuration(node)
         self.assertEqual(list(configuration), [])
 
     def test_yields_configuration_when_machine_install_rackd_true(self):
         controller = factory.make_RackController()
         ControllerInfo.objects.set_version(controller, "3.0.0-123-g.abc")
-        node = factory.make_Node(
-            osystem="ubuntu", netboot=False, install_rackd=True
-        )
+        node = factory.make_Node(osystem="ubuntu", netboot=False, install_rackd=True)
         configuration = generate_rack_controller_configuration(node)
         secret = "1234"
         SecretManager().set_simple_secret("rpc-shared", secret)
@@ -457,10 +447,7 @@ class TestGenerateKVMPodConfiguration(MAASServerTestCase):
         )
         self.assertEqual(
             secret_manager.get_composite_secret("deploy-metadata", obj=node),
-            {
-                DEPLOY_SECRETS_LXD_KEY: cert.certificate_pem()
-                + cert.private_key_pem()
-            },
+            {DEPLOY_SECRETS_LXD_KEY: cert.certificate_pem() + cert.private_key_pem()},
         )
 
     def test_includes_smt_off_for_install_kvm_on_ppc64(self):
@@ -553,9 +540,7 @@ class TestGenerateEphemeralNetplanLockRemoval(MAASServerTestCase):
         self.assertEqual(config, [])
 
     def test_removes_lock_when_ephemeral(self):
-        node = factory.make_Node(
-            status=random.choice(COMMISSIONING_LIKE_STATUSES)
-        )
+        node = factory.make_Node(status=random.choice(COMMISSIONING_LIKE_STATUSES))
         config = list(generate_ephemeral_netplan_lock_removal(node))
         self.assertEqual(config, [("runcmd", ["rm -rf /run/netplan"])])
 
@@ -563,9 +548,7 @@ class TestGenerateEphemeralNetplanLockRemoval(MAASServerTestCase):
 class TestGenerateEphemeralDeploymentNetworkConfiguration(MAASServerTestCase):
     def test_yields_nothing_when_node_is_not_ephemeral_deployment(self):
         node = factory.make_Node()
-        config = list(
-            generate_ephemeral_deployment_network_configuration(node)
-        )
+        config = list(generate_ephemeral_deployment_network_configuration(node))
         self.assertEqual(config, [])
 
     def test_yields_configuration_when_node_is_ephemeral_deployment(self):
@@ -574,9 +557,7 @@ class TestGenerateEphemeralDeploymentNetworkConfiguration(MAASServerTestCase):
             ephemeral_deploy=True,
             status=NODE_STATUS.DEPLOYING,
         )
-        config = list(
-            generate_ephemeral_deployment_network_configuration(node)
-        )
+        config = list(generate_ephemeral_deployment_network_configuration(node))
         self.assertEqual(
             config,
             [
@@ -585,9 +566,7 @@ class TestGenerateEphemeralDeploymentNetworkConfiguration(MAASServerTestCase):
                     [
                         {
                             "path": "/etc/netplan/50-maas.yaml",
-                            "content": yaml.safe_dump(
-                                {"network": {"version": 2}}
-                            ),
+                            "content": yaml.safe_dump({"network": {"version": 2}}),
                         },
                     ],
                 ),

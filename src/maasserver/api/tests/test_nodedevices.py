@@ -81,9 +81,7 @@ class TestNodeDevicesAPIFilter(APITestCase.ForUser):
             choice1 = self.choices()
         else:
             choice1 = factory.pick_choice(self.choices)
-        node_device = factory.make_NodeDevice(
-            node=self.node, **{self.key: choice1}
-        )
+        node_device = factory.make_NodeDevice(node=self.node, **{self.key: choice1})
         # create a device with different criteria
         if callable(self.choices):
             choice2 = self.choices()

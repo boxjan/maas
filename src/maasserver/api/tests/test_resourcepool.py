@@ -38,9 +38,7 @@ class TestResourcePoolAPI(APITestCase.ForUser):
 
     def test_GET_returns_pool(self):
         pool = factory.make_ResourcePool()
-        response = self.client.get(
-            reverse("resourcepool_handler", args=[pool.id]), {}
-        )
+        response = self.client.get(reverse("resourcepool_handler", args=[pool.id]), {})
         self.assertEqual(response.status_code, http.client.OK)
         result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(result["name"], pool.name)
@@ -115,9 +113,7 @@ class TestResourcePoolAPI(APITestCase.ForUser):
 
     def test_DELETE_default_pool_denied(self):
         self.become_admin()
-        response = self.client.delete(
-            reverse("resourcepool_handler", args=[0]), {}
-        )
+        response = self.client.delete(reverse("resourcepool_handler", args=[0]), {})
         self.assertEqual(response.status_code, http.client.BAD_REQUEST)
         self.assertIsNotNone(ResourcePool.objects.get_default_resource_pool())
 
@@ -131,9 +127,7 @@ class TestResourcePoolAPI(APITestCase.ForUser):
     def test_DELETE_is_idempotent(self):
         self.become_admin()
         pool = factory.make_ResourcePool()
-        response = self.client.delete(
-            reverse("resourcepool_handler", args=[pool.id])
-        )
+        response = self.client.delete(reverse("resourcepool_handler", args=[pool.id]))
         self.assertEqual(response.status_code, http.client.NO_CONTENT)
         self.assertIsNone(reload_object(pool))
 
@@ -150,9 +144,7 @@ class TestResourcePoolAPIWithRBAC(APITestCase.ForUser):
         pool = factory.make_ResourcePool()
         self.store.add_pool(pool)
         self.store.allow(self.user.username, pool, "view")
-        response = self.client.get(
-            reverse("resourcepool_handler", args=[pool.id]), {}
-        )
+        response = self.client.get(reverse("resourcepool_handler", args=[pool.id]), {})
         self.assertEqual(response.status_code, http.client.OK)
         result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(result["name"], pool.name)
@@ -165,9 +157,7 @@ class TestResourcePoolAPIWithRBAC(APITestCase.ForUser):
     def test_GET_returns_forbidden(self):
         pool = factory.make_ResourcePool()
         self.store.add_pool(pool)
-        response = self.client.get(
-            reverse("resourcepool_handler", args=[pool.id]), {}
-        )
+        response = self.client.get(reverse("resourcepool_handler", args=[pool.id]), {})
         self.assertEqual(response.status_code, http.client.FORBIDDEN)
 
     def test_PUT_updates_pool(self):
@@ -200,18 +190,14 @@ class TestResourcePoolAPIWithRBAC(APITestCase.ForUser):
     def test_DELETE_removes_pool(self):
         pool = factory.make_ResourcePool()
         self.store.allow(self.user.username, ALL_RESOURCES, "edit")
-        response = self.client.delete(
-            reverse("resourcepool_handler", args=[pool.id])
-        )
+        response = self.client.delete(reverse("resourcepool_handler", args=[pool.id]))
         self.assertEqual(response.status_code, http.client.NO_CONTENT)
 
     def test_DELETE_forbidden_edit_on_pool_only(self):
         pool = factory.make_ResourcePool()
         self.store.add_pool(pool)
         self.store.allow(self.user.username, pool, "edit")
-        response = self.client.delete(
-            reverse("resourcepool_handler", args=[pool.id])
-        )
+        response = self.client.delete(reverse("resourcepool_handler", args=[pool.id]))
         self.assertEqual(response.status_code, http.client.FORBIDDEN)
 
     def test_DELETE_forbidden(self):

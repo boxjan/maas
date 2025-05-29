@@ -56,8 +56,7 @@ def get_launchpad_ssh_keys(auth_id: str) -> List[str]:
         http.HTTPStatus.GONE,
     ):
         raise ImportSSHKeysError(
-            "Unable to import SSH keys. "
-            "launchpad user %s doesn't exist." % auth_id
+            "Unable to import SSH keys. " "launchpad user %s doesn't exist." % auth_id
         )
     # If another type of HTTP error, need to force the raise
     response.raise_for_status()
@@ -75,8 +74,7 @@ def get_github_ssh_keys(auth_id: str) -> List[str]:
         http.HTTPStatus.GONE,
     ):
         raise ImportSSHKeysError(
-            "Unable to import SSH keys. "
-            "github user %s doesn't exist." % auth_id
+            "Unable to import SSH keys. " "github user %s doesn't exist." % auth_id
         )
     # If another type of HTTP error, need to force the raise
     response.raise_for_status()

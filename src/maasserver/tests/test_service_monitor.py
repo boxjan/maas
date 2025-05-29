@@ -85,9 +85,7 @@ class TestProxyService(MAASTransactionServerTestCase):
         )
         self.patch(config, "is_config_present").return_value = True
         expected_state = yield maybeDeferred(service.getExpectedState)
-        self.assertEqual(
-            (SERVICE_STATE.OFF, "proxy disabled."), expected_state
-        )
+        self.assertEqual((SERVICE_STATE.OFF, "proxy disabled."), expected_state)
 
     @wait_for_reactor
     @inlineCallbacks
@@ -122,9 +120,7 @@ class TestProxyService(MAASTransactionServerTestCase):
         )
         self.patch(config, "is_config_present").return_value = True
         expected_state = yield maybeDeferred(service.getExpectedState)
-        self.assertEqual(
-            (SERVICE_STATE.OFF, "proxy disabled."), expected_state
-        )
+        self.assertEqual((SERVICE_STATE.OFF, "proxy disabled."), expected_state)
 
     @wait_for_reactor
     @inlineCallbacks

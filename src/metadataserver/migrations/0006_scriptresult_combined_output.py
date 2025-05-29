@@ -4,9 +4,7 @@ import metadataserver.fields
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("metadataserver", "0005_store_powerstate_on_scriptset_creation")
-    ]
+    dependencies = [("metadataserver", "0005_store_powerstate_on_scriptset_creation")]
 
     operations = [
         migrations.AddField(

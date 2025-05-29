@@ -185,14 +185,11 @@ def compose_machine(client, pod_type, context, request, pod_id, name):
     def wrap_failure(failure):
         prefix = "Unable to compose machine because"
         if failure.check(UnknownPodType):
-            raise PodProblem(
-                prefix + " '%s' is an unknown pod type." % pod_type
-            )
+            raise PodProblem(prefix + " '%s' is an unknown pod type." % pod_type)
         elif failure.check(NotImplementedError):
             raise PodProblem(
                 prefix
-                + " '%s' driver does not implement the 'compose' method."
-                % pod_type
+                + " '%s' driver does not implement the 'compose' method." % pod_type
             )
         elif failure.check(PodActionFail):
             raise PodProblem(prefix + ": " + str(failure.value))
@@ -227,14 +224,11 @@ def decompose_machine(client, pod_type, context, pod_id, name):
     def wrap_failure(failure):
         prefix = "Unable to decompose machine because"
         if failure.check(UnknownPodType):
-            raise PodProblem(
-                prefix + " '%s' is an unknown pod type." % pod_type
-            )
+            raise PodProblem(prefix + " '%s' is an unknown pod type." % pod_type)
         elif failure.check(NotImplementedError):
             raise PodProblem(
                 prefix
-                + " '%s' driver does not implement the 'decompose' method."
-                % pod_type
+                + " '%s' driver does not implement the 'decompose' method." % pod_type
             )
         elif failure.check(PodActionFail):
             raise PodProblem(prefix + ": " + str(failure.value))

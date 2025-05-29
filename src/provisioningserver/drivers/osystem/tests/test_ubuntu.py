@@ -69,15 +69,11 @@ class TestUbuntuOS(MAASTestCase):
         osystem = UbuntuOS()
         releases = osystem.get_supported_commissioning_releases()
         self.assertIsInstance(releases, list)
-        self.assertSequenceEqual(
-            ["bionic", "focal", "jammy", "noble"], releases
-        )
+        self.assertSequenceEqual(["bionic", "focal", "jammy", "noble"], releases)
 
     def test_get_supported_commissioning_releases_excludes_non_lts(self):
         supported = ["bionic", "focal", "jammy", "noble"]
-        self.patch_autospec(
-            UbuntuDistroInfo, "supported"
-        ).return_value = supported
+        self.patch_autospec(UbuntuDistroInfo, "supported").return_value = supported
         osystem = UbuntuOS()
         releases = osystem.get_supported_commissioning_releases()
         self.assertIsInstance(releases, list)
@@ -132,9 +128,7 @@ class TestUbuntuOS(MAASTestCase):
             "saucy",
             "utopic",
         ]
-        self.patch_autospec(
-            UbuntuDistroInfo, "unsupported"
-        ).return_value = unsupported
+        self.patch_autospec(UbuntuDistroInfo, "unsupported").return_value = unsupported
         osystem = UbuntuOS()
         releases = osystem.get_supported_commissioning_releases()
         self.assertIsInstance(releases, list)

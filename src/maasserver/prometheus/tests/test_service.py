@@ -143,11 +143,7 @@ class TestPrometheusDiscoveryResource(MAASServerTestCase):
             instances = [
                 ip
                 + ":"
-                + str(
-                    REGION_PROMETHEUS_PORT
-                    if is_region
-                    else RACK_PROMETHEUS_PORT
-                )
+                + str(REGION_PROMETHEUS_PORT if is_region else RACK_PROMETHEUS_PORT)
                 for controller in bucketed_controllers[
                     (
                         zone.name,

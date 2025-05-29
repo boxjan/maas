@@ -13,9 +13,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="bootresourceset",
             name="sync",
-            field=models.ManyToManyField(
-                blank=True, to="maasserver.RegionController"
-            ),
+            field=models.ManyToManyField(blank=True, to="maasserver.RegionController"),
         ),
         migrations.AddField(
             model_name="bootresourcefile",

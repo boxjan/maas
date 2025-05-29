@@ -43,9 +43,7 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
         # wrap the call to time request latency and call the next handler
         call_next = self.metrics.record_call_latency(
             "maas_apiserver_request_latency",
-            get_labels=lambda args, kwargs, response: get_labels(
-                request, response
-            ),
+            get_labels=lambda args, kwargs, response: get_labels(request, response),
         )(call_next)
         response = await call_next(request)
 

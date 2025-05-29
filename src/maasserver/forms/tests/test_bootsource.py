@@ -36,9 +36,7 @@ class TestBootSourceForm(MAASServerTestCase):
         form.save()
         boot_source = reload_object(boot_source)
         self.assertEqual(boot_source.url, "http://example.com/")
-        self.assertEqual(
-            boot_source.keyring_filename, params["keyring_filename"]
-        )
+        self.assertEqual(boot_source.keyring_filename, params["keyring_filename"])
 
     def test_creates_boot_source_object_with_keyring_filename(self):
         params = {
@@ -49,9 +47,7 @@ class TestBootSourceForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), form._errors)
         boot_source = form.save()
         self.assertEqual(boot_source.url, "http://example.com/")
-        self.assertEqual(
-            boot_source.keyring_filename, params["keyring_filename"]
-        )
+        self.assertEqual(boot_source.keyring_filename, params["keyring_filename"])
 
     def test_creates_boot_source_object_with_keyring_data(self):
         in_mem_file = InMemoryUploadedFile(

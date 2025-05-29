@@ -60,9 +60,7 @@ class TestPowerHelpers(MAASTestCase):
     def setUp(self):
         super().setUp()
         self.useFixture(EventTypesAllRegistered())
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_rpc_methods(self):
         fixture = self.useFixture(MockClusterToRegionRPCFixture())
@@ -124,9 +122,7 @@ class TestPowerHelpers(MAASTestCase):
         message = factory.make_name("message")
         power_change = "on"
         protocol, io = self.patch_rpc_methods()
-        d = power.power_change_failure(
-            system_id, hostname, power_change, message
-        )
+        d = power.power_change_failure(system_id, hostname, power_change, message)
         io.flush()
 
         protocol.SendEvent.assert_called_once_with(
@@ -144,9 +140,7 @@ class TestChangePowerState(MAASTestCase):
     def setUp(self):
         super().setUp()
         self.useFixture(EventTypesAllRegistered())
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     @inlineCallbacks
     def patch_rpc_methods(self, return_value={}, side_effect=None):
@@ -194,9 +188,7 @@ class TestChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = random.choice(["on", "off"])
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         self.patch(power, "is_driver_available").return_value = True
         perform_power_driver_change = self.patch_autospec(
             power, "perform_power_driver_change"
@@ -205,9 +197,7 @@ class TestChangePowerState(MAASTestCase):
             power, "perform_power_driver_query"
         )
         perform_power_driver_query.return_value = succeed(power_change)
-        power_change_success = self.patch_autospec(
-            power, "power_change_success"
-        )
+        power_change_success = self.patch_autospec(power, "power_change_success")
         yield self.patch_rpc_methods()
 
         yield power.change_power_state(
@@ -220,32 +210,22 @@ class TestChangePowerState(MAASTestCase):
         perform_power_driver_query.assert_called_once_with(
             system_id, hostname, power_driver.name, context
         )
-        power_change_success.assert_called_once_with(
-            system_id, hostname, power_change
-        )
+        power_change_success.assert_called_once_with(system_id, hostname, power_change)
 
     @inlineCallbacks
     def test_return_none_when_unqueryable(self):
         system_id = factory.make_name("system_id")
         hostname = factory.make_name("hostname")
         power_driver = random.choice(
-            [
-                driver
-                for _, driver in PowerDriverRegistry
-                if not driver.queryable
-            ]
+            [driver for _, driver in PowerDriverRegistry if not driver.queryable]
         )
         power_change = "on"
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         self.patch(power, "is_driver_available").return_value = True
         get_item = self.patch(PowerDriverRegistry, "get_item")
         get_item.return_value = MagicMock()
         get_item.return_value.queryable = False
-        perform_power_driver_query = self.patch(
-            power, "perform_power_driver_query"
-        )
+        perform_power_driver_query = self.patch(power, "perform_power_driver_query")
         perform_power_driver_query.return_value = succeed(power_change)
         self.patch(power, "power_change_success")
         yield self.patch_rpc_methods()
@@ -267,14 +247,10 @@ class TestChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = "on"
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         self.patch(power, "is_driver_available").return_value = True
         get_item = self.patch(PowerDriverRegistry, "get_item")
-        perform_power_driver_query = self.patch(
-            power, "perform_power_driver_query"
-        )
+        perform_power_driver_query = self.patch(power, "perform_power_driver_query")
         perform_power_driver_query.return_value = succeed(power_change)
         self.patch(power, "power_change_success")
         yield self.patch_rpc_methods()
@@ -300,14 +276,10 @@ class TestChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = "off"
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         self.patch(power, "is_driver_available").return_value = True
         get_item = self.patch(PowerDriverRegistry, "get_item")
-        perform_power_driver_query = self.patch(
-            power, "perform_power_driver_query"
-        )
+        perform_power_driver_query = self.patch(power, "perform_power_driver_query")
         perform_power_driver_query.return_value = succeed(power_change)
         self.patch(power, "power_change_success")
         yield self.patch_rpc_methods()
@@ -333,14 +305,10 @@ class TestChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = "cycle"
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         self.patch(power, "is_driver_available").return_value = True
         get_item = self.patch(PowerDriverRegistry, "get_item")
-        perform_power_driver_query = self.patch(
-            power, "perform_power_driver_query"
-        )
+        perform_power_driver_query = self.patch(power, "perform_power_driver_query")
         perform_power_driver_query.return_value = succeed("on")
         self.patch(power, "power_change_success")
         yield self.patch_rpc_methods()
@@ -353,9 +321,7 @@ class TestChangePowerState(MAASTestCase):
         perform_power_driver_query.assert_called_once_with(
             system_id, hostname, power_driver.name, context
         )
-        power.power_change_success.assert_called_once_with(
-            system_id, hostname, "on"
-        )
+        power.power_change_success.assert_called_once_with(system_id, hostname, "on")
         self.assertEqual(result, "on")
 
     @inlineCallbacks
@@ -398,9 +364,7 @@ class TestMaybeChangePowerState(MAASTestCase):
         super().setUp()
         self.patch(power, "power_action_registry", {})
         for _, power_driver in PowerDriverRegistry:
-            self.patch(
-                power_driver, "detect_missing_packages"
-            ).return_value = []
+            self.patch(power_driver, "detect_missing_packages").return_value = []
         self.useFixture(EventTypesAllRegistered())
         # Defer later won't run during the test so replace it with a
         # maybeDeferred.
@@ -409,9 +373,7 @@ class TestMaybeChangePowerState(MAASTestCase):
         ).side_effect = lambda clock, delay, func, *args, **kwargs: maybeDeferred(
             func, *args, **kwargs
         )
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_methods_using_rpc(self):
         pcs = self.patch_autospec(power, "power_change_starting")
@@ -444,9 +406,7 @@ class TestMaybeChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = random.choice(["on", "off", "cycle"])
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
 
         d = power.maybe_change_power_state(
             system_id, hostname, power_driver.name, power_change, context
@@ -470,9 +430,7 @@ class TestMaybeChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = random.choice(["on", "off", "cycle"])
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         yield power.maybe_change_power_state(
             system_id, hostname, power_driver.name, power_change, context
         )
@@ -488,9 +446,7 @@ class TestMaybeChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = random.choice(["on", "off", "cycle"])
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         power_driver.detect_missing_packages.return_value = ["gone"]
         with TestCase.assertRaises(self, exceptions.PowerActionFail):
             yield power.maybe_change_power_state(
@@ -508,17 +464,13 @@ class TestMaybeChangePowerState(MAASTestCase):
         power_changes = ["on", "off"]
         random.shuffle(power_changes)
         current_power_change, power_change = power_changes
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         power.power_action_registry[system_id] = (
             current_power_change,
             sentinel.d,
         )
         self.addCleanup(power.power_action_registry.pop, system_id)
-        with TestCase.assertRaises(
-            self, exceptions.PowerActionAlreadyInProgress
-        ):
+        with TestCase.assertRaises(self, exceptions.PowerActionAlreadyInProgress):
             yield power.maybe_change_power_state(
                 system_id, hostname, power_driver.name, power_change, context
             )
@@ -530,12 +482,8 @@ class TestMaybeChangePowerState(MAASTestCase):
         power_driver = random.choice(
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
-        current_power_change = power_change = random.choice(
-            ["on", "off", "cycle"]
-        )
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        current_power_change = power_change = random.choice(["on", "off", "cycle"])
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         power.power_action_registry[system_id] = (
             current_power_change,
             sentinel.d,
@@ -559,9 +507,7 @@ class TestMaybeChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = random.choice(["on", "off", "cycle"])
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
 
         yield power.maybe_change_power_state(
             system_id, hostname, power_driver.name, power_change, context
@@ -585,9 +531,7 @@ class TestMaybeChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = random.choice(["on", "off", "cycle"])
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
 
         yield power.maybe_change_power_state(
             system_id, hostname, power_driver.name, power_change, context
@@ -616,9 +560,7 @@ class TestMaybeChangePowerState(MAASTestCase):
             system_id, hostname, power_driver.name, power_change, context
         )
         self.assertNotIn(system_id, power.power_action_registry)
-        self.assertIn(
-            f"{hostname}: Power {power_change} failed.", logger.messages
-        )
+        self.assertIn(f"{hostname}: Power {power_change} failed.", logger.messages)
         logs = logger.dump()
 
         self.assertIn(
@@ -678,9 +620,7 @@ class TestMaybeChangePowerState(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_change = random.choice(["on", "off", "cycle"])
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
 
         yield power.maybe_change_power_state(
             system_id, hostname, power_driver.name, power_change, context
@@ -705,12 +645,8 @@ class TestPowerQuery(MAASTestCase):
         self.useFixture(EventTypesAllRegistered())
         self.patch(power, "deferToThread", maybeDeferred)
         for _, power_driver in PowerDriverRegistry:
-            self.patch(
-                power_driver, "detect_missing_packages"
-            ).return_value = []
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+            self.patch(power_driver, "detect_missing_packages").return_value = []
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_rpc_methods(self, return_value={}, side_effect=None):
         fixture = self.useFixture(MockClusterToRegionRPCFixture())
@@ -728,9 +664,7 @@ class TestPowerQuery(MAASTestCase):
         hostname = factory.make_name("hostname")
         message = factory.make_name("message")
         SendEvent, _, io = self.patch_rpc_methods()
-        d = power.power_query_failure(
-            system_id, hostname, Failure(Exception(message))
-        )
+        d = power.power_query_failure(system_id, hostname, Failure(Exception(message)))
         # This blocks until the deferred is complete.
         io.flush()
         self.assertIsNone(extract_result(d))
@@ -748,9 +682,7 @@ class TestPowerQuery(MAASTestCase):
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
         power_state = random.choice(["on", "off"])
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         self.patch(power, "is_driver_available").return_value = True
         _, markNodeBroken, io = self.patch_rpc_methods()
         mock_perform_power_driver_query = self.patch(
@@ -758,9 +690,7 @@ class TestPowerQuery(MAASTestCase):
         )
         mock_perform_power_driver_query.return_value = power_state
 
-        d = power.get_power_state(
-            system_id, hostname, power_driver.name, context
-        )
+        d = power.get_power_state(system_id, hostname, power_driver.name, context)
         # This blocks until the deferred is complete.
         io.flush()
         self.assertEqual(power_state, extract_result(d))
@@ -779,17 +709,13 @@ class TestPowerQuery(MAASTestCase):
         power_driver = random.choice(
             [driver for _, driver in PowerDriverRegistry if driver.queryable]
         )
-        context = {
-            factory.make_name("context-key"): factory.make_name("context-val")
-        }
+        context = {factory.make_name("context-key"): factory.make_name("context-val")}
         self.patch(power, "is_driver_available").return_value = False
         _, markNodeBroken, io = self.patch_rpc_methods()
 
         power_driver.detect_missing_packages.return_value = ["gone"]
 
-        d = power.get_power_state(
-            system_id, hostname, power_driver.name, context
-        )
+        d = power.get_power_state(system_id, hostname, power_driver.name, context)
         # This blocks until the deferred is complete.
         io.flush()
 
@@ -811,9 +737,7 @@ class TestPowerQuery(MAASTestCase):
         # This blocks until the deferred is complete.
         io.flush()
 
-        error = self.assertRaises(
-            exceptions.PowerActionFail, extract_result, report
-        )
+        error = self.assertRaises(exceptions.PowerActionFail, extract_result, report)
         self.assertEqual(err_msg, str(error))
         power.power_state_update.assert_called_once_with(system_id, "error")
 
@@ -832,9 +756,7 @@ class TestPowerQuery(MAASTestCase):
         io.flush()
 
         self.assertEqual(power_state, extract_result(report))
-        power.power_state_update.assert_called_once_with(
-            system_id, power_state
-        )
+        power.power_state_update.assert_called_once_with(system_id, power_state)
 
     def test_report_power_state_changes_power_state_if_unknown(self):
         system_id = factory.make_name("system_id")
@@ -851,9 +773,7 @@ class TestPowerQuery(MAASTestCase):
         io.flush()
 
         self.assertEqual(power_state, extract_result(report))
-        power.power_state_update.assert_called_once_with(
-            system_id, power_state
-        )
+        power.power_state_update.assert_called_once_with(system_id, power_state)
 
 
 class TestPowerQueryExceptions(MAASTestCase):
@@ -867,9 +787,7 @@ class TestPowerQueryExceptions(MAASTestCase):
                     "perform_power_driver_query"
                 ),
                 "waits": (  # Pauses between retries.
-                    []
-                    if driver.name in PowerDriverRegistry
-                    else DEFAULT_WAITING_POLICY
+                    [] if driver.name in PowerDriverRegistry else DEFAULT_WAITING_POLICY
                 ),
                 "calls": (  # No. of calls to the driver.
                     1
@@ -903,18 +821,14 @@ class TestPowerQueryExceptions(MAASTestCase):
         send_node_event = self.patch_autospec(power, "send_node_event")
         send_node_event.return_value = succeed(None)
 
-        self.patch(
-            self.power_driver, "detect_missing_packages"
-        ).return_value = []
+        self.patch(self.power_driver, "detect_missing_packages").return_value = []
 
         system_id = factory.make_name("system_id")
         hostname = factory.make_name("hostname")
         context = sentinel.context
         clock = Clock()
 
-        d = power.get_power_state(
-            system_id, hostname, self.power_type, context, clock
-        )
+        d = power.get_power_state(system_id, hostname, self.power_type, context, clock)
         d = power.report_power_state(d, system_id, hostname)
 
         # Crank through some number of retries.
@@ -961,18 +875,10 @@ class TestPowerQueryAsync(MAASTestCase):
         hostname = factory.make_name("hostname")
         if power_type is None:
             power_type = random.choice(
-                [
-                    driver.name
-                    for _, driver in PowerDriverRegistry
-                    if driver.queryable
-                ]
+                [driver.name for _, driver in PowerDriverRegistry if driver.queryable]
             )
         state = random.choice(["on", "off", "unknown", "error"])
-        context = {
-            factory.make_name("context-key"): (
-                factory.make_name("context-val")
-            )
-        }
+        context = {factory.make_name("context-key"): (factory.make_name("context-val"))}
         return {
             "context": context,
             "hostname": hostname,
@@ -990,11 +896,7 @@ class TestPowerQueryAsync(MAASTestCase):
 
     def pick_alternate_state(self, state):
         return random.choice(
-            [
-                value
-                for value in ["on", "off", "unknown", "error"]
-                if value != state
-            ]
+            [value for value in ["on", "off", "unknown", "error"] if value != state]
         )
 
     @inlineCallbacks

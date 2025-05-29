@@ -20,9 +20,7 @@ from provisioningserver.utils.version import get_running_version
 
 
 class TestWebhookPowerDriver(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
@@ -55,9 +53,7 @@ class TestWebhookPowerDriver(MAASTestCase):
                     b"Authorization": [
                         (
                             b"Basic "
-                            + base64.b64encode(
-                                f"{power_user}:{power_pass}".encode()
-                            )
+                            + base64.b64encode(f"{power_user}:{power_pass}".encode())
                         )
                     ],
                 }
@@ -115,16 +111,12 @@ class TestWebhookPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(webhook_module, "readBody")
         expected_response = factory.make_name("body")
         mock_readBody.return_value = succeed(expected_response.encode())
         method = random.choice([b"POST", b"GET"])
-        headers = self.webhook._make_auth_headers(
-            factory.make_name("system_id"), {}
-        )
+        headers = self.webhook._make_auth_headers(factory.make_name("system_id"), {})
 
         response = yield self.webhook._webhook_request(
             method,
@@ -157,9 +149,7 @@ class TestWebhookPowerDriver(MAASTestCase):
         expected_response = factory.make_name("body")
         mock_readBody.return_value = succeed(expected_response.encode())
         method = random.choice([b"POST", b"GET"])
-        headers = self.webhook._make_auth_headers(
-            factory.make_name("system_id"), {}
-        )
+        headers = self.webhook._make_auth_headers(factory.make_name("system_id"), {})
 
         response = yield self.webhook._webhook_request(
             method, b"https://10.0.0.42", headers
@@ -179,9 +169,7 @@ class TestWebhookPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(webhook_module, "readBody")
         expected_response = factory.make_name("body")
         error = PartialDownloadError(
@@ -190,9 +178,7 @@ class TestWebhookPowerDriver(MAASTestCase):
         )
         mock_readBody.return_value = fail(error)
         method = random.choice([b"POST", b"GET"])
-        headers = self.webhook._make_auth_headers(
-            factory.make_name("system_id"), {}
-        )
+        headers = self.webhook._make_auth_headers(factory.make_name("system_id"), {})
 
         response = yield self.webhook._webhook_request(
             method, b"https://10.0.0.42", headers
@@ -206,9 +192,7 @@ class TestWebhookPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(webhook_module, "readBody")
         expected_response = factory.make_name("body")
         error = PartialDownloadError(
@@ -219,9 +203,7 @@ class TestWebhookPowerDriver(MAASTestCase):
         method = random.choice([b"POST", b"GET"])
 
         with self.assertRaisesRegex(PartialDownloadError, "^404 Not Found$"):
-            yield self.webhook._webhook_request(
-                method, b"https://10.0.0.42", {}
-            )
+            yield self.webhook._webhook_request(method, b"https://10.0.0.42", {})
         mock_readBody.assert_called_once_with(expected_headers)
 
     @inlineCallbacks
@@ -231,9 +213,7 @@ class TestWebhookPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.BAD_REQUEST
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(webhook_module, "readBody")
         method = random.choice([b"POST", b"GET"])
 
@@ -241,9 +221,7 @@ class TestWebhookPowerDriver(MAASTestCase):
             PowerActionError,
             "with response status code: HTTPStatus.BAD_REQUEST",
         ):
-            yield self.webhook._webhook_request(
-                method, b"https://10.0.0.42", {}
-            )
+            yield self.webhook._webhook_request(method, b"https://10.0.0.42", {})
         mock_readBody.assert_not_called()
 
     def test_missing_packages(self):
@@ -322,9 +300,7 @@ class TestWebhookPowerDriver(MAASTestCase):
     @inlineCallbacks
     def test_power_query_unknown(self):
         mock_webhook_request = self.patch(self.webhook, "_webhook_request")
-        mock_webhook_request.return_value = succeed(
-            factory.make_string().encode()
-        )
+        mock_webhook_request.return_value = succeed(factory.make_string().encode())
         system_id = factory.make_name("system_id")
         power_query_uri = factory.make_url()
         context = {

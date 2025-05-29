@@ -24,22 +24,14 @@ from metadataserver.api import (
 )
 
 # Handlers for nodes requesting their own metadata.
-meta_data_handler = OperationsResource(
-    MetaDataHandler, authentication=api_auth
-)
-user_data_handler = OperationsResource(
-    UserDataHandler, authentication=api_auth
-)
+meta_data_handler = OperationsResource(MetaDataHandler, authentication=api_auth)
+user_data_handler = OperationsResource(UserDataHandler, authentication=api_auth)
 curtin_user_data_handler = OperationsResource(
     CurtinUserDataHandler, authentication=api_auth
 )
-version_index_handler = OperationsResource(
-    VersionIndexHandler, authentication=api_auth
-)
+version_index_handler = OperationsResource(VersionIndexHandler, authentication=api_auth)
 index_handler = OperationsResource(IndexHandler, authentication=api_auth)
-maas_scripts_handler = OperationsResource(
-    MAASScriptsHandler, authentication=api_auth
-)
+maas_scripts_handler = OperationsResource(MAASScriptsHandler, authentication=api_auth)
 commissioning_scripts_handler = OperationsResource(
     CommissioningScriptsHandler, authentication=api_auth
 )
@@ -156,8 +148,7 @@ by_id_patterns = [
 by_mac_patterns = [
     re_path(
         # could-init adds additional slashes in front of urls.
-        r"^[/]*(?P<version>[^/]+)/by-mac/(?P<mac>[^/]+)/"
-        r"meta-data/(?P<item>.*)$",
+        r"^[/]*(?P<version>[^/]+)/by-mac/(?P<mac>[^/]+)/" r"meta-data/(?P<item>.*)$",
         meta_data_by_mac_handler,
         name="metadata-meta-data-by-mac",
     ),

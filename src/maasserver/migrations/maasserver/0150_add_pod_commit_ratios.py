@@ -11,15 +11,11 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="bmc",
             name="cpu_over_commit_ratio",
-            field=models.FloatField(
-                default=1, validators=[MinValueValidator(0)]
-            ),
+            field=models.FloatField(default=1, validators=[MinValueValidator(0)]),
         ),
         migrations.AddField(
             model_name="bmc",
             name="memory_over_commit_ratio",
-            field=models.FloatField(
-                default=1, validators=[MinValueValidator(0)]
-            ),
+            field=models.FloatField(default=1, validators=[MinValueValidator(0)]),
         ),
     ]

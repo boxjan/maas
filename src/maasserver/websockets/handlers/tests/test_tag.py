@@ -25,12 +25,8 @@ class TestTagHandler(MAASServerTestCase):
             "kernel_opts": tag.kernel_opts,
             "updated": dehydrate_datetime(tag.updated),
             "created": dehydrate_datetime(tag.created),
-            "machine_count": tag.node_set.filter(
-                node_type=NODE_TYPE.MACHINE
-            ).count(),
-            "device_count": tag.node_set.filter(
-                node_type=NODE_TYPE.DEVICE
-            ).count(),
+            "machine_count": tag.node_set.filter(node_type=NODE_TYPE.MACHINE).count(),
+            "device_count": tag.node_set.filter(node_type=NODE_TYPE.DEVICE).count(),
             "controller_count": tag.node_set.filter(
                 node_type__in=(
                     NODE_TYPE.REGION_CONTROLLER,
@@ -174,9 +170,7 @@ class TestTagHandler(MAASServerTestCase):
     def test_delete_no_admin(self):
         handler = TagHandler(factory.make_User(), {}, None)
         tag = factory.make_Tag()
-        self.assertRaises(
-            HandlerPermissionError, handler.delete, {"id": tag.id}
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete, {"id": tag.id})
         self.assertIsNotNone(reload_object(tag))
 
     def test_node_filter(self):

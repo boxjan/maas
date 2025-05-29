@@ -13,9 +13,7 @@ from provisioningserver.rpc import exceptions
 
 
 class ConnectionPool:
-    def __init__(
-        self, reactor, service, max_idle_conns=1, max_conns=1, keepalive=1000
-    ):
+    def __init__(self, reactor, service, max_idle_conns=1, max_conns=1, keepalive=1000):
         # The maximum number of connections to allways allocate per eventloop
         self._max_idle_connections = max_idle_conns
         # The maximum number of connections to allocate while under load per eventloop
@@ -110,11 +108,7 @@ class ConnectionPool:
         return random.choice(free_conns)
 
     def get_all_connections(self):
-        return [
-            conn
-            for conn_list in self.connections.values()
-            for conn in conn_list
-        ]
+        return [conn for conn_list in self.connections.values() for conn in conn_list]
 
     def get_all_free_connections(self):
         return [
@@ -147,9 +141,7 @@ class ConnectionPool:
 
         self.connections[eventloop].append(connection)
         # clone connection to equal num idle connections
-        idle_limit = self._max_idle_connections - len(
-            self.connections[eventloop]
-        )
+        idle_limit = self._max_idle_connections - len(self.connections[eventloop])
         # if there's room for more and first conn, create more idle conns
         if idle_limit > 0 and len(self.connections[eventloop]) == 1:
             for _ in range(idle_limit):

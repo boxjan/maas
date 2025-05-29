@@ -98,13 +98,7 @@ class TestStaticRoute(MAASServerTestCase):
             gateway_ip=gateway_ip,
         )
         self.assertEqual(
-            str(
-                {
-                    "__all__": [
-                        "source and destination cannot be the same subnet."
-                    ]
-                }
-            ),
+            str({"__all__": ["source and destination cannot be the same subnet."]}),
             str(error),
         )
 
@@ -120,13 +114,7 @@ class TestStaticRoute(MAASServerTestCase):
             gateway_ip=gateway_ip,
         )
         self.assertEqual(
-            str(
-                {
-                    "__all__": [
-                        "source and destination must be the same IP version."
-                    ]
-                }
-            ),
+            str({"__all__": ["source and destination must be the same IP version."]}),
             str(error),
         )
 
@@ -142,8 +130,6 @@ class TestStaticRoute(MAASServerTestCase):
             gateway_ip=gateway_ip,
         )
         self.assertEqual(
-            str(
-                {"__all__": ["gateway_ip must be with in the source subnet."]}
-            ),
+            str({"__all__": ["gateway_ip must be with in the source subnet."]}),
             str(error),
         )

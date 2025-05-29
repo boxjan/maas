@@ -68,9 +68,7 @@ class TestOptions(MAASTestCase):
 class TestProvisioningServiceMaker(MAASTestCase):
     """Tests for `provisioningserver.plugin.ProvisioningServiceMaker`."""
 
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
@@ -110,9 +108,7 @@ class TestProvisioningServiceMaker(MAASTestCase):
             next(attempts)
             clock.advance(seconds)
 
-        service = service_maker.makeService(
-            Options(), clock=clock, sleep=advance
-        )
+        service = service_maker.makeService(Options(), clock=clock, sleep=advance)
         self.assertIsInstance(service, MultiService)
         self.assertEqual(service.namedServices, {})
         self.mock_generate_certificate.assert_not_called()
@@ -135,9 +131,7 @@ class TestProvisioningServiceMaker(MAASTestCase):
             next(attempts)
             clock.advance(60)
 
-        service = service_maker.makeService(
-            Options(), clock=clock, sleep=advance
-        )
+        service = service_maker.makeService(Options(), clock=clock, sleep=advance)
         self.assertIsInstance(service, MultiService)
         self.assertNotEqual(service.namedServices, {})
         # First two fail, the third one succeeds
@@ -222,9 +216,7 @@ class TestProvisioningServiceMaker(MAASTestCase):
 
     def test_makeService_cleanup_prometheus_dir(self):
         tmpdir = Path(self.useFixture(TempDirectory()).path)
-        self.useFixture(
-            EnvironmentVariable("prometheus_multiproc_dir", str(tmpdir))
-        )
+        self.useFixture(EnvironmentVariable("prometheus_multiproc_dir", str(tmpdir)))
         pid = os.getpid()
         file1 = tmpdir / f"histogram_{pid}.db"
         file1.touch()

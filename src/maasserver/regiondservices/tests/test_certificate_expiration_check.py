@@ -32,12 +32,8 @@ class TestCertificateExpirationCheckService(MAASTransactionServerTestCase):
                 "cert": cert.certificate_pem(),
             },
         )
-        Config.objects.set_config(
-            "tls_cert_expiration_notification_enabled", enabled
-        )
-        Config.objects.set_config(
-            "tls_cert_expiration_notification_interval", interval
-        )
+        Config.objects.set_config("tls_cert_expiration_notification_enabled", enabled)
+        Config.objects.set_config("tls_cert_expiration_notification_interval", interval)
 
     def get_notifications(self):
         notifications = Notification.objects.filter(
@@ -140,9 +136,7 @@ class TestCertificateExpirationCheckService(MAASTransactionServerTestCase):
         self.assertTrue(notification.dismissable)
         self.assertTrue(notification.admins)
         self.assertFalse(notification.users)
-        self.assertEqual(
-            REGIOND_CERT_EXPIRED_NOTIFICATION_IDENT, notification.ident
-        )
+        self.assertEqual(REGIOND_CERT_EXPIRED_NOTIFICATION_IDENT, notification.ident)
 
     @wait_for_reactor
     @inlineCallbacks

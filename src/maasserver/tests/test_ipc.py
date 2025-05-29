@@ -50,23 +50,17 @@ wait_for_reactor = wait_for()
 class TestGetIPCSocketPath(MAASTestCase):
     def test_returns_ipc_socket_env(self):
         path = factory.make_name("path")
-        self.useFixture(
-            EnvironmentVariableFixture("MAAS_IPC_SOCKET_PATH", path)
-        )
+        self.useFixture(EnvironmentVariableFixture("MAAS_IPC_SOCKET_PATH", path))
         self.assertEqual(path, get_ipc_socket_path())
 
     def test_returns_ipc_from_maas_data(self):
         path = factory.make_name("path")
         self.useFixture(EnvironmentVariableFixture("MAAS_DATA", path))
-        self.assertEqual(
-            os.path.join(path, "maas-regiond.sock"), get_ipc_socket_path()
-        )
+        self.assertEqual(os.path.join(path, "maas-regiond.sock"), get_ipc_socket_path())
 
     def test_returns_ipc_at_default_location(self):
         self.useFixture(EnvironmentVariableFixture("MAAS_DATA", None))
-        self.assertEqual(
-            "/var/lib/maas/maas-regiond.sock", get_ipc_socket_path()
-        )
+        self.assertEqual("/var/lib/maas/maas-regiond.sock", get_ipc_socket_path())
 
 
 class TestIPCCommunication(MAASTransactionServerTestCase):
@@ -82,9 +76,7 @@ class TestIPCCommunication(MAASTransactionServerTestCase):
         self.patch(ipc, "get_all_interface_source_addresses")
 
     def make_IPCMasterService(self, workers=None, run_loop=False):
-        master = IPCMasterService(
-            reactor, workers=workers, socket_path=self.ipc_path
-        )
+        master = IPCMasterService(reactor, workers=workers, socket_path=self.ipc_path)
 
         if not run_loop:
             # Prevent the update loop from running.
@@ -203,15 +195,11 @@ class TestIPCCommunication(MAASTransactionServerTestCase):
 
         def getEndpoints():
             region = RegionController.objects.get_running_controller()
-            process = RegionControllerProcess.objects.get(
-                region=region, pid=pid
-            )
+            process = RegionControllerProcess.objects.get(region=region, pid=pid)
             return {
                 (endpoint.address, endpoint.port)
                 for endpoint in (
-                    RegionControllerProcessEndpoint.objects.filter(
-                        process=process
-                    )
+                    RegionControllerProcessEndpoint.objects.filter(process=process)
                 )
             }
 
@@ -271,15 +259,11 @@ class TestIPCCommunication(MAASTransactionServerTestCase):
         connid = str(uuid.uuid4())
         address = factory.make_ipv4_address()
         port = random.randint(1000, 5000)
-        yield worker.rpcRegisterConnection(
-            connid, rackd.system_id, address, port
-        )
+        yield worker.rpcRegisterConnection(connid, rackd.system_id, address, port)
 
         def getConnection():
             region = RegionController.objects.get_running_controller()
-            process = RegionControllerProcess.objects.get(
-                region=region, pid=pid
-            )
+            process = RegionControllerProcess.objects.get(region=region, pid=pid)
             endpoint = RegionControllerProcessEndpoint.objects.get(
                 process=process, address=address, port=port
             )
@@ -330,18 +314,12 @@ class TestIPCCommunication(MAASTransactionServerTestCase):
         connid2 = str(uuid.uuid4())
         address = factory.make_ipv4_address()
         port = random.randint(1000, 5000)
-        yield worker.rpcRegisterConnection(
-            connid1, rackd.system_id, address, port
-        )
-        yield worker.rpcRegisterConnection(
-            connid2, rackd.system_id, address, port
-        )
+        yield worker.rpcRegisterConnection(connid1, rackd.system_id, address, port)
+        yield worker.rpcRegisterConnection(connid2, rackd.system_id, address, port)
 
         def getConnection():
             region = RegionController.objects.get_running_controller()
-            process = RegionControllerProcess.objects.get(
-                region=region, pid=pid
-            )
+            process = RegionControllerProcess.objects.get(region=region, pid=pid)
             endpoint = RegionControllerProcessEndpoint.objects.get(
                 process=process, address=address, port=port
             )
@@ -430,9 +408,7 @@ class TestIPCCommunication(MAASTransactionServerTestCase):
 
         yield master.update()
 
-        old_region_process = yield deferToDatabase(
-            reload_object, old_region_process
-        )
+        old_region_process = yield deferToDatabase(reload_object, old_region_process)
         old_other_region_process = yield deferToDatabase(
             reload_object, old_other_region_process
         )
@@ -554,9 +530,7 @@ class TestIPCCommunication(MAASTransactionServerTestCase):
         def reload_connections(objects):
             return list(reload_objects(RegionRackRPCConnection, objects))
 
-        rpc_connections = yield deferToDatabase(
-            reload_connections, rpc_connections
-        )
+        rpc_connections = yield deferToDatabase(reload_connections, rpc_connections)
         self.assertEqual(rpc_connections, [])
 
         yield master.stopService()
@@ -643,9 +617,7 @@ class TestIPCCommunication(MAASTransactionServerTestCase):
             process = yield deferToDatabase(master._getProcessObjFor, pid)
             rpc_conns = conn["rpc"]["connections"].copy()
             rpc_conns.pop(random.choice(list(rpc_conns.keys())))
-            yield deferToDatabase(
-                master._updateConnections, process, rpc_conns
-            )
+            yield deferToDatabase(master._updateConnections, process, rpc_conns)
 
         def _get_conn_count():
             return RegionRackRPCConnection.objects.filter(

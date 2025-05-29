@@ -16,9 +16,7 @@ class VmClustersRepository(BaseRepository[VmCluster, VmClusterRequest]):
     async def find_by_id(self, id: int) -> VmCluster | None:
         raise Exception("Not implemented yet.")
 
-    async def list(
-        self, pagination_params: PaginationParams
-    ) -> ListResult[VmCluster]:
+    async def list(self, pagination_params: PaginationParams) -> ListResult[VmCluster]:
         raise Exception("Not implemented yet.")
 
     async def update(self, id: int, request: VmClusterRequest) -> VmCluster:

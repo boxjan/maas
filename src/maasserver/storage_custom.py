@@ -111,11 +111,7 @@ class StorageLayout:
 
     def disk_names(self) -> Set[str]:
         """Return a list of physical disk names required by the layout."""
-        return {
-            entry.name
-            for entry in self.sorted_entries
-            if isinstance(entry, Disk)
-        }
+        return {entry.name for entry in self.sorted_entries if isinstance(entry, Disk)}
 
 
 class ConfigError(Exception):
@@ -147,17 +143,14 @@ def apply_layout_to_machine(layout: StorageLayout, machine):
     machine._clear_full_storage_configuration()
 
     block_devices = {
-        disk.name: disk
-        for disk in machine.current_config.blockdevice_set.all()
+        disk.name: disk for disk in machine.current_config.blockdevice_set.all()
     }
     missing_disks = layout.disk_names() - set(
         machine.physicalblockdevice_set.values_list("name", flat=True)
     )
     if missing_disks:
         missing_disks_list = ", ".join(sorted(missing_disks))
-        raise UnappliableLayout(
-            f"Unknown machine disk(s): {missing_disks_list}"
-        )
+        raise UnappliableLayout(f"Unknown machine disk(s): {missing_disks_list}")
     for entry in layout.sorted_entries:
         entry_type = type(entry).__name__
         apply_layout = _LAYOUT_APPLIERS[entry_type]
@@ -202,9 +195,7 @@ def _flatten_raid(name: str, data: Config) -> List[StorageEntry]:
     members = data.get("members", [])
     spares = data.get("spares", [])
     if set(members) & set(spares):
-        raise ConfigError(
-            f"RAID '{name}' has duplicated devices in members and spares"
-        )
+        raise ConfigError(f"RAID '{name}' has duplicated devices in members and spares")
     if spares and level == 0:
         raise ConfigError("RAID level 0 doesn't support spares")
     items: List[StorageEntry] = [
@@ -319,9 +310,7 @@ def _flatten(config: Config) -> List[StorageEntry]:
     return items
 
 
-def _apply_layout_disk(
-    machine: models.Node, entry: StorageEntry, block_devices: List
-):
+def _apply_layout_disk(machine: models.Node, entry: StorageEntry, block_devices: List):
     if not entry.ptable:
         return
     disk = block_devices[entry.name]
@@ -404,9 +393,7 @@ def _apply_layout_bcache(
     block_devices[entry.name] = bcache.virtual_device
 
 
-def _apply_layout_lvm(
-    machine: models.Node, entry: StorageEntry, block_devices: List
-):
+def _apply_layout_lvm(machine: models.Node, entry: StorageEntry, block_devices: List):
     devices = []
     partitions = []
     for name in entry.members:
@@ -415,9 +402,7 @@ def _apply_layout_lvm(
             partitions.append(device)
         else:
             devices.append(device)
-    vg = models.VolumeGroup.objects.create_volume_group(
-        entry.name, devices, partitions
-    )
+    vg = models.VolumeGroup.objects.create_volume_group(entry.name, devices, partitions)
     block_devices[entry.name] = vg
 
 
@@ -429,9 +414,7 @@ def _apply_layout_logicalvolume(
     block_devices[entry.name] = lv
 
 
-def _apply_layout_raid(
-    machine: models.Node, entry: StorageEntry, block_devices: List
-):
+def _apply_layout_raid(machine: models.Node, entry: StorageEntry, block_devices: List):
     devices = []
     partitions = []
     spare_devices = []
@@ -524,16 +507,12 @@ def _set_mountpoints(entries: Dict[str, StorageEntry], config: Config):
         fs.mount_options = data.get("options", "")
     # all special filesystems must have a mount point
     special_devices = {
-        entry.name
-        for entry in entries.values()
-        if isinstance(entry, SpecialDevice)
+        entry.name for entry in entries.values() if isinstance(entry, SpecialDevice)
     }
     unmounted_devices = special_devices - mounted_devices
     if unmounted_devices:
         unmounted_list = ", ".join(sorted(unmounted_devices))
-        raise ConfigError(
-            f"Special device(s) missing mountpoint: {unmounted_list}"
-        )
+        raise ConfigError(f"Special device(s) missing mountpoint: {unmounted_list}")
 
 
 def _get_size(size: str) -> int:

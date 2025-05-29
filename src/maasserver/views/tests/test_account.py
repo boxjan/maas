@@ -63,9 +63,7 @@ class TestLogin(MAASServerTestCase):
 
     def test_login_GET_returns_external_auth_url(self):
         auth_url = "http://candid.example.com"
-        SecretManager().set_composite_secret(
-            "external-auth", {"url": auth_url}
-        )
+        SecretManager().set_composite_secret("external-auth", {"url": auth_url})
         response = self.client.get(reverse("login"))
         self.assertEqual(response.status_code, http.client.OK)
         self.assertEqual(
@@ -173,9 +171,7 @@ class TestAuthenticate(MAASServerTestCase):
             data={"username": username, "password": password},
         )
         self.assertEqual(response.status_code, http.client.OK)
-        self.assertEqual(
-            token_to_dict(token), json_load_bytes(response.content)
-        )
+        self.assertEqual(token_to_dict(token), json_load_bytes(response.content))
 
     def test_returns_first_of_existing_credentials(self):
         username = factory.make_name("username")
@@ -189,9 +185,7 @@ class TestAuthenticate(MAASServerTestCase):
             data={"username": username, "password": password},
         )
         self.assertEqual(response.status_code, http.client.OK)
-        self.assertEqual(
-            token_to_dict(token), json_load_bytes(response.content)
-        )
+        self.assertEqual(token_to_dict(token), json_load_bytes(response.content))
 
     def test_returns_existing_named_credentials(self):
         username = factory.make_name("username")
@@ -208,9 +202,7 @@ class TestAuthenticate(MAASServerTestCase):
             },
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(
-            token_to_dict(token), json_load_bytes(response.content)
-        )
+        self.assertEqual(token_to_dict(token), json_load_bytes(response.content))
 
     def test_returns_first_of_existing_named_credentials(self):
         username = factory.make_name("username")
@@ -227,9 +219,7 @@ class TestAuthenticate(MAASServerTestCase):
             },
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(
-            token_to_dict(tokens[0]), json_load_bytes(response.content)
-        )
+        self.assertEqual(token_to_dict(tokens[0]), json_load_bytes(response.content))
 
     def test_returns_new_credentials(self):
         username = factory.make_name("username")
@@ -242,9 +232,7 @@ class TestAuthenticate(MAASServerTestCase):
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
         [token] = get_auth_tokens(user)
-        self.assertEqual(
-            token_to_dict(token), json_load_bytes(response.content)
-        )
+        self.assertEqual(token_to_dict(token), json_load_bytes(response.content))
 
     def test_returns_new_named_credentials(self):
         username = factory.make_name("username")
@@ -261,9 +249,7 @@ class TestAuthenticate(MAASServerTestCase):
             },
         )
         self.assertEqual(response.status_code, HTTPStatus.OK)
-        self.assertEqual(
-            json_load_bytes(response.content).get("name"), consumer
-        )
+        self.assertEqual(json_load_bytes(response.content).get("name"), consumer)
 
     def test_rejects_unknown_username(self):
         username = factory.make_name("username")

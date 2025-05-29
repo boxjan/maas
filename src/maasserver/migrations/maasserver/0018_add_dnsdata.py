@@ -51,9 +51,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="dnsresource",
             name="ttl",
-            field=models.PositiveIntegerField(
-                default=None, null=True, blank=True
-            ),
+            field=models.PositiveIntegerField(default=None, null=True, blank=True),
         ),
         migrations.AddField(
             model_name="dnsdata",

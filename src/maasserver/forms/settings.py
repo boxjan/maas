@@ -76,9 +76,7 @@ def make_default_osystem_field(*args, **kwargs):
         choices=os_choices,
         validators=[validate_missing_boot_images],
         error_messages={
-            "invalid_choice": compose_invalid_choice_text(
-                "osystem", os_choices
-            )
+            "invalid_choice": compose_invalid_choice_text("osystem", os_choices)
         },
         **kwargs,
     )
@@ -94,21 +92,15 @@ def validate_port(value, allow_ports=None):
         return
     msg = "Unable to change port number"
     if value > 65535 or value <= 0:
-        raise ValidationError(
-            "%s. Port number is not between 0 - 65535." % msg
-        )
+        raise ValidationError("%s. Port number is not between 0 - 65535." % msg)
     if value >= 0 and value <= 1023:
-        raise ValidationError(
-            "%s. Port number is reserved for system services." % msg
-        )
+        raise ValidationError("%s. Port number is reserved for system services." % msg)
     # 5240 -> reserved for region HTTP.
     # 5241 - 4247 -> reserved for other MAAS services.
     # 5248 -> reserved for rack HTTP.
     # 5250+ -> reserved for region workers (RPC).
     if value >= 5240 and value <= 5270:
-        raise ValidationError(
-            "%s. Port number is reserved for MAAS services." % msg
-        )
+        raise ValidationError("%s. Port number is reserved for MAAS services." % msg)
 
 
 def validate_syslog_port(value):
@@ -155,9 +147,7 @@ def make_default_distro_series_field(*args, **kwargs):
         choices=release_choices,
         validators=[validate_missing_boot_images],
         error_messages={
-            "invalid_choice": compose_invalid_choice_text(
-                "release", release_choices
-            )
+            "invalid_choice": compose_invalid_choice_text("release", release_choices)
         },
         **kwargs,
     )
@@ -169,17 +159,13 @@ def make_default_min_hwe_kernel_field(*args, **kwargs):
     kernel_choices = [("", "--- No minimum kernel ---")]
     # Global choices are limited to the commissioning release as min_hwe_kernel
     # is used during commissioning.
-    commissioning_series = Config.objects.get_config(
-        "commissioning_distro_series"
-    )
+    commissioning_series = Config.objects.get_config("commissioning_distro_series")
     if commissioning_series:
         commissioning_os_release = "ubuntu/" + commissioning_series
         kernel_choices += list_hwe_kernel_choices(
             [
                 kernel
-                for kernel in BootResource.objects.get_kernels(
-                    commissioning_os_release
-                )
+                for kernel in BootResource.objects.get_kernels(commissioning_os_release)
                 if release_a_newer_than_b(kernel, commissioning_series)
             ]
         )
@@ -263,9 +249,7 @@ def make_active_discovery_interval_field(*args, **kwargs):
 
 def make_maas_internal_domain_field(*args, **kwargs):
     """Build and return the maas_internal_domain field."""
-    return forms.CharField(
-        validators=[validate_internal_domain_name], **kwargs
-    )
+    return forms.CharField(validators=[validate_internal_domain_name], **kwargs)
 
 
 def validate_ipmi_k_g(value):
@@ -598,8 +582,7 @@ CONFIG_ITEMS = {
             "label": "Default storage layout",
             "choices": STORAGE_LAYOUT_CHOICES,
             "help_text": (
-                "Storage layout that is applied to a node when it is "
-                "commissioned."
+                "Storage layout that is applied to a node when it is " "commissioned."
             ),
         },
     },
@@ -618,9 +601,7 @@ CONFIG_ITEMS = {
         "form": forms.BooleanField,
         "form_kwargs": {
             "required": False,
-            "label": (
-                "Enable the installation of proprietary drivers (i.e. HPVSA)"
-            ),
+            "label": ("Enable the installation of proprietary drivers (i.e. HPVSA)"),
         },
     },
     "windows_kms_host": {
@@ -751,8 +732,7 @@ CONFIG_ITEMS = {
         "form_kwargs": {
             "required": False,
             "label": (
-                "The maximum number of commissioning results runs which are "
-                "stored"
+                "The maximum number of commissioning results runs which are " "stored"
             ),
             "min_value": 1,
         },
@@ -762,10 +742,7 @@ CONFIG_ITEMS = {
         "form": forms.IntegerField,
         "form_kwargs": {
             "required": False,
-            "label": (
-                "The maximum number of testing results runs which are "
-                "stored"
-            ),
+            "label": ("The maximum number of testing results runs which are " "stored"),
             "min_value": 1,
         },
     },
@@ -775,8 +752,7 @@ CONFIG_ITEMS = {
         "form_kwargs": {
             "required": False,
             "label": (
-                "The maximum number of installation result runs which are "
-                "stored"
+                "The maximum number of installation result runs which are " "stored"
             ),
             "min_value": 1,
         },
@@ -808,9 +784,7 @@ CONFIG_ITEMS = {
         "form": forms.BooleanField,
         "form_kwargs": {
             "required": False,
-            "label": (
-                "Enable or disable notifications for new MAAS releases."
-            ),
+            "label": ("Enable or disable notifications for new MAAS releases."),
         },
     },
     "use_rack_proxy": {
@@ -972,9 +946,7 @@ CONFIG_ITEMS = {
             "choices": IPMI_CIPHER_SUITE_ID_CHOICES,
             "error_messages": {
                 "invalid_choice": "Valid choices are {}".format(
-                    ",".join(
-                        choice[0] for choice in IPMI_CIPHER_SUITE_ID_CHOICES
-                    )
+                    ",".join(choice[0] for choice in IPMI_CIPHER_SUITE_ID_CHOICES)
                 ),
             },
             "help_text": (
@@ -992,9 +964,7 @@ CONFIG_ITEMS = {
             "choices": IPMI_WORKAROUND_FLAG_CHOICES,
             "error_messages": {
                 "invalid_choice": "Valid choices are {}".format(
-                    ", ".join(
-                        choice[0] for choice in IPMI_WORKAROUND_FLAG_CHOICES
-                    )
+                    ", ".join(choice[0] for choice in IPMI_WORKAROUND_FLAG_CHOICES)
                 ),
             },
             "help_text": (
@@ -1069,9 +1039,7 @@ CONFIG_ITEMS = {
         "form_kwargs": {
             "label": "Notify when the certificate is due to expire",
             "required": False,
-            "help_text": (
-                "Enable/Disable notification about certificate expiration."
-            ),
+            "help_text": ("Enable/Disable notification about certificate expiration."),
         },
     },
     "tls_cert_expiration_notification_interval": {
@@ -1081,8 +1049,7 @@ CONFIG_ITEMS = {
             "label": "Certificate expiration reminder (days)",
             "required": False,
             "help_text": (
-                "Configure notification when certificate is "
-                "due to expire in (days)."
+                "Configure notification when certificate is " "due to expire in (days)."
             ),
             "min_value": 1,
             "max_value": 90,

@@ -135,9 +135,7 @@ def normalise_openssh_public_key(keytext):
                     env=env,
                 )
         except CalledProcessError:
-            raise OpenSSHKeyError(
-                "Key could not be converted to RFC4716 form."
-            )
+            raise OpenSSHKeyError("Key could not be converted to RFC4716 form.")
         # Convert RFC4716 back to OpenSSH format public key.
         keypath.write_bytes(rfc4716key)
         try:

@@ -42,9 +42,7 @@ class ScriptForm(Form):
         self.user = user
         self._scripts = list(
             Script.objects.filter(
-                script_type__in=[
-                    entry[1] for entry in self.script_fields_details
-                ]
+                script_type__in=[entry[1] for entry in self.script_fields_details]
             )
         )
         self._set_up_script_fields()
@@ -104,9 +102,7 @@ class ScriptForm(Form):
                         if script.name not in params:
                             params[script.name] = {}
                         if isinstance(value, timedelta):
-                            params[script.name][name] = int(
-                                value.total_seconds()
-                            )
+                            params[script.name][name] = int(value.total_seconds())
                         else:
                             params[script.name][name] = value
         return params
@@ -161,25 +157,17 @@ class ScriptForm(Form):
                         required=False, initial=None
                     )
                     if pname not in self.fields:
-                        self.fields[pname] = DurationField(
-                            required=False, initial=None
-                        )
+                        self.fields[pname] = DurationField(required=False, initial=None)
                 elif ptype in ["url", "string", "password"]:
-                    self.fields[combined_name] = CharField(
-                        required=False, initial=None
-                    )
+                    self.fields[combined_name] = CharField(required=False, initial=None)
                     if pname not in self.fields:
-                        self.fields[pname] = CharField(
-                            required=False, initial=None
-                        )
+                        self.fields[pname] = CharField(required=False, initial=None)
                 elif ptype == "boolean":
                     self.fields[combined_name] = BooleanField(
                         required=False, initial=None
                     )
                     if pname not in self.fields:
-                        self.fields[pname] = BooleanField(
-                            required=False, initial=None
-                        )
+                        self.fields[pname] = BooleanField(required=False, initial=None)
                 elif ptype == "choice":
                     # Support a Django choice list or a string list
                     choices = [
@@ -244,10 +232,7 @@ class TestForm(ScriptForm):
 
     def is_valid(self):
         valid = super().is_valid()
-        if (
-            not self.instance.is_machine
-            or self.instance.status == NODE_STATUS.DEPLOYED
-        ):
+        if not self.instance.is_machine or self.instance.status == NODE_STATUS.DEPLOYED:
             testing_scripts = self.cleaned_data.get("testing_scripts")
             if testing_scripts is None:
                 return valid
@@ -298,9 +283,7 @@ class CommissionForm(TestForm):
         skip_storage = self.cleaned_data.get("skip_storage", False)
         commissioning_scripts = self.cleaned_data.get("commissioning_scripts")
         testing_scripts = self.cleaned_data.get("testing_scripts")
-        params = self.get_script_param_dict(
-            commissioning_scripts + testing_scripts
-        )
+        params = self.get_script_param_dict(commissioning_scripts + testing_scripts)
         self.instance.start_commissioning(
             self.user,
             enable_ssh,

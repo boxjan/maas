@@ -14,9 +14,7 @@ class Migration(migrations.Migration):
         ("maasserver", "0270_storage_uuid_drop_unique"),
     ]
 
-    operations = [
-        migrations.RunSQL(f"DROP INDEX {name}") for name in OLD_INDEXES
-    ] + [
+    operations = [migrations.RunSQL(f"DROP INDEX {name}") for name in OLD_INDEXES] + [
         migrations.AlterField(
             model_name="notification",
             name="ident",

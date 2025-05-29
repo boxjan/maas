@@ -35,17 +35,12 @@ def validate_domain_name(name):
             raise ValidationError("DNS name contains an empty label.")
         if len(label) > 63:
             raise ValidationError(
-                "Label is too long: %r.  Maximum allowed is 63 characters."
-                % label
+                "Label is too long: %r.  Maximum allowed is 63 characters." % label
             )
         if label.startswith("-") or label.endswith("-"):
-            raise ValidationError(
-                "Label cannot start or end with hyphen: %r." % label
-            )
+            raise ValidationError("Label cannot start or end with hyphen: %r." % label)
         if not label_chars.match(label):
-            raise ValidationError(
-                "Label contains disallowed characters: %r." % label
-            )
+            raise ValidationError("Label contains disallowed characters: %r." % label)
 
 
 def validate_hostname(hostname):
@@ -68,9 +63,7 @@ def validate_hostname(hostname):
     host_part = hostname.split(".")[0]
     if "_" in host_part:
         # The host label cannot contain underscores; the rest of the name can.
-        raise ValidationError(
-            "Host label cannot contain underscore: %r." % host_part
-        )
+        raise ValidationError("Host label cannot contain underscore: %r." % host_part)
     validate_domain_name(hostname)
 
 
@@ -139,13 +132,7 @@ def validate_url(url, schemes=("http", "https")):
     regex = _lazy_re_compile(
         r"^(?:[a-z0-9.+-]*)://"
         r"(?:[^\s:@/]+(?::[^\s:@/]*)?@)?"
-        r"(?:"
-        + URLValidator.ipv4_re
-        + "|"
-        + URLValidator.ipv6_re
-        + "|"
-        + host_re
-        + ")"
+        r"(?:" + URLValidator.ipv4_re + "|" + URLValidator.ipv6_re + "|" + host_re + ")"
         r"(?::\d{1,5})?"
         r"(?:[/?#][^\s]*)?"
         r"\Z",

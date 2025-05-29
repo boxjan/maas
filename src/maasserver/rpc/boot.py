@@ -103,9 +103,7 @@ def event_log_pxe_request(machine, purpose):
         event_description=options[purpose],
     )
     # Create a status message for performing a PXE boot.
-    Event.objects.create_node_event(
-        machine, event_type=EVENT_TYPES.PERFORMING_PXE_BOOT
-    )
+    Event.objects.create_node_event(machine, event_type=EVENT_TYPES.PERFORMING_PXE_BOOT)
 
 
 def _get_files_map(
@@ -221,9 +219,7 @@ def merge_kparams_with_extra(kparams, extra_kernel_opts):
     if extra_kernel_opts is not None and extra_kernel_opts != "":
         # We need to remove spaces from the tempita subsitutions so the split
         #  command works as desired.
-        final_params = re.sub(
-            r"{{\s*([\w\.]*)\s*}}", r"{{\g<1>}}", extra_kernel_opts
-        )
+        final_params = re.sub(r"{{\s*([\w\.]*)\s*}}", r"{{\g<1>}}", extra_kernel_opts)
 
     # Need to get a list of all kernel params in the extra opts.
     elist = []
@@ -277,9 +273,7 @@ def get_boot_config_for_machine(
                 and machine.previous_status == NODE_STATUS.DEPLOYED
             )
         ):
-            boot_osystem = machine.get_osystem(
-                default=configs["default_osystem"]
-            )
+            boot_osystem = machine.get_osystem(default=configs["default_osystem"])
             boot_series = machine.get_distro_series(
                 default=configs["default_distro_series"]
             )
@@ -394,9 +388,7 @@ def get_boot_config_for_machine(
     return boot_osystem, boot_series, subarch, final_osystem, final_series
 
 
-def get_base_url_for_local_ip(
-    local_ip, internal_domain, use_domain_names: bool = True
-):
+def get_base_url_for_local_ip(local_ip, internal_domain, use_domain_names: bool = True):
     """Get the base URL for the preseed using the `local_ip`."""
     subnet = Subnet.objects.get_best_subnet_for_ip(local_ip)
     if (
@@ -437,9 +429,7 @@ def get_final_boot_purpose(machine, arch, purpose):
         return purpose
 
 
-def get_quirks_kernel_opts(
-    final_osystem: str, final_series: str
-) -> str | None:
+def get_quirks_kernel_opts(final_osystem: str, final_series: str) -> str | None:
     if final_osystem == "centos":
         return "nvme-core.multipath=0"
 
@@ -499,11 +489,7 @@ def get_config(
     # Compute the syslog server.
     log_host, log_port = (
         local_ip,
-        (
-            configs["maas_syslog_port"]
-            if configs["maas_syslog_port"]
-            else RSYSLOG_PORT
-        ),
+        (configs["maas_syslog_port"] if configs["maas_syslog_port"] else RSYSLOG_PORT),
     )
     if configs["remote_syslog"]:
         log_host, log_port = splithost(configs["remote_syslog"])
@@ -534,11 +520,9 @@ def get_config(
             update_boot_interface_vlan(machine, local_ip)
         else:
             try:
-                machine.boot_interface = (
-                    machine.current_config.interface_set.get(
-                        type=INTERFACE_TYPE.PHYSICAL,
-                        mac_address=normalise_macaddress(mac),
-                    )
+                machine.boot_interface = machine.current_config.interface_set.get(
+                    type=INTERFACE_TYPE.PHYSICAL,
+                    mac_address=normalise_macaddress(mac),
                 )
             except ObjectDoesNotExist:
                 # MAC is unknown. Determine the boot_interface using the boot_cluster_ip.
@@ -556,8 +540,7 @@ def get_config(
                 )
                 if (
                     rack_interface is not None
-                    and machine.boot_interface.vlan_id
-                    != rack_interface.vlan_id
+                    and machine.boot_interface.vlan_id != rack_interface.vlan_id
                 ):
                     # Rack controller and machine is not on the same VLAN, with
                     # DHCP relay this is possible. Lets ensure that the VLAN on the
@@ -614,8 +597,7 @@ def get_config(
                 # Log that we are setting to local boot for a device.
                 maaslog.warning(
                     "Device %s with MAC address %s is PXE booting; "
-                    "instructing the device to boot locally."
-                    % (machine.hostname, mac)
+                    "instructing the device to boot locally." % (machine.hostname, mac)
                 )
                 # Set the purpose to 'local-device' so we can log a message
                 # on the rack.
@@ -681,13 +663,9 @@ def get_config(
             default_osystem=configs["default_osystem"],
             default_distro_series=configs["default_distro_series"],
         )
-        extra_kernel_opts = merge_kparams_with_extra(
-            kparams, extra_kernel_opts
-        )
+        extra_kernel_opts = merge_kparams_with_extra(kparams, extra_kernel_opts)
         if final_osystem != "ubuntu":
-            ephemeral_opts = get_quirks_kernel_opts(
-                final_osystem, final_series
-            )
+            ephemeral_opts = get_quirks_kernel_opts(final_osystem, final_series)
     else:
         purpose = "commissioning"  # enlistment
         if configs["use_rack_proxy"]:

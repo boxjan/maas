@@ -111,9 +111,7 @@ class TestSequence(MAASServerTestCase):
         name = factory.make_name("seq", sep="")
         seq = Sequence(name)
         seq.create_if_not_exists()
-        self.assertSequenceEqual(
-            list(range(1, 11)), [next(seq) for _ in range(10)]
-        )
+        self.assertSequenceEqual(list(range(1, 11)), [next(seq) for _ in range(10)])
 
     def test_iteration_returns_sequential_values(self):
         name = factory.make_name("seq", sep="")

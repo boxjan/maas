@@ -99,8 +99,7 @@ def get_machine_state_stats():
         "broken",
     )
     return {
-        status: node_status[getattr(NODE_STATUS, status.upper())]
-        for status in statuses
+        status: node_status[getattr(NODE_STATUS, status.upper())] for status in statuses
     }
 
 
@@ -326,9 +325,7 @@ def get_vmcluster_stats(**filter_params):
         stats["available_resources"]["cores"] += res.cores.total
         stats["available_resources"]["over_cores"] += res.cores.overcommited
         stats["available_resources"]["memory"] += res.memory.general.total
-        stats["available_resources"][
-            "over_memory"
-        ] += res.memory.general.overcommited
+        stats["available_resources"]["over_memory"] += res.memory.general.overcommited
         stats["utilized_resources"]["cores"] += res.cores.allocated
         stats["utilized_resources"]["memory"] += res.memory.general.allocated
 
@@ -378,9 +375,7 @@ def get_brownfield_stats():
             current_commissioning_script_set__scriptresult__status=SCRIPT_STATUS.PASSED,
         ).count(),
         "commissioned_after_deploy_no_brownfield": no_brownfield_machines.filter(
-            latest_commissioning_script_date__gt=F(
-                "latest_installation_script_date"
-            ),
+            latest_commissioning_script_date__gt=F("latest_installation_script_date"),
         ).count(),
     }
 
@@ -391,10 +386,7 @@ def get_storage_layouts_stats():
         .values("last_applied_storage_layout")
         .annotate(count=Count("id"))
     )
-    return {
-        entry["last_applied_storage_layout"]: entry["count"]
-        for entry in counts
-    }
+    return {entry["last_applied_storage_layout"]: entry["count"] for entry in counts}
 
 
 def get_tls_configuration_stats():
@@ -486,9 +478,7 @@ def get_maas_stats():
 
     return {
         "controllers": {
-            "regionracks": node_types.get(
-                NODE_TYPE.REGION_AND_RACK_CONTROLLER, 0
-            ),
+            "regionracks": node_types.get(NODE_TYPE.REGION_AND_RACK_CONTROLLER, 0),
             "regions": node_types.get(NODE_TYPE.REGION_CONTROLLER, 0),
             "racks": node_types.get(NODE_TYPE.RACK_CONTROLLER, 0),
         },
@@ -533,9 +523,7 @@ def make_maas_user_agent_request():
     headers = {"User-Agent": get_maas_user_agent()}
     params = get_request_params()
     try:
-        requests.get(
-            "https://stats.images.maas.io/", params=params, headers=headers
-        )
+        requests.get("https://stats.images.maas.io/", params=params, headers=headers)
     except Exception:
         # Do not fail if for any reason requests does.
         pass
@@ -554,9 +542,7 @@ class StatsService(TimerService):
     """
 
     def __init__(self, interval=STATS_SERVICE_PERIOD):
-        super().__init__(
-            interval.total_seconds(), self.maybe_make_stats_request
-        )
+        super().__init__(interval.total_seconds(), self.maybe_make_stats_request)
 
     def maybe_make_stats_request(self):
         def determine_stats_request():

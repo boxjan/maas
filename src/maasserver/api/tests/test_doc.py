@@ -46,9 +46,7 @@ class TestGetAPIDescription(MAASTestCase):
 
     def test_adds_hash(self):
         self.patch(doc_module, "_describe_api").return_value = {}
-        self.patch(
-            doc_module, "_get_api_description_hash"
-        ).return_value = "abcd"
+        self.patch(doc_module, "_get_api_description_hash").return_value = "abcd"
         self.assertEqual(get_api_description(), {"hash": "abcd"})
 
     def test_cached(self):
@@ -103,9 +101,7 @@ class TestFindingResources(MAASTestCase):
     def test_urlpatterns_with_resource_hidden(self):
         # Resources for handlers with resource_uri attributes are discovered
         # in a urlconf module and returned, unless hidden = True.
-        handler = type(
-            "\\m/", (BaseHandler,), {"resource_uri": True, "hidden": True}
-        )
+        handler = type("\\m/", (BaseHandler,), {"resource_uri": True, "hidden": True})
         resource = Resource(handler)
         module = self.make_module()
         module.urlpatterns = [re_path("^metal", resource)]
@@ -139,9 +135,7 @@ class TestGeneratingDocs(MAASTestCase):
         """
         name = factory.make_name("handler")
         namespace = {
-            "resource_uri": classmethod(
-                lambda cls: factory.make_name("resource-uri")
-            )
+            "resource_uri": classmethod(lambda cls: factory.make_name("resource-uri"))
         }
         handler = type(name, (BaseHandler,), namespace)
         return OperationsResource(handler)
@@ -285,9 +279,7 @@ class TestDescribingAPI(MAASTestCase):
     def setUp(self):
         super().setUp()
         # Override config maas url so that it's stable for testing.
-        self.useFixture(
-            RegionConfigurationFixture(maas_url="http://example.com/")
-        )
+        self.useFixture(RegionConfigurationFixture(maas_url="http://example.com/"))
 
     def test_describe_handler(self):
         # _describe_handler() returns a description of a handler that can be
@@ -317,9 +309,7 @@ class TestDescribingAPI(MAASTestCase):
         ]
         observed = _describe_handler(ExampleHandler)
         # The description contains several entries.
-        self.assertSetEqual(
-            {"actions", "doc", "name", "params", "path"}, set(observed)
-        )
+        self.assertSetEqual({"actions", "doc", "name", "params", "path"}, set(observed))
         self.assertEqual(ExampleHandler.__doc__, observed["doc"])
         self.assertEqual(ExampleHandler.__name__, observed["name"])
         self.assertEqual(("p_foo", "p_bar"), observed["params"])
@@ -413,11 +403,7 @@ class TestGeneratePowerTypesDoc(MAASTestCase):
 
     def test_generate_power_types_doc_generates_describes_power_type(self):
         power_driver = random.choice(
-            [
-                driver
-                for _, driver in PowerDriverRegistry
-                if len(driver.settings) > 0
-            ]
+            [driver for _, driver in PowerDriverRegistry if len(driver.settings) > 0]
         )
         doc = generate_power_types_doc()
         self.assertIn(power_driver.name, doc)
@@ -471,9 +457,7 @@ class TestDescribeCanonical(MAASTestCase):
 
     def test_sorts_sequences(self):
         self.assertEqual(_describe_canonical([3, 1, 2]), (1, 2, 3))
-        self.assertEqual(
-            _describe_canonical([[1, 2], [1, 1]]), ((1, 1), (1, 2))
-        )
+        self.assertEqual(_describe_canonical([[1, 2], [1, 1]]), ((1, 1), (1, 2)))
 
     def test_returns_mappings_as_tuples(self):
         self.assertEqual(_describe_canonical({1: 2}), ((1, 2),))

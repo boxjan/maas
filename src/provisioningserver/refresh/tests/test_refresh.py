@@ -90,28 +90,18 @@ class TestRefresh(MAASTestCase):
         base_url = factory.make_simple_http_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, base_url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, base_url)
         requests = [call[0] for call in self.urlopen_calls]
 
         for request in requests:
-            self.assertEqual(
-                f"{base_url}/metadata/{MD_VERSION}/", request.full_url
-            )
+            self.assertEqual(f"{base_url}/metadata/{MD_VERSION}/", request.full_url)
             auth_header = request.get_header("Authorization")
-            self.assertTrue(
-                auth_header.startswith("OAuth oauth_nonce="), auth_header
-            )
+            self.assertTrue(auth_header.startswith("OAuth oauth_nonce="), auth_header)
             self.assertIn(f'oauth_consumer_key="{consumer_key}"', auth_header)
             self.assertIn(f'oauth_token="{token_key}"', auth_header)
 
-        self.assertIn(
-            f"Starting {script_name}", requests[0].data.decode("ascii")
-        )
-        self.assertIn(
-            f'filename="{script_name}"', requests[1].data.decode("ascii")
-        )
+        self.assertIn(f"Starting {script_name}", requests[0].data.decode("ascii"))
+        self.assertIn(f'filename="{script_name}"', requests[1].data.decode("ascii"))
         self.assertIn(
             f"Finished refreshing {system_id}",
             requests[2].data.decode("ascii"),
@@ -138,9 +128,7 @@ class TestRefresh(MAASTestCase):
         url = factory.make_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
         signal.assert_any_call(
             ANY,
             ANY,
@@ -170,9 +158,7 @@ class TestRefresh(MAASTestCase):
         url = factory.make_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
 
         env = mock_popen.call_args[1]["env"]
         for name in [
@@ -198,9 +184,7 @@ class TestRefresh(MAASTestCase):
         url = factory.make_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
         signal.assert_any_call(
             ANY,
             ANY,
@@ -228,9 +212,7 @@ class TestRefresh(MAASTestCase):
         url = factory.make_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
         signal.mock_any_call(
             ANY,
             ANY,
@@ -258,9 +240,7 @@ class TestRefresh(MAASTestCase):
         url = factory.make_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
         signal.assert_any_call(
             ANY,
             ANY,
@@ -285,22 +265,16 @@ class TestRefresh(MAASTestCase):
         token_secret = factory.make_name("token_secret")
         url = factory.make_url()
 
-        def timeout_run(
-            proc, combined_path, stdout_path, stderr_path, timeout_seconds
-        ):
+        def timeout_run(proc, combined_path, stdout_path, stderr_path, timeout_seconds):
             # Contract of capture_script_output is to create these files
             for path in (stdout_path, stderr_path, combined_path):
                 open(path, "w").close()
             raise TimeoutExpired(proc.args, timeout_seconds)
 
-        mock_capture_script_output = self.patch(
-            refresh, "capture_script_output"
-        )
+        mock_capture_script_output = self.patch(refresh, "capture_script_output")
         mock_capture_script_output.side_effect = timeout_run
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
 
         signal.assert_any_call(
             ANY,
@@ -326,9 +300,7 @@ class TestRefresh(MAASTestCase):
         url = factory.make_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
         signal.assert_any_call(
             ANY,
             ANY,
@@ -352,9 +324,7 @@ class TestRefresh(MAASTestCase):
         with patch.dict("os.environ", {"SNAP": path}), patch.dict(
             refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True
         ):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
         signal.assert_any_call(
             ANY,
             ANY,
@@ -368,9 +338,7 @@ class TestRefresh(MAASTestCase):
 
         def find_temporary_directories():
             maas_data = Path(get_maas_data_path(""))
-            return {
-                str(entry) for entry in maas_data.iterdir() if entry.is_dir()
-            }
+            return {str(entry) for entry in maas_data.iterdir() if entry.is_dir()}
 
         tmpdirs_during = set()
         tmpdir_during = None
@@ -421,9 +389,7 @@ class TestRefresh(MAASTestCase):
         url = factory.make_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
         script_path = Path(self.tmpdir) / script_name
         mock_popen.assert_called_once_with(
             [str(script_path)],
@@ -457,9 +423,7 @@ class TestRefresh(MAASTestCase):
         url = factory.make_url()
 
         with patch.dict(refresh.NODE_INFO_SCRIPTS, info_scripts, clear=True):
-            refresh.refresh(
-                system_id, consumer_key, token_key, token_secret, url
-            )
+            refresh.refresh(system_id, consumer_key, token_key, token_secret, url)
         script_path = Path(self.tmpdir) / script_name
         mock_popen.assert_called_once_with(
             ["sudo", "-E", str(script_path)],

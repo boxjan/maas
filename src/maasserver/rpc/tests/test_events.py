@@ -54,9 +54,7 @@ class TestSendEvent(MAASServerTestCase):
         node = factory.make_Node()
         description = factory.make_name("description")
         timestamp = datetime.datetime.utcnow()
-        events.send_event(
-            node.system_id, event_type.name, description, timestamp
-        )
+        events.send_event(node.system_id, event_type.name, description, timestamp)
         # Doesn't raise a DoesNotExist error.
         Event.objects.get(
             node=node,
@@ -141,9 +139,7 @@ class TestSendEventIPAddress(MAASServerTestCase):
         ip = factory.make_StaticIPAddress(
             interface=node.current_config.interface_set.first()
         )
-        events.send_event_ip_address(
-            ip.ip, event_type.name, description, timestamp
-        )
+        events.send_event_ip_address(ip.ip, event_type.name, description, timestamp)
         # Doesn't raise a DoesNotExist error.
         Event.objects.get(
             node=node,
@@ -168,9 +164,7 @@ class TestSendEventIPAddress(MAASServerTestCase):
         ip = factory.make_StaticIPAddress()
         for interface in node.current_config.interface_set.all():
             ip.interface_set.add(interface)
-        events.send_event_ip_address(
-            ip.ip, event_type.name, description, timestamp
-        )
+        events.send_event_ip_address(ip.ip, event_type.name, description, timestamp)
         # Doesn't raise a DoesNotExist error.
         Event.objects.get(
             node=node,

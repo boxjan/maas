@@ -174,9 +174,7 @@ def update_foreign_dhcp(system_id, interface_name, dhcp_ip=None):
     """
     rack_controller = RackController.objects.get(system_id=system_id)
     interface = (
-        rack_controller.current_config.interface_set.filter(
-            name=interface_name
-        )
+        rack_controller.current_config.interface_set.filter(name=interface_name)
         .select_related("vlan")
         .first()
     )

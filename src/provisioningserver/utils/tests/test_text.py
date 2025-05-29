@@ -31,9 +31,7 @@ class TestNormaliseWhitespace(MAASTestCase):
         self.assertEqual("word", normalise_whitespace("word "))
 
     def test_replaces_any_whitespace_sequence_with_single_space(self):
-        self.assertEqual(
-            "one two three", normalise_whitespace("one   two\t\nthree")
-        )
+        self.assertEqual("one two three", normalise_whitespace("one   two\t\nthree"))
 
     def test_treats_punctuation_as_non_space(self):
         punctuation = ".?;:!"
@@ -60,9 +58,7 @@ class TestNormaliseToCommaList(MAASTestCase):
     @hypothesis.given(delimiters)
     def test_eliminates_empty_words(self, delimiter):
         word = factory.make_name("word")
-        self.assertEqual(
-            word, normalise_to_comma_list(delimiter + word + delimiter)
-        )
+        self.assertEqual(word, normalise_to_comma_list(delimiter + word + delimiter))
 
 
 class TestNormalizeToCommaListScenarios(MAASTestCase):

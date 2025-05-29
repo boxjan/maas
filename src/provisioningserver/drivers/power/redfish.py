@@ -38,9 +38,7 @@ maaslog = get_maas_logger("drivers.power.redfish")
 
 
 # no trailing slashes
-REDFISH_POWER_CONTROL_ENDPOINT = (
-    b"redfish/v1/Systems/%s/Actions/ComputerSystem.Reset"
-)
+REDFISH_POWER_CONTROL_ENDPOINT = b"redfish/v1/Systems/%s/Actions/ComputerSystem.Reset"
 
 REDFISH_SYSTEMS_ENDPOINT = b"redfish/v1/Systems"
 
@@ -98,15 +96,11 @@ class RedfishPowerDriverBase(PowerDriver):
                 if etag:
                     headers.addRawHeader(b"If-Match", etag)
                 return (
-                    yield self._redfish_request(
-                        method, uri, headers, get_bodyProducer
-                    )
+                    yield self._redfish_request(method, uri, headers, get_bodyProducer)
                 )
             except Exception as e:
                 if retries == MAX_REQUEST_RETRIES:
-                    maaslog.error(
-                        "Maximum number of retries reached. Giving up!"
-                    )
+                    maaslog.error("Maximum number of retries reached. Giving up!")
                     raise e
                 maaslog.info(
                     "Power action failure: %s. This is the try number %d out of 6.",
@@ -124,12 +118,8 @@ class RedfishPowerDriverBase(PowerDriver):
         get_bodyProducer: Callable = lambda: None,
     ):
         """Send the Redfish request and return the response."""
-        agent = RedirectAgent(
-            Agent(reactor, contextFactory=WebClientContextFactory())
-        )
-        d = agent.request(
-            method, uri, headers=headers, bodyProducer=get_bodyProducer()
-        )
+        agent = RedirectAgent(Agent(reactor, contextFactory=WebClientContextFactory()))
+        d = agent.request(method, uri, headers=headers, bodyProducer=get_bodyProducer())
 
         def render_response(response, uri):
             """Render the HTTPS response received."""
@@ -261,9 +251,7 @@ class RedfishPowerDriver(RedfishPowerDriverBase):
     def get_etag(self, url, node_id, headers):
         """Get the system Etag suggested for PATCH calls"""
         uri = join(url, REDFISH_SYSTEMS_ENDPOINT, b"%s" % node_id)
-        node_data, node_headers = yield self.redfish_request(
-            b"GET", uri, headers
-        )
+        node_data, node_headers = yield self.redfish_request(b"GET", uri, headers)
         etag = node_data.get("@odata.etag")
         if etag is None and node_headers.getRawHeaders("etag"):
             etag = node_headers.getRawHeaders("etag")[0]
@@ -320,9 +308,7 @@ class RedfishPowerDriver(RedfishPowerDriverBase):
 
         def _get_bodyProducer():
             return FileBodyProducer(
-                BytesIO(
-                    json.dumps({"ResetType": power_change}).encode("utf-8")
-                )
+                BytesIO(json.dumps({"ResetType": power_change}).encode("utf-8"))
             )
 
         yield self.redfish_request(
@@ -420,9 +406,7 @@ class RedfishPowerDriver(RedfishPowerDriverBase):
                     sleep_time,
                 )
                 yield pause(sleep_time)
-                return (
-                    yield self._power_query(url, node_id, headers, retries + 1)
-                )
+                return (yield self._power_query(url, node_id, headers, retries + 1))
             case _:
                 maaslog.error(
                     "Redfish returned the unexpected power state '%s' for the BMC card in node %s.",

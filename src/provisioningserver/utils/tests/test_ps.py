@@ -96,12 +96,8 @@ class TestIsPIDInContainer(MAASTestCase):
         pid = random.randint(1, 1000)
         pid_path = os.path.join(proc_path, str(pid))
         os.mkdir(pid_path)
-        atomic_write(
-            self.cgroup.encode("ascii"), os.path.join(pid_path, "cgroup")
-        )
-        self.assertEqual(
-            self.result, is_pid_in_container(pid, proc_path=proc_path)
-        )
+        atomic_write(self.cgroup.encode("ascii"), os.path.join(pid_path, "cgroup"))
+        self.assertEqual(self.result, is_pid_in_container(pid, proc_path=proc_path))
 
 
 class TestRunningInContainer(MAASTestCase):
@@ -128,9 +124,7 @@ class TestGetRunningPIDsWithCommand(MAASTestCase):
         os.mkdir(pid_path)
         atomic_write(cgroup.encode("ascii"), os.path.join(pid_path, "cgroup"))
         if command is not None:
-            atomic_write(
-                command.encode("ascii"), os.path.join(pid_path, "comm")
-            )
+            atomic_write(command.encode("ascii"), os.path.join(pid_path, "comm"))
 
     def make_init_process(self, proc_path, in_container=False):
         self.make_process(proc_path, 1, in_container=in_container)
@@ -144,17 +138,11 @@ class TestGetRunningPIDsWithCommand(MAASTestCase):
             self.make_process(proc_path, pid, command=command)
         pids_not_running_command = random.sample(range(1000, 2000), 3)
         for pid in pids_not_running_command:
-            self.make_process(
-                proc_path, pid, command=factory.make_name("command")
-            )
+            self.make_process(proc_path, pid, command=factory.make_name("command"))
         pids_running_command_in_container = random.sample(range(2000, 3000), 3)
         for pid in pids_running_command_in_container:
-            self.make_process(
-                proc_path, pid, in_container=True, command=command
-            )
-        mock_running_in_container = self.patch(
-            ps_module, "running_in_container"
-        )
+            self.make_process(proc_path, pid, in_container=True, command=command)
+        mock_running_in_container = self.patch(ps_module, "running_in_container")
         mock_running_in_container.return_value = False
         self.assertCountEqual(
             pids_running_command,
@@ -180,9 +168,7 @@ class TestGetRunningPIDsWithCommand(MAASTestCase):
         command = factory.make_name("command")
         pids_running_command = random.sample(range(2, 1000), 3)
         for pid in pids_running_command:
-            self.make_process(
-                proc_path, pid, in_container=True, command=command
-            )
+            self.make_process(proc_path, pid, in_container=True, command=command)
         pids_not_running_command = random.sample(range(1000, 2000), 3)
         for pid in pids_not_running_command:
             self.make_process(
@@ -191,9 +177,7 @@ class TestGetRunningPIDsWithCommand(MAASTestCase):
                 in_container=True,
                 command=factory.make_name("command"),
             )
-        mock_running_in_container = self.patch(
-            ps_module, "running_in_container"
-        )
+        mock_running_in_container = self.patch(ps_module, "running_in_container")
         mock_running_in_container.return_value = True
         self.assertCountEqual(
             pids_running_command,

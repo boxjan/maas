@@ -21,9 +21,7 @@ def getRegionClient():
     try:
         rpc_service = provisioningserver.services.getServiceNamed("rpc")
     except KeyError:
-        raise exceptions.NoConnectionsAvailable(
-            "Cluster services are unavailable."
-        )
+        raise exceptions.NoConnectionsAvailable("Cluster services are unavailable.")
     else:
         # won't scale connections if existing connections are busy, but will always return connection if one exists
         return rpc_service.getClient(busy_ok=True)

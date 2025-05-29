@@ -186,8 +186,7 @@ class TestDiscoverPod(MAASTestCase):
             name=factory.make_name("name"),
             project=factory.make_name("project"),
             pods=[
-                DiscoveredPod(name=factory.make_name("pod-name"))
-                for _ in range(0, 3)
+                DiscoveredPod(name=factory.make_name("pod-name")) for _ in range(0, 3)
             ],
         )
         fake_driver.discover.return_value = returnValue(expected_cluster)
@@ -209,9 +208,7 @@ class TestComposeMachine(MAASTestCase):
             cores=random.randint(1, 8),
             cpu_speed=random.randint(1000, 3000),
             memory=random.randint(1024, 8192),
-            block_devices=[
-                RequestedMachineBlockDevice(size=random.randint(8, 16))
-            ],
+            block_devices=[RequestedMachineBlockDevice(size=random.randint(8, 16))],
             interfaces=[RequestedMachineInterface()],
         )
 
@@ -474,9 +471,7 @@ class TestSendPodCommissioningResults(MAASTestCase):
                     status="WORKING",
                     files={
                         filename1: json.dumps(data1, indent=4).encode(),
-                        f"{filename1}.out": json.dumps(
-                            data1, indent=4
-                        ).encode(),
+                        f"{filename1}.out": json.dumps(data1, indent=4).encode(),
                         f"{filename1}.err": b"",
                         f"{filename1}.yaml": b"",
                     },
@@ -493,9 +488,7 @@ class TestSendPodCommissioningResults(MAASTestCase):
                     status="WORKING",
                     files={
                         filename2: json.dumps(data2, indent=4).encode(),
-                        f"{filename2}.out": json.dumps(
-                            data2, indent=4
-                        ).encode(),
+                        f"{filename2}.out": json.dumps(data2, indent=4).encode(),
                         f"{filename2}.err": b"",
                         f"{filename2}.yaml": b"",
                     },
@@ -538,9 +531,7 @@ class TestSendPodCommissioningResults(MAASTestCase):
     @inlineCallbacks
     def test_handles_driver_raising_NotImplementedError(self):
         fake_driver = MagicMock()
-        fake_driver.get_commissioning_data.return_value = fail(
-            NotImplementedError()
-        )
+        fake_driver.get_commissioning_data.return_value = fail(NotImplementedError())
         self.patch(PodDriverRegistry, "get_item").return_value = fake_driver
         with self.assertRaises(NotImplementedError):
             yield pods.send_pod_commissioning_results(
@@ -591,9 +582,7 @@ class TestDecomposeMachine(MAASTestCase):
         pod_id = random.randint(1, 10)
         pod_name = factory.make_name("pod")
         with self.assertRaises(exceptions.UnknownPodType):
-            yield pods.decompose_machine(
-                unknown_type, {}, pod_id=pod_id, name=pod_name
-            )
+            yield pods.decompose_machine(unknown_type, {}, pod_id=pod_id, name=pod_name)
 
     @inlineCallbacks
     def test_handles_driver_not_returning_Deferred(self):

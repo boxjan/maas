@@ -55,9 +55,7 @@ DISPLAYED_BLOCKDEVICE_FIELDS = (
 )
 
 
-def raise_error_for_invalid_state_on_allocated_operations(
-    node, user, operation
-):
+def raise_error_for_invalid_state_on_allocated_operations(node, user, operation):
     if node.status not in [NODE_STATUS.READY, NODE_STATUS.ALLOCATED]:
         raise NodeStateViolation(
             "Cannot %s block device because the machine is not Ready "
@@ -388,17 +386,11 @@ class BlockDeviceHandler(OperationsHandler):
                 )
         else:
             if device.type == "physical":
-                form = UpdatePhysicalBlockDeviceForm(
-                    instance=device, data=request.data
-                )
+                form = UpdatePhysicalBlockDeviceForm(instance=device, data=request.data)
             elif device.type == "virtual":
-                form = UpdateVirtualBlockDeviceForm(
-                    instance=device, data=request.data
-                )
+                form = UpdateVirtualBlockDeviceForm(instance=device, data=request.data)
             else:
-                raise ValueError(
-                    "Cannot update block device of type %s" % device.type
-                )
+                raise ValueError("Cannot update block device of type %s" % device.type)
         if form.is_valid():
             return form.save()
         else:
@@ -581,8 +573,7 @@ class BlockDeviceHandler(OperationsHandler):
             raise MAASAPIBadRequest(
                 "Filesystem is part of a %s, and cannot be "
                 "unformatted. Remove block device from %s "
-                "before unformatting the block device."
-                % (nice_name, nice_name)
+                "before unformatting the block device." % (nice_name, nice_name)
             )
         filesystem.delete()
         return device

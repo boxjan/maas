@@ -36,9 +36,7 @@ def pre_delete_record_relations_on_delete(sender, instance, **kwargs):
     instance.__previous_dnsresources = set(instance.dnsresource_set.all())
 
 
-signals.watch(
-    pre_delete, pre_delete_record_relations_on_delete, sender=StaticIPAddress
-)
+signals.watch(pre_delete, pre_delete_record_relations_on_delete, sender=StaticIPAddress)
 
 
 def post_delete_remake_sip_for_bmc(sender, instance, **kwargs):
@@ -59,9 +57,7 @@ def post_delete_remake_sip_for_bmc(sender, instance, **kwargs):
         bmc.save()
 
 
-signals.watch(
-    post_delete, post_delete_remake_sip_for_bmc, sender=StaticIPAddress
-)
+signals.watch(post_delete, post_delete_remake_sip_for_bmc, sender=StaticIPAddress)
 
 
 def post_delete_clean_up_dns(sender, instance, **kwargs):
@@ -170,12 +166,8 @@ def post_delete_check_range_utilization(sender, instance, **kwargs):
     instance.subnet.update_allocation_notification()
 
 
-signals.watch(
-    post_save, post_save_check_range_utilization, sender=StaticIPAddress
-)
-signals.watch(
-    post_delete, post_delete_check_range_utilization, sender=StaticIPAddress
-)
+signals.watch(post_save, post_save_check_range_utilization, sender=StaticIPAddress)
+signals.watch(post_delete, post_delete_check_range_utilization, sender=StaticIPAddress)
 
 
 # Enable all signals by default.

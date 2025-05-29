@@ -102,21 +102,13 @@ class PackageRepository(CleanSave, TimestampedModel):
 
     name = CharField(max_length=41, unique=True, default="")
 
-    url = URLOrPPAField(
-        blank=False, help_text="The URL of the PackageRepository."
-    )
+    url = URLOrPPAField(blank=False, help_text="The URL of the PackageRepository.")
 
-    distributions = ArrayField(
-        TextField(), blank=True, null=True, default=list
-    )
+    distributions = ArrayField(TextField(), blank=True, null=True, default=list)
 
-    disabled_pockets = ArrayField(
-        TextField(), blank=True, null=True, default=list
-    )
+    disabled_pockets = ArrayField(TextField(), blank=True, null=True, default=list)
 
-    disabled_components = ArrayField(
-        TextField(), blank=True, null=True, default=list
-    )
+    disabled_components = ArrayField(TextField(), blank=True, null=True, default=list)
 
     disable_sources = BooleanField(default=True)
 

@@ -111,12 +111,8 @@ class VMClusterHandler(TimestampedModelHandler):
             "project": cluster.project,
             "hosts": [self._dehydrate_vmhost(vmhost) for vmhost in vmhosts],
             "total_resources": self._dehydrate_resources(resources),
-            "virtual_machines": [
-                self._dehydrate_virtual_machine(vm) for vm in vms
-            ],
-            "resource_pool": (
-                cluster.pool.id if cluster.pool is not None else ""
-            ),
+            "virtual_machines": [self._dehydrate_virtual_machine(vm) for vm in vms],
+            "resource_pool": (cluster.pool.id if cluster.pool is not None else ""),
             "availability_zone": cluster.zone.id,
             "version": (vmhosts[0].version if len(vmhosts) > 0 else ""),
             "created_at": self.dehydrate_created(cluster.created),
@@ -128,9 +124,7 @@ class VMClusterHandler(TimestampedModelHandler):
         def get_objects(params):
             # Clear rbac cache before check (this is in its own thread).
             rbac.clear()
-            return VMCluster.objects.get_clusters(
-                self.user, self._meta.view_permission
-            )
+            return VMCluster.objects.get_clusters(self.user, self._meta.view_permission)
 
         @transactional
         def render_objects(objs):

@@ -37,9 +37,7 @@ class NoSuchNode(Exception):
 
     @classmethod
     def from_mac_address(cls, mac_address):
-        return cls(
-            "Node with mac_address=%s could not be found." % mac_address
-        )
+        return cls("Node with mac_address=%s could not be found." % mac_address)
 
 
 class NodeStateViolation(Exception):
@@ -51,9 +49,7 @@ class NoSuchCluster(Exception):
 
     @classmethod
     def from_uuid(cls, uuid):
-        return cls(
-            "The rack controller with UUID %s could not be found." % uuid
-        )
+        return cls("The rack controller with UUID %s could not be found." % uuid)
 
 
 class NoSuchOperatingSystem(Exception):

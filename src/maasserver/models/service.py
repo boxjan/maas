@@ -77,9 +77,7 @@ class ServiceManager(Manager):
         this should be called to update the services for `node`.
         """
         # Grab all current services for the node.
-        services = {
-            service.name: service for service in self.filter(node=node)
-        }
+        services = {service.name: service for service in self.filter(node=node)}
 
         # Expected services that should be on the node.
         expected_services = None
@@ -100,9 +98,7 @@ class ServiceManager(Manager):
         # Create the missing services.
         for service in expected_services:
             if service not in services:
-                self.create(
-                    node=node, name=service, status=SERVICE_STATUS.UNKNOWN
-                )
+                self.create(node=node, name=service, status=SERVICE_STATUS.UNKNOWN)
 
     def update_service_for(self, node, service, status, status_info=""):
         """Update `service` for `node` with `status`."""
@@ -160,9 +156,7 @@ class Service(CleanSave, TimestampedModel):
         editable=False,
     )
 
-    status_info = CharField(
-        max_length=255, null=False, blank=True, editable=False
-    )
+    status_info = CharField(max_length=255, null=False, blank=True, editable=False)
 
     def __str__(self):
         info = f"{self.name} - {self.status}"

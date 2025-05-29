@@ -46,17 +46,14 @@ def make_rackcontrollers(
         make_scripts(rackcontroller, lxd_info)
         rackcontrollers.append(rackcontroller)
 
-        ControllerInfo.objects.create(
-            node=rackcontroller, version=running_version
-        )
+        ControllerInfo.objects.create(node=rackcontroller, version=running_version)
 
     return rackcontrollers
 
 
 def make_rackcontrollers_primary_or_secondary(rackcontrollers, vlans):
     rack_groups = (
-        rackcontrollers[idx : idx + 2]
-        for idx in range(0, len(rackcontrollers), 2)
+        rackcontrollers[idx : idx + 2] for idx in range(0, len(rackcontrollers), 2)
     )
     for vlan in chain(*vlans.values()):
         try:

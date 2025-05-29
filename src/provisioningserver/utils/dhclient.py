@@ -47,14 +47,12 @@ def get_dhclient_info(proc_path="/proc"):
     """Return dictionary mapping interfaces to assigned address from
     dhclient.
     """
-    dhclient_pids = get_running_pids_with_command(
-        "dhclient", proc_path=proc_path
-    )
+    dhclient_pids = get_running_pids_with_command("dhclient", proc_path=proc_path)
     dhclient_info = {}
     for pid in dhclient_pids:
-        cmdline = read_text_file(
-            os.path.join(proc_path, str(pid), "cmdline")
-        ).split("\x00")
+        cmdline = read_text_file(os.path.join(proc_path, str(pid), "cmdline")).split(
+            "\x00"
+        )
         if "-lf" in cmdline:
             idx_lf = cmdline.index("-lf")
             lease_path = cmdline[idx_lf + 1]  # After '-lf' option.

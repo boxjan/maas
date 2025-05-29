@@ -52,9 +52,7 @@ class TestResourcePoolsAPI(APITestCase.ForUser):
         pools.append(ResourcePool.objects.get_default_resource_pool())
         pools.sort(key=attrgetter("name"))
         response = self.client.get(reverse("resourcepools_handler"), {})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertCountEqual(
             [
@@ -84,9 +82,7 @@ class TestResourcePoolsAPIWithRBAC(APITestCase.ForUser):
         for _ in range(3):
             factory.make_ResourcePool()
         response = self.client.get(reverse("resourcepools_handler"), {})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual([], result)
 
@@ -97,9 +93,7 @@ class TestResourcePoolsAPIWithRBAC(APITestCase.ForUser):
         viewable = random.choice(pools)
         self.store.allow(self.user.username, viewable, "view")
         response = self.client.get(reverse("resourcepools_handler"), {})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertCountEqual(
             [

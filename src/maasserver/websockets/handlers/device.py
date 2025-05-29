@@ -191,23 +191,17 @@ class DeviceHandler(NodeHandler):
         # We handle interfaces ourselves, because of ip_assignment.
         boot_interface = obj.get_boot_interface()
         data["primary_mac"] = (
-            "%s" % boot_interface.mac_address
-            if boot_interface is not None
-            else ""
+            "%s" % boot_interface.mac_address if boot_interface is not None else ""
         )
 
         if for_list:
             # Put the boot interface ip assignment/address in the device data.
-            data["ip_assignment"] = self.dehydrate_ip_assignment(
-                obj, boot_interface
-            )
+            data["ip_assignment"] = self.dehydrate_ip_assignment(obj, boot_interface)
             data["ip_address"] = self.dehydrate_ip_address(obj, boot_interface)
         else:
             data["interfaces"] = [
                 self.dehydrate_interface(interface, obj)
-                for interface in obj.current_config.interface_set.all().order_by(
-                    "name"
-                )
+                for interface in obj.current_config.interface_set.all().order_by("name")
             ]
             # Propogate the boot interface ip assignment/address to the device.
             for iface_data in data["interfaces"]:
@@ -270,9 +264,7 @@ class DeviceHandler(NodeHandler):
 
         # Cleanup any fields that have a None value.
         new_params = {
-            key: value
-            for key, value in new_params.items()
-            if value is not None
+            key: value for key, value in new_params.items() if value is not None
         }
         return super().preprocess_form(action, new_params)
 
@@ -282,12 +274,8 @@ class DeviceHandler(NodeHandler):
         interface.ip_addresses.all().delete()
         if ip_assignment == DEVICE_IP_ASSIGNMENT_TYPE.EXTERNAL:
             if "ip_address" not in params:
-                raise ValidationError(
-                    {"ip_address": ["IP address must be specified"]}
-                )
-            subnet = Subnet.objects.get_best_subnet_for_ip(
-                params["ip_address"]
-            )
+                raise ValidationError({"ip_address": ["IP address must be specified"]})
+            subnet = Subnet.objects.get_best_subnet_for_ip(params["ip_address"])
             sticky_ip = StaticIPAddress.objects.create(
                 alloc_type=IPADDRESS_TYPE.USER_RESERVED,
                 ip=params["ip_address"],
@@ -411,9 +399,7 @@ class DeviceHandler(NodeHandler):
         """Perform the action on the object."""
         obj = self.get_object(params, permission=self._meta.edit_permission)
         action_name = params.get("action")
-        action = get_node_action(
-            obj, action_name, self.user, request=self.request
-        )
+        action = get_node_action(obj, action_name, self.user, request=self.request)
         if action is None:
             raise NodeActionError(
                 "%s action is not available for this device." % action_name

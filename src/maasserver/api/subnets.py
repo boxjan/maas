@@ -174,9 +174,7 @@ class SubnetHandler(OperationsHandler):
         @error-example "not-found"
             No Subnet matches the given query.
         """
-        return Subnet.objects.get_subnet_or_404(
-            id, request.user, NodePermission.view
-        )
+        return Subnet.objects.get_subnet_or_404(id, request.user, NodePermission.view)
 
     def update(self, request, id):
         """@description-title Update a subnet
@@ -302,9 +300,7 @@ class SubnetHandler(OperationsHandler):
         @error-example "not-found"
             No Subnet matches the given query.
         """
-        subnet = Subnet.objects.get_subnet_or_404(
-            id, request.user, NodePermission.view
-        )
+        subnet = Subnet.objects.get_subnet_or_404(id, request.user, NodePermission.view)
         return subnet.get_ipranges_in_use().render_json()
 
     @operation(idempotent=True)
@@ -325,12 +321,8 @@ class SubnetHandler(OperationsHandler):
         @error-example "not-found"
             No Subnet matches the given query.
         """
-        subnet = Subnet.objects.get_subnet_or_404(
-            id, request.user, NodePermission.view
-        )
-        return subnet.get_ipranges_not_in_use().render_json(
-            include_purpose=False
-        )
+        subnet = Subnet.objects.get_subnet_or_404(id, request.user, NodePermission.view)
+        return subnet.get_ipranges_not_in_use().render_json(include_purpose=False)
 
     @operation(idempotent=True)
     def statistics(self, request, id):
@@ -373,9 +365,7 @@ class SubnetHandler(OperationsHandler):
         @error-example "not-found"
             No Subnet matches the given query.
         """
-        subnet = Subnet.objects.get_subnet_or_404(
-            id, request.user, NodePermission.view
-        )
+        subnet = Subnet.objects.get_subnet_or_404(id, request.user, NodePermission.view)
         include_ranges = get_optional_param(
             request.GET, "include_ranges", default=False, validator=StringBool
         )
@@ -421,9 +411,7 @@ class SubnetHandler(OperationsHandler):
         @error-example "not-found"
             No Subnet matches the given query.
         """
-        subnet = Subnet.objects.get_subnet_or_404(
-            id, request.user, NodePermission.view
-        )
+        subnet = Subnet.objects.get_subnet_or_404(id, request.user, NodePermission.view)
         with_username = get_optional_param(
             request.GET, "with_username", default=True, validator=StringBool
         )

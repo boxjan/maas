@@ -78,9 +78,7 @@ class Command(BaseCommand):
         triggers = cls._get_all_triggers(database)
         with connections[database].cursor() as cursor:
             for trigger_name, table in triggers:
-                cursor.execute(
-                    f"DROP TRIGGER IF EXISTS {trigger_name} ON {table};"
-                )
+                cursor.execute(f"DROP TRIGGER IF EXISTS {trigger_name} ON {table};")
 
     @classmethod
     def _drop_all_views(cls, database):
@@ -169,13 +167,9 @@ class Command(BaseCommand):
 
         schema_path = get_path("/var/lib/temporal/schema")
 
-        temporal_schema_path = os.path.join(
-            schema_path, "temporal", "versioned"
-        )
+        temporal_schema_path = os.path.join(schema_path, "temporal", "versioned")
 
-        visibility_schema_path = os.path.join(
-            schema_path, "visibility", "versioned"
-        )
+        visibility_schema_path = os.path.join(schema_path, "visibility", "versioned")
 
         # This multi-step approach is taken from Temporal auto-setup:
         # https://github.com/temporalio/docker-builds/blob/0e21f3235ec3168d851a6457aa1b1e9c5ac15fc1/docker/auto-setup.sh#L204
@@ -189,9 +183,7 @@ class Command(BaseCommand):
                     "UPDATE temporal.schema_version set db_name = current_database()"
                 )
 
-            cursor.execute(
-                "SELECT to_regclass('temporal_visibility.schema_version')"
-            )
+            cursor.execute("SELECT to_regclass('temporal_visibility.schema_version')")
             if not cursor.fetchone()[0]:
                 setup_temporal_visibility_schema = True
             else:
@@ -247,16 +239,13 @@ class Command(BaseCommand):
         self._drop_all_triggers(database)
 
         # Run the django builtin migrations.
-        call_command(
-            "migrate", interactive=False, verbosity=options.get("verbosity")
-        )
+        call_command("migrate", interactive=False, verbosity=options.get("verbosity"))
 
         # Make sure we're going to see the same database as the migrations
         # have left behind.
         if connections[database].in_atomic_block:
             raise AssertionError(
-                "An ongoing transaction may hide changes made "
-                "by external processes."
+                "An ongoing transaction may hide changes made " "by external processes."
             )
 
         # Install all database functions, triggers, and views. This is

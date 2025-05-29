@@ -18,19 +18,14 @@ from maasserver.testing.testcase import MAASServerTestCase
 # duplicated from dnsdata.py so as to not export them
 INVALID_CNAME_MSG = "Invalid CNAME: Should be '<server>'."
 INVALID_MX_MSG = (
-    "Invalid MX: Should be '<preference> <server>'."
-    " Range for preference is 0-65535."
+    "Invalid MX: Should be '<preference> <server>'." " Range for preference is 0-65535."
 )
 INVALID_SRV_MSG = (
     "Invalid SRV: Should be '<priority> <weight> <port> <server>'."
     " Range for priority, weight, and port are 0-65536."
 )
-INVALID_SSHFP_MSG = (
-    "Invalid SSHFP: Should be '<algorithm> <fptype> <fingerprint>'."
-)
-CNAME_AND_OTHER_MSG = (
-    "CNAME records for a name cannot coexist with non-CNAME records."
-)
+INVALID_SSHFP_MSG = "Invalid SSHFP: Should be '<algorithm> <fptype> <fingerprint>'."
+CNAME_AND_OTHER_MSG = "CNAME records for a name cannot coexist with non-CNAME records."
 MULTI_CNAME_MSG = "Only one CNAME can be associated with a name."
 
 
@@ -40,9 +35,7 @@ class TestDNSDataManagerGetDNSDataOr404(MAASServerTestCase):
         dnsdata = factory.make_DNSData()
         self.assertEqual(
             dnsdata,
-            DNSData.objects.get_dnsdata_or_404(
-                dnsdata.id, user, NodePermission.view
-            ),
+            DNSData.objects.get_dnsdata_or_404(dnsdata.id, user, NodePermission.view),
         )
 
     def test_user_edit_raises_PermissionError(self):
@@ -72,9 +65,7 @@ class TestDNSDataManagerGetDNSDataOr404(MAASServerTestCase):
         dnsdata = factory.make_DNSData()
         self.assertEqual(
             dnsdata,
-            DNSData.objects.get_dnsdata_or_404(
-                dnsdata.id, admin, NodePermission.view
-            ),
+            DNSData.objects.get_dnsdata_or_404(dnsdata.id, admin, NodePermission.view),
         )
 
     def test_admin_edit_returns_dnsdata(self):
@@ -82,9 +73,7 @@ class TestDNSDataManagerGetDNSDataOr404(MAASServerTestCase):
         dnsdata = factory.make_DNSData()
         self.assertEqual(
             dnsdata,
-            DNSData.objects.get_dnsdata_or_404(
-                dnsdata.id, admin, NodePermission.edit
-            ),
+            DNSData.objects.get_dnsdata_or_404(dnsdata.id, admin, NodePermission.edit),
         )
 
     def test_admin_admin_returns_dnsdata(self):
@@ -92,9 +81,7 @@ class TestDNSDataManagerGetDNSDataOr404(MAASServerTestCase):
         dnsdata = factory.make_DNSData()
         self.assertEqual(
             dnsdata,
-            DNSData.objects.get_dnsdata_or_404(
-                dnsdata.id, admin, NodePermission.admin
-            ),
+            DNSData.objects.get_dnsdata_or_404(dnsdata.id, admin, NodePermission.admin),
         )
 
 
@@ -104,9 +91,7 @@ class TestDNSData(MAASServerTestCase):
         domain = factory.make_Domain()
         dnsdata = factory.make_DNSData(name=name, domain=domain)
         from_db = DNSData.objects.get(dnsresource__name=name)
-        self.assertEqual(
-            (from_db.dnsresource.name, from_db.id), (name, dnsdata.id)
-        )
+        self.assertEqual((from_db.dnsresource.name, from_db.id), (name, dnsdata.id))
 
     # The following tests intentionally pass in a lowercase rrtype,
     # which will be upshifted in the creation of the DNSData record.
@@ -125,9 +110,7 @@ class TestDNSData(MAASServerTestCase):
     def test_rejects_bad_cname_target(self):
         target = factory.make_name("na*e")
         dnsresource = factory.make_DNSResource(no_ip_addresses=True)
-        dnsdata = DNSData(
-            dnsresource=dnsresource, rrtype="CNAME", rrdata=target
-        )
+        dnsdata = DNSData(dnsresource=dnsresource, rrtype="CNAME", rrdata=target)
         with self.assertRaisesRegex(
             ValidationError,
             re.escape("{'__all__': [\"%s\"]}" % INVALID_CNAME_MSG),
@@ -141,9 +124,7 @@ class TestDNSData(MAASServerTestCase):
 
     def test_rejects_bad_sshfp_record(self):
         dnsresource = factory.make_DNSResource(no_ip_addresses=True)
-        dnsdata = DNSData(
-            dnsresource=dnsresource, rrtype="SSHFP", rrdata="wrong data"
-        )
+        dnsdata = DNSData(dnsresource=dnsresource, rrtype="SSHFP", rrdata="wrong data")
         with self.assertRaisesRegex(
             ValidationError,
             re.escape("{'__all__': [\"%s\"]}" % INVALID_SSHFP_MSG),
@@ -174,9 +155,7 @@ class TestDNSData(MAASServerTestCase):
             random.randint(1, 65535),
             target,
         )
-        dnsdata = factory.make_DNSData(
-            rrtype="srv", rrdata=data, name=srv_name
-        )
+        dnsdata = factory.make_DNSData(rrtype="srv", rrdata=data, name=srv_name)
         from_db = DNSData.objects.get(dnsresource__name=srv_name)
         self.assertEqual(
             (
@@ -229,18 +208,12 @@ class TestDNSData(MAASServerTestCase):
                 ValidationError,
                 re.escape("{'__all__': ['%s']}" % MULTI_CNAME_MSG),
             ):
-                factory.make_DNSData(
-                    dnsresource=dnsdata.dnsresource, rrtype="CNAME"
-                )
+                factory.make_DNSData(dnsresource=dnsdata.dnsresource, rrtype="CNAME")
         else:
-            factory.make_DNSData(
-                dnsresource=dnsdata.dnsresource, rrtype=dnsdata.rrtype
-            )
+            factory.make_DNSData(dnsresource=dnsdata.dnsresource, rrtype=dnsdata.rrtype)
             self.assertEqual(
                 2,
-                DNSData.objects.filter(
-                    dnsresource=dnsdata.dnsresource
-                ).count(),
+                DNSData.objects.filter(dnsresource=dnsdata.dnsresource).count(),
             )
 
 
@@ -255,9 +228,7 @@ class TestDNSDataMapping(MAASServerTestCase):
             h_name = dnsresource.name
             # Yes, dnsrr.name='@' and domain.name='maas' hits this, and we find
             # nothing, which is what we need to find.
-            nodes = Node.objects.filter(
-                hostname=h_name, domain=dnsresource.domain
-            )
+            nodes = Node.objects.filter(hostname=h_name, domain=dnsresource.domain)
         if nodes.exists():
             node = nodes.first()
             system_id = node.system_id
@@ -318,13 +289,9 @@ class TestDNSDataMapping(MAASServerTestCase):
         domain = factory.make_Domain(name=d_name)
         expected_mapping = {}
         # Make a node that is at the top of the domain, and a couple others.
-        dnsrr = factory.make_DNSResource(
-            name="@", domain=domain, no_ip_addresses=True
-        )
+        dnsrr = factory.make_DNSResource(name="@", domain=domain, no_ip_addresses=True)
         factory.make_DNSData(dnsresource=dnsrr, ip_addresses=True)
-        factory.make_Node_with_Interface_on_Subnet(
-            hostname=name, domain=parent
-        )
+        factory.make_Node_with_Interface_on_Subnet(hostname=name, domain=parent)
         expected_mapping.update(self.make_mapping(dnsrr))
         # Add one resource to the domain which has no data, so it should not be
         # in the returned mapping.
@@ -374,7 +341,5 @@ class TestDNSDataMapping(MAASServerTestCase):
             expected_mapping = {}
             for dnsrr in dom.dnsresource_set.all():
                 expected_mapping.update(self.make_mapping(dnsrr, raw_ttl=True))
-            actual = DNSData.objects.get_hostname_dnsdata_mapping(
-                dom, raw_ttl=True
-            )
+            actual = DNSData.objects.get_hostname_dnsdata_mapping(dom, raw_ttl=True)
             self.assertEqual(expected_mapping, actual)

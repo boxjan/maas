@@ -44,16 +44,10 @@ class TestUpdateServices(MAASTransactionServerTestCase):
         )
 
     def test_update_services_updates_all_services(self):
-        services = {
-            service: self.make_service(service) for service in RACK_SERVICES
-        }
+        services = {service: self.make_service(service) for service in RACK_SERVICES}
         rack_controller = factory.make_RackController()
         update_services(rack_controller.system_id, services.values())
         for service_name in RACK_SERVICES:
-            service = Service.objects.get(
-                node=rack_controller, name=service_name
-            )
+            service = Service.objects.get(node=rack_controller, name=service_name)
             self.assertEqual(service.status, services[service_name]["status"])
-            self.assertEqual(
-                service.status_info, services[service_name]["status_info"]
-            )
+            self.assertEqual(service.status_info, services[service_name]["status_info"])

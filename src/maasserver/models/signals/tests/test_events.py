@@ -60,9 +60,7 @@ class TestStatusTransitionEvent(MAASServerTestCase):
             NODE_STATUS_CHOICES_DICT[node.status],
             user.username,
         )
-        self.assertEqual(
-            EVENT_TYPES.NODE_CHANGED_STATUS, latest_event.type.name
-        )
+        self.assertEqual(EVENT_TYPES.NODE_CHANGED_STATUS, latest_event.type.name)
         self.assertEqual(
             EVENT_DETAILS[EVENT_TYPES.NODE_CHANGED_STATUS].description,
             latest_event.type.description,

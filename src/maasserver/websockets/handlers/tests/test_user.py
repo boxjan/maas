@@ -89,9 +89,7 @@ class TestUserHandler(MAASServerTestCase):
         user = factory.make_User()
         admin = factory.make_admin()
         handler = UserHandler(admin, {}, None)
-        self.assertEqual(
-            self.dehydrate_user(user), handler.get({"id": user.id})
-        )
+        self.assertEqual(self.dehydrate_user(user), handler.get({"id": user.id}))
 
     def test_get_for_user_getting_self(self):
         user = factory.make_User()
@@ -105,9 +103,7 @@ class TestUserHandler(MAASServerTestCase):
         user = factory.make_User()
         other_user = factory.make_User()
         handler = UserHandler(user, {}, None)
-        self.assertRaises(
-            HandlerDoesNotExistError, handler.get, {"id": other_user.id}
-        )
+        self.assertRaises(HandlerDoesNotExistError, handler.get, {"id": other_user.id})
 
     def test_list_for_admin(self):
         admin = factory.make_admin()
@@ -163,9 +159,7 @@ class TestUserHandler(MAASServerTestCase):
             node.acquire(user)
         handler = UserHandler(user, {}, None)
         users_from_ws = handler.list({})
-        self.assertEqual(
-            [self.dehydrate_user(user, for_self=True)], users_from_ws
-        )
+        self.assertEqual([self.dehydrate_user(user, for_self=True)], users_from_ws)
         user_from_ws = users_from_ws[0]
         self.assertEqual(user_from_ws["sshkeys_count"], len(keys))
         self.assertEqual(user_from_ws["machines_count"], num_machines)

@@ -29,9 +29,7 @@ class TestGetProxies(MAASServerTestCase):
         Config.objects.set_config("enable_http_proxy", True)
         url = factory.make_parsed_url().geturl()
         Config.objects.set_config("http_proxy", url)
-        self.assertEqual(
-            {"http": urlparse(url), "https": urlparse(url)}, get_proxies()
-        )
+        self.assertEqual({"http": urlparse(url), "https": urlparse(url)}, get_proxies())
 
     def test_returns_populated_dict_when_http_proxy_is_disabled(self):
         Config.objects.set_config("enable_http_proxy", False)

@@ -117,10 +117,7 @@ NODES_PREFETCH = [
     "boot_interface__vlan__space",
     "boot_interface__ip_addresses__subnet",
     "boot_interface__parents",
-    (
-        "boot_interface__children_relationships__child__"
-        "children_relationships__child"
-    ),
+    ("boot_interface__children_relationships__child__" "children_relationships__child"),
     "current_config__interface_set__vlan__primary_rack",
     "current_config__interface_set__vlan__secondary_rack",
     "current_config__interface_set__vlan__fabric__vlan_set",
@@ -172,9 +169,7 @@ def filtered_nodes_list_from_request(request, model=None):
 
     match_macs = get_optional_list(request.GET, "mac_address")
     if match_macs is not None:
-        invalid_macs = [
-            mac for mac in match_macs if not MAC_FIELD_RE.match(mac)
-        ]
+        invalid_macs = [mac for mac in match_macs if not MAC_FIELD_RE.match(mac)]
         if len(invalid_macs) != 0:
             raise MAASAPIValidationError(
                 "Invalid MAC address(es): %s" % ", ".join(invalid_macs)
@@ -183,13 +178,9 @@ def filtered_nodes_list_from_request(request, model=None):
     if model is None:
         model = Node
     # Fetch nodes and apply filters.
-    nodes = model.objects.get_nodes(
-        request.user, NodePermission.view, ids=match_ids
-    )
+    nodes = model.objects.get_nodes(request.user, NodePermission.view, ids=match_ids)
     if match_macs is not None:
-        nodes = nodes.filter(
-            current_config__interface__mac_address__in=match_macs
-        )
+        nodes = nodes.filter(current_config__interface__mac_address__in=match_macs)
     match_hostnames = get_optional_list(request.GET, "hostname")
     if match_hostnames is not None:
         nodes = nodes.filter(hostname__in=match_hostnames)
@@ -214,9 +205,7 @@ def is_registered(request, ignore_statuses=None):
     if ignore_statuses is None:
         ignore_statuses = [NODE_STATUS.RETIRED]
 
-    mac_address = normalise_macaddress(
-        get_mandatory_param(request.GET, "mac_address")
-    )
+    mac_address = normalise_macaddress(get_mandatory_param(request.GET, "mac_address"))
 
     interfaces = (
         Interface.objects.filter(mac_address=mac_address)
@@ -237,20 +226,14 @@ def get_cached_script_results(node):
         node._cached_commissioning_script_results = []
         node._cached_testing_script_results = []
         for script_result in node._cached_script_results:
-            if (
-                script_result.script_set.result_type
-                == RESULT_TYPE.INSTALLATION
-            ):
+            if script_result.script_set.result_type == RESULT_TYPE.INSTALLATION:
                 # Don't include installation results in the health
                 # status.
                 continue
             elif script_result.status == SCRIPT_STATUS.ABORTED:
                 # LP: #1724235 - Ignore aborted scripts.
                 continue
-            elif (
-                script_result.script_set.result_type
-                == RESULT_TYPE.COMMISSIONING
-            ):
+            elif script_result.script_set.result_type == RESULT_TYPE.COMMISSIONING:
                 node._cached_commissioning_script_results.append(script_result)
             elif script_result.script_set.result_type == RESULT_TYPE.TESTING:
                 node._cached_testing_script_results.append(script_result)
@@ -807,9 +790,7 @@ class NodesHandler(OperationsHandler):
             form = ReadNodesForm(data=request.GET)
             if not form.is_valid():
                 raise MAASAPIValidationError(form.errors)
-            nodes = self.base_model.objects.get_nodes(
-                request.user, NodePermission.view
-            )
+            nodes = self.base_model.objects.get_nodes(request.user, NodePermission.view)
             nodes, _, _ = form.filter_nodes(nodes)
             nodes = nodes.select_related(*NODES_SELECT_RELATED)
             nodes = prefetch_queryset(nodes, NODES_PREFETCH).order_by("id")
@@ -1000,9 +981,7 @@ class PowerMixin:
             system_id=system_id, user=request.user, perm=NodePermission.edit
         )
         if node.owner is None and node.node_type != NODE_TYPE.RACK_CONTROLLER:
-            raise NodeStateViolation(
-                "Can't start node: it hasn't been allocated."
-            )
+            raise NodeStateViolation("Can't start node: it hasn't been allocated.")
         if isinstance(user_data, str):
             user_data = user_data.encode()
         try:
@@ -1021,13 +1000,8 @@ class PowerMixin:
                 default=False,
                 validator=StringBool,
             )
-            bridge_type = get_optional_param(
-                request.POST, "bridge_type", default=None
-            )
-            if (
-                bridge_type is not None
-                and bridge_type not in BRIDGE_TYPE_CHOICES_DICT
-            ):
+            bridge_type = get_optional_param(request.POST, "bridge_type", default=None)
+            if bridge_type is not None and bridge_type not in BRIDGE_TYPE_CHOICES_DICT:
                 raise MAASAPIValidationError(
                     {
                         "bridge_type": compose_invalid_choice_text(
@@ -1234,6 +1208,5 @@ class PowersMixin:
             machines = self.base_model.objects.filter(system_id__in=match_ids)
 
         return {
-            machine.system_id: machine.get_power_parameters()
-            for machine in machines
+            machine.system_id: machine.get_power_parameters() for machine in machines
         }

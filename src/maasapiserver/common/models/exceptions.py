@@ -22,9 +22,7 @@ class AlreadyExistsException(BaseException):
 
 class BadRequestException(BaseException):
     def __init__(self, details: list[BaseExceptionDetail]):
-        super().__init__(
-            "Invalid request. Please check the provided data.", details
-        )
+        super().__init__("Invalid request. Please check the provided data.", details)
 
 
 class PreconditionFailedException(BaseException):

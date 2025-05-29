@@ -8,8 +8,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="bmc",
             name="name",
-            field=models.CharField(
-                blank=True, default="", unique=True, max_length=255
-            ),
+            field=models.CharField(blank=True, default="", unique=True, max_length=255),
         )
     ]

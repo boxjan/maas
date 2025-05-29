@@ -15,9 +15,7 @@ log = LegacyLogger()
 signals = SignalsManager()
 
 
-def post_save__update_version_notifications(
-    sender, instance, created, **kwargs
-):
+def post_save__update_version_notifications(sender, instance, created, **kwargs):
     update_version_notifications()
 
 
@@ -25,9 +23,7 @@ def post_delete__update_version_notifications(sender, instance, **kwargs):
     update_version_notifications()
 
 
-signals.watch(
-    post_save, post_save__update_version_notifications, sender=ControllerInfo
-)
+signals.watch(post_save, post_save__update_version_notifications, sender=ControllerInfo)
 signals.watch(
     post_delete,
     post_delete__update_version_notifications,

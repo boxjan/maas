@@ -52,9 +52,7 @@ class BootSourceSelectionHandler(OperationsHandler):
             No BootSource matches the given query.
         """
         boot_source = get_object_or_404(BootSource, id=boot_source_id)
-        return get_object_or_404(
-            BootSourceSelection, boot_source=boot_source, id=id
-        )
+        return get_object_or_404(BootSourceSelection, boot_source=boot_source, id=id)
 
     def update(self, request, boot_source_id, id):
         """@description-title Update a boot-source selection
@@ -206,9 +204,7 @@ class BootSourceSelectionsHandler(OperationsHandler):
 
         """
         boot_source = get_object_or_404(BootSource, id=boot_source_id)
-        form = BootSourceSelectionForm(
-            data=request.data, boot_source=boot_source
-        )
+        form = BootSourceSelectionForm(data=request.data, boot_source=boot_source)
         if form.is_valid():
             return form.save()
         else:

@@ -98,9 +98,7 @@ class TestGetDNSServerAddress(MAASServerTestCase):
             Mock(return_value=[IPAddress("127.0.0.1")]),
         )
         get_dns_server_address()
-        self.assertEqual(
-            call(WARNING_MESSAGE % "127.0.0.1"), logger.warning.call_args
-        )
+        self.assertEqual(call(WARNING_MESSAGE % "127.0.0.1"), logger.warning.call_args)
 
     def test_get_dns_server_address_uses_rack_controller_url(self):
         ip = factory.make_ipv4_address()
@@ -360,9 +358,7 @@ class TestZoneGenerator(MAASServerTestCase):
             "36.168.192.in-addr.arpa",
             "overlap",
         ]
-        zone_names = [
-            info.zone_name for zone in zones for info in zone.zone_info
-        ]
+        zone_names = [info.zone_name for zone in zones for info in zone.zone_info]
         self.assertCountEqual(zone_names, expected_domains)
 
     def test_yields_forward_and_reverse_zone_no_overlap(self):
@@ -403,9 +399,7 @@ class TestZoneGenerator(MAASServerTestCase):
             "37.232.10.in-addr.arpa",
             "33.232.10.in-addr.arpa",
         ]
-        zone_names = [
-            info.zone_name for zone in zones for info in zone.zone_info
-        ]
+        zone_names = [info.zone_name for zone in zones for info in zone.zone_info]
         self.assertCountEqual(zone_names, expected_domains)
 
     def test_with_node_yields_fwd_and_rev_zone(self):
@@ -506,19 +500,11 @@ class TestZoneGenerator(MAASServerTestCase):
         self.assertCountEqual(zones[0]._dynamic_updates, updates)
         self.assertCountEqual(
             zones[1]._dynamic_updates,
-            [
-                DynamicDNSUpdate.as_reverse_record_update(
-                    updates[0], IPNetwork("10/29")
-                )
-            ],
+            [DynamicDNSUpdate.as_reverse_record_update(updates[0], IPNetwork("10/29"))],
         )
         self.assertCountEqual(
             zones[2]._dynamic_updates,
-            [
-                DynamicDNSUpdate.as_reverse_record_update(
-                    updates[0], IPNetwork("10/24")
-                )
-            ],
+            [DynamicDNSUpdate.as_reverse_record_update(updates[0], IPNetwork("10/24"))],
         )
 
     def test_parent_of_default_domain_gets_glue(self):
@@ -543,9 +529,7 @@ class TestZoneGenerator(MAASServerTestCase):
         assertIsReverseZoneWithDomain(self, rev2, default_domain.name, "10/24")
         # maas.example.com is the default zone, and has an A RR for its NS RR.
         # example.com has NS maas.example.com., and a glue record for that.
-        expected_map_0 = {
-            "@": HostnameRRsetMapping(None, {(30, "A", "5.5.5.5")}, None)
-        }
+        expected_map_0 = {"@": HostnameRRsetMapping(None, {(30, "A", "5.5.5.5")}, None)}
         expected_map_1 = {
             "maas": HostnameRRsetMapping(
                 None,
@@ -579,12 +563,8 @@ class TestZoneGenerator(MAASServerTestCase):
             node.current_config.interface_set.all().exclude(id=boot_iface.id)
         )
         # Now go add IP addresses to the boot interface, and one other
-        boot_ip = factory.make_StaticIPAddress(
-            interface=boot_iface, subnet=subnet
-        )
-        sip = factory.make_StaticIPAddress(
-            interface=interfaces[0], subnet=subnet
-        )
+        boot_ip = factory.make_StaticIPAddress(interface=boot_iface, subnet=subnet)
+        sip = factory.make_StaticIPAddress(interface=interfaces[0], subnet=subnet)
         default_ttl = random.randint(10, 300)
         Config.objects.set_config("default_dns_ttl", default_ttl)
         fwd, rev1, rev2 = ZoneGenerator(
@@ -650,9 +630,7 @@ class TestZoneGenerator(MAASServerTestCase):
         ip = factory.make_StaticIPAddress(subnet=subnet)
         resolver = self.patch(server_address, "resolve_hostname")
         resolver.return_value = {IPAddress(ip.ip)}
-        zones = ZoneGenerator(
-            [default_domain], subnet, serial=random.randint(0, 65535)
-        )
+        zones = ZoneGenerator([default_domain], subnet, serial=random.randint(0, 65535))
         [forward_zone] = [
             zone for zone in zones if isinstance(zone, DNSForwardZoneConfig)
         ]
@@ -710,13 +688,9 @@ class TestZoneGenerator(MAASServerTestCase):
             ),
         ]
         for net in [net1, net2]:
-            if (
-                net.version == 6 and net.prefixlen < 124
-            ) or net.prefixlen < 24:
+            if (net.version == 6 and net.prefixlen < 124) or net.prefixlen < 24:
                 for network in ZoneGenerator._split_large_subnet(net2):
-                    expected.append(
-                        DNSReverseZoneConfig(domain.name, network=network)
-                    )
+                    expected.append(DNSReverseZoneConfig(domain.name, network=network))
             elif net.version == 6 and net.prefixlen > 124:
                 expected.append(
                     DNSReverseZoneConfig(
@@ -752,9 +726,7 @@ class TestZoneGenerator(MAASServerTestCase):
         for domain in domains:
             expected_zones.add(DNSForwardZoneConfig(domain.name))
         for subnet in subnets:
-            networks = ZoneGenerator._split_large_subnet(
-                IPNetwork(subnet.cidr)
-            )
+            networks = ZoneGenerator._split_large_subnet(IPNetwork(subnet.cidr))
             for network in networks:
                 expected_zones.add(
                     DNSReverseZoneConfig(default_domain.name, network=network)
@@ -883,9 +855,7 @@ class TestZoneGenerator(MAASServerTestCase):
                     for ip in record.ip_addresses.all()
                     if IPAddress(ip.ip) in network
                 ):
-                    mapping[
-                        f"{record.name}.{default_domain.name}"
-                    ] = HostnameIPMapping(
+                    mapping[f"{record.name}.{default_domain.name}"] = HostnameIPMapping(
                         None,
                         record.address_ttl,
                         ip_set,
@@ -1032,16 +1002,10 @@ class TestZoneGenerator(MAASServerTestCase):
                 zone._mapping,
                 expected[i]._mapping,
             )
-            self.assertCountEqual(
-                zone._dynamic_updates, expected[i]._dynamic_updates
-            )
+            self.assertCountEqual(zone._dynamic_updates, expected[i]._dynamic_updates)
             if isinstance(zone, DNSReverseZoneConfig):
-                self.assertCountEqual(
-                    zone._dynamic_ranges, expected[i]._dynamic_ranges
-                )
-                self.assertCountEqual(
-                    zone._rfc2317_ranges, expected[i]._rfc2317_ranges
-                )
+                self.assertCountEqual(zone._dynamic_ranges, expected[i]._dynamic_ranges)
+                self.assertCountEqual(zone._rfc2317_ranges, expected[i]._rfc2317_ranges)
 
     def test_configs_are_merged_when_glue_overlaps(self):
         self.patch(warn_loopback)
@@ -1102,9 +1066,7 @@ class TestZoneGenerator(MAASServerTestCase):
                     )
                 )
                 if len(ip_set) > 0:
-                    mapping[
-                        f"{record.name}.{default_domain.name}"
-                    ] = HostnameIPMapping(
+                    mapping[f"{record.name}.{default_domain.name}"] = HostnameIPMapping(
                         None,
                         record.address_ttl,
                         ip_set,
@@ -1172,16 +1134,10 @@ class TestZoneGenerator(MAASServerTestCase):
                 zone._mapping,
                 expected[i]._mapping,
             )
-            self.assertCountEqual(
-                zone._dynamic_updates, expected[i]._dynamic_updates
-            )
+            self.assertCountEqual(zone._dynamic_updates, expected[i]._dynamic_updates)
             if isinstance(zone, DNSReverseZoneConfig):
-                self.assertCountEqual(
-                    zone._dynamic_ranges, expected[i]._dynamic_ranges
-                )
-                self.assertCountEqual(
-                    zone._rfc2317_ranges, expected[i]._rfc2317_ranges
-                )
+                self.assertCountEqual(zone._dynamic_ranges, expected[i]._dynamic_ranges)
+                self.assertCountEqual(zone._rfc2317_ranges, expected[i]._rfc2317_ranges)
 
 
 class TestZoneGeneratorTTL(MAASTransactionServerTestCase):
@@ -1328,9 +1284,7 @@ class TestZoneGeneratorTTL(MAASTransactionServerTestCase):
             domain=domain, address_ttl=random.randint(400, 499)
         )
         node_ips = {boot_ip.ip}
-        dnsrr_ips = {
-            ip.ip for ip in dnsrr.ip_addresses.all() if ip is not None
-        }
+        dnsrr_ips = {ip.ip for ip in dnsrr.ip_addresses.all() if ip is not None}
         expected_forward = {
             node.hostname: HostnameIPMapping(
                 node.system_id, node.address_ttl, node_ips, node.node_type
@@ -1447,9 +1401,7 @@ class TestZoneGeneratorTTL(MAASTransactionServerTestCase):
             domain=domain,
             address_ttl=random.randint(400, 499),
         )
-        dnsdata = factory.make_DNSData(
-            dnsresource=dnsrr, ttl=random.randint(500, 599)
-        )
+        dnsdata = factory.make_DNSData(dnsresource=dnsrr, ttl=random.randint(500, 599))
         expected_forward = {
             dnsrr.name: HostnameRRsetMapping(
                 None, {(dnsdata.ttl, dnsdata.rrtype, dnsdata.rrdata)}
@@ -1485,9 +1437,7 @@ class TestZoneGeneratorTTL(MAASTransactionServerTestCase):
 
 
 class TestZoneGeneratorEndToEnd(MAASServerTestCase):
-    def _find_most_specific_subnet(
-        self, ip: StaticIPAddress, subnets: list[Subnet]
-    ):
+    def _find_most_specific_subnet(self, ip: StaticIPAddress, subnets: list[Subnet]):
         networks = []
         for subnet in subnets:
             net = IPNetwork(subnet.cidr)
@@ -1564,9 +1514,7 @@ class TestZoneGeneratorEndToEnd(MAASServerTestCase):
             zone.write_config()
 
         # check forward zones
-        with open(
-            os.path.join(config_path, f"zone.{default_domain.name}"), "r"
-        ) as zf:
+        with open(os.path.join(config_path, f"zone.{default_domain.name}"), "r") as zf:
             default_domain_contents = zf.read()
 
         with open(os.path.join(config_path, f"zone.{domain.name}"), "r") as zf:
@@ -1586,9 +1534,7 @@ class TestZoneGeneratorEndToEnd(MAASServerTestCase):
         # check reverse zones
         for record in all_records:
             ip = record.ip_addresses.first()
-            subnet = self._find_most_specific_subnet(
-                ip, [subnet1, subnet2, subnet3]
-            )
+            subnet = self._find_most_specific_subnet(ip, [subnet1, subnet2, subnet3])
             rev_subnet = ".".join(str(subnet.network).split(".")[2::-1])
             if subnet.prefixlen > 24:
                 rev_subnet = f"{str(subnet.network).split('.')[-1]}-{subnet.prefixlen}.{rev_subnet}"

@@ -33,20 +33,14 @@ class ZonesService(Service):
     ):
         super().__init__(connection)
         self.zones_repository = (
-            zones_repository
-            if zones_repository
-            else ZonesRepository(connection)
+            zones_repository if zones_repository else ZonesRepository(connection)
         )
         self.nodes_service = (
             nodes_service if nodes_service else NodesService(connection)
         )
-        self.bmc_service = (
-            bmc_service if bmc_service else BmcService(connection)
-        )
+        self.bmc_service = bmc_service if bmc_service else BmcService(connection)
         self.vmcluster_service = (
-            vmcluster_service
-            if vmcluster_service
-            else VmClustersService(connection)
+            vmcluster_service if vmcluster_service else VmClustersService(connection)
         )
 
     async def create(self, zone_request: ZoneRequest) -> Zone:
@@ -58,14 +52,10 @@ class ZonesService(Service):
     async def get_by_name(self, name: str) -> Optional[Zone]:
         return await self.zones_repository.find_by_name(name)
 
-    async def list(
-        self, pagination_params: PaginationParams
-    ) -> ListResult[Zone]:
+    async def list(self, pagination_params: PaginationParams) -> ListResult[Zone]:
         return await self.zones_repository.list(pagination_params)
 
-    async def delete(
-        self, zone_id: int, etag_if_match: str | None = None
-    ) -> None:
+    async def delete(self, zone_id: int, etag_if_match: str | None = None) -> None:
         """
         Delete a zone. All the resources in the zone will be moved to the default zone.
         """

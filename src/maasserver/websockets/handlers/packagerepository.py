@@ -57,9 +57,7 @@ class PackageRepositoryHandler(TimestampedModelHandler):
         request = HttpRequest()
         request.user = self.user
         # Update by using form.
-        form = PackageRepositoryForm(
-            instance=obj, request=request, data=params
-        )
+        form = PackageRepositoryForm(instance=obj, request=request, data=params)
         if form.is_valid():
             try:
                 obj = form.save(ENDPOINT.UI, request)

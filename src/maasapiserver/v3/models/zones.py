@@ -13,8 +13,6 @@ class Zone(MaasTimestampedBaseModel):
             name=self.name,
             description=self.description,
             hal_links=BaseHal(
-                self=BaseHref(
-                    href=f"{self_base_hyperlink.rstrip('/')}/{self.id}"
-                )
+                self=BaseHref(href=f"{self_base_hyperlink.rstrip('/')}/{self.id}")
             ),
         )

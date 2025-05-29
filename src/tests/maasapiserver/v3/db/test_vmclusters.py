@@ -24,12 +24,8 @@ class TestVmClustersRepository:
         zone_a = await create_test_zone(fixture, name="A")
         zone_b = await create_test_zone(fixture, name="B")
 
-        vmcluster_a = await create_test_vmcluster(
-            fixture, name="A", zone_id=zone_a.id
-        )
-        vmcluster_b = await create_test_vmcluster(
-            fixture, name="B", zone_id=zone_b.id
-        )
+        vmcluster_a = await create_test_vmcluster(fixture, name="A", zone_id=zone_a.id)
+        vmcluster_b = await create_test_vmcluster(fixture, name="B", zone_id=zone_b.id)
         vmcluster_repository = VmClustersRepository(db_connection)
         await vmcluster_repository.move_to_zone(zone_b.id, zone_a.id)
 

@@ -4,9 +4,7 @@ import maasserver.models.cleansave
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0042_add_routable_rack_controllers_to_bmc")
-    ]
+    dependencies = [("maasserver", "0042_add_routable_rack_controllers_to_bmc")]
 
     operations = [
         migrations.CreateModel(

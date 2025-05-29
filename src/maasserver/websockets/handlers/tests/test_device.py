@@ -130,8 +130,7 @@ class TestDeviceHandler(MAASTransactionServerTestCase):
             "created": dehydrate_datetime(node.created),
             "domain": {"id": node.domain.id, "name": node.domain.name},
             "extra_macs": [
-                "%s" % mac_address.mac_address
-                for mac_address in node.get_extra_macs()
+                "%s" % mac_address.mac_address for mac_address in node.get_extra_macs()
             ],
             "link_speeds": sorted(
                 {
@@ -147,18 +146,12 @@ class TestDeviceHandler(MAASTransactionServerTestCase):
             "link_type": NODE_TYPE_TO_LINK_TYPE[node.node_type],
             "id": node.id,
             "primary_mac": (
-                ""
-                if boot_interface is None
-                else "%s" % boot_interface.mac_address
+                "" if boot_interface is None else "%s" % boot_interface.mac_address
             ),
-            "parent": (
-                node.parent.system_id if node.parent is not None else None
-            ),
+            "parent": (node.parent.system_id if node.parent is not None else None),
             "permissions": permissions,
             "ip_address": self.dehydrate_ip_address(node, boot_interface),
-            "ip_assignment": self.dehydrate_ip_assignment(
-                node, boot_interface
-            ),
+            "ip_assignment": self.dehydrate_ip_assignment(node, boot_interface),
             "interfaces": [
                 self.dehydrate_interface(interface, node)
                 for interface in node.current_config.interface_set.all().order_by(
@@ -244,9 +237,7 @@ class TestDeviceHandler(MAASTransactionServerTestCase):
     def make_devices(self, number, owner=None, ip_assignment=None):
         """Create `number` of new devices."""
         for counter in range(number):
-            self.make_device_with_ip_address(
-                owner=owner, ip_assignment=ip_assignment
-            )
+            self.make_device_with_ip_address(owner=owner, ip_assignment=ip_assignment)
 
     @transactional
     def test_get(self):
@@ -265,9 +256,7 @@ class TestDeviceHandler(MAASTransactionServerTestCase):
         device = self.make_device_with_ip_address(
             owner=owner, ip_assignment=DEVICE_IP_ASSIGNMENT_TYPE.STATIC
         )
-        queries, _ = count_queries(
-            handler.get, {"system_id": device.system_id}
-        )
+        queries, _ = count_queries(handler.get, {"system_id": device.system_id})
 
         # This check is to notify the developer that a change was made that
         # affects the number of queries performed when doing a node get.
@@ -437,18 +426,14 @@ class TestDeviceHandler(MAASTransactionServerTestCase):
     def test_get_form_class_raises_error_for_unknown_action(self):
         user = factory.make_User()
         handler = DeviceHandler(user, {}, None)
-        self.assertRaises(
-            HandlerError, handler.get_form_class, factory.make_name()
-        )
+        self.assertRaises(HandlerError, handler.get_form_class, factory.make_name())
 
     @transactional
     def test_create_raises_validation_error_for_missing_macs(self):
         user = factory.make_User()
         handler = DeviceHandler(user, {}, None)
         params = {"hostname": factory.make_name("hostname")}
-        error = self.assertRaises(
-            HandlerValidationError, handler.create, params
-        )
+        error = self.assertRaises(HandlerValidationError, handler.create, params)
         self.assertEqual(
             {"mac_addresses": ["This field is required."]},
             error.message_dict,
@@ -1119,9 +1104,7 @@ class TestDeviceHandler(MAASTransactionServerTestCase):
     def test_update_updates_node_non_admin_update_own(self):
         user = factory.make_User()
         handler = DeviceHandler(user, {}, None)
-        node = factory.make_Node(
-            owner=user, interface=True, node_type=NODE_TYPE.DEVICE
-        )
+        node = factory.make_Node(owner=user, interface=True, node_type=NODE_TYPE.DEVICE)
         node_data = self.dehydrate_device(node, user)
         new_zone = factory.make_Zone()
         new_hostname = factory.make_name("hostname")
@@ -1153,9 +1136,7 @@ class TestDeviceHandler(MAASTransactionServerTestCase):
     def test_update_owned_with_rbac(self):
         rbac = self.useFixture(RBACEnabled())
         user = factory.make_User(is_local=False)
-        rbac.store.allow(
-            user.username, factory.make_ResourcePool(), "admin-machines"
-        )
+        rbac.store.allow(user.username, factory.make_ResourcePool(), "admin-machines")
         node = factory.make_Node(owner=user, node_type=NODE_TYPE.DEVICE)
         handler = DeviceHandler(user, {}, None)
         new_hostname = factory.make_name("hostname")

@@ -121,9 +121,7 @@ class EventsHandler(OperationsHandler):
         after = get_optional_param(request.GET, "after", None, Int)
         before = get_optional_param(request.GET, "before", None, Int)
         level = get_optional_param(request.GET, "level", "INFO")
-        limit = get_optional_param(
-            request.GET, "limit", DEFAULT_EVENT_LOG_LIMIT, Int
-        )
+        limit = get_optional_param(request.GET, "limit", DEFAULT_EVENT_LOG_LIMIT, Int)
         owner = get_optional_param(request.GET, "owner", default=None)
 
         # Limit what we'll return to avoid being swamped.
@@ -147,9 +145,7 @@ class EventsHandler(OperationsHandler):
         elif level in LOGGING_LEVELS_BY_NAME:
             events = Event.objects.filter(node__in=nodes)
             # Eliminate logs below the requested level.
-            events = events.exclude(
-                type__level__lt=LOGGING_LEVELS_BY_NAME[level]
-            )
+            events = events.exclude(type__level__lt=LOGGING_LEVELS_BY_NAME[level])
         elif level is not None:
             raise MAASAPIBadRequest("Unrecognised log level: %s" % level)
 

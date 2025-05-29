@@ -42,9 +42,7 @@ def get_valid_ip_range(low, high):
 
 def add_ip_range(IPRange, Subnet, type, low, high, ngi):
     if low is not None and high is not None:
-        subnets = Subnet.objects.raw(
-            find_best_subnet_for_ip_query, [low, high]
-        )
+        subnets = Subnet.objects.raw(find_best_subnet_for_ip_query, [low, high])
         for subnet in subnets:
             # There will only ever be one or zero due to the LIMIT 1.
             comment = "Migrated from MAAS 1.x"
@@ -87,6 +85,4 @@ def create_ipranges_from_nodegroupinterfaces(apps, schema_editor):
 class Migration(migrations.Migration):
     dependencies = [("maasserver", "0020_nodegroup_to_rackcontroller")]
 
-    operations = [
-        migrations.RunPython(create_ipranges_from_nodegroupinterfaces)
-    ]
+    operations = [migrations.RunPython(create_ipranges_from_nodegroupinterfaces)]

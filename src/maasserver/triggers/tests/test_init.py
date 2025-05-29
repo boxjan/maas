@@ -46,8 +46,7 @@ class TestTriggers(MAASServerTestCase):
 
         with closing(connection.cursor()) as cursor:
             cursor.execute(
-                "SELECT * FROM pg_trigger WHERE "
-                "tgname = 'node_node_create_notify'"
+                "SELECT * FROM pg_trigger WHERE " "tgname = 'node_node_create_notify'"
             )
             triggers = cursor.fetchall()
 
@@ -314,9 +313,7 @@ class TestTriggersUsed(MAASServerTestCase):
 
     def find_triggers_in_database(self):
         with connection.cursor() as cursor:
-            cursor.execute(
-                "SELECT tgname::text FROM pg_trigger WHERE NOT tgisinternal"
-            )
+            cursor.execute("SELECT tgname::text FROM pg_trigger WHERE NOT tgisinternal")
             return {tgname for tgname, in cursor.fetchall()}
 
     def check_triggers_in_database(self):

@@ -54,9 +54,7 @@ class BootResourceManager(Manager):
         arch = f"{architecture}/{subarchitecture}"
         return get_one(self.filter(rtype=rtype, name=name, architecture=arch))
 
-    def has_synced_resource(
-        self, osystem, architecture, subarchitecture, series
-    ):
+    def has_synced_resource(self, osystem, architecture, subarchitecture, series):
         """Return True if `BootResource` exists with type of SYNCED, and given
         osystem, architecture, subarchitecture, and series."""
         name = f"{osystem}/{series}"
@@ -64,9 +62,7 @@ class BootResourceManager(Manager):
             BOOT_RESOURCE_TYPE.SYNCED, name, architecture, subarchitecture
         )
 
-    def get_synced_resource(
-        self, osystem, architecture, subarchitecture, series
-    ):
+    def get_synced_resource(self, osystem, architecture, subarchitecture, series):
         """Return `BootResource` with type of SYNCED, and given
         osystem, architecture, subarchitecture, and series."""
         name = f"{osystem}/{series}"
@@ -115,9 +111,7 @@ class BootResourceManager(Manager):
                 if "platform" in resource.extra:
                     arches.add(f"{arch}/{resource.extra['platform']}")
                 if "supported_platforms" in resource.extra:
-                    for platform in resource.extra[
-                        "supported_platforms"
-                    ].split(","):
+                    for platform in resource.extra["supported_platforms"].split(","):
                         arches.add(f"{arch}/{platform}")
         return sorted(arches)
 
@@ -137,9 +131,7 @@ class BootResourceManager(Manager):
         Prefers `i386` then `amd64` resources if available.  Returns `None`
         if none match requirements.
         """
-        commissionable = list(
-            self.get_commissionable_resource(osystem, series)
-        )
+        commissionable = list(self.get_commissionable_resource(osystem, series))
         for resource in commissionable:
             # Prefer i386. It will work for most cases where we don't
             # know the actual architecture.
@@ -166,10 +158,7 @@ class BootResourceManager(Manager):
         subarchitecture, and series."""
         if purpose is not None:
             os_driver = OperatingSystemRegistry.get_item(osystem)
-            if (
-                os_driver is None
-                or purpose not in os_driver.get_boot_image_purposes()
-            ):
+            if os_driver is None or purpose not in os_driver.get_boot_image_purposes():
                 return None
 
         if osystem != "custom":
@@ -185,9 +174,9 @@ class BootResourceManager(Manager):
             architecture__startswith=architecture,
         ).all()
         for resource in resources:
-            if resource.supports_subarch(
+            if resource.supports_subarch(subarchitecture) or resource.supports_platform(
                 subarchitecture
-            ) or resource.supports_platform(subarchitecture):
+            ):
                 return resource
         return None
 
@@ -248,13 +237,9 @@ class BootResourceManager(Manager):
             ):
                 continue
             subarch = resource.split_arch()[1]
-            channel, _, kplatform, flavor = parse_subarch_kernel_string(
-                subarch
-            )
+            channel, _, kplatform, flavor = parse_subarch_kernel_string(subarch)
 
-            old_style_platform = (
-                not channel and platform and platform != "generic"
-            )
+            old_style_platform = not channel and platform and platform != "generic"
 
             # Skip non-generic platform-specific kernels
             if platform:
@@ -279,9 +264,7 @@ class BootResourceManager(Manager):
                 kernels.add(subarch)
                 if resource.rolling:
                     kernels.add(
-                        "-".join(
-                            (kplatform, channel, "rolling", flavor)
-                        ).strip("-")
+                        "-".join((kplatform, channel, "rolling", flavor)).strip("-")
                     )
             elif old_style_platform:
                 # TODO A hack to pass through the old-style platform kernels
@@ -290,9 +273,7 @@ class BootResourceManager(Manager):
             # Add resource compatibility levels to the set
             if include_subarches and "subarches" in resource.extra:
                 for extra_subarch in resource.extra["subarches"].split(","):
-                    channel, _, _, flavor = parse_subarch_kernel_string(
-                        extra_subarch
-                    )
+                    channel, _, _, flavor = parse_subarch_kernel_string(extra_subarch)
                     # TODO This is a hack for old-style platform kernels
                     old_style_platform = (
                         not channel and platform and platform != "generic"
@@ -452,9 +433,7 @@ class BootResourceManager(Manager):
         lts_releases = lts_releases.exclude(support_eol__isnull=True)
         lts_releases = lts_releases.order_by("-support_eol")
         lts_releases = lts_releases.values("release").distinct()
-        lts_releases = [
-            "ubuntu/%s" % release["release"] for release in lts_releases
-        ]
+        lts_releases = ["ubuntu/%s" % release["release"] for release in lts_releases]
 
         # Filter the completed and commissionable resources. The operation
         # loses the ordering of the releases.
@@ -467,9 +446,7 @@ class BootResourceManager(Manager):
                 resources.append(resource)
 
         # Re-order placing the resource with the longest support window first.
-        return sorted(
-            resources, key=lambda resource: lts_releases.index(resource.name)
-        )
+        return sorted(resources, key=lambda resource: lts_releases.index(resource.name))
 
 
 def validate_architecture(value):
@@ -576,9 +553,7 @@ class BootResource(CleanSave, TimestampedModel):
         ):
             return self.sets.order_by("id").last()
         elif self.sets.all():
-            return sorted(self.sets.all(), key=attrgetter("id"), reverse=True)[
-                0
-            ]
+            return sorted(self.sets.all(), key=attrgetter("id"), reverse=True)[0]
         else:
             return None
 
@@ -606,9 +581,7 @@ class BootResource(CleanSave, TimestampedModel):
                 sync_size=Sum("files__bootresourcefilesync__size"),
             )
         else:
-            resource_sets = sorted(
-                self.sets.all(), key=attrgetter("id"), reverse=True
-            )
+            resource_sets = sorted(self.sets.all(), key=attrgetter("id"), reverse=True)
         n_regions = RegionController.objects.count()
         for resource_set in resource_sets:
             if resource_set.files_count > 0 and resource_set.sync_size == (
@@ -650,9 +623,7 @@ class BootResource(CleanSave, TimestampedModel):
         :rtype: string
         """
         version_name = now().strftime("%Y%m%d")
-        sets = self.sets.filter(version__startswith=version_name).order_by(
-            "version"
-        )
+        sets = self.sets.filter(version__startswith=version_name).order_by("version")
         if not sets.exists():
             return version_name
         max_idx = 0
@@ -705,9 +676,7 @@ def get_boot_resources_last_deployments() -> Dict[str, datetime]:
         # e.g.,
         #       event["description"] = "deployed ubuntu/noble/amd64/generic"
         #       image_identifier = "ubuntu/noble/amd64"
-        image_identifier = event["description"][len("deployed ") :].rsplit(
-            "/", 1
-        )[0]
+        image_identifier = event["description"][len("deployed ") :].rsplit("/", 1)[0]
         if image_identifier not in resource_dict.keys():
             resource_dict[image_identifier] = event["latest_created"]
         else:

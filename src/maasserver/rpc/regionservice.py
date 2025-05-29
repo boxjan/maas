@@ -85,9 +85,7 @@ class Region(SecuredRPCProtocol):
     connection is established, AMP is symmetric.
     """
 
-    def __init__(
-        self, auth_status: ConnectionAuthStatus = ConnectionAuthStatus(False)
-    ):
+    def __init__(self, auth_status: ConnectionAuthStatus = ConnectionAuthStatus(False)):
         super().__init__(
             unauthenticated_commands=[region.Authenticate.commandName],
             auth_status=auth_status,
@@ -257,9 +255,7 @@ class Region(SecuredRPCProtocol):
         Implementation of
         :py:class:`~provisioningserver.rpc.region.MarkNodeFailed`.
         """
-        d = deferToDatabase(
-            nodes.mark_node_failed, system_id, error_description
-        )
+        d = deferToDatabase(nodes.mark_node_failed, system_id, error_description)
         d.addCallback(lambda args: {})
         return d
 
@@ -281,9 +277,7 @@ class Region(SecuredRPCProtocol):
         Implementation of
         :py:class:`~provisioningserver.rpc.region.UpdateNodePowerState`.
         """
-        d = deferToDatabase(
-            nodes.update_node_power_state, system_id, power_state
-        )
+        d = deferToDatabase(nodes.update_node_power_state, system_id, power_state)
         d.addCallback(lambda args: {})
         return d
 
@@ -294,9 +288,7 @@ class Region(SecuredRPCProtocol):
         Implementation of
         :py:class:`~provisioningserver.rpc.region.RegisterEventType`.
         """
-        d = deferToDatabase(
-            events.register_event_type, name, description, level
-        )
+        d = deferToDatabase(events.register_event_type, name, description, level)
         d.addCallback(lambda args: {})
         return d
 
@@ -309,9 +301,7 @@ class Region(SecuredRPCProtocol):
         """
         timestamp = datetime.now()
         dbtasks = eventloop.services.getServiceNamed("database-tasks")
-        dbtasks.addTask(
-            events.send_event, system_id, type_name, description, timestamp
-        )
+        dbtasks.addTask(events.send_event, system_id, type_name, description, timestamp)
         # Don't wait for the record to be written.
         return succeed({})
 
@@ -354,9 +344,7 @@ class Region(SecuredRPCProtocol):
         return succeed({})
 
     @region.ReportForeignDHCPServer.responder
-    def report_foreign_dhcp_server(
-        self, system_id, interface_name, dhcp_ip=None
-    ):
+    def report_foreign_dhcp_server(self, system_id, interface_name, dhcp_ip=None):
         """report_foreign_dhcp_server()
 
         Implementation of
@@ -427,9 +415,7 @@ class Region(SecuredRPCProtocol):
         Implementation of
         :py:class:`~provisioningserver.rpc.region.ReportNeighbours`.
         """
-        d = deferToDatabase(
-            rackcontrollers.report_mdns_entries, system_id, mdns
-        )
+        d = deferToDatabase(rackcontrollers.report_mdns_entries, system_id, mdns)
         d.addCallback(lambda args: {})
         return d
 
@@ -440,9 +426,7 @@ class Region(SecuredRPCProtocol):
         Implementation of
         :py:class:`~provisioningserver.rpc.region.ReportNeighbours`.
         """
-        d = deferToDatabase(
-            rackcontrollers.report_neighbours, system_id, neighbours
-        )
+        d = deferToDatabase(rackcontrollers.report_neighbours, system_id, neighbours)
         d.addCallback(lambda args: {})
         return d
 
@@ -564,9 +548,7 @@ class Region(SecuredRPCProtocol):
 
             promtail_enabled = Config.objects.get_config("promtail_enabled")
             promtail_port = (
-                Config.objects.get_config("promtail_port")
-                if promtail_enabled
-                else None
+                Config.objects.get_config("promtail_port") if promtail_enabled else None
             )
 
             return {
@@ -582,9 +564,7 @@ class Region(SecuredRPCProtocol):
 
         The scope specificies which part of the state needs to be updated.
         """
-        d = deferToDatabase(
-            rackcontrollers.update_state, system_id, scope, state
-        )
+        d = deferToDatabase(rackcontrollers.update_state, system_id, scope, state)
         return d.addCallback(lambda _: {})
 
 
@@ -747,14 +727,10 @@ class RegionServer(Region):
             def get_cluster_certificate() -> bytes | None:
                 try:
                     secret_manager = SecretManager()
-                    raw_certificate_secret = (
-                        secret_manager.get_composite_secret(
-                            "cluster-certificate"
-                        )
+                    raw_certificate_secret = secret_manager.get_composite_secret(
+                        "cluster-certificate"
                     )
-                    return fernet_encrypt_psk(
-                        json.dumps(raw_certificate_secret)
-                    )
+                    return fernet_encrypt_psk(json.dumps(raw_certificate_secret))
                 # This should happen only in some tests. We don't want to encrypt the certificate in every test that uses RPC:
                 # this computation would be very expensive and would be pleonastic outside the dedicated unit tests for
                 # this functionality.
@@ -764,13 +740,9 @@ class RegionServer(Region):
                     )
                     return None
 
-            encrypted_certificate = yield deferToDatabase(
-                get_cluster_certificate
-            )
+            encrypted_certificate = yield deferToDatabase(get_cluster_certificate)
             return {
-                "encrypted_cluster_certificate": encrypted_certificate.decode(
-                    "utf-8"
-                )
+                "encrypted_cluster_certificate": encrypted_certificate.decode("utf-8")
                 if encrypted_certificate
                 else None,
                 "system_id": self.ident,
@@ -840,9 +812,7 @@ class RegionServer(Region):
 
     def connectionLost(self, reason):
         if self.hostIsRemote:
-            d = self.factory.service.ipcWorker.rpcUnregisterConnection(
-                self.connid
-            )
+            d = self.factory.service.ipcWorker.rpcUnregisterConnection(self.connid)
             d.addErrback(
                 log.err, "Failed to unregister the connection with the master."
             )
@@ -1112,9 +1082,7 @@ class RegionService(service.Service):
         try:
             # Look for the first AF_INET{,6} port.
             port = next(
-                port
-                for port in self.ports
-                if port.addressFamily in [AF_INET, AF_INET6]
+                port for port in self.ports if port.addressFamily in [AF_INET, AF_INET6]
             )
         except StopIteration:
             # There's no AF_INET (IPv4) or AF_INET6 (IPv6) port. As far as this
@@ -1212,8 +1180,7 @@ class RegionService(service.Service):
         connections = list(self.connections.values())
         if len(connections) == 0:
             raise exceptions.NoConnectionsAvailable(
-                "Unable to connect to any rack controller; no connections "
-                "available."
+                "Unable to connect to any rack controller; no connections " "available."
             )
         else:
             connection = random.choice(connections)

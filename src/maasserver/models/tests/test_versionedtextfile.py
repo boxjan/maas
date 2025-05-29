@@ -25,9 +25,7 @@ class TestVersionedTextFile(MAASServerTestCase):
         textfile = VersionedTextFile(data=SAMPLE_TEXT)
         textfile.save()
         from_db = VersionedTextFile.objects.get(id=textfile.id)
-        self.assertEqual(
-            (from_db.id, from_db.data), (textfile.id, SAMPLE_TEXT)
-        )
+        self.assertEqual((from_db.id, from_db.data), (textfile.id, SAMPLE_TEXT))
 
     def test_contents_immutable(self):
         textfile = VersionedTextFile(data=SAMPLE_TEXT)
@@ -104,9 +102,7 @@ class TestVersionedTextFile(MAASServerTestCase):
         revert_to = random.randint(-10, -1)
         reverted_ids = textfile_ids[revert_to:]
         remaining_ids = textfile_ids[:revert_to]
-        self.assertEqual(
-            textfile_ids[revert_to - 1], textfile.revert(revert_to).id
-        )
+        self.assertEqual(textfile_ids[revert_to - 1], textfile.revert(revert_to).id)
         for i in reverted_ids:
             self.assertRaises(
                 VersionedTextFile.DoesNotExist,
@@ -226,9 +222,7 @@ class TestVersionedTextFile(MAASServerTestCase):
         textfile = VersionedTextFile.objects.create(
             data='#!/bin/sh\r\necho "Created on Windows!"\r\n'
         )
-        self.assertEqual(
-            '#!/bin/sh\necho "Created on Windows!"\n', textfile.data
-        )
+        self.assertEqual('#!/bin/sh\necho "Created on Windows!"\n', textfile.data)
         updated_textfile = textfile.update(
             '#!/bin/sh\r\necho "Updated on Windows!"\r\n'
         )

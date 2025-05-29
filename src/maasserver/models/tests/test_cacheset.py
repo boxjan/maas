@@ -60,27 +60,21 @@ class TestCacheSetManager(MAASServerTestCase):
         cache_set = CacheSet.objects.get_or_create_cache_set_for_block_device(
             block_device
         )
-        cache_set_prev = (
-            CacheSet.objects.get_or_create_cache_set_for_block_device(
-                block_device
-            )
+        cache_set_prev = CacheSet.objects.get_or_create_cache_set_for_block_device(
+            block_device
         )
         self.assertEqual(cache_set_prev, cache_set)
 
     def test_get_or_create_cache_set_for_partition_creates_new(self):
         partition = factory.make_Partition()
-        cache_set = CacheSet.objects.get_or_create_cache_set_for_partition(
-            partition
-        )
+        cache_set = CacheSet.objects.get_or_create_cache_set_for_partition(partition)
         self.assertEqual(partition, cache_set.get_device())
 
     def test_get_or_create_cache_set_for_partition_returns_previous(self):
         partition = factory.make_Partition()
-        cache_set = CacheSet.objects.get_or_create_cache_set_for_partition(
+        cache_set = CacheSet.objects.get_or_create_cache_set_for_partition(partition)
+        cache_set_prev = CacheSet.objects.get_or_create_cache_set_for_partition(
             partition
-        )
-        cache_set_prev = (
-            CacheSet.objects.get_or_create_cache_set_for_partition(partition)
         )
         self.assertEqual(cache_set_prev, cache_set)
 
@@ -313,8 +307,6 @@ class TestCacheSet(MAASServerTestCase):
             filesystems=filesystems,
             group_type=FILESYSTEM_GROUP_TYPE.LVM_VG,
         )
-        virtual_block_device = factory.make_VirtualBlockDevice(
-            filesystem_group=fsgroup
-        )
+        virtual_block_device = factory.make_VirtualBlockDevice(filesystem_group=fsgroup)
         cache_set = factory.make_CacheSet(block_device=virtual_block_device)
         self.assertEqual(cache_set.get_numa_node_indexes(), [0, 1, 2])

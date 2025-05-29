@@ -156,9 +156,7 @@ class TestClient(MAASTestCase):
         conn, client = self.make_connection_and_client()
         self.patch_autospec(conn, "callRemote")
         conn.callRemote.return_value = sentinel.response
-        client(
-            sentinel.command, _timeout=None, foo=sentinel.foo, bar=sentinel.bar
-        )
+        client(sentinel.command, _timeout=None, foo=sentinel.foo, bar=sentinel.bar)
         mock_metrics.assert_called_with(
             "maas_rack_region_rpc_call_latency",
             "observe",
@@ -268,9 +266,7 @@ class TestConnectionAuthStatus(MAASTestCase):
 
 
 class TestSecuredRPCProtocol(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
@@ -468,9 +464,7 @@ class TestRPCProtocol_UnhandledErrorsWhenHandlingCommands(MAASTestCase):
             amp.AmpBox(
                 _error=seq,
                 _error_code=amp.UNHANDLED_ERROR_CODE,
-                _error_description=(
-                    b"Unknown Error [%s]" % cmd_ref.encode("ascii")
-                ),
+                _error_description=(b"Unknown Error [%s]" % cmd_ref.encode("ascii")),
             )
         ]
         self.assertEqual(expected_boxes_sent, observed_boxes_sent)

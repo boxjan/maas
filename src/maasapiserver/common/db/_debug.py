@@ -16,9 +16,7 @@ class CompiledQuery:
 
     def __init__(self, query: ClauseElement):
         statement = getattr(query, "statement", query)
-        compiled = statement.compile(
-            dialect=postgresql.dialect()  # type: ignore
-        )
+        compiled = statement.compile(dialect=postgresql.dialect())  # type: ignore
         self.sql = str(compiled)
         self.params = compiled.params
 

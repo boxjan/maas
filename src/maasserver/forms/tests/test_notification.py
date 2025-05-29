@@ -118,7 +118,5 @@ class TestNotificationForm(MAASServerTestCase):
             self.assertTrue(notification_saved.admins)
         else:
             self.assertFalse(notification_saved.admins)
-        self.assertEqual(
-            notification_saved.context, json.loads(data["context"])
-        )
+        self.assertEqual(notification_saved.context, json.loads(data["context"]))
         self.assertEqual(notification_saved.category, data["category"])

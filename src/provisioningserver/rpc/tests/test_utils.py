@@ -29,9 +29,7 @@ class TestCreateNode(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def prepare_region_rpc(self):
         fixture = self.useFixture(MockLiveClusterToRegionRPCFixture())
@@ -84,9 +82,7 @@ class TestCreateNode(MAASTestCase):
         protocol, connecting = self.prepare_region_rpc()
         self.addCleanup((yield connecting))
         system_id = factory.make_name("system-id")
-        protocol.CreateNode.return_value = defer.succeed(
-            {"system_id": system_id}
-        )
+        protocol.CreateNode.return_value = defer.succeed({"system_id": system_id})
 
         uuid = "node-" + factory.make_UUID()
         macs = sorted(factory.make_mac_address() for _ in range(3))
@@ -99,9 +95,7 @@ class TestCreateNode(MAASTestCase):
             "power_control": None,
             "system_id": uuid,
         }
-        new_system_id = yield create_node(
-            macs, arch, power_type, power_parameters
-        )
+        new_system_id = yield create_node(macs, arch, power_type, power_parameters)
         self.assertEqual(system_id, new_system_id)
 
     @defer.inlineCallbacks
@@ -109,9 +103,7 @@ class TestCreateNode(MAASTestCase):
         protocol, connecting = self.prepare_region_rpc()
         self.addCleanup((yield connecting))
         system_id = factory.make_name("system-id")
-        protocol.CreateNode.return_value = defer.succeed(
-            {"system_id": system_id}
-        )
+        protocol.CreateNode.return_value = defer.succeed({"system_id": system_id})
 
         uuid = "node-" + factory.make_UUID()
         arch = factory.make_name("architecture")
@@ -128,9 +120,7 @@ class TestCreateNode(MAASTestCase):
         macs = sorted(factory.make_mac_address() for _ in range(3))
         macs_with_duplicate = macs + [choice(macs)]
 
-        yield create_node(
-            macs_with_duplicate, arch, power_type, power_parameters
-        )
+        yield create_node(macs_with_duplicate, arch, power_type, power_parameters)
         protocol.CreateNode.assert_called_once_with(
             protocol,
             architecture=arch,
@@ -178,9 +168,7 @@ class TestCommissionNode(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def prepare_region_rpc(self):
         fixture = self.useFixture(MockLiveClusterToRegionRPCFixture())

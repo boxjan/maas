@@ -22,9 +22,7 @@ maaslog = get_maas_logger("subnet")
 class SubnetHandler(TimestampedModelHandler):
     class Meta:
         queryset = (
-            Subnet.objects.all()
-            .select_related("vlan")
-            .prefetch_related("iprange_set")
+            Subnet.objects.all().select_related("vlan").prefetch_related("iprange_set")
         )
         pk = "id"
         form = SubnetForm
@@ -63,9 +61,7 @@ class SubnetHandler(TimestampedModelHandler):
 
     def update(self, parameters):
         subnet = self.get_object(parameters)
-        assert self.user.has_perm(
-            NodePermission.admin, subnet
-        ), "Permission denied."
+        assert self.user.has_perm(NodePermission.admin, subnet), "Permission denied."
         # The JavaScript object will still contain the space for backward
         # compatibility, so we need to strip it out.
         if "space" in parameters:
@@ -74,9 +70,7 @@ class SubnetHandler(TimestampedModelHandler):
 
     def _cache_pks(self, objs):
         subnets = super()._cache_pks(objs)
-        self.cache["staticroutes"] = StaticRoute.objects.filter(
-            source__in=objs
-        )
+        self.cache["staticroutes"] = StaticRoute.objects.filter(source__in=objs)
         # Prefetching on the staticipaddress query set doesn't work,
         # since it only works with model objects. Working with model
         # objects for the IPs doesn't scale.
@@ -85,9 +79,7 @@ class SubnetHandler(TimestampedModelHandler):
         return subnets
 
     def create(self, parameters):
-        assert self.user.has_perm(
-            NodePermission.admin, Subnet
-        ), "Permission denied."
+        assert self.user.has_perm(NodePermission.admin, Subnet), "Permission denied."
         # The JavaScript object will still contain the space for backward
         # compatibility, so we need to strip it out.
         if "space" in parameters:
@@ -97,9 +89,7 @@ class SubnetHandler(TimestampedModelHandler):
     def delete(self, parameters):
         """Delete this Subnet."""
         subnet = self.get_object(parameters)
-        assert self.user.has_perm(
-            NodePermission.admin, subnet
-        ), "Permission denied."
+        assert self.user.has_perm(NodePermission.admin, subnet), "Permission denied."
         subnet.delete()
 
     def scan(self, parameters):
@@ -115,14 +105,10 @@ class SubnetHandler(TimestampedModelHandler):
         )
 
         subnet = self.get_object(parameters)
-        assert self.user.has_perm(
-            NodePermission.admin, Discovery
-        ), "Permission denied."
+        assert self.user.has_perm(NodePermission.admin, Discovery), "Permission denied."
         cidr = subnet.get_ipnetwork()
         if cidr.version != 4:
-            raise ValueError(
-                "Cannot scan subnet: only IPv4 subnets can be scanned."
-            )
+            raise ValueError("Cannot scan subnet: only IPv4 subnets can be scanned.")
         cidrs = [cidr]
         if not RackController.objects.filter_by_subnet_cidrs(cidrs).exists():
             raise ValueError("Subnet must be configured on a rack controller.")

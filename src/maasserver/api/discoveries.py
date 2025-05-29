@@ -311,9 +311,7 @@ class DiscoveriesHandler(OperationsHandler):
         @success-example "success-json" [exkey=discovery-scan]
         placeholder text
         """
-        cidrs = get_optional_list(
-            request.POST, "cidr", default=[], validator=CIDR
-        )
+        cidrs = get_optional_list(request.POST, "cidr", default=[], validator=CIDR)
         # The RPC call requires a list of CIDRs.
         ipnetworks = [IPNetwork(cidr) for cidr in cidrs]
         force = get_optional_param(
@@ -341,9 +339,7 @@ class DiscoveriesHandler(OperationsHandler):
                 "internet service provider or IT department to be sure this "
                 "is\nallowed before proceeding.**\n"
             )
-            return HttpResponseBadRequest(
-                content_type="text/plain", content=error
-            )
+            return HttpResponseBadRequest(content_type="text/plain", content=error)
         elif len(cidrs) == 0 and force is True:
             # No CIDRs specified and force==True, so scan all networks.
             results = scan_all_rack_networks(
@@ -480,9 +476,7 @@ def user_friendly_scan_results(rpc_results: RPCResults) -> dict:
         "scan_started_on": get_controller_summary(rpc_results.success),
         "scan_failed_on": get_controller_summary(rpc_results.failed),
         "scan_attempted_on": get_controller_summary(rpc_results.available),
-        "failed_to_connect_to": get_controller_summary(
-            rpc_results.unavailable
-        ),
+        "failed_to_connect_to": get_controller_summary(rpc_results.unavailable),
         # This is very unlikely to happen, but it's here just in case.
         "rpc_call_timed_out_on": get_controller_summary(rpc_results.timeout),
         "failures": get_failure_summary(rpc_results.failures),

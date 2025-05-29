@@ -12,15 +12,11 @@ class NodesService(Service):
     ):
         super().__init__(connection)
         self.nodes_repository = (
-            nodes_repository
-            if nodes_repository
-            else NodesRepository(connection)
+            nodes_repository if nodes_repository else NodesRepository(connection)
         )
 
     async def move_to_zone(self, old_zone_id: int, new_zone_id: int) -> None:
         """
         Move all the Nodes from 'old_zone_id' to 'new_zone_id'.
         """
-        return await self.nodes_repository.move_to_zone(
-            old_zone_id, new_zone_id
-        )
+        return await self.nodes_repository.move_to_zone(old_zone_id, new_zone_id)

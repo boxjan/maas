@@ -64,9 +64,7 @@ class ProvisioningServiceMaker:
         # Use a backlog of 50, which seems to be fairly common.
         s.listen(50)
         # Adopt this socket into Twisted's reactor.
-        site_endpoint = AdoptedStreamServerEndpoint(
-            reactor, s.fileno(), s.family
-        )
+        site_endpoint = AdoptedStreamServerEndpoint(reactor, s.fileno(), s.family)
         site_endpoint.port = port  # Make it easy to get the port number.
         site_endpoint.socket = s  # Prevent garbage collection.
 
@@ -157,9 +155,7 @@ class ProvisioningServiceMaker:
     def _makeRackHTTPService(self, resource_root, rpc_service):
         from provisioningserver.rackdservices import http
 
-        http_service = http.RackHTTPService(
-            resource_root, rpc_service, reactor
-        )
+        http_service = http.RackHTTPService(resource_root, rpc_service, reactor)
         http_service.setName("http")
         return http_service
 
@@ -251,9 +247,7 @@ class ProvisioningServiceMaker:
             sleep(wait)
         if secret is not None:
             # only setup services if the shared secret is configured
-            for service in self._makeServices(
-                tftp_root, tftp_port, clock=clock
-            ):
+            for service in self._makeServices(tftp_root, tftp_port, clock=clock):
                 service.setServiceParent(services)
 
         return services

@@ -173,9 +173,7 @@ def link_resources(
             # will cause the contents from one subarch to overwrite the
             # contents of another.
             assert len(subarches) == 1
-            directory = os.path.join(
-                snapshot_path, "bootloader", bootloader_type, arch
-            )
+            directory = os.path.join(snapshot_path, "bootloader", bootloader_type, arch)
         if not os.path.exists(directory):
             os.makedirs(directory)
         for cached_file, logical_name in links:
@@ -321,9 +319,7 @@ def compose_snapshot_path(storage_path):
     return os.path.join(storage_path, snapshot_name)
 
 
-def download_all_boot_resources(
-    sources, storage_path, product_mapping, store=None
-):
+def download_all_boot_resources(sources, storage_path, product_mapping, store=None):
     """Download the actual boot resources.
 
     Local copies of boot resources are downloaded into a "cache" directory.

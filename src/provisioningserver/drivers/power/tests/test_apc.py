@@ -19,9 +19,7 @@ class TestAPCPowerDriver(MAASTestCase):
     def make_context(self, pdu_type=None, outlet=None):
         context = {
             "power_address": factory.make_name("power_address"),
-            "node_outlet": (
-                outlet if outlet is not None else random.randrange(1, 8)
-            ),
+            "node_outlet": (outlet if outlet is not None else random.randrange(1, 8)),
             "power_on_delay": "5",
         }
         # Don't put pdu_type in the context by default, since driver
@@ -155,9 +153,7 @@ class TestAPCPowerDriver(MAASTestCase):
         context = self.make_context(pdu_type=pdu_type)
         mock_run_process = self.patch(driver, "run_process")
         mock_run_process.return_value = "Error"
-        self.assertRaises(
-            PowerActionError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_query, system_id, context)
 
     def test_masterswitch(self):
         context = self.make_context(pdu_type="MASTERSWITCH", outlet=5)

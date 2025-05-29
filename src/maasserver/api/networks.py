@@ -35,9 +35,7 @@ def render_network_json(subnet):
         "description": subnet.name,
         "default_gateway": subnet.gateway_ip,
         "dns_servers": subnet.dns_servers,
-        "resource_uri": reverse(
-            "network_handler", args=["subnet-%d" % subnet.id]
-        ),
+        "resource_uri": reverse("network_handler", args=["subnet-%d" % subnet.id]),
     }
 
 

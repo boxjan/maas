@@ -31,9 +31,7 @@ class TestGetSharedSecret(MAASTransactionServerTestCase):
         self.assertGreaterEqual(len(secret), 16)
 
     def test_same_secret_is_returned_on_subsequent_calls(self):
-        self.assertEqual(
-            security.get_shared_secret(), security.get_shared_secret()
-        )
+        self.assertEqual(security.get_shared_secret(), security.get_shared_secret())
 
     def test_errors_when_database_value_cannot_be_decoded(self):
         SecretManager().set_simple_secret("rpc-shared", "_")

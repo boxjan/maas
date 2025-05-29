@@ -252,9 +252,7 @@ class TestEnlistmentAPI(APITestCase.ForAnonymousAndUserAndAdmin):
 
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
         self.assertIn("application/json", response["Content-Type"])
-        self.assertEqual(
-            {"architecture"}, parsed_result.keys(), response.content
-        )
+        self.assertEqual({"architecture"}, parsed_result.keys(), response.content)
 
     def test_POST_create_creates_machine_with_domain(self):
         domain = factory.make_Domain()
@@ -300,9 +298,7 @@ class TestMachineHostnameEnlistment(APITestCase.ForAnonymousAndUserAndAdmin):
                 "mac_addresses": [factory.make_mac_address()],
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         expected_hostname = "{}.{}".format(
             hostname_without_domain,
@@ -332,9 +328,7 @@ class TestNonAdminEnlistmentAPI(APITestCase.ForAnonymousAndUser):
                 "mac_addresses": ["aa:bb:cc:dd:ee:ff"],
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         system_id = json_load_bytes(response.content)["system_id"]
         self.assertEqual(
             NODE_STATUS.NEW, Machine.objects.get(system_id=system_id).status
@@ -410,9 +404,7 @@ class TestAnonymousEnlistmentAPI(APITestCase.ForAnonymous):
             parsed_result["domain"].keys(),
         )
         # Limited fields on zone.
-        self.assertEqual(
-            {"id", "name", "description"}, parsed_result["zone"].keys()
-        )
+        self.assertEqual({"id", "name", "description"}, parsed_result["zone"].keys())
 
     def test_POST_create_returns_machine_with_matching_power_parameters(self):
         mock_create_machine = self.patch(machines_module, "create_machine")
@@ -460,10 +452,7 @@ class TestAnonymousEnlistmentAPI(APITestCase.ForAnonymous):
         machine = factory.make_Machine(
             hostname=hostname, status=NODE_STATUS.NEW, architecture=""
         )
-        macs = [
-            str(factory.make_Interface(node=machine).mac_address)
-            for _ in range(3)
-        ]
+        macs = [str(factory.make_Interface(node=machine).mac_address) for _ in range(3)]
         architecture = make_usable_architecture(self)
         response = self.client.post(
             reverse("machines_handler"),
@@ -615,9 +604,7 @@ class TestSimpleUserLoggedInEnlistmentAPI(APITestCase.ForUser):
         # them.
         factory.make_Node(status=NODE_STATUS.NEW),
         factory.make_Node(status=NODE_STATUS.NEW),
-        response = self.client.post(
-            reverse("machines_handler"), {"op": "accept_all"}
-        )
+        response = self.client.post(reverse("machines_handler"), {"op": "accept_all"})
         self.assertEqual(http.client.OK, response.status_code)
         machines_returned = json_load_bytes(response.content)
         self.assertEqual([], machines_returned)
@@ -794,9 +781,7 @@ class TestAdminLoggedInEnlistmentAPI(APITestCase.ForAdmin):
             },
         )
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         machine = Machine.objects.get(
             system_id=json_load_bytes(response.content)["system_id"]
         )
@@ -846,9 +831,7 @@ class TestAdminLoggedInEnlistmentAPI(APITestCase.ForAdmin):
             },
         )
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         machine = Machine.objects.get(
             system_id=json_load_bytes(response.content)["system_id"]
         )
@@ -977,9 +960,7 @@ class TestAdminLoggedInEnlistmentAPI(APITestCase.ForAdmin):
             factory.make_Node(status=NODE_STATUS.NEW),
             factory.make_Node(status=NODE_STATUS.NEW),
         ]
-        response = self.client.post(
-            reverse("machines_handler"), {"op": "accept_all"}
-        )
+        response = self.client.post(reverse("machines_handler"), {"op": "accept_all"})
         self.assertEqual(http.client.OK, response.status_code)
         machines_returned = json_load_bytes(response.content)
         self.assertSetEqual(

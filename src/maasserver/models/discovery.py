@@ -50,9 +50,7 @@ class DiscoveryQueriesMixin(MAASQueriesMixin):
         # Circular imports
         from maasserver.models import Interface
 
-        known_macs = Interface.objects.values_list(
-            "mac_address", flat=True
-        ).distinct()
+        known_macs = Interface.objects.values_list("mac_address", flat=True).distinct()
         return self.exclude(mac_address__in=known_macs)
 
     def by_unknown_ip(self):
@@ -62,9 +60,9 @@ class DiscoveryQueriesMixin(MAASQueriesMixin):
         # Circular imports
         from maasserver.models import StaticIPAddress
 
-        known_ips = StaticIPAddress.objects.exclude(
-            ip__isnull=True
-        ).values_list("ip", flat=True)
+        known_ips = StaticIPAddress.objects.exclude(ip__isnull=True).values_list(
+            "ip", flat=True
+        )
         return self.exclude(ip__in=known_ips)
 
     def by_unknown_ip_and_mac(self):
@@ -134,9 +132,7 @@ class DiscoveryManager(Manager, DiscoveryQueriesMixin):
         maaslog.info(
             "%s all %s entries."
             % (
-                "Cleared"
-                if user is None
-                else "User '%s' cleared" % (user.username),
+                "Cleared" if user is None else "User '%s' cleared" % (user.username),
                 what,
             )
         )
@@ -145,9 +141,7 @@ class DiscoveryManager(Manager, DiscoveryQueriesMixin):
         # Circular imports.
         from maasserver.models import MDNS, Neighbour, RDNS
 
-        delete_result = Neighbour.objects.filter(
-            ip=ip, mac_address=mac
-        ).delete()
+        delete_result = Neighbour.objects.filter(ip=ip, mac_address=mac).delete()
         MDNS.objects.filter(ip=ip).delete()
         RDNS.objects.filter(ip=ip).delete()
         if delete_result[0] >= 1:
@@ -259,9 +253,7 @@ class Discovery(Model):
         on_delete=DO_NOTHING,
     )
 
-    observer_interface_name = CharField(
-        blank=False, editable=False, max_length=255
-    )
+    observer_interface_name = CharField(blank=False, editable=False, max_length=255)
 
     fabric = ForeignKey(
         "Fabric",
@@ -297,13 +289,9 @@ class Discovery(Model):
         on_delete=DO_NOTHING,
     )
 
-    subnet_cidr = CIDRField(
-        blank=True, unique=False, editable=False, null=True
-    )
+    subnet_cidr = CIDRField(blank=True, unique=False, editable=False, null=True)
 
-    is_external_dhcp = BooleanField(
-        blank=True, unique=False, editable=False, null=True
-    )
+    is_external_dhcp = BooleanField(blank=True, unique=False, editable=False, null=True)
 
     objects = DiscoveryManager()
 

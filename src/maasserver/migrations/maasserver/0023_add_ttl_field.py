@@ -12,32 +12,24 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dnsdata",
             name="ttl",
-            field=models.PositiveIntegerField(
-                null=True, default=None, blank=True
-            ),
+            field=models.PositiveIntegerField(null=True, default=None, blank=True),
         ),
         migrations.AddField(
             model_name="domain",
             name="ttl",
-            field=models.PositiveIntegerField(
-                null=True, default=None, blank=True
-            ),
+            field=models.PositiveIntegerField(null=True, default=None, blank=True),
         ),
         migrations.AddField(
             model_name="node",
             name="address_ttl",
-            field=models.PositiveIntegerField(
-                null=True, default=None, blank=True
-            ),
+            field=models.PositiveIntegerField(null=True, default=None, blank=True),
         ),
         # No data has ever lived here, so this is really just a rename.
         migrations.RemoveField(model_name="dnsresource", name="ttl"),
         migrations.AddField(
             model_name="dnsresource",
             name="address_ttl",
-            field=models.PositiveIntegerField(
-                null=True, default=None, blank=True
-            ),
+            field=models.PositiveIntegerField(null=True, default=None, blank=True),
         ),
         migrations.AlterField(
             model_name="dnsresource",

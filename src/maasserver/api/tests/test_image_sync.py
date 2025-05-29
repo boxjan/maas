@@ -34,9 +34,7 @@ class TestImageSyncProgressHandler(APITestCase.ForAdmin):
         )
         uri = get_image_sync_uri(file.id, region.system_id)
         response = self.client.put(uri, {})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         syncstatus = file.bootresourcefilesync_set.get(region=region)
         self.assertEqual(syncstatus.size, 0)
 
@@ -51,9 +49,7 @@ class TestImageSyncProgressHandler(APITestCase.ForAdmin):
         test_size = random.randint(1, 30)
         uri = get_image_sync_uri(file.id, region.system_id)
         response = self.client.put(uri, {"size": test_size})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         syncstatus = file.bootresourcefilesync_set.get(region=region)
         self.assertEqual(test_size, syncstatus.size)
 
@@ -69,9 +65,7 @@ class TestImageSyncProgressHandler(APITestCase.ForAdmin):
         test_size = random.randint(1, 30)
         uri = get_image_sync_uri(file.id, region.system_id)
         response = self.client.put(uri, {"size": test_size})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         syncset = file.bootresourcefilesync_set.get(region=region)
         self.assertEqual(syncset.size, test_size)
 
@@ -86,9 +80,7 @@ class TestImageSyncProgressHandler(APITestCase.ForAdmin):
         test_size = random.randint(1, 30)
         uri = get_image_sync_uri((file.id + 1), region.system_id)
         response = self.client.put(uri, {"size": test_size})
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_read_nonexistent_brfsync(self):
         region = factory.make_RegionController()
@@ -100,9 +92,7 @@ class TestImageSyncProgressHandler(APITestCase.ForAdmin):
         )
         uri = get_image_sync_uri(file.id, region.system_id)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         r = json.loads(response.content)
         self.assertEqual(r.get("size"), 0)
 
@@ -115,14 +105,10 @@ class TestImageSyncProgressHandler(APITestCase.ForAdmin):
             resource_set, size=total_size
         )
         test_size = random.randint(1, 10)
-        filesync = file.bootresourcefilesync_set.create(
-            region=region, size=test_size
-        )
+        filesync = file.bootresourcefilesync_set.create(region=region, size=test_size)
         uri = get_image_sync_uri(file.id, region.system_id)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         r = json.loads(response.content)
         self.assertEqual(r.get("size"), filesync.size)
 
@@ -136,9 +122,7 @@ class TestImageSyncProgressHandler(APITestCase.ForAdmin):
         )
         uri = get_image_sync_uri((file.id + 1), region.system_id)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
 
 class TestImagesSyncProgressHandler(APITestCase.ForAdmin):
@@ -161,18 +145,12 @@ class TestImagesSyncProgressHandler(APITestCase.ForAdmin):
             synced=[(regions[0], 256)],
         )
         response = self.client.get(reverse("images_sync_progress_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         status = response.json()
         self.assertEqual(complete.size, status[str(complete.id)]["size"])
         self.assertEqual(complete.sha256, status[str(complete.id)]["sha256"])
-        self.assertEqual(
-            partial_sync.size, status[str(partial_sync.id)]["size"]
-        )
-        self.assertEqual(
-            partial_sync.sha256, status[str(partial_sync.id)]["sha256"]
-        )
+        self.assertEqual(partial_sync.size, status[str(partial_sync.id)]["size"])
+        self.assertEqual(partial_sync.sha256, status[str(partial_sync.id)]["sha256"])
         self.assertItemsEqual(
             (str(partial_sync.id), str(complete.id)), set(status.keys())
         )
@@ -189,8 +167,7 @@ class TestImagesSyncProgressHandler(APITestCase.ForAdmin):
         resource = factory.make_BootResource(rtype=BOOT_RESOURCE_TYPE.UPLOADED)
         resource_set = factory.make_BootResourceSet(resource)
         rfiles = [
-            factory.make_BootResourceFile(resource_set=resource_set)
-            for _ in range(3)
+            factory.make_BootResourceFile(resource_set=resource_set) for _ in range(3)
         ]
         response = self.client.post(
             reverse("images_sync_progress_handler"),
@@ -200,22 +177,14 @@ class TestImagesSyncProgressHandler(APITestCase.ForAdmin):
                 "size": 1,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         for f in rfiles[:1]:
-            self.assertEqual(
-                1, f.bootresourcefilesync_set.get(region=regions[0]).size
-            )
+            self.assertEqual(1, f.bootresourcefilesync_set.get(region=regions[0]).size)
         self.assertFalse(
-            rfiles[0]
-            .bootresourcefilesync_set.filter(region=regions[1])
-            .exists()
+            rfiles[0].bootresourcefilesync_set.filter(region=regions[1]).exists()
         )
         self.assertFalse(
-            rfiles[2]
-            .bootresourcefilesync_set.filter(region=regions[0])
-            .exists()
+            rfiles[2].bootresourcefilesync_set.filter(region=regions[0]).exists()
         )
 
     def test_bulk_create_single_val(self):
@@ -231,10 +200,6 @@ class TestImagesSyncProgressHandler(APITestCase.ForAdmin):
                 "size": 1,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         for f in rfiles:
-            self.assertEqual(
-                1, f.bootresourcefilesync_set.get(region=regions[0]).size
-            )
+            self.assertEqual(1, f.bootresourcefilesync_set.get(region=regions[0]).size)

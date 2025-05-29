@@ -195,9 +195,7 @@ class TestPodForm(MAASTransactionServerTestCase):
         form = PodForm(data=pod_info, request=self.request)
         self.assertTrue(form.is_valid(), form._errors)
         pod = form.save()
-        self.assertEqual(
-            pod_info["cpu_over_commit_ratio"], pod.cpu_over_commit_ratio
-        )
+        self.assertEqual(pod_info["cpu_over_commit_ratio"], pod.cpu_over_commit_ratio)
         self.assertEqual(
             pod_info["memory_over_commit_ratio"], pod.memory_over_commit_ratio
         )
@@ -216,9 +214,7 @@ class TestPodForm(MAASTransactionServerTestCase):
         self.assertCountEqual(tags, pod.tags)
 
     def test_creates_pod_with_existing_pod_console_logging_tag(self):
-        tag = factory.make_Tag(
-            name="pod-console-logging", kernel_opts="foo bar"
-        )
+        tag = factory.make_Tag(name="pod-console-logging", kernel_opts="foo bar")
         pod_info = self.make_pod_info()
         form = PodForm(data=pod_info, request=self.request)
         self.assertTrue(form.is_valid(), form._errors)
@@ -319,9 +315,7 @@ class TestPodForm(MAASTransactionServerTestCase):
             parameters=power_parameters,
         )
         new_name = factory.make_name("pod")
-        form = PodForm(
-            data={"name": new_name}, request=self.request, instance=orig_pod
-        )
+        form = PodForm(data={"name": new_name}, request=self.request, instance=orig_pod)
         self.assertTrue(form.is_valid(), form._errors)
         pod = form.save()
         self.assertEqual(new_name, pod.name)
@@ -376,9 +370,7 @@ class TestPodForm(MAASTransactionServerTestCase):
         )
         self.assertTrue(form.is_valid(), form._errors)
         pod = form.save()
-        self.assertEqual(
-            pod.default_storage_pool.pool_id, default_storage_pool.id
-        )
+        self.assertEqual(pod.default_storage_pool.pool_id, default_storage_pool.id)
 
     def test_updates_default_macvlan_mode(self):
         discovered_pod = self.make_discovered_pod()
@@ -396,9 +388,7 @@ class TestPodForm(MAASTransactionServerTestCase):
 
     def test_updates_clustered_peers_certificates(self):
         cluster = factory.make_VMCluster(pods=0)
-        vmhosts = [
-            factory.make_Pod(pod_type="lxd", cluster=cluster) for _ in range(3)
-        ]
+        vmhosts = [factory.make_Pod(pod_type="lxd", cluster=cluster) for _ in range(3)]
         sample_cert = get_sample_cert()
         form = PodForm(
             data={
@@ -499,9 +489,7 @@ class TestPodForm(MAASTransactionServerTestCase):
             created_with_cert_expiration_days=12,
         )
         pod_info["password"] = ""
-        non_maas_cert = Certificate.generate(
-            "mycn", validity=timedelta(days=24)
-        )
+        non_maas_cert = Certificate.generate("mycn", validity=timedelta(days=24))
         pod_info["certificate"] = non_maas_cert.certificate_pem()
         pod_info["key"] = non_maas_cert.private_key_pem()
         form = PodForm(instance=pod, data=pod_info, request=self.request)
@@ -549,9 +537,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
 
     def test_requires_pod_kwarg(self):
         request = MagicMock()
-        error = self.assertRaises(
-            ValueError, ComposeMachineForm, request=request
-        )
+        error = self.assertRaises(ValueError, ComposeMachineForm, request=request)
         self.assertEqual("'pod' kwargs is required.", str(error))
 
     def test_sets_up_fields_based_on_pod(self):
@@ -586,9 +572,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         self.assertFalse(cpu_speed.required)
         max_cpu_speed_validator, min_cpu_speed_validator = cpu_speed.validators
         self.assertIsInstance(max_cpu_speed_validator, MaxValueValidator)
-        self.assertEqual(
-            max_cpu_speed_validator.limit_value, pod.hints.cpu_speed
-        )
+        self.assertEqual(max_cpu_speed_validator.limit_value, pod.hints.cpu_speed)
         self.assertIsInstance(min_cpu_speed_validator, MinValueValidator)
         self.assertEqual(min_cpu_speed_validator.limit_value, 300)
 
@@ -598,9 +582,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         pod.architectures = []
         form = ComposeMachineForm(request=request, pod=pod)
         self.assertFalse(form.fields["architecture"].required)
-        self.assertEqual(
-            pod.architectures, form.fields["architecture"].choices
-        )
+        self.assertEqual(pod.architectures, form.fields["architecture"].choices)
         self.assertNotIn("architecture", form.initial)
 
     def test_sets_up_fields_based_on_pod_no_max_cpu_speed(self):
@@ -630,9 +612,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         pod = make_pod_with_hints()
         form = ComposeMachineForm(data={}, request=request, pod=pod)
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         self.assertEqual(request_machine.architecture, pod.architectures[0])
         self.assertEqual(request_machine.cores, DEFAULT_COMPOSED_CORES)
@@ -643,9 +623,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
 
         for block_device in request_machine.block_devices:
             self.assertIsInstance(block_device, RequestedMachineBlockDevice)
-            self.assertEqual(
-                block_device.size, DEFAULT_COMPOSED_STORAGE * (1000**3)
-            )
+            self.assertEqual(block_device.size, DEFAULT_COMPOSED_STORAGE * (1000**3))
         for interface in request_machine.interfaces:
             self.assertIsInstance(interface, RequestedMachineInterface)
         self.assertEqual(request_machine.known_host_interfaces, [])
@@ -681,9 +659,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             pod=pod,
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         self.assertEqual(request_machine.architecture, architecture)
         self.assertEqual(request_machine.cores, cores)
@@ -713,9 +689,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             pod=pod,
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertCountEqual(request_machine.pinned_cores, pinned_cores)
 
     def test_get_machine_pinned_cores_invalid(self):
@@ -738,13 +712,9 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             disk_1 // (1000**3),
             disk_2 // (1000**3),
         )
-        form = ComposeMachineForm(
-            data={"storage": storage}, request=request, pod=pod
-        )
+        form = ComposeMachineForm(data={"storage": storage}, request=request, pod=pod)
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
 
         actual_disk_1, actual_disk_2 = request_machine.block_devices
@@ -803,9 +773,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         (eth0,) = request_machine.interfaces
 
@@ -826,13 +794,9 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         pod = make_pod_with_hints()
         pod.ip_address = host.boot_interface.ip_addresses.first()
         pod.save()
-        form = ComposeMachineForm(
-            data=dict(interfaces=""), request=request, pod=pod
-        )
+        form = ComposeMachineForm(data=dict(interfaces=""), request=request, pod=pod)
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         (iface,) = request_machine.interfaces
         self.assertIsInstance(iface, RequestedMachineInterface)
@@ -860,14 +824,10 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         composed_machine.interfaces = [
-            DiscoveredMachineInterface(
-                mac_address="00:01:02:03:04:05", boot=True
-            )
+            DiscoveredMachineInterface(mac_address="00:01:02:03:04:05", boot=True)
         ]
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
         request = MagicMock()
         ip = factory.make_StaticIPAddress(
             interface=host.get_boot_interface(), subnet=subnet
@@ -879,9 +839,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         (eth0,) = request_machine.interfaces
 
@@ -911,9 +869,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         (eth0,) = request_machine.interfaces
 
@@ -944,9 +900,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         (eth0,) = request_machine.interfaces
 
@@ -970,9 +924,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         (eth0,) = request_machine.interfaces
 
@@ -1000,9 +952,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         eth0, eth1 = request_machine.interfaces
         self.assertIsInstance(eth0, RequestedMachineInterface)
@@ -1040,9 +990,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         eth0, eth1 = request_machine.interfaces
         self.assertIsInstance(eth0, RequestedMachineInterface)
@@ -1085,9 +1033,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         eth0, eth1 = request_machine.interfaces
         self.assertIsInstance(eth0, RequestedMachineInterface)
@@ -1137,9 +1083,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertIsInstance(request_machine, RequestedMachine)
         eth0, eth1 = request_machine.interfaces
         self.assertIsInstance(eth0, RequestedMachineInterface)
@@ -1179,9 +1123,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertEqual(
             [
                 RequestedMachineInterface(
@@ -1234,9 +1176,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertEqual(
             [
                 RequestedMachineInterface(
@@ -1272,9 +1212,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             data={"interfaces": interfaces}, request=request, pod=pod
         )
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertEqual(
             [
                 RequestedMachineInterface(
@@ -1291,15 +1229,11 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Need to test that it can actually find the pod host's data correctly
         # and that this matches what is expected.
         request = MagicMock()
-        pod_host = factory.make_Machine_with_Interface_on_Subnet(
-            interface_count=3
-        )
+        pod_host = factory.make_Machine_with_Interface_on_Subnet(interface_count=3)
         pod = make_pod_with_hints(host=pod_host)
         form = ComposeMachineForm(data={}, request=request, pod=pod)
         self.assertTrue(form.is_valid(), form.errors)
-        request_machine = form.get_requested_machine(
-            get_known_host_interfaces(pod)
-        )
+        request_machine = form.get_requested_machine(get_known_host_interfaces(pod))
         self.assertEqual(
             [
                 KnownHostInterface(
@@ -1309,8 +1243,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
                     if interface.type == INTERFACE_TYPE.BRIDGE
                     else InterfaceAttachType.MACVLAN,
                     dhcp_enabled=(
-                        interface.vlan.dhcp_on
-                        or interface.vlan.relay_vlan.dhcp_on
+                        interface.vlan.dhcp_on or interface.vlan.relay_vlan.dhcp_on
                     ),
                 )
                 for interface in pod.host.current_config.interface_set.all()
@@ -1338,9 +1271,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             )
         ]
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         request = MagicMock()
         subnet = pod.host.boot_interface.ip_addresses.first().subnet
@@ -1383,9 +1314,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
             )
         ]
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
         request = MagicMock()
         subnet = pod.host.boot_interface.ip_addresses.first().subnet
         host = factory.make_Machine_with_Interface_on_Subnet(subnet=subnet)
@@ -1407,9 +1336,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         self.assertTrue(form.is_valid(), form.errors)
         machine = form.compose()
         ip = StaticIPAddress.objects.filter(ip=expected_ip).first()
-        self.assertEqual(
-            ip.get_interface().node_config, machine.current_config
-        )
+        self.assertEqual(ip.get_interface().node_config, machine.current_config)
         mock_post_commit_do.assert_called_once()
 
     def test_compose_with_commissioning(self):
@@ -1425,9 +1352,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         # Mock start_commissioning so it doesn't use post commit hooks.
         mock_commissioning = self.patch(Machine, "start_commissioning")
@@ -1454,9 +1379,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         # Mock start_commissioning so it doesn't use post commit hooks.
         self.patch(Machine, "start_commissioning")
@@ -1483,9 +1406,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         request = MagicMock()
         pod = make_pod_with_hints()
 
-        form = ComposeMachineForm(
-            data={"hostname": "test"}, request=request, pod=pod
-        )
+        form = ComposeMachineForm(data={"hostname": "test"}, request=request, pod=pod)
         self.assertFalse(form.is_valid())
         self.assertEqual(
             {"hostname": ['Node with hostname "test" already exists']},
@@ -1501,11 +1422,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         )
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            {
-                "hostname": [
-                    "Host label cannot contain underscore: 'testing_hostname'."
-                ]
-            },
+            {"hostname": ["Host label cannot contain underscore: 'testing_hostname'."]},
             form.errors,
         )
 
@@ -1522,9 +1439,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         # Mock start_commissioning so it doesn't use post commit hooks.
         mock_commissioning = self.patch(Machine, "start_commissioning")
@@ -1554,9 +1469,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         # Mock start_commissioning so it doesn't use post commit hooks.
         mock_commissioning = self.patch(Machine, "start_commissioning")
@@ -1584,9 +1497,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         domain = factory.make_Domain()
         zone = factory.make_Zone()
@@ -1618,9 +1529,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         pool = factory.make_ResourcePool()
         form = ComposeMachineForm(
@@ -1648,9 +1557,7 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         form = ComposeMachineForm(
             data={"skip_commissioning": "true"}, request=request, pod=pod
@@ -1739,17 +1646,13 @@ class TestComposeMachineForm(MAASTransactionServerTestCase):
         # Mock the result of the composed machine.
         composed_machine, pod_hints = self.make_compose_machine_result(pod)
         mock_compose_machine = self.patch(pods_module, "compose_machine")
-        mock_compose_machine.return_value = succeed(
-            (composed_machine, pod_hints)
-        )
+        mock_compose_machine.return_value = succeed((composed_machine, pod_hints))
 
         # Mock start_commissioning so it doesn't use post commit hooks.
         mock_commissioning = self.patch(Machine, "start_commissioning")
 
         def get_free_ip():
-            free_ip = factory.make_StaticIPAddress(
-                interface=pod.host.boot_interface
-            )
+            free_ip = factory.make_StaticIPAddress(interface=pod.host.boot_interface)
             requested_ip = free_ip.ip
             free_ip.delete()
             return requested_ip
@@ -1787,9 +1690,7 @@ class TestComposeMachineForPodsForm(MAASServerTestCase):
     def make_data(self, pods):
         return {
             "cores": random.randint(1, min(pod.hints.cores for pod in pods)),
-            "memory": random.randint(
-                1024, min(pod.hints.memory for pod in pods)
-            ),
+            "memory": random.randint(1024, min(pod.hints.memory for pod in pods)),
             "architecture": random.choice(
                 [
                     "amd64/generic",

@@ -10,9 +10,7 @@ from maasserver import forms
 from maasserver.testing.factory import factory
 
 
-def make_arch(
-    with_subarch=True, arch_name=None, subarch_name=None, extra=None
-):
+def make_arch(with_subarch=True, arch_name=None, subarch_name=None, extra=None):
     """Generate an arbitrary architecture name.
 
     :param with_subarch: Should the architecture include a slash and a

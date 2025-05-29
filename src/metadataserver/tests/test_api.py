@@ -110,16 +110,12 @@ class TestHelpers(MAASServerTestCase):
         input_text = "Hello."
         response = make_text_response(input_text)
         self.assertEqual("text/plain", response["Content-Type"])
-        self.assertEqual(
-            input_text, response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(input_text, response.content.decode(settings.DEFAULT_CHARSET))
 
     def test_make_list_response_presents_list_as_newline_separated_text(self):
         response = make_list_response(["aaa", "bbb"])
         self.assertEqual("text/plain", response["Content-Type"])
-        self.assertEqual(
-            "aaa\nbbb", response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual("aaa\nbbb", response.content.decode(settings.DEFAULT_CHARSET))
 
     def test_check_version_accepts_latest(self):
         check_version("latest")
@@ -137,9 +133,7 @@ class TestHelpers(MAASServerTestCase):
         self.assertEqual(node, get_node_for_request(request))
 
     def test_get_node_for_request_reports_missing_auth_header(self):
-        self.assertRaises(
-            Unauthorized, get_node_for_request, self.fake_request()
-        )
+        self.assertRaises(Unauthorized, get_node_for_request, self.fake_request())
 
     def test_get_node_for_mac_refuses_if_anonymous_access_disabled(self):
         self.patch(settings, "ALLOW_UNSAFE_METADATA_ACCESS", False)
@@ -148,16 +142,12 @@ class TestHelpers(MAASServerTestCase):
         )
 
     def test_get_node_for_mac_raises_404_for_unknown_mac(self):
-        self.assertRaises(
-            MAASAPINotFound, get_node_for_mac, factory.make_mac_address()
-        )
+        self.assertRaises(MAASAPINotFound, get_node_for_mac, factory.make_mac_address())
 
     def test_get_node_for_mac_finds_node_by_mac(self):
         node = factory.make_Node_with_Interface_on_Subnet()
         iface = node.get_boot_interface()
-        self.assertEqual(
-            iface.node_config.node, get_node_for_mac(iface.mac_address)
-        )
+        self.assertEqual(iface.node_config.node, get_node_for_mac(iface.mac_address))
 
     def test_get_queried_node_looks_up_by_mac_if_given(self):
         node = factory.make_Node_with_Interface_on_Subnet()
@@ -245,9 +235,7 @@ class TestHelpers(MAASServerTestCase):
         self.assertEqual(action, event.action)
         self.assertIn(origin, event.description)
         self.assertIn(description, event.description)
-        self.assertEqual(
-            EVENT_TYPES.REQUEST_CONTROLLER_REFRESH, event.type.name
-        )
+        self.assertEqual(EVENT_TYPES.REQUEST_CONTROLLER_REFRESH, event.type.name)
 
     def test_process_file_creates_new_entry_for_output(self):
         results = {}
@@ -715,9 +703,7 @@ def call_signal(
     if headers is None:
         headers = {}
     if client is None:
-        client = make_node_client(
-            factory.make_Node(status=NODE_STATUS.COMMISSIONING)
-        )
+        client = make_node_client(factory.make_Node(status=NODE_STATUS.COMMISSIONING))
     if status is None:
         status = SIGNAL_STATUS.OK
     params = {"op": "signal", "status": status}
@@ -760,9 +746,7 @@ class TestMetadataCommon(MAASServerTestCase):
 
     def test_no_anonymous_access(self):
         url = reverse(self.get_metadata_name())
-        self.assertEqual(
-            http.client.UNAUTHORIZED, self.client.get(url).status_code
-        )
+        self.assertEqual(http.client.UNAUTHORIZED, self.client.get(url).status_code)
 
     def test_metadata_index_shows_latest(self):
         client = make_node_client()
@@ -782,11 +766,7 @@ class TestMetadataCommon(MAASServerTestCase):
         client = make_node_client()
         view_name = self.get_metadata_name("-version")
         url = reverse(view_name, args=["latest"])
-        content = (
-            client.get(url)
-            .content.decode(settings.DEFAULT_CHARSET)
-            .splitlines()
-        )
+        content = client.get(url).content.decode(settings.DEFAULT_CHARSET).splitlines()
         for needle in ("meta-data", "maas-commissioning-scripts"):
             self.assertIn(needle, content)
 
@@ -1068,9 +1048,7 @@ class TestMetadataUserData(MAASServerTestCase):
         NodeUserData.objects.set_user_data(node, sample_binary_data)
         client = make_node_client(node)
         user_data = factory.make_name("user data").encode("ascii")
-        self.patch(
-            api, "generate_user_data_for_poweroff"
-        ).return_value = user_data
+        self.patch(api, "generate_user_data_for_poweroff").return_value = user_data
         response = client.get(reverse("metadata-user-data", args=["latest"]))
         self.assertEqual("application/octet-stream", response["Content-Type"])
         self.assertIsInstance(response.content, bytes)
@@ -1080,9 +1058,7 @@ class TestMetadataUserData(MAASServerTestCase):
         )
 
     def test_user_data_for_node_without_user_data_returns_not_found(self):
-        client = make_node_client(
-            factory.make_Node(status=NODE_STATUS.COMMISSIONING)
-        )
+        client = make_node_client(factory.make_Node(status=NODE_STATUS.COMMISSIONING))
         response = client.get(reverse("metadata-user-data", args=["latest"]))
         self.assertEqual(http.client.NOT_FOUND, response.status_code)
 
@@ -1095,9 +1071,7 @@ class TestMetadataUserDataStateChanges(MAASServerTestCase):
         self.useFixture(SignalsDisabled("power"))
 
     def test_request_does_not_cause_status_change_if_not_deploying(self):
-        status = factory.pick_enum(
-            NODE_STATUS, but_not=[NODE_STATUS.DEPLOYING]
-        )
+        status = factory.pick_enum(NODE_STATUS, but_not=[NODE_STATUS.DEPLOYING])
         node = factory.make_Node(status=status)
         NodeUserData.objects.set_user_data(node, sample_binary_data)
         client = make_node_client(node)
@@ -1114,9 +1088,7 @@ class TestMetadataUserDataStateChanges(MAASServerTestCase):
         self.assertEqual(NODE_STATUS.DEPLOYED, reload_object(node).status)
 
     def test_skips_status_change_if_installing_kvm_and_sets_agent_name(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.DEPLOYING, install_kvm=True
-        )
+        node = factory.make_Node(status=NODE_STATUS.DEPLOYING, install_kvm=True)
         NodeUserData.objects.set_user_data(node, sample_binary_data)
         client = make_node_client(node)
         response = client.get(reverse("metadata-user-data", args=["latest"]))
@@ -1128,9 +1100,7 @@ class TestMetadataUserDataStateChanges(MAASServerTestCase):
     def test_skips_status_change_if_registering_vmhost_and_sets_agent_name(
         self,
     ):
-        node = factory.make_Node(
-            status=NODE_STATUS.DEPLOYING, register_vmhost=True
-        )
+        node = factory.make_Node(status=NODE_STATUS.DEPLOYING, register_vmhost=True)
         NodeUserData.objects.set_user_data(node, sample_binary_data)
         client = make_node_client(node)
         response = client.get(reverse("metadata-user-data", args=["latest"]))
@@ -1179,9 +1149,7 @@ class TestCurtinMetadataUserData(MAASServerTestCase):
     def test_curtin_user_data_view_returns_curtin_data(self):
         # This should be in a reusable place - when we just run this
         # test, it takes ~1s to calculate the API description.
-        self.patch(support, "get_api_description").return_value = {
-            "hash": "0xDEADBEEF"
-        }
+        self.patch(support, "get_api_description").return_value = {"hash": "0xDEADBEEF"}
         node = factory.make_Node()
         url = reverse("curtin-metadata-user-data", args=["latest"])
         userdata = self.patch(api, "get_curtin_userdata")
@@ -1189,9 +1157,7 @@ class TestCurtinMetadataUserData(MAASServerTestCase):
 
         response = client.get(url)
         userdata.assert_called_once_with(ANY, node)
-        self.assertEqual(
-            http.client.OK.value, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK.value, response.status_code, response.content)
 
 
 class TestInstallingAPI(MAASServerTestCase):
@@ -1216,9 +1182,7 @@ class TestInstallingAPI(MAASServerTestCase):
         client = make_node_client(node)
         response = call_signal(client, status=SIGNAL_STATUS.OK)
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.DEPLOYING, reload_object(other_node).status
-        )
+        self.assertEqual(NODE_STATUS.DEPLOYING, reload_object(other_node).status)
 
     def test_signaling_installation_success_leaves_node_deploying(self):
         node = factory.make_Node(
@@ -1232,9 +1196,7 @@ class TestInstallingAPI(MAASServerTestCase):
         self.assertEqual(NODE_STATUS.DEPLOYING, reload_object(node).status)
 
     def test_signaling_installation_success_does_not_populate_tags(self):
-        populate_tags_for_single_node = self.patch(
-            api, "populate_tags_for_single_node"
-        )
+        populate_tags_for_single_node = self.patch(api, "populate_tags_for_single_node")
         node = factory.make_Node(
             interface=True,
             status=NODE_STATUS.DEPLOYING,
@@ -1247,9 +1209,7 @@ class TestInstallingAPI(MAASServerTestCase):
         populate_tags_for_single_node.assert_not_called()
 
     def test_tag_population_failure_logs_event(self):
-        populate_tags_for_single_node = self.patch(
-            api, "populate_tags_for_single_node"
-        )
+        populate_tags_for_single_node = self.patch(api, "populate_tags_for_single_node")
         populate_tags_for_single_node.side_effect = Exception
         node = factory.make_Node(
             interface=True,
@@ -1296,9 +1256,7 @@ class TestInstallingAPI(MAASServerTestCase):
         client = make_node_client(node=node)
         response = call_signal(client, status=SIGNAL_STATUS.FAILED)
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status)
 
     def test_signaling_installation_failure_is_idempotent(self):
         node = factory.make_Node(
@@ -1310,9 +1268,7 @@ class TestInstallingAPI(MAASServerTestCase):
         call_signal(client, status=SIGNAL_STATUS.FAILED)
         response = call_signal(client, status=SIGNAL_STATUS.FAILED)
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status)
 
     def test_signaling_installation_updates_last_ping(self):
         start_time = floor(time.time())
@@ -1327,9 +1283,7 @@ class TestInstallingAPI(MAASServerTestCase):
 
         end_time = ceil(time.time())
         script_set = node.current_installation_script_set
-        self.assertGreaterEqual(
-            ceil(script_set.last_ping.timestamp()), start_time
-        )
+        self.assertGreaterEqual(ceil(script_set.last_ping.timestamp()), start_time)
         self.assertLessEqual(floor(script_set.last_ping.timestamp()), end_time)
 
     def test_signaling_installation_with_netconf_sets_script_to_netconf(self):
@@ -1338,9 +1292,7 @@ class TestInstallingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_installation_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_installation_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -1358,9 +1310,7 @@ class TestInstallingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_installation_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_installation_script_set.scriptresult_set.first()
         script_result.status = random.choice(
             [SCRIPT_STATUS.PENDING, SCRIPT_STATUS.APPLYING_NETCONF]
         )
@@ -1382,9 +1332,7 @@ class TestInstallingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_installation_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_installation_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -1402,9 +1350,7 @@ class TestInstallingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_installation_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_installation_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -1422,9 +1368,7 @@ class TestInstallingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_installation_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_installation_script_set.scriptresult_set.first()
         script_status = factory.pick_choice(
             SCRIPT_STATUS_CHOICES,
             but_not=[
@@ -1452,9 +1396,7 @@ class TestInstallingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_installation_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_installation_script_set.scriptresult_set.first()
         script_status = factory.pick_choice(
             SCRIPT_STATUS_CHOICES,
             but_not=[
@@ -1486,9 +1428,7 @@ class TestInstallingAPI(MAASServerTestCase):
         old_last_sync = node.last_sync = datetime.now()
         node.save()
 
-        script_result = (
-            node.current_installation_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_installation_script_set.scriptresult_set.first()
         script_status = factory.pick_choice(
             SCRIPT_STATUS_CHOICES,
             but_not=[
@@ -1524,9 +1464,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(mode, member.mode)
         self.assertEqual(content, tar.extractfile(path).read())
 
-    def validate_scripts(
-        self, script_set, path_name, tar, start_time, end_time
-    ):
+    def validate_scripts(self, script_set, path_name, tar, start_time, end_time):
         meta_data = []
         contains_network_config = False
         for script_result in script_set:
@@ -1540,9 +1478,7 @@ class TestMAASScripts(MAASServerTestCase):
                 script = NODE_INFO_SCRIPTS[script_result.name]
                 content = script["content"]
                 md_item["timeout_seconds"] = script["timeout"].total_seconds()
-                md_item["parallel"] = script.get(
-                    "parallel", SCRIPT_PARALLEL.DISABLED
-                )
+                md_item["parallel"] = script.get("parallel", SCRIPT_PARALLEL.DISABLED)
                 md_item["hardware_type"] = script.get(
                     "hardware_type", HARDWARE_TYPE.NODE
                 )
@@ -1648,8 +1584,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -1658,9 +1593,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(len(NODE_INFO_SCRIPTS) + 1, len(tar.getmembers()))
         commissioning_meta_data = []
         for script in (
-            Script.objects.filter(
-                script_type=SCRIPT_TYPE.COMMISSIONING, default=True
-            )
+            Script.objects.filter(script_type=SCRIPT_TYPE.COMMISSIONING, default=True)
             .exclude(
                 # Network configuration is based on node configuration however
                 # the node doesn't exist yet. Once the node is created the
@@ -1691,9 +1624,7 @@ class TestMAASScripts(MAASServerTestCase):
             self.extract_and_validate_file(
                 tar, path, start_time, end_time, script.script.data.encode()
             )
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertEqual(
             {
                 "1.0": {
@@ -1712,8 +1643,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
         end_time = ceil(time.time())
@@ -1745,9 +1675,7 @@ class TestMAASScripts(MAASServerTestCase):
             self.extract_and_validate_file(
                 tar, path, start_time, end_time, script.script.data.encode()
             )
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertEqual(
             {
                 "1.0": {
@@ -1775,8 +1703,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -1817,9 +1744,7 @@ class TestMAASScripts(MAASServerTestCase):
             self.extract_and_validate_file(
                 tar, path, start_time, end_time, script.script.data.encode()
             )
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertEqual(
             {
                 "1.0": {
@@ -1842,8 +1767,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -1871,9 +1795,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertDictEqual(
             {
                 "1.0": {
@@ -1922,8 +1844,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -1948,8 +1869,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -1968,9 +1888,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertDictEqual(
             {
                 "1.0": {
@@ -1995,8 +1913,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -2024,9 +1941,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertDictEqual(
             {
                 "1.0": {
@@ -2054,8 +1969,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -2083,9 +1997,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertDictEqual(
             {
                 "1.0": {
@@ -2116,8 +2028,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -2138,9 +2049,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertCountEqual(
             commissioning_meta_data,
             meta_data["1.0"]["commissioning_scripts"],
@@ -2151,9 +2060,7 @@ class TestMAASScripts(MAASServerTestCase):
             status=NODE_STATUS.TESTING, with_empty_script_sets=True
         )
 
-        bad_script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        bad_script_result = node.current_testing_script_set.scriptresult_set.first()
         bad_script_result.script.delete()
         script_result = factory.make_ScriptResult(
             script_set=node.current_testing_script_set,
@@ -2166,29 +2073,22 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
         self.assertEqual(2, len(tar.getmembers()))
 
-        self.assertEqual(
-            1, node.current_testing_script_set.scriptresult_set.count()
-        )
+        self.assertEqual(1, node.current_testing_script_set.scriptresult_set.count())
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertDictEqual(
             {
                 "1.0": {
                     "testing_scripts": [
                         {
                             "name": script_result.name,
-                            "path": os.path.join(
-                                "testing", script_result.name
-                            ),
+                            "path": os.path.join("testing", script_result.name),
                             "script_result_id": script_result.id,
                             "script_version_id": script_result.script.script.id,
                             "timeout_seconds": (
@@ -2238,8 +2138,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -2276,9 +2175,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertDictEqual(
             {
                 "1.0": {
@@ -2301,9 +2198,7 @@ class TestMAASScripts(MAASServerTestCase):
         script_set = factory.make_ScriptSet(result_type=RESULT_TYPE.TESTING)
         node.current_testing_script_set = script_set
         node.save()
-        factory.make_ScriptResult(
-            script_set=script_set, status=SCRIPT_STATUS.RUNNING
-        )
+        factory.make_ScriptResult(script_set=script_set, status=SCRIPT_STATUS.RUNNING)
 
         response = make_node_client(node=node).get(
             reverse("maas-scripts", args=["latest"])
@@ -2311,8 +2206,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -2329,9 +2223,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertDictEqual(
             {
                 "1.0": {
@@ -2365,8 +2257,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -2382,9 +2273,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         self.assertDictEqual(
             {
                 "1.0": {
@@ -2405,8 +2294,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.NO_CONTENT,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
 
     def test_scripts_with_timeout_greater_than_24_hours(self):
@@ -2416,9 +2304,7 @@ class TestMAASScripts(MAASServerTestCase):
         )
         # Make script timeout value to 24:05:00
         timeout = timedelta(days=1, seconds=600)
-        script = factory.make_Script(
-            script_type=SCRIPT_TYPE.TESTING, timeout=timeout
-        )
+        script = factory.make_Script(script_type=SCRIPT_TYPE.TESTING, timeout=timeout)
         factory.make_ScriptResult(
             script_set=node.current_testing_script_set,
             script=script,
@@ -2438,9 +2324,7 @@ class TestMAASScripts(MAASServerTestCase):
             start_time,
             end_time,
         )
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
         # Assertion should fail if timeout conversions are improper
         self.assertDictEqual(
             {
@@ -2456,9 +2340,7 @@ class TestMAASScripts(MAASServerTestCase):
 
     def _test_release_scripts_are_returned(self, node_status: NODE_STATUS):
         start_time = floor(time.time())
-        node = factory.make_Node(
-            status=node_status, with_empty_script_sets=True
-        )
+        node = factory.make_Node(status=node_status, with_empty_script_sets=True)
 
         script = factory.make_Script(script_type=SCRIPT_TYPE.RELEASE)
         factory.make_ScriptResult(
@@ -2473,8 +2355,7 @@ class TestMAASScripts(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertEqual("application/x-tar", response["Content-Type"])
         tar = tarfile.open(mode="r", fileobj=BytesIO(response.content))
@@ -2493,9 +2374,7 @@ class TestMAASScripts(MAASServerTestCase):
             end_time,
         )
 
-        meta_data = json.loads(
-            tar.extractfile("index.json").read().decode("utf-8")
-        )
+        meta_data = json.loads(tar.extractfile("index.json").read().decode("utf-8"))
 
         self.assertDictEqual(
             {
@@ -2565,9 +2444,7 @@ class TestMAASScriptsProperties(MAASServerTestCase):
             )
         )
         notags_scriptresult = factory.make_ScriptResult(
-            script=factory.make_Script(
-                tags=[], hardware_type=HARDWARE_TYPE.STORAGE
-            )
+            script=factory.make_Script(tags=[], hardware_type=HARDWARE_TYPE.STORAGE)
         )
         tags_properties = get_script_result_properties(tags_scriptresult)
         notags_properties = get_script_result_properties(notags_scriptresult)
@@ -2594,9 +2471,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         )
         text_script = factory.make_Script(
             script_type=SCRIPT_TYPE.COMMISSIONING,
-            script=VersionedTextFile.objects.create(
-                data=factory.make_string()
-            ),
+            script=VersionedTextFile.objects.create(data=factory.make_string()),
         )
         response = make_node_client().get(
             reverse("commissioning-scripts", args=["latest"])
@@ -2604,8 +2479,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         self.assertEqual(
             http.client.OK,
             response.status_code,
-            "Unexpected response %d: %s"
-            % (response.status_code, response.content),
+            "Unexpected response %d: %s" % (response.status_code, response.content),
         )
         self.assertIn(
             response["Content-Type"],
@@ -2663,21 +2537,15 @@ class TestCommissioningAPI(MAASServerTestCase):
         client = make_node_client(node)
         response = call_signal(client, status=SIGNAL_STATUS.OK)
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.COMMISSIONING, reload_object(other_node).status
-        )
+        self.assertEqual(NODE_STATUS.COMMISSIONING, reload_object(other_node).status)
 
     def test_signaling_commissioning_OK_repopulates_tags_and_status_msg(self):
-        populate_tags_for_single_node = self.patch(
-            api, "populate_tags_for_single_node"
-        )
+        populate_tags_for_single_node = self.patch(api, "populate_tags_for_single_node")
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
         client = make_node_client(node)
-        response = call_signal(
-            client, status=SIGNAL_STATUS.OK, script_result=0
-        )
+        response = call_signal(client, status=SIGNAL_STATUS.OK, script_result=0)
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(NODE_STATUS.READY, reload_object(node).status)
         populate_tags_for_single_node.assert_called_once_with(ANY, node)
@@ -2686,9 +2554,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        nmd = NodeMetadata.objects.create(
-            node=node, key="enlisting", value="True"
-        )
+        nmd = NodeMetadata.objects.create(node=node, key="enlisting", value="True")
         client = make_node_client(node=node)
         response = call_signal(client, status=SIGNAL_STATUS.OK)
         self.assertEqual(response.status_code, http.client.OK)
@@ -2698,19 +2564,13 @@ class TestCommissioningAPI(MAASServerTestCase):
 
     def test_signaling_commissioning_OK_repopulates_tags_when_enlisting(self):
         # Regression test for LP:1787492
-        populate_tags_for_single_node = self.patch(
-            api, "populate_tags_for_single_node"
-        )
+        populate_tags_for_single_node = self.patch(api, "populate_tags_for_single_node")
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        nmd = NodeMetadata.objects.create(
-            node=node, key="enlisting", value="True"
-        )
+        nmd = NodeMetadata.objects.create(node=node, key="enlisting", value="True")
         client = make_node_client(node)
-        response = call_signal(
-            client, status=SIGNAL_STATUS.OK, script_result=0
-        )
+        response = call_signal(client, status=SIGNAL_STATUS.OK, script_result=0)
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(NODE_STATUS.NEW, reload_object(node).status)
         self.assertIsNone(reload_object(nmd))
@@ -2720,9 +2580,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        nmd = NodeMetadata.objects.create(
-            node=node, key="enlisting", value="True"
-        )
+        nmd = NodeMetadata.objects.create(node=node, key="enlisting", value="True")
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -2799,9 +2657,7 @@ class TestCommissioningAPI(MAASServerTestCase):
                 NODE_TYPE_CHOICES, but_not=[NODE_TYPE.MACHINE]
             ),
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         client = make_node_client(node=node)
@@ -2812,9 +2668,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             script_result=exit_status,
             files={script_result.name: output.encode("ascii")},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         script_result = reload_object(script_result)
         self.assertEqual(exit_status, script_result.exit_status)
         self.assertEqual(output, script_result.output.decode("utf-8"))
@@ -2832,9 +2686,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         client = make_node_client(node=node)
@@ -2844,9 +2696,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             script_result=exit_status,
             files={script_result.name: factory.make_string().encode("ascii")},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         script_result = reload_object(script_result)
         self.assertEqual(exit_status, script_result.exit_status)
 
@@ -2854,9 +2704,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         client = make_node_client(node=node)
@@ -2865,9 +2713,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             script_result=random.randint(0, 255),
             files={script_result.name: b""},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         script_result = reload_object(script_result)
         self.assertEqual(b"", script_result.stdout)
 
@@ -2908,15 +2754,11 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        nmd = NodeMetadata.objects.create(
-            node=node, key="enlisting", value="True"
-        )
+        nmd = NodeMetadata.objects.create(node=node, key="enlisting", value="True")
         client = make_node_client(node=node)
         response = call_signal(client, status=SIGNAL_STATUS.FAILED)
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status)
         self.assertIsNone(reload_object(nmd))
 
     def test_signaling_commissioning_failure_makes_node_failed_tests(self):
@@ -2926,16 +2768,12 @@ class TestCommissioningAPI(MAASServerTestCase):
         client = make_node_client(node=node)
         response = call_signal(client, status=SIGNAL_STATUS.FAILED)
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status)
         for script_result in node.current_testing_script_set:
             self.assertEqual(SCRIPT_STATUS.ABORTED, script_result.status)
 
     def test_signaling_commissioning_failure_does_not_populate_tags(self):
-        populate_tags_for_single_node = self.patch(
-            api, "populate_tags_for_single_node"
-        )
+        populate_tags_for_single_node = self.patch(api, "populate_tags_for_single_node")
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
@@ -2952,9 +2790,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         )
         client = make_node_client(node=node)
         response = call_signal(client, status=SIGNAL_STATUS.WORKING)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertIsNone(reload_object(node).status_expires)
 
     def test_signaling_commissioning_failure_is_idempotent(self):
@@ -2965,9 +2801,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         call_signal(client, status=SIGNAL_STATUS.FAILED)
         response = call_signal(client, status=SIGNAL_STATUS.FAILED)
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status)
 
     def test_signaling_commissioning_failure_sets_node_error(self):
         node = factory.make_Node(
@@ -2975,9 +2809,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         )
         client = make_node_client(node=node)
         error_text = factory.make_string()
-        response = call_signal(
-            client, status=SIGNAL_STATUS.FAILED, error=error_text
-        )
+        response = call_signal(client, status=SIGNAL_STATUS.FAILED, error=error_text)
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(error_text, reload_object(node).error)
 
@@ -3043,9 +2875,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         client = make_node_client(node=node)
@@ -3063,9 +2893,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         client = make_node_client(node=node)
@@ -3090,15 +2918,11 @@ class TestCommissioningAPI(MAASServerTestCase):
             script_result.save()
             script_results.append(script_result)
 
-            contents[script_result.name] = factory.make_string().encode(
-                "ascii"
-            )
+            contents[script_result.name] = factory.make_string().encode("ascii")
 
         client = make_node_client(node=node)
         exit_status = random.randint(0, 255)
-        response = call_signal(
-            client, script_result=exit_status, files=contents
-        )
+        response = call_signal(client, script_result=exit_status, files=contents)
 
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(
@@ -3118,9 +2942,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         client = make_node_client(node=node)
@@ -3138,9 +2960,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         client = make_node_client(node=node)
@@ -3177,9 +2997,7 @@ class TestCommissioningAPI(MAASServerTestCase):
                 power_type="moonshot",
                 power_parameters=json.dumps(params),
             )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         node = reload_object(node)
         self.assertEqual("mscm", node.power_type)
         self.assertNotEqual(params, node.get_power_parameters())
@@ -3209,9 +3027,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         response = call_signal(
             client, power_type="ipmi", power_parameters=json.dumps(params)
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         node = reload_object(node)
         self.assertEqual("ipmi", node.power_type)
         self.assertEqual(params, node.get_power_parameters())
@@ -3229,9 +3045,7 @@ class TestCommissioningAPI(MAASServerTestCase):
         response = call_signal(
             client, power_type="ipmi", power_parameters=json.dumps(params)
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         node = reload_object(node)
         self.assertEqual(params, node.get_power_parameters())
 
@@ -3240,9 +3054,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             status=NODE_STATUS.COMMISSIONING, with_empty_script_sets=True
         )
         client = make_node_client(node=node)
-        response = call_signal(
-            client, power_type="ipmi", power_parameters="badjson"
-        )
+        response = call_signal(client, power_type="ipmi", power_parameters="badjson")
         self.assertEqual(response.status_code, http.client.BAD_REQUEST)
         self.assertEqual(
             response.content.decode(settings.DEFAULT_CHARSET),
@@ -3262,9 +3074,7 @@ class TestCommissioningAPI(MAASServerTestCase):
 
         end_time = ceil(time.time())
         script_set = node.current_commissioning_script_set
-        self.assertGreaterEqual(
-            ceil(script_set.last_ping.timestamp()), start_time
-        )
+        self.assertGreaterEqual(ceil(script_set.last_ping.timestamp()), start_time)
         self.assertLessEqual(floor(script_set.last_ping.timestamp()), end_time)
 
     def test_signaling_commissioning_with_netconf_sets_script_to_netconf(self):
@@ -3273,9 +3083,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3293,9 +3101,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = random.choice(
             [SCRIPT_STATUS.PENDING, SCRIPT_STATUS.APPLYING_NETCONF]
         )
@@ -3317,9 +3123,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3337,9 +3141,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3357,9 +3159,7 @@ class TestCommissioningAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_status = factory.pick_choice(
             SCRIPT_STATUS_CHOICES,
             but_not=[
@@ -3439,9 +3239,7 @@ class TestTestingAPI(MAASServerTestCase):
         node = factory.make_Node(
             status=NODE_STATUS.TESTING, with_empty_script_sets=True
         )
-        nmd = NodeMetadata.objects.create(
-            node=node, key="enlisting", value="True"
-        )
+        nmd = NodeMetadata.objects.create(node=node, key="enlisting", value="True")
         client = make_node_client(node=node)
         response = call_signal(client, status=SIGNAL_STATUS.OK)
         self.assertEqual(response.status_code, http.client.OK)
@@ -3487,16 +3285,12 @@ class TestTestingAPI(MAASServerTestCase):
         event = Event.objects.last()
         self.assertEqual(response.status_code, http.client.OK)
 
-        self.assertEqual(
-            NODE_STATUS.FAILED_TESTING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_TESTING, reload_object(node).status)
         self.assertEqual(event.type.name, EVENT_TYPES.FAILED_TESTING)
         self.assertEqual(
             SCRIPT_STATUS.ABORTED, node.current_commissioning_script_set.status
         )
-        self.assertEqual(
-            SCRIPT_STATUS.ABORTED, node.current_testing_script_set.status
-        )
+        self.assertEqual(SCRIPT_STATUS.ABORTED, node.current_testing_script_set.status)
 
     def test_signaling_testing_testing_transitions_to_testing(self):
         node = factory.make_Node(
@@ -3523,9 +3317,7 @@ class TestTestingAPI(MAASServerTestCase):
 
         end_time = ceil(time.time())
         script_set = node.current_testing_script_set
-        self.assertGreaterEqual(
-            ceil(script_set.last_ping.timestamp()), start_time
-        )
+        self.assertGreaterEqual(ceil(script_set.last_ping.timestamp()), start_time)
         self.assertLessEqual(floor(script_set.last_ping.timestamp()), end_time)
 
     def test_signaling_testing_creates_status_message_package_install(self):
@@ -3534,9 +3326,7 @@ class TestTestingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_testing_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3555,9 +3345,7 @@ class TestTestingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_testing_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3576,9 +3364,7 @@ class TestTestingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_testing_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3596,9 +3382,7 @@ class TestTestingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_testing_script_set.scriptresult_set.first()
         script_result.status = random.choice(
             [SCRIPT_STATUS.PENDING, SCRIPT_STATUS.APPLYING_NETCONF]
         )
@@ -3620,9 +3404,7 @@ class TestTestingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_testing_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3640,9 +3422,7 @@ class TestTestingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_testing_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3660,9 +3440,7 @@ class TestTestingAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_testing_script_set.scriptresult_set.first()
         script_status = factory.pick_choice(
             SCRIPT_STATUS_CHOICES,
             but_not=[
@@ -3693,9 +3471,7 @@ class TestTestingAPI(MAASServerTestCase):
         )
         node.status_expires = datetime.now()
         node.save()
-        script_result = (
-            node.current_testing_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_testing_script_set.scriptresult_set.first()
         client = make_node_client(node=node)
         response = call_signal(
             client,
@@ -3719,9 +3495,7 @@ class TestNewAPI(MAASServerTestCase):
         # When creating a new ScriptSet for commissioning during enlistment
         # only the builtin commissioning scripts should be added.
         factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING)
-        factory.make_Script(
-            script_type=SCRIPT_TYPE.TESTING, tags=["commissioning"]
-        )
+        factory.make_Script(script_type=SCRIPT_TYPE.TESTING, tags=["commissioning"])
 
         client = make_node_client(node)
         response = call_signal(client, status=SIGNAL_STATUS.COMMISSIONING)
@@ -3742,9 +3516,7 @@ class TestNewAPI(MAASServerTestCase):
         # This happens when commissioning is started by the user with correct
         # power parameters but an invalid or missing boot MAC.
         node = factory.make_Node(status=NODE_STATUS.COMMISSIONING)
-        factory.make_Script(
-            script_type=SCRIPT_TYPE.TESTING, tags=["commissioning"]
-        )
+        factory.make_Script(script_type=SCRIPT_TYPE.TESTING, tags=["commissioning"])
         commissioning = ScriptSet.objects.create_commissioning_script_set(node)
         testing = ScriptSet.objects.create_testing_script_set(node)
         node.current_commissioning_script_set = commissioning
@@ -3816,9 +3588,7 @@ class TestDiskErasingAPI(MAASServerTestCase):
         client = make_node_client(node=node)
         response = call_signal(client, status=SIGNAL_STATUS.FAILED)
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DISK_ERASING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DISK_ERASING, reload_object(node).status)
 
     def test_signaling_erasing_ok_does_not_release_the_machine(self):
         node = factory.make_Node(
@@ -3883,9 +3653,7 @@ class TestRescueModeAPI(MAASServerTestCase):
             owner=factory.make_User(),
             with_empty_script_sets=True,
         )
-        script_result = random.choice(
-            list(node.current_commissioning_script_set)
-        )
+        script_result = random.choice(list(node.current_commissioning_script_set))
         exit_status = random.randint(0, 255)
         out = factory.make_string().encode()
 
@@ -3932,9 +3700,7 @@ class TestByMACMetadataAPI(MAASServerTestCase):
         iface = node.get_boot_interface()
         user_data = factory.make_string().encode("ascii")
         NodeUserData.objects.set_user_data(iface.node_config.node, user_data)
-        url = reverse(
-            "metadata-user-data-by-mac", args=["latest", iface.mac_address]
-        )
+        url = reverse("metadata-user-data-by-mac", args=["latest", iface.mac_address])
         response = self.client.get(url)
         self.assertEqual(
             (http.client.OK, user_data),
@@ -3995,9 +3761,7 @@ class TestAnonymousAPI(MAASServerTestCase):
         anon_netboot_off_url = reverse(
             "metadata-node-by-id", args=["latest", node.system_id]
         )
-        response = self.client.post(
-            anon_netboot_off_url, {"op": "netboot_off"}
-        )
+        response = self.client.post(anon_netboot_off_url, {"op": "netboot_off"})
         node = reload_object(node)
         self.assertEqual(
             (http.client.OK, False),
@@ -4013,9 +3777,7 @@ class TestAnonymousAPI(MAASServerTestCase):
 
     def test_anonymous_get_enlist_preseed(self):
         # The preseed for enlistment can be obtained anonymously.
-        anon_enlist_preseed_url = reverse(
-            "metadata-enlist-preseed", args=["latest"]
-        )
+        anon_enlist_preseed_url = reverse("metadata-enlist-preseed", args=["latest"])
         # Fake the preseed so we're just exercising the view.
         fake_preseed = factory.make_string()
         self.patch(api, "get_enlist_preseed", Mock(return_value=fake_preseed))
@@ -4044,9 +3806,7 @@ class TestAnonymousAPI(MAASServerTestCase):
         vlan.dhcp_on = True
         vlan.primary_rack = rack
         vlan.save()
-        anon_enlist_preseed_url = reverse(
-            "metadata-enlist-preseed", args=["latest"]
-        )
+        anon_enlist_preseed_url = reverse("metadata-enlist-preseed", args=["latest"])
         response = self.client.get(
             anon_enlist_preseed_url,
             {"op": "get_enlist_preseed"},
@@ -4067,9 +3827,7 @@ class TestAnonymousAPI(MAASServerTestCase):
         find_rack_controller_mock.return_value = rack
         get_default_region_ip_mock = self.patch(api, "get_default_region_ip")
         get_default_region_ip_mock.return_value = expected_source_ip
-        anon_enlist_preseed_url = reverse(
-            "metadata-enlist-preseed", args=["latest"]
-        )
+        anon_enlist_preseed_url = reverse("metadata-enlist-preseed", args=["latest"])
         response = self.client.get(
             anon_enlist_preseed_url,
             {"op": "get_enlist_preseed"},
@@ -4083,9 +3841,7 @@ class TestAnonymousAPI(MAASServerTestCase):
     def test_anonymous_get_preseed(self):
         # The preseed for a node can be obtained anonymously.
         node = factory.make_Node()
-        anon_node_url = reverse(
-            "metadata-node-by-id", args=["latest", node.system_id]
-        )
+        anon_node_url = reverse("metadata-node-by-id", args=["latest", node.system_id])
         response = self.client.get(anon_node_url, {"op": "get_preseed"})
         self.assertEqual(response.status_code, http.client.OK)
 
@@ -4095,9 +3851,7 @@ class TestEnlistViews(MAASServerTestCase):
 
     def test_get_instance_id(self):
         # instance-id must be available
-        md_url = reverse(
-            "enlist-metadata-meta-data", args=["latest", "instance-id"]
-        )
+        md_url = reverse("enlist-metadata-meta-data", args=["latest", "instance-id"])
         response = self.client.get(md_url)
         self.assertEqual(
             (http.client.OK.value, "text/plain"),
@@ -4108,9 +3862,7 @@ class TestEnlistViews(MAASServerTestCase):
 
     def test_get_hostname(self):
         # instance-id must be available
-        md_url = reverse(
-            "enlist-metadata-meta-data", args=["latest", "local-hostname"]
-        )
+        md_url = reverse("enlist-metadata-meta-data", args=["latest", "local-hostname"])
         response = self.client.get(md_url)
         self.assertEqual(
             (http.client.OK, "text/plain"),
@@ -4122,9 +3874,7 @@ class TestEnlistViews(MAASServerTestCase):
     def test_public_keys_returns_empty(self):
         # An enlisting node has no SSH keys, but it does request them.
         # If the node insists, we give it the empty list.
-        md_url = reverse(
-            "enlist-metadata-meta-data", args=["latest", "public-keys"]
-        )
+        md_url = reverse("enlist-metadata-meta-data", args=["latest", "public-keys"])
         response = self.client.get(md_url)
         self.assertEqual(
             (http.client.OK, ""),
@@ -4146,9 +3896,7 @@ class TestEnlistViews(MAASServerTestCase):
         self.assertEqual(response.status_code, http.client.OK)
 
         self.assertEqual("text/plain", response["Content-Type"])
-        self.assertNotEqual(
-            "", response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertNotEqual("", response.content.decode(settings.DEFAULT_CHARSET))
 
     def test_metadata_list(self):
         # /enlist/latest/metadata request should list available keys
@@ -4158,9 +3906,7 @@ class TestEnlistViews(MAASServerTestCase):
             (http.client.OK, "text/plain"),
             (response.status_code, response["Content-Type"]),
         )
-        content = response.content.decode(
-            settings.DEFAULT_CHARSET
-        ).splitlines()
+        content = response.content.decode(settings.DEFAULT_CHARSET).splitlines()
         for needle in ("instance-id", "local-hostname"):
             self.assertIn(needle, content)
 
@@ -4172,9 +3918,7 @@ class TestEnlistViews(MAASServerTestCase):
             (http.client.OK, "text/plain"),
             (response.status_code, response["Content-Type"]),
         )
-        content = response.content.decode(
-            settings.DEFAULT_CHARSET
-        ).splitlines()
+        content = response.content.decode(settings.DEFAULT_CHARSET).splitlines()
         for needle in ("user-data", "meta-data"):
             self.assertIn(needle, content)
 

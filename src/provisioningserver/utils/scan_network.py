@@ -147,9 +147,7 @@ def get_interface_cidrs_to_scan(
             # (interface, cidr) pairs with matching CIDRs, and/or CIDRs which
             # are a superset of the specified CIDRs.
             to_scan = {
-                ifname: list(
-                    yield_cidrs_on_interface(IPSet(cidrs), ifname, interfaces)
-                )
+                ifname: list(yield_cidrs_on_interface(IPSet(cidrs), ifname, interfaces))
                 for ifname in interfaces
             }
     else:
@@ -160,9 +158,7 @@ def get_interface_cidrs_to_scan(
             # A specific interface was specified, but no specific CIDRs.
             # In this case, we scan any IPv4 CIDRs we find on that interface.
             to_scan = {
-                interface_name: yield_ipv4_networks_on_link(
-                    interface_name, interfaces
-                )
+                interface_name: yield_ipv4_networks_on_link(interface_name, interfaces)
             }
     return to_scan
 
@@ -381,9 +377,7 @@ def warn_about_missing_cidrs(
     }
     for cidr in cidrs:
         if IPNetwork(cidr) not in cidrs_on_interface:
-            stderr.write(
-                f"Warning: {cidr} is not present on {ifname_to_scan}\n"
-            )
+            stderr.write(f"Warning: {cidr} is not present on {ifname_to_scan}\n")
             stderr.flush()
 
 
@@ -415,8 +409,7 @@ def adjust_scanning_parameters(
             cidrs.append(ifname_to_scan)
         else:
             raise ActionScriptError(
-                "First argument must be an interface or CIDR: %s"
-                % ifname_to_scan
+                "First argument must be an interface or CIDR: %s" % ifname_to_scan
             )
         ifname_to_scan = None
     return ifname_to_scan
@@ -442,8 +435,7 @@ def scan_networks(args, to_scan, stderr, stdout):
         clock_diff = time.monotonic() - clock
         if count > 0:
             stderr.write(
-                "%d nmap scan(s) completed in %d second(s).\n"
-                % (count, clock_diff)
+                "%d nmap scan(s) completed in %d second(s).\n" % (count, clock_diff)
             )
             stderr.flush()
     else:
@@ -485,9 +477,7 @@ def run(args, stdout=sys.stdout, stderr=sys.stderr):
 
     # We may need to adjust the scanning parameters if the first positional
     # argument was a CIDR and not an interface.
-    ifname_to_scan = adjust_scanning_parameters(
-        ifname_to_scan, cidrs, interfaces
-    )
+    ifname_to_scan = adjust_scanning_parameters(ifname_to_scan, cidrs, interfaces)
 
     # Validate that each CIDR is an IPv4 CIDR. We don't want to spend an
     # eternity trying to scan an IPv6 subnet.

@@ -51,9 +51,7 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         expected = [left + right]
 
         # A route from node1 to node2 is found.
-        self.assertEqual(
-            expected, list(find_addresses_between_nodes([node1], [node2]))
-        )
+        self.assertEqual(expected, list(find_addresses_between_nodes([node1], [node2])))
 
     def test_yields_routes_between_multiple_nodes_on_same_space(self):
         space = factory.make_Space()
@@ -91,9 +89,7 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         expected = []
 
         # No routable addresses are found.
-        self.assertEqual(
-            expected, list(find_addresses_between_nodes([node1], [node2]))
-        )
+        self.assertEqual(expected, list(find_addresses_between_nodes([node1], [node2])))
 
     def test_does_not_contain_routes_between_addrs_of_diff_network_fams(self):
         space = factory.make_Space()  # One space.
@@ -107,9 +103,7 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         expected = []
 
         # No routable addresses are found.
-        self.assertEqual(
-            expected, list(find_addresses_between_nodes([node1], [node2]))
-        )
+        self.assertEqual(expected, list(find_addresses_between_nodes([node1], [node2])))
 
     def gen_disjoint_networks(self):
         """Generate disjoint networks.
@@ -134,13 +128,9 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         # Create the node for the "left" that has two IP addresses, one in the
         # null space, one in a non-null space.
         origin = factory.make_Node(hostname="origin")
-        origin_iface = factory.make_Interface(
-            node=origin, link_connected=False
-        )
+        origin_iface = factory.make_Interface(node=origin, link_connected=False)
         origin_subnet = factory.make_Subnet(space=space, cidr=next(networks))
-        origin_subnet_null_space = factory.make_Subnet(
-            space=None, cidr=next(networks)
-        )
+        origin_subnet_null_space = factory.make_Subnet(space=None, cidr=next(networks))
         origin_sip = factory.make_StaticIPAddress(
             interface=origin_iface, subnet=origin_subnet
         )
@@ -160,9 +150,7 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         # Same VLAN, different subnet, different node.
         node_same_vlan = factory.make_Node(hostname="same-vlan")
         sip_same_vlan = factory.make_StaticIPAddress(
-            interface=factory.make_Interface(
-                node=node_same_vlan, link_connected=False
-            ),
+            interface=factory.make_Interface(node=node_same_vlan, link_connected=False),
             subnet=factory.make_Subnet(
                 space=space, vlan=origin_subnet.vlan, cidr=next(networks)
             ),
@@ -226,9 +214,7 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         # additional routes between the origin and the other nodes, which
         # would have obscured the test.
         origin_sip_2 = factory.make_StaticIPAddress(
-            interface=factory.make_Interface(
-                node=origin, link_connected=False
-            ),
+            interface=factory.make_Interface(node=origin, link_connected=False),
             subnet=factory.make_Subnet(space=space, cidr=next(networks)),
         )
 
@@ -236,8 +222,7 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         # created on the same node, in no particular order.
         origin_ips = origin_sip.get_ipaddress(), origin_sip_2.get_ipaddress()
         expected_mutual = {
-            (origin, ip1, origin, ip2)
-            for ip1, ip2 in product(origin_ips, origin_ips)
+            (origin, ip1, origin, ip2) for ip1, ip2 in product(origin_ips, origin_ips)
         }
         # There's a mutual route for the null-space IP address too.
         expected_mutual.add(
@@ -262,12 +247,8 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         # Create the node for the "left" that has two IP addresses, one in the
         # null space, one in a non-null space.
         origin = factory.make_Node(hostname="origin")
-        origin_iface = factory.make_Interface(
-            node=origin, link_connected=False
-        )
-        origin_subnet_null_space = factory.make_Subnet(
-            space=None, cidr=network1
-        )
+        origin_iface = factory.make_Interface(node=origin, link_connected=False)
+        origin_subnet_null_space = factory.make_Subnet(space=None, cidr=network1)
         factory.make_StaticIPAddress(
             interface=origin_iface, subnet=origin_subnet_null_space
         )
@@ -277,16 +258,12 @@ class TestFindAddressesBetweenNodes(MAASServerTestCase):
         no_match_iface = factory.make_Interface(
             node=node_no_match, link_connected=False
         )
-        no_match_subnet_null_space = factory.make_Subnet(
-            space=None, cidr=network2
-        )
+        no_match_subnet_null_space = factory.make_Subnet(space=None, cidr=network2)
         factory.make_StaticIPAddress(
             interface=no_match_iface, subnet=no_match_subnet_null_space
         )
 
-        no_matches = list(
-            find_addresses_between_nodes({origin}, {node_no_match})
-        )
+        no_matches = list(find_addresses_between_nodes({origin}, {node_no_match}))
         self.assertEqual([], no_matches)
 
 

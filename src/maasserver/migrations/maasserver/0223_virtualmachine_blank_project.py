@@ -10,9 +10,7 @@ def create_virtual_machines(apps, schema_editor):
     VirtualMachine = apps.get_model("maasserver", "VirtualMachine")
     nodes_info = (
         Node.objects.filter(bmc__power_type="virsh")
-        .annotate(
-            identifier=RawSQL("instance_power_parameters->>'power_id'", ())
-        )
+        .annotate(identifier=RawSQL("instance_power_parameters->>'power_id'", ()))
         .values(
             "memory",
             "bmc_id",

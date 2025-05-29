@@ -113,9 +113,7 @@ def main():
     )
 
     parser.add_argument("status", help="Status", choices=VALID_STATUS)
-    parser.add_argument(
-        "error", help="Optional error message", nargs="?", default=None
-    )
+    parser.add_argument("error", help="Optional error message", nargs="?", default=None)
 
     args = parser.parse_args()
 

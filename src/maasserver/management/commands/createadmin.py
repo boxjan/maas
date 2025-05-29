@@ -59,9 +59,7 @@ def read_password(prompt: str):
 def prompt_for_username() -> str:
     username = read_input("Username: ")
     if not username:
-        raise EmptyUsername(
-            "You must input a username or provide it with --username."
-        )
+        raise EmptyUsername("You must input a username or provide it with --username.")
     return username
 
 
@@ -180,6 +178,4 @@ class Command(BaseCommand):
                     ImportSSHKeysError,
                     requests.exceptions.RequestException,
                 ) as e:
-                    raise SSHKeysError(
-                        "Importing SSH keys failed.\n%s" % e.args[0]
-                    )
+                    raise SSHKeysError("Importing SSH keys failed.\n%s" % e.args[0])

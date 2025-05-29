@@ -148,9 +148,7 @@ SAMPLE_LXD_RESOURCES = {
                 "pci_address": "0000:00:02.0",
                 "vendor": "Intel Corporation",
                 "vendor_id": "8086",
-                "product": (
-                    "4th Gen Core Processor Integrated Graphics Controller"
-                ),
+                "product": ("4th Gen Core Processor Integrated Graphics Controller"),
                 "product_id": "0416",
             }
         ],

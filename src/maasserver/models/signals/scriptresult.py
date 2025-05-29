@@ -19,9 +19,7 @@ from provisioningserver.events import EVENT_TYPES
 signals = SignalsManager()
 
 
-def emit_script_result_status_transition_event(
-    script_result, old_values, **kwargs
-):
+def emit_script_result_status_transition_event(script_result, old_values, **kwargs):
     """Send a status transition event."""
     [old_status] = old_values
 
@@ -54,9 +52,7 @@ def emit_script_result_status_transition_event(
             EVENT_TYPES.RUNNING_TEST,
             event_description=script_name,
         )
-    elif script_result.status in SCRIPT_STATUS_FAILED.union(
-        {SCRIPT_STATUS.ABORTED}
-    ):
+    elif script_result.status in SCRIPT_STATUS_FAILED.union({SCRIPT_STATUS.ABORTED}):
         Event.objects.create_node_event(
             script_result.script_set.node,
             EVENT_TYPES.SCRIPT_DID_NOT_COMPLETE,

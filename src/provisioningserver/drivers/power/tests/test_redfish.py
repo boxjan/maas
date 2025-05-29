@@ -35,14 +35,10 @@ SAMPLE_HEADERS = {
     b"odata-version": [b"4.0"],
     b"etag": [b'"1631219999"'],
     b"vary": [b"Accept-Encoding"],
-    b"content-type": [
-        b"application/json;odata.metadata=minimal;charset=utf-8"
-    ],
+    b"content-type": [b"application/json;odata.metadata=minimal;charset=utf-8"],
     b"server": [b"iDRAC/8"],
     b"date": [b"Thu, 09 Sep 2021 08:39:59 GMT"],
-    b"link": [
-        b"</redfish/v1/Schemas/ComputerSystem.v1_5_0.json>;rel=describedby"
-    ],
+    b"link": [b"</redfish/v1/Schemas/ComputerSystem.v1_5_0.json>;rel=describedby"],
     b"cache-control": [b"no-cache"],
     b"allow": [b"POST,PATCH"],
     b"access-control-allow-origin": [b"*"],
@@ -93,9 +89,7 @@ SAMPLE_JSON_SYSTEM = {
         "UefiTargetBootSourceOverride": "",
     },
     "Description": "Computer System which represents a machine.",
-    "EthernetInterfaces": {
-        "@odata.id": "/redfish/v1/Systems/1/EthernetInterfaces"
-    },
+    "EthernetInterfaces": {"@odata.id": "/redfish/v1/Systems/1/EthernetInterfaces"},
     "HostName": "WORTHY-BOAR",
     "Id": "1",
     "IndicatorLED": "Off",
@@ -128,9 +122,7 @@ SAMPLE_JSON_SYSTEM = {
     "Processors": {"@odata.id": "/redfish/v1/Systems/1/Processors"},
     "SKU": "7PW1RD2",
     "SerialNumber": "CN7475166I0364",
-    "SimpleStorage": {
-        "@odata.id": "/redfish/v1/Systems/1/Storage/Controllers"
-    },
+    "SimpleStorage": {"@odata.id": "/redfish/v1/Systems/1/Storage/Controllers"},
     "Status": {
         "Health": "Critical",
         "HealthRollUp": "Critical",
@@ -159,9 +151,7 @@ class TestWebClientContextFactory(MAASTestCase):
 
 
 class TestRedfishPowerDriver(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
@@ -228,13 +218,9 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = Headers(NODE_HEADERS)
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(redfish_module, "readBody")
-        mock_readBody.return_value = succeed(
-            json.dumps(NODE_DATA).encode("utf-8")
-        )
+        mock_readBody.return_value = succeed(json.dumps(NODE_DATA).encode("utf-8"))
         etag = yield driver.get_etag(url, node_id, headers)
         self.assertEqual(b'"1631210000"', etag)
 
@@ -252,13 +238,9 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = Headers(NODE_HEADERS)
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(redfish_module, "readBody")
-        mock_readBody.return_value = succeed(
-            json.dumps(NODE_DATA).encode("utf-8")
-        )
+        mock_readBody.return_value = succeed(json.dumps(NODE_DATA).encode("utf-8"))
         expected_etag = b'"1631219999"'
         etag = yield driver.get_etag(url, node_id, headers)
         self.assertEqual(expected_etag, etag)
@@ -280,13 +262,9 @@ class TestRedfishPowerDriver(MAASTestCase):
                 b"Testing": [b"Headers"],
             }
         )
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(redfish_module, "readBody")
-        mock_readBody.return_value = succeed(
-            json.dumps(NODE_DATA).encode("utf-8")
-        )
+        mock_readBody.return_value = succeed(json.dumps(NODE_DATA).encode("utf-8"))
         etag = yield driver.get_etag(url, node_id, headers)
         self.assertIsNone(etag)
 
@@ -302,14 +280,12 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(redfish_module, "readBody")
         mock_readBody.return_value = succeed(
-            json.dumps(
-                {"Members": [{"@odata.id": "/redfish/v1/Systems/1/"}]}
-            ).encode("utf-8")
+            json.dumps({"Members": [{"@odata.id": "/redfish/v1/Systems/1/"}]}).encode(
+                "utf-8"
+            )
         )
 
         node_id = yield driver.get_node_id(url, headers)
@@ -327,14 +303,12 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(redfish_module, "readBody")
         mock_readBody.return_value = succeed(
-            json.dumps(
-                {"Members": [{"@odata.id": "/redfish/v1/Systems/1"}]}
-            ).encode("utf-8")
+            json.dumps({"Members": [{"@odata.id": "/redfish/v1/Systems/1"}]}).encode(
+                "utf-8"
+            )
         )
 
         node_id = yield driver.get_node_id(url, headers)
@@ -352,9 +326,7 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.return_value = succeed(
-            expected_headers
-        )
+        mock_agent.return_value.request.return_value = succeed(expected_headers)
         mock_readBody = self.patch(redfish_module, "readBody")
         mock_readBody.return_value = succeed(
             json.dumps(SAMPLE_JSON_SYSTEMS).encode("utf-8")
@@ -390,9 +362,7 @@ class TestRedfishPowerDriver(MAASTestCase):
         )
         expected_response = SAMPLE_JSON_SYSTEMS
 
-        response, return_headers = yield driver.redfish_request(
-            b"GET", uri, headers
-        )
+        response, return_headers = yield driver.redfish_request(b"GET", uri, headers)
         mock_agent.return_value.request.assert_has_calls(
             [
                 call(b"GET", uri, headers, None),
@@ -414,8 +384,8 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.side_effect = (
-            lambda *args, **kwargs: succeed(expected_headers)
+        mock_agent.return_value.request.side_effect = lambda *args, **kwargs: succeed(
+            expected_headers
         )
         mock_readBody = self.patch(redfish_module, "readBody")
         mock_readBody.side_effect = lambda _: succeed(b'{"invalid": "json"')
@@ -437,8 +407,8 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.side_effect = (
-            lambda *args, **kwargs: succeed(expected_headers)
+        mock_agent.return_value.request.side_effect = lambda *args, **kwargs: succeed(
+            expected_headers
         )
         mock_readBody = self.patch(redfish_module, "readBody")
         error = PartialDownloadError(
@@ -464,8 +434,8 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.OK
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.side_effect = (
-            lambda *args, **kwargs: succeed(expected_headers)
+        mock_agent.return_value.request.side_effect = lambda *args, **kwargs: succeed(
+            expected_headers
         )
         mock_readBody = self.patch(redfish_module, "readBody")
         error = PartialDownloadError(
@@ -496,8 +466,8 @@ class TestRedfishPowerDriver(MAASTestCase):
         expected_headers = Mock()
         expected_headers.code = HTTPStatus.BAD_REQUEST
         expected_headers.headers = "Testing Headers"
-        mock_agent.return_value.request.side_effect = (
-            lambda *args, **kwargs: succeed(expected_headers)
+        mock_agent.return_value.request.side_effect = lambda *args, **kwargs: succeed(
+            expected_headers
         )
         mock_readBody = self.patch(redfish_module, "readBody")
 
@@ -516,13 +486,9 @@ class TestRedfishPowerDriver(MAASTestCase):
         url = driver.get_url(context)
         headers = driver.make_auth_headers(**context)
         node_id = b"1"
-        mock_file_body_producer = self.patch(
-            redfish_module, "FileBodyProducer"
-        )
+        mock_file_body_producer = self.patch(redfish_module, "FileBodyProducer")
         payload = FileBodyProducer(
-            BytesIO(
-                json.dumps({"ResetType": "%s" % power_change}).encode("utf-8")
-            )
+            BytesIO(json.dumps({"ResetType": "%s" % power_change}).encode("utf-8"))
         )
         mock_file_body_producer.return_value = payload
         mock_redfish_request = self.patch(driver, "redfish_request")
@@ -530,9 +496,7 @@ class TestRedfishPowerDriver(MAASTestCase):
         yield driver.power(power_change, url, node_id, headers)
         self.assertEqual(1, len(mock_redfish_request.mock_calls))
         self.assertEqual(b"POST", mock_redfish_request.mock_calls[0].args[0])
-        self.assertEqual(
-            expected_uri, mock_redfish_request.mock_calls[0].args[1]
-        )
+        self.assertEqual(expected_uri, mock_redfish_request.mock_calls[0].args[1])
         self.assertEqual(headers, mock_redfish_request.mock_calls[0].args[2])
         self.assertEqual(
             payload, mock_redfish_request.mock_calls[0].args[3]()
@@ -546,13 +510,9 @@ class TestRedfishPowerDriver(MAASTestCase):
         url = driver.get_url(context)
         headers = driver.make_auth_headers(**context)
         node_id = b"1"
-        mock_file_body_producer = self.patch(
-            redfish_module, "FileBodyProducer"
-        )
+        mock_file_body_producer = self.patch(redfish_module, "FileBodyProducer")
         payload = FileBodyProducer(
-            BytesIO(
-                json.dumps({"ResetType": "%s" % power_change}).encode("utf-8")
-            )
+            BytesIO(json.dumps({"ResetType": "%s" % power_change}).encode("utf-8"))
         )
         mock_file_body_producer.return_value = payload
         mock_redfish_request = self.patch(driver, "redfish_request")
@@ -568,9 +528,7 @@ class TestRedfishPowerDriver(MAASTestCase):
         self.assertEqual(3, len(mock_redfish_request.mock_calls))
 
         self.assertEqual(b"POST", mock_redfish_request.mock_calls[0].args[0])
-        self.assertEqual(
-            expected_uri, mock_redfish_request.mock_calls[0].args[1]
-        )
+        self.assertEqual(expected_uri, mock_redfish_request.mock_calls[0].args[1])
         self.assertEqual(headers, mock_redfish_request.mock_calls[0].args[2])
         self.assertEqual(
             payload, mock_redfish_request.mock_calls[0].args[3]()
@@ -598,13 +556,9 @@ class TestRedfishPowerDriver(MAASTestCase):
         url = driver.get_url(context)
         headers = driver.make_auth_headers(**context)
         node_id = b"1"
-        mock_file_body_producer = self.patch(
-            redfish_module, "FileBodyProducer"
-        )
+        mock_file_body_producer = self.patch(redfish_module, "FileBodyProducer")
         payload = FileBodyProducer(
-            BytesIO(
-                json.dumps({"ResetType": "%s" % power_change}).encode("utf-8")
-            )
+            BytesIO(json.dumps({"ResetType": "%s" % power_change}).encode("utf-8"))
         )
         mock_file_body_producer.return_value = payload
         mock_redfish_request = self.patch(driver, "redfish_request")
@@ -620,9 +574,7 @@ class TestRedfishPowerDriver(MAASTestCase):
         self.assertEqual(3, len(mock_redfish_request.mock_calls))
 
         self.assertEqual(b"POST", mock_redfish_request.mock_calls[0].args[0])
-        self.assertEqual(
-            expected_uri, mock_redfish_request.mock_calls[0].args[1]
-        )
+        self.assertEqual(expected_uri, mock_redfish_request.mock_calls[0].args[1])
         self.assertEqual(headers, mock_redfish_request.mock_calls[0].args[2])
         self.assertEqual(
             payload, mock_redfish_request.mock_calls[0].args[3]()
@@ -650,13 +602,9 @@ class TestRedfishPowerDriver(MAASTestCase):
         url = driver.get_url(context)
         headers = driver.make_auth_headers(**context)
         node_id = b"1"
-        mock_file_body_producer = self.patch(
-            redfish_module, "FileBodyProducer"
-        )
+        mock_file_body_producer = self.patch(redfish_module, "FileBodyProducer")
         payload = FileBodyProducer(
-            BytesIO(
-                json.dumps({"ResetType": "%s" % power_change}).encode("utf-8")
-            )
+            BytesIO(json.dumps({"ResetType": "%s" % power_change}).encode("utf-8"))
         )
         mock_file_body_producer.return_value = payload
         mock_redfish_request = self.patch(driver, "redfish_request")
@@ -680,9 +628,7 @@ class TestRedfishPowerDriver(MAASTestCase):
         url = driver.get_url(context)
         node_id = b"1"
         headers = driver.make_auth_headers(**context)
-        mock_file_body_producer = self.patch(
-            redfish_module, "FileBodyProducer"
-        )
+        mock_file_body_producer = self.patch(redfish_module, "FileBodyProducer")
         payload = FileBodyProducer(
             BytesIO(
                 json.dumps(
@@ -721,9 +667,7 @@ class TestRedfishPowerDriver(MAASTestCase):
         url = driver.get_url(context)
         node_id = b"1"
         headers = driver.make_auth_headers(**context)
-        mock_file_body_producer = self.patch(
-            redfish_module, "FileBodyProducer"
-        )
+        mock_file_body_producer = self.patch(redfish_module, "FileBodyProducer")
         payload = FileBodyProducer(
             BytesIO(
                 json.dumps(
@@ -785,28 +729,20 @@ class TestRedfishPowerDriver(MAASTestCase):
             PowerActionError("BOOM"),
             succeed(True),
         ]
-        yield driver.redfish_request(
-            b"POST", url, headers, get_bodyProducer, get_etag
-        )
+        yield driver.redfish_request(b"POST", url, headers, get_bodyProducer, get_etag)
         self.assertEqual(2, len(mock_redfish_request.mock_calls))
         self.assertEqual(b"POST", mock_redfish_request.mock_calls[0].args[0])
         self.assertEqual(url, mock_redfish_request.mock_calls[0].args[1])
-        self.assertEqual(
-            get_bodyProducer, mock_redfish_request.mock_calls[0].args[3]
-        )
+        self.assertEqual(get_bodyProducer, mock_redfish_request.mock_calls[0].args[3])
 
         self.assertEqual(b"POST", mock_redfish_request.mock_calls[1].args[0])
         self.assertEqual(url, mock_redfish_request.mock_calls[1].args[1])
         # Check that the retry has replaced the etag.
         self.assertEqual(
             [b"67890"],
-            mock_redfish_request.mock_calls[1]
-            .args[2]
-            .getRawHeaders(b"If-Match"),
+            mock_redfish_request.mock_calls[1].args[2].getRawHeaders(b"If-Match"),
         )
-        self.assertEqual(
-            get_bodyProducer, mock_redfish_request.mock_calls[1].args[3]
-        )
+        self.assertEqual(get_bodyProducer, mock_redfish_request.mock_calls[1].args[3])
 
     @inlineCallbacks
     def test_redfish_request_unset_etag(self):
@@ -835,14 +771,10 @@ class TestRedfishPowerDriver(MAASTestCase):
 
         mock_redfish_request = self.patch(driver, "_redfish_request")
         mock_redfish_request.return_value = succeed(True)
-        yield driver.redfish_request(
-            b"POST", url, headers, get_bodyProducer, get_etag
-        )
+        yield driver.redfish_request(b"POST", url, headers, get_bodyProducer, get_etag)
         self.assertEqual(
             None,
-            mock_redfish_request.mock_calls[0]
-            .args[2]
-            .getRawHeaders(b"If-Match"),
+            mock_redfish_request.mock_calls[0].args[2].getRawHeaders(b"If-Match"),
         )
 
     @inlineCallbacks

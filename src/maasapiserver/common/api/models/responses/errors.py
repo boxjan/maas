@@ -62,9 +62,7 @@ class PreconditionFailedBodyResponse(ErrorBodyResponse):
 class PreconditionFailedResponse(JSONResponse):
     def __init__(self, details: Optional[list[BaseExceptionDetail]]):
         super().__init__(
-            content=jsonable_encoder(
-                PreconditionFailedBodyResponse(details=details)
-            ),
+            content=jsonable_encoder(PreconditionFailedBodyResponse(details=details)),
             status_code=status.HTTP_412_PRECONDITION_FAILED,
         )
 
@@ -77,9 +75,7 @@ class ValidationErrorBodyResponse(ErrorBodyResponse):
 class ValidationErrorResponse(JSONResponse):
     def __init__(self, details: Optional[list[BaseExceptionDetail]]):
         super().__init__(
-            content=jsonable_encoder(
-                ValidationErrorBodyResponse(details=details)
-            ),
+            content=jsonable_encoder(ValidationErrorBodyResponse(details=details)),
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         )
 

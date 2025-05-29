@@ -29,9 +29,7 @@ class TestValidateProduct(MAASTestCase):
     """Tests for `validate_product`."""
 
     def test_ignores_random(self):
-        self.assertTrue(
-            validate_product({}, factory.make_name("product_name"))
-        )
+        self.assertTrue(validate_product({}, factory.make_name("product_name")))
 
     def test_validates_ubuntu(self):
         self.assertTrue(
@@ -184,9 +182,7 @@ class TestValuePassesFilterList(MAASTestCase):
 
     def test_matched_value_passes(self):
         value = factory.make_name("value")
-        self.assertTrue(
-            download_descriptions.value_passes_filter_list([value], value)
-        )
+        self.assertTrue(download_descriptions.value_passes_filter_list([value], value))
 
     def test_value_passes_if_matched_anywhere_in_filter(self):
         value = factory.make_name("value")
@@ -221,15 +217,11 @@ class TestValuePassesFilter(MAASTestCase):
 
     def test_matching_value_passes(self):
         value = factory.make_name("value")
-        self.assertTrue(
-            download_descriptions.value_passes_filter(value, value)
-        )
+        self.assertTrue(download_descriptions.value_passes_filter(value, value))
 
     def test_any_value_matches_asterisk(self):
         self.assertTrue(
-            download_descriptions.value_passes_filter(
-                "*", factory.make_name("value")
-            )
+            download_descriptions.value_passes_filter("*", factory.make_name("value"))
         )
 
 
@@ -316,9 +308,7 @@ class TestImagePassesFilter(MAASTestCase):
             download_descriptions.image_passes_filter(
                 [
                     self.make_filter_from_image(
-                        image._replace(
-                            release=factory.make_name("other-release")
-                        )
+                        image._replace(release=factory.make_name("other-release"))
                     )
                 ],
                 image.os,
@@ -352,9 +342,7 @@ class TestImagePassesFilter(MAASTestCase):
             download_descriptions.image_passes_filter(
                 [
                     self.make_filter_from_image(
-                        image._replace(
-                            subarch=factory.make_name("other-subarch")
-                        )
+                        image._replace(subarch=factory.make_name("other-subarch"))
                     )
                 ],
                 image.os,
@@ -415,13 +403,9 @@ class TestBootMerge(MAASTestCase):
 
     def test_does_not_overwrite_existing_entry(self):
         image = make_image_spec()
-        total_resources = set_resource(
-            resource="Original resource", image_spec=image
-        )
+        total_resources = set_resource(resource="Original resource", image_spec=image)
         original_resources = total_resources.mapping.copy()
-        resources_from_repo = set_resource(
-            resource="New resource", image_spec=image
-        )
+        resources_from_repo = set_resource(resource="New resource", image_spec=image)
         download_descriptions.boot_merge(total_resources, resources_from_repo)
         self.assertEqual(original_resources, total_resources.mapping)
 
@@ -481,9 +465,7 @@ class TestRepoDumper(MAASTestCase):
         dumper = RepoDumper(boot_images_dict)
         subarches = [factory.make_name("subarch") for _ in range(3)]
         item, _ = self.make_item(subarch=subarches.pop(), subarches=subarches)
-        self.patch(
-            download_descriptions, "products_exdata"
-        ).return_value = item
+        self.patch(download_descriptions, "products_exdata").return_value = item
         dumper.insert_item(
             sentinel.data,
             sentinel.src,
@@ -644,9 +626,7 @@ class TestRepoDumper(MAASTestCase):
         item, _ = self.make_item(
             arch="amd64", bootloader_type="uefi", os="grub-efi-signed"
         )
-        self.patch(
-            download_descriptions, "products_exdata"
-        ).return_value = item
+        self.patch(download_descriptions, "products_exdata").return_value = item
         dumper.insert_item(
             {
                 "bootloader_type": "uefi",
@@ -678,9 +658,7 @@ class TestRepoDumper(MAASTestCase):
         boot_images_dict = BootImageMapping()
         dumper = RepoDumper(boot_images_dict)
         item, _ = self.make_item(os="ubuntu")
-        self.patch(
-            download_descriptions, "products_exdata"
-        ).return_value = item
+        self.patch(download_descriptions, "products_exdata").return_value = item
         dumper.insert_item(
             {"os": "ubuntu"},
             sentinel.src,
@@ -697,9 +675,7 @@ class TestRepoDumper(MAASTestCase):
         boot_images_dict = BootImageMapping()
         dumper = RepoDumper(boot_images_dict, validate_products=False)
         item, _ = self.make_item(os="ubuntu")
-        self.patch(
-            download_descriptions, "products_exdata"
-        ).return_value = item
+        self.patch(download_descriptions, "products_exdata").return_value = item
         dumper.insert_item(
             {"os": "ubuntu"},
             sentinel.src,
@@ -732,9 +708,7 @@ class TestRepoDumper(MAASTestCase):
         dumper = RepoDumper(boot_images_dict)
 
         with FakeLogger("maas.import-images", level=logging.INFO) as maaslog:
-            self.assertRaises(
-                io_error, dumper.sync, sentinel.reader, sentinel.path
-            )
+            self.assertRaises(io_error, dumper.sync, sentinel.reader, sentinel.path)
         self.assertIn("I/O error while syncing boot images.", maaslog.output)
 
 
@@ -742,39 +716,29 @@ class TestDownloadImageDescriptionsUserAgent(MAASTestCase):
     """Tests for user agent string with `download_image_descriptions.`"""
 
     def test_doesnt_pass_user_agent_when_not_set(self):
-        mock_UrlMirrorReader = self.patch(
-            download_descriptions, "UrlMirrorReader"
-        )
+        mock_UrlMirrorReader = self.patch(download_descriptions, "UrlMirrorReader")
         self.patch(download_descriptions.RepoDumper, "sync")
         path = factory.make_url()
         download_descriptions.download_image_descriptions(path)
         mock_UrlMirrorReader.assert_called_once_with(path, policy=ANY)
 
     def test_passes_user_agent(self):
-        mock_UrlMirrorReader = self.patch(
-            download_descriptions, "UrlMirrorReader"
-        )
+        mock_UrlMirrorReader = self.patch(download_descriptions, "UrlMirrorReader")
         self.patch(download_descriptions.RepoDumper, "sync")
         path = factory.make_url()
         user_agent = factory.make_name("agent")
-        download_descriptions.download_image_descriptions(
-            path, user_agent=user_agent
-        )
+        download_descriptions.download_image_descriptions(path, user_agent=user_agent)
         mock_UrlMirrorReader.assert_called_once_with(
             path, policy=ANY, user_agent=user_agent
         )
 
     def test_doesnt_pass_user_agenton_fallback(self):
-        mock_UrlMirrorReader = self.patch(
-            download_descriptions, "UrlMirrorReader"
-        )
+        mock_UrlMirrorReader = self.patch(download_descriptions, "UrlMirrorReader")
         mock_UrlMirrorReader.side_effect = [TypeError(), Mock()]
         self.patch(download_descriptions.RepoDumper, "sync")
         path = factory.make_url()
         user_agent = factory.make_name("agent")
-        download_descriptions.download_image_descriptions(
-            path, user_agent=user_agent
-        )
+        download_descriptions.download_image_descriptions(path, user_agent=user_agent)
         mock_UrlMirrorReader.assert_has_calls(
             [
                 call(path, policy=ANY, user_agent=user_agent),

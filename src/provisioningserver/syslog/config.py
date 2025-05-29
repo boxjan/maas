@@ -68,9 +68,7 @@ def write_config(write_local, forwarders=None, port=None, promtail_port=None):
         "write_local": write_local,
         "port": port if port else 5247,
         "forwarders": (
-            sorted(forwarders, key=itemgetter("name"))
-            if forwarders is not None
-            else []
+            sorted(forwarders, key=itemgetter("name")) if forwarders is not None else []
         ),
         "promtail_port": promtail_port if promtail_port else 0,
     }

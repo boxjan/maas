@@ -76,9 +76,9 @@ class PodHandler(TimestampedModelHandler):
 
     def get_queryset(self, for_list=False):
         """Return `QuerySet` for devices only viewable by `user`."""
-        return Pod.objects.get_pods(
-            self.user, PodPermission.view
-        ).select_related("hints")
+        return Pod.objects.get_pods(self.user, PodPermission.view).select_related(
+            "hints"
+        )
 
     def preprocess_form(self, action, params):
         """Process the `params` before passing the data to the form."""
@@ -94,9 +94,7 @@ class PodHandler(TimestampedModelHandler):
 
         # Cleanup any fields that have a None value.
         new_params = {
-            key: value
-            for key, value in new_params.items()
-            if value is not None
+            key: value for key, value in new_params.items() if value is not None
         }
         return super().preprocess_form(action, new_params)
 
@@ -169,9 +167,7 @@ class PodHandler(TimestampedModelHandler):
 
     def dehydrate_resources(self, obj, for_list=False):
         """Dehydrate resources info."""
-        return dataclasses.asdict(
-            get_vm_host_resources(obj, detailed=not for_list)
-        )
+        return dataclasses.asdict(get_vm_host_resources(obj, detailed=not for_list))
 
     async def get_projects(self, params):
         """Return projects from the specified pod."""
@@ -193,9 +189,7 @@ class PodHandler(TimestampedModelHandler):
 
             request = HttpRequest()
             request.user = self.user
-            form = PodForm(
-                data=self.preprocess_form("create", params), request=request
-            )
+            form = PodForm(data=self.preprocess_form("create", params), request=request)
             if form.is_valid():
                 return form.save()
             else:

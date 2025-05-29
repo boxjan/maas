@@ -337,9 +337,7 @@ class TestKernelOpts(MAASTestCase):
         self.assertNotIn("apparmor=0", cmdline)
 
     def test_commissioning_compose_kernel_command_line_inc_extra_opts(self):
-        mock_get_curtin_sep = self.patch(
-            kernel_opts, "get_curtin_kernel_cmdline_sep"
-        )
+        mock_get_curtin_sep = self.patch(kernel_opts, "get_curtin_kernel_cmdline_sep")
         sep = factory.make_name("sep")
         mock_get_curtin_sep.return_value = sep
         extra_opts = "special console=ABCD -- options to pass"
@@ -357,9 +355,7 @@ class TestKernelOpts(MAASTestCase):
     def test_compose_kernel_command_line_inc_common_opts(self):
         # Test that some kernel arguments appear on commissioning, install
         # and xinstall command lines.
-        params = self.make_kernel_parameters(
-            purpose="commissioning", arch="i386"
-        )
+        params = self.make_kernel_parameters(purpose="commissioning", arch="i386")
         cmdline = compose_kernel_command_line(params)
         self.assertIn("nomodeset", cmdline)
 
@@ -375,17 +371,13 @@ class TestKernelOpts(MAASTestCase):
         # The result of compose_kernel_command_line includes the purpose
         # options for a "xinstall" node.
         params = self.make_kernel_parameters(purpose="xinstall")
-        self.assertIn(
-            "root=squash:http://", compose_kernel_command_line(params)
-        )
+        self.assertIn("root=squash:http://", compose_kernel_command_line(params))
 
     def test_compose_kernel_command_line_inc_purpose_opts_comm_node(self):
         # The result of compose_kernel_command_line includes the purpose
         # options for a "commissioning" node.
         params = self.make_kernel_parameters(purpose="commissioning")
-        self.assertIn(
-            "root=squash:http://", compose_kernel_command_line(params)
-        )
+        self.assertIn("root=squash:http://", compose_kernel_command_line(params))
 
     def test_compose_kernel_command_line_inc_arm_specific_option(self):
         params = self.make_kernel_parameters(arch="armhf", subarch="highbank")
@@ -412,9 +404,7 @@ class TestKernelOpts(MAASTestCase):
         params = make_kernel_parameters(fs_host=factory.make_ipv4_address())
         for needle in [
             "ro",
-            (
-                f"root=squash:http://{params.fs_host}:5248/images/{params.xinstall_path}"
-            ),
+            (f"root=squash:http://{params.fs_host}:5248/images/{params.xinstall_path}"),
         ]:
             self.assertIn(needle, compose_kernel_command_line(params))
 
@@ -440,9 +430,7 @@ class TestKernelOpts(MAASTestCase):
 
     def test_xinstall_compose_kernel_command_line_ephemeral_opts(self):
         # ephemeral opts MUST appear before the separator
-        mock_get_curtin_sep = self.patch(
-            kernel_opts, "get_curtin_kernel_cmdline_sep"
-        )
+        mock_get_curtin_sep = self.patch(kernel_opts, "get_curtin_kernel_cmdline_sep")
         sep = factory.make_name("sep")
         mock_get_curtin_sep.return_value = sep
 

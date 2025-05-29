@@ -21,9 +21,7 @@ TIMEOUT = get_testing_timeout()
 class TestRPCView(MAASTransactionServerTestCase):
     def setUp(self):
         super().setUp()
-        self.patch(
-            ipc, "get_all_interface_source_addresses"
-        ).return_value = set()
+        self.patch(ipc, "get_all_interface_source_addresses").return_value = set()
         load_builtin_scripts()
 
     def test_rpc_info_empty(self):
@@ -43,9 +41,7 @@ class TestRPCView(MAASTransactionServerTestCase):
         # `workers` is only included so ipc-master will not actually get the
         # workers service because this test runs in all-in-one mode.
         self.useFixture(
-            RegionEventLoopFixture(
-                "ipc-master", "ipc-worker", "rpc", "workers"
-            )
+            RegionEventLoopFixture("ipc-master", "ipc-worker", "rpc", "workers")
         )
 
         eventloop.start(master=True, all_in_one=True).wait(TIMEOUT)

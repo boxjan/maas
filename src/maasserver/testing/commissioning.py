@@ -77,9 +77,7 @@ class LXDNetworkPort:
     supported_modes: List[str] = dataclasses.field(
         default_factory=lambda: ["10000baseT/Full"]
     )
-    supported_ports: List[str] = dataclasses.field(
-        default_factory=lambda: ["fiber"]
-    )
+    supported_ports: List[str] = dataclasses.field(default_factory=lambda: ["fiber"])
     port_type: str = "fiber"
     transceiver_type: str = "internal"
     auto_negotiation: bool = True
@@ -205,9 +203,7 @@ class FakeCommissioningData:
 
     @property
     def debian_architecture(self):
-        return kernel_to_debian_architecture(
-            self.environment["kernel_architecture"]
-        )
+        return kernel_to_debian_architecture(self.environment["kernel_architecture"])
 
     def add_disk(self, id: str, size: int):
         self._disks.append(LXDDisk(id, size=size))
@@ -220,9 +216,7 @@ class FakeCommissioningData:
         )
         bus, device, func = prev_address.split(":")
         next_device = int(device, 16) + 1
-        self._allocated_pci_addresses.append(
-            f"{bus}:{next_device:0>4x}:{func}"
-        )
+        self._allocated_pci_addresses.append(f"{bus}:{next_device:0>4x}:{func}")
         return self._allocated_pci_addresses[-1]
 
     def allocate_usb_address(self):
@@ -334,9 +328,7 @@ class FakeCommissioningData:
             card.ports = []
         network = self.create_physical_network_without_nic(name, mac_address)
         if port is None:
-            port = LXDNetworkPort(
-                network.name, len(card.ports), address=network.hwaddr
-            )
+            port = LXDNetworkPort(network.name, len(card.ports), address=network.hwaddr)
         card.ports.append(port)
         if self._boot_interface_mac is None:
             self._boot_interface_mac = network.hwaddr
@@ -391,9 +383,7 @@ class FakeCommissioningData:
         network = LXDNetwork(
             name,
             mac_address,
-            bridge=LXDBridge(
-                upper_devices=[parent.name for parent in parents]
-            ),
+            bridge=LXDBridge(upper_devices=[parent.name for parent in parents]),
         )
         self.networks[name] = network
         return network
@@ -439,9 +429,7 @@ class FakeCommissioningData:
                     dict_factory=lambda x: {
                         k: v
                         for (k, v) in x
-                        if not (
-                            k in ("pci_address", "usb_address") and v is None
-                        )
+                        if not (k in ("pci_address", "usb_address") and v is None)
                     },
                 )
                 for card in self._network_cards
@@ -452,19 +440,14 @@ class FakeCommissioningData:
             if card["ports"] is None:
                 del card["ports"]
         networks = {
-            name: dataclasses.asdict(network)
-            for name, network in self.networks.items()
+            name: dataclasses.asdict(network) for name, network in self.networks.items()
         }
         pci_resources = {
-            "devices": [
-                dataclasses.asdict(device) for device in self._pci_devices
-            ],
+            "devices": [dataclasses.asdict(device) for device in self._pci_devices],
             "total": len(self._pci_devices),
         }
         usb_resources = {
-            "devices": [
-                dataclasses.asdict(device) for device in self._usb_devices
-            ],
+            "devices": [dataclasses.asdict(device) for device in self._usb_devices],
             "total": len(self._usb_devices),
         }
 
@@ -544,9 +527,7 @@ class FakeCommissioningData:
             if network.type != "broadcast":
                 continue
             interface = {
-                "mac_address": self._get_network_port_mac(
-                    name, network.hwaddr
-                ),
+                "mac_address": self._get_network_port_mac(name, network.hwaddr),
                 "links": [],
                 "enabled": network.state == "up",
                 "source": "machine-resources",
@@ -580,9 +561,7 @@ class FakeCommissioningData:
                     "address": f"{address.address}/{address.netmask}",
                     "mode": "static",
                 }
-                address_annotation = self.address_annotations.get(
-                    address.address, {}
-                )
+                address_annotation = self.address_annotations.get(address.address, {})
                 link.update(address_annotation)
                 interface["links"].append(link)
             interfaces[name] = interface

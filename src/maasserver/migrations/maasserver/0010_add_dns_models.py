@@ -37,9 +37,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "ttl",
-                    models.PositiveIntegerField(
-                        default=None, null=True, blank=True
-                    ),
+                    models.PositiveIntegerField(default=None, null=True, blank=True),
                 ),
             ],
             options={
@@ -64,9 +62,7 @@ class Migration(migrations.Migration):
                 ("updated", models.DateTimeField(editable=False)),
                 (
                     "name",
-                    maasserver.fields.DomainNameField(
-                        unique=True, max_length=256
-                    ),
+                    maasserver.fields.DomainNameField(unique=True, max_length=256),
                 ),
                 (
                     "authoritative",
@@ -92,9 +88,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="dnsresource",
             name="ip_addresses",
-            field=models.ManyToManyField(
-                blank=True, to="maasserver.StaticIPAddress"
-            ),
+            field=models.ManyToManyField(blank=True, to="maasserver.StaticIPAddress"),
         ),
         migrations.AddField(
             model_name="node",

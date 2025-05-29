@@ -182,9 +182,7 @@ def _get_maas_repo_commit_count():
 def _git_cmd(*cmd):
     """Run a git command and return output, or None in case of error."""
     try:
-        return (
-            shell.call_and_check(["git"] + list(cmd)).decode("ascii").strip()
-        )
+        return shell.call_and_check(["git"] + list(cmd)).decode("ascii").strip()
     except (shell.ExternalProcessError, FileNotFoundError):
         # We may not be in a git repository, or any manner of other errors, or
         # git is not installed.

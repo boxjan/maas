@@ -49,15 +49,10 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
         form = CreateVolumeGroupForm(node, data=data)
         self.assertFalse(
             form.is_valid(),
-            "Should be invalid because of missing block_devices and "
-            "partitions.",
+            "Should be invalid because of missing block_devices and " "partitions.",
         )
         self.assertEqual(
-            {
-                "__all__": [
-                    "At least one valid block device or partition is required."
-                ]
-            },
+            {"__all__": ["At least one valid block device or partition is required."]},
             form._errors,
         )
 
@@ -71,8 +66,7 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
         form = CreateVolumeGroupForm(node, data=data)
         self.assertFalse(
             form.is_valid(),
-            "Should be invalid because of block device does not "
-            "belonging to node.",
+            "Should be invalid because of block device does not " "belonging to node.",
         )
         self.assertEqual(
             {
@@ -94,8 +88,7 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
         form = CreateVolumeGroupForm(node, data=data)
         self.assertFalse(
             form.is_valid(),
-            "Should be invalid because of partition does not "
-            "belonging to node.",
+            "Should be invalid because of partition does not " "belonging to node.",
         )
         self.assertEqual(
             {
@@ -125,9 +118,7 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
 
     def test_creates_volume_group_with_block_devices(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         block_device_ids = [block_device.id for block_device in block_devices]
         data = {
             "name": factory.make_name("vg"),
@@ -160,12 +151,8 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
 
     def test_creates_volume_group_with_block_devices_by_name(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
-        block_device_names = [
-            block_device.name for block_device in block_devices
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
+        block_device_names = [block_device.name for block_device in block_devices]
         data = {
             "name": factory.make_name("vg"),
             "block_devices": block_device_names,
@@ -185,12 +172,9 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
             node=node,
             size=(MIN_BLOCK_DEVICE_SIZE * 3) + PARTITION_TABLE_EXTRA_SPACE,
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = [
-            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE) for _ in range(2)
         ]
         partition_ids = [partition.id for partition in partitions]
         data = {"name": factory.make_name("vg"), "partitions": partition_ids}
@@ -198,8 +182,7 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), form._errors)
         volume_group = form.save()
         partitions_in_vg = [
-            filesystem.partition
-            for filesystem in volume_group.filesystems.all()
+            filesystem.partition for filesystem in volume_group.filesystems.all()
         ]
         self.assertCountEqual(partitions, partitions_in_vg)
 
@@ -209,12 +192,9 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
             node=node,
             size=(MIN_BLOCK_DEVICE_SIZE * 3) + PARTITION_TABLE_EXTRA_SPACE,
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = [
-            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE) for _ in range(2)
         ]
         partition_names = [partition.name for partition in partitions]
         data = {"name": factory.make_name("vg"), "partitions": partition_names}
@@ -222,27 +202,21 @@ class TestCreateVolumeGroupForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), form._errors)
         volume_group = form.save()
         partitions_in_vg = [
-            filesystem.partition
-            for filesystem in volume_group.filesystems.all()
+            filesystem.partition for filesystem in volume_group.filesystems.all()
         ]
         self.assertCountEqual(partitions, partitions_in_vg)
 
     def test_creates_volume_group_with_block_devices_and_partitions(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         block_device_ids = [block_device.id for block_device in block_devices]
         block_device = factory.make_PhysicalBlockDevice(
             node=node,
             size=(MIN_BLOCK_DEVICE_SIZE * 3) + PARTITION_TABLE_EXTRA_SPACE,
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = [
-            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE) for _ in range(2)
         ]
         partition_ids = [partition.id for partition in partitions]
         data = {
@@ -374,9 +348,7 @@ class TestUpdateVolumeGroupForm(MAASServerTestCase):
         node = factory.make_Node()
         volume_group = factory.make_VolumeGroup(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         data = {"add_partitions": [partition.id]}
         form = UpdateVolumeGroupForm(volume_group, data=data)
@@ -391,9 +363,7 @@ class TestUpdateVolumeGroupForm(MAASServerTestCase):
         node = factory.make_Node()
         volume_group = factory.make_VolumeGroup(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         data = {"add_partitions": [partition.name]}
         form = UpdateVolumeGroupForm(volume_group, data=data)
@@ -408,9 +378,7 @@ class TestUpdateVolumeGroupForm(MAASServerTestCase):
         node = factory.make_Node()
         volume_group = factory.make_VolumeGroup(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         factory.make_Filesystem(
             fstype=FILESYSTEM_TYPE.LVM_PV,
@@ -427,9 +395,7 @@ class TestUpdateVolumeGroupForm(MAASServerTestCase):
         node = factory.make_Node()
         volume_group = factory.make_VolumeGroup(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         factory.make_Filesystem(
             fstype=FILESYSTEM_TYPE.LVM_PV,
@@ -520,8 +486,7 @@ class TestCreateLogicalVolumeForm(MAASServerTestCase):
             {
                 "__all__": [
                     "Volume group (%s) cannot hold any more logical volumes, "
-                    "because it doesn't have enough free space."
-                    % (volume_group.name)
+                    "because it doesn't have enough free space." % (volume_group.name)
                 ]
             },
             form._errors,

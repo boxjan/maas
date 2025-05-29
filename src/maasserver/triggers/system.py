@@ -2569,9 +2569,7 @@ def register_system_triggers():
 
     # - Interface
     register_procedure(DHCP_INTERFACE_UPDATE)
-    register_trigger(
-        "maasserver_interface", "sys_dhcp_interface_update", "update"
-    )
+    register_trigger("maasserver_interface", "sys_dhcp_interface_update", "update")
 
     # - Node
     register_procedure(DHCP_NODE_UPDATE)
@@ -2584,17 +2582,11 @@ def register_system_triggers():
     register_procedure(DHCP_SNIPPET_UPDATE_VALUE)
 
     register_procedure(DHCP_SNIPPET_INSERT)
-    register_trigger(
-        "maasserver_dhcpsnippet", "sys_dhcp_snippet_insert", "insert"
-    )
+    register_trigger("maasserver_dhcpsnippet", "sys_dhcp_snippet_insert", "insert")
     register_procedure(DHCP_SNIPPET_UPDATE)
-    register_trigger(
-        "maasserver_dhcpsnippet", "sys_dhcp_snippet_update", "update"
-    )
+    register_trigger("maasserver_dhcpsnippet", "sys_dhcp_snippet_update", "update")
     register_procedure(DHCP_SNIPPET_DELETE)
-    register_trigger(
-        "maasserver_dhcpsnippet", "sys_dhcp_snippet_delete", "delete"
-    )
+    register_trigger("maasserver_dhcpsnippet", "sys_dhcp_snippet_delete", "delete")
 
     # - Config/ntp_servers (and ntp_external_only)
     register_procedure(DHCP_CONFIG_NTP_SERVERS_INSERT)
@@ -2648,17 +2640,11 @@ def register_system_triggers():
 
     # - DNSResource
     register_procedure(DNS_DNSRESOURCE_INSERT)
-    register_trigger(
-        "maasserver_dnsresource", "sys_dns_dnsresource_insert", "insert"
-    )
+    register_trigger("maasserver_dnsresource", "sys_dns_dnsresource_insert", "insert")
     register_procedure(DNS_DNSRESOURCE_UPDATE)
-    register_trigger(
-        "maasserver_dnsresource", "sys_dns_dnsresource_update", "update"
-    )
+    register_trigger("maasserver_dnsresource", "sys_dns_dnsresource_update", "update")
     register_procedure(DNS_DNSRESOURCE_DELETE)
-    register_trigger(
-        "maasserver_dnsresource", "sys_dns_dnsresource_delete", "delete"
-    )
+    register_trigger("maasserver_dnsresource", "sys_dns_dnsresource_delete", "delete")
 
     # - DNSResource -> StaticIPAddress
     register_procedure(DNS_DNSRESOURCE_IP_LINK)
@@ -2698,9 +2684,7 @@ def register_system_triggers():
 
     # - Interface
     register_procedure(DNS_INTERFACE_UPDATE)
-    register_trigger(
-        "maasserver_interface", "sys_dns_interface_update", "update"
-    )
+    register_trigger("maasserver_interface", "sys_dns_interface_update", "update")
 
     # - Config
     register_procedure(DNS_CONFIG_INSERT)
@@ -2737,17 +2721,11 @@ def register_system_triggers():
 
     # - ResourcePool
     register_procedure(RBAC_RPOOL_INSERT)
-    register_trigger(
-        "maasserver_resourcepool", "sys_rbac_rpool_insert", "insert"
-    )
+    register_trigger("maasserver_resourcepool", "sys_rbac_rpool_insert", "insert")
     register_procedure(RBAC_RPOOL_UPDATE)
-    register_trigger(
-        "maasserver_resourcepool", "sys_rbac_rpool_update", "update"
-    )
+    register_trigger("maasserver_resourcepool", "sys_rbac_rpool_update", "update")
     register_procedure(RBAC_RPOOL_DELETE)
-    register_trigger(
-        "maasserver_resourcepool", "sys_rbac_rpool_delete", "delete"
-    )
+    register_trigger("maasserver_resourcepool", "sys_rbac_rpool_delete", "delete")
 
     register_procedure(
         render_dns_dynamic_update_dnsresource_ip_addresses_procedure("insert")
@@ -2765,17 +2743,13 @@ def register_system_triggers():
         "sys_dns_updates_dns_ip_delete",
         "delete",
     )
-    register_procedure(
-        render_dns_dynamic_update_dnsresource_procedure("update")
-    )
+    register_procedure(render_dns_dynamic_update_dnsresource_procedure("update"))
     register_trigger(
         "maasserver_dnsresource",
         "sys_dns_updates_maasserver_dnsresource_update",
         "update",
     )
-    register_procedure(
-        render_dns_dynamic_update_dnsresource_procedure("delete")
-    )
+    register_procedure(render_dns_dynamic_update_dnsresource_procedure("delete"))
     register_trigger(
         "maasserver_dnsresource",
         "sys_dns_updates_maasserver_dnsresource_delete",
@@ -2835,17 +2809,13 @@ def register_system_triggers():
         "sys_dns_updates_maasserver_subnet_delete",
         "delete",
     )
-    register_procedure(
-        render_dns_dynamic_update_interface_static_ip_address("insert")
-    )
+    register_procedure(render_dns_dynamic_update_interface_static_ip_address("insert"))
     register_trigger(
         "maasserver_interface_ip_addresses",
         "sys_dns_updates_interface_ip_insert",
         "insert",
     )
-    register_procedure(
-        render_dns_dynamic_update_interface_static_ip_address("delete")
-    )
+    register_procedure(render_dns_dynamic_update_interface_static_ip_address("delete"))
     register_trigger(
         "maasserver_interface_ip_addresses",
         "sys_dns_updates_interface_ip_delete",

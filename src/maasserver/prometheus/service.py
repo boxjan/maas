@@ -38,11 +38,7 @@ class PrometheusDiscoveryResource(Resource):
             instances = [
                 ip
                 + ":"
-                + str(
-                    REGION_PROMETHEUS_PORT
-                    if is_region
-                    else RACK_PROMETHEUS_PORT
-                )
+                + str(REGION_PROMETHEUS_PORT if is_region else RACK_PROMETHEUS_PORT)
                 for controller in controllers
                 for ip in controller.ip_addresses()
             ]

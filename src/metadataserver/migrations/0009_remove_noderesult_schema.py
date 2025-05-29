@@ -9,13 +9,9 @@ class DeleteModel(migrations.DeleteModel):
     users have upgraded and others failed to upgrade.
     """
 
-    def database_forwards(
-        self, app_label, schema_editor, from_state, to_state
-    ):
+    def database_forwards(self, app_label, schema_editor, from_state, to_state):
         try:
-            super().database_forwards(
-                app_label, schema_editor, from_state, to_state
-            )
+            super().database_forwards(app_label, schema_editor, from_state, to_state)
         except utils.ProgrammingError:
             # Error is raised when the table has already been deleted. This
             # is for users that upgrade to 2.2 beta1 before 2.2 beta3.

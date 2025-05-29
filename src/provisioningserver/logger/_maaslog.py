@@ -15,8 +15,7 @@ class MAASLogger(logging.getLoggerClass()):
 
     def exception(self, *args, **kwargs):
         raise NotImplementedError(
-            "Don't log exceptions to maaslog; use the default "
-            "Django logger instead"
+            "Don't log exceptions to maaslog; use the default " "Django logger instead"
         )
 
 

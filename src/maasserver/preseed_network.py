@@ -121,9 +121,7 @@ class InterfaceConfiguration:
         """Generate all route operations."""
         routes = []
         for route in sorted(matching_routes, key=attrgetter("id")):
-            routes.append(
-                _generate_route_operation(route, version=self.version)
-            )
+            routes.append(_generate_route_operation(route, version=self.version))
         return routes
 
     def _generate_physical_operation(self):
@@ -158,8 +156,7 @@ class InterfaceConfiguration:
         node = self.iface.node_config.node
         if (
             self.iface == node.boot_interface
-            and NODE_STATUS.COMMISSIONING
-            in {node.status, node.previous_status}
+            and NODE_STATUS.COMMISSIONING in {node.status, node.previous_status}
             and self.iface.ip_addresses.exclude(
                 alloc_type=IPADDRESS_TYPE.DISCOVERED, ip=None
             ).exists()
@@ -344,9 +341,7 @@ class InterfaceConfiguration:
                         if "addresses" not in v2_config:
                             v2_config["addresses"] = v2_cidrs
                     v1_config.append(v1_subnet_operation)
-                    self.addr_family_present[
-                        IPNetwork(subnet.cidr).version
-                    ] = True
+                    self.addr_family_present[IPNetwork(subnet.cidr).version] = True
                     matching_subnet_routes = self._get_matching_routes(subnet)
                     # Keep track of routes which apply to the context of this
                     # interface for rendering the v2 YAML.
@@ -355,9 +350,7 @@ class InterfaceConfiguration:
                     # the v1 YAML, but it's per-interface for the v2 YAML.
                     self._set_default_gateway(
                         subnet,
-                        v1_subnet_operation
-                        if self.version == 1
-                        else v2_config,
+                        v1_subnet_operation if self.version == 1 else v2_config,
                     )
 
                     if "dns_nameservers" not in v1_subnet_operation:
@@ -371,9 +364,7 @@ class InterfaceConfiguration:
                         v1_subnet_operation[
                             "dns_search"
                         ] = self.node_config.default_search_list
-                        v2_nameservers[
-                            "search"
-                        ] = self.node_config.default_search_list
+                        v2_nameservers["search"] = self.node_config.default_search_list
 
                         for ip in StaticIPAddress.objects.filter(
                             interface__node_config__node__in=[
@@ -395,9 +386,7 @@ class InterfaceConfiguration:
                                 if ip_address not in subnet.get_ipnetwork():
                                     # without gateway, only use in-subnet addrs
                                     continue
-                            v1_subnet_operation["dns_nameservers"].append(
-                                ip.ip
-                            )
+                            v1_subnet_operation["dns_nameservers"].append(ip.ip)
                             v2_nameservers["addresses"].append(ip.ip)
 
                     for ip in subnet.dns_servers:
@@ -409,9 +398,7 @@ class InterfaceConfiguration:
                     if matching_subnet_routes and self.version == 1:
                         # For the v1 YAML, the list of routes is rendered
                         # within the context of each subnet.
-                        routes = self._generate_route_operations(
-                            matching_subnet_routes
-                        )
+                        routes = self._generate_route_operations(matching_subnet_routes)
                         v1_subnet_operation["routes"] = routes
 
                     # Delete if no DNS servers were added.
@@ -473,8 +460,7 @@ class InterfaceConfiguration:
                     "name": self.name,
                     "mac_address": str(self.iface.mac_address),
                     "bond_interfaces": [
-                        parent.name
-                        for parent in self.iface.parents.order_by("name")
+                        parent.name for parent in self.iface.parents.order_by("name")
                     ],
                     "params": self._get_bond_params(),
                 }
@@ -486,8 +472,7 @@ class InterfaceConfiguration:
                 {
                     "macaddress": str(self.iface.mac_address),
                     "interfaces": [
-                        parent.name
-                        for parent in self.iface.parents.order_by("name")
+                        parent.name for parent in self.iface.parents.order_by("name")
                     ],
                 }
             )
@@ -509,8 +494,7 @@ class InterfaceConfiguration:
                     "name": self.name,
                     "mac_address": str(self.iface.mac_address),
                     "bridge_interfaces": [
-                        parent.name
-                        for parent in self.iface.parents.order_by("name")
+                        parent.name for parent in self.iface.parents.order_by("name")
                     ],
                     "params": self._get_bridge_params(),
                 }
@@ -522,15 +506,12 @@ class InterfaceConfiguration:
                 {
                     "macaddress": str(self.iface.mac_address),
                     "interfaces": [
-                        parent.name
-                        for parent in self.iface.parents.order_by("name")
+                        parent.name for parent in self.iface.parents.order_by("name")
                     ],
                 }
             )
             if self.iface.params:
-                bridge_type = self.iface.params.get(
-                    "bridge_type", BRIDGE_TYPE.STANDARD
-                )
+                bridge_type = self.iface.params.get("bridge_type", BRIDGE_TYPE.STANDARD)
                 if bridge_type == BRIDGE_TYPE.OVS:
                     bridge_operation.update(
                         {
@@ -540,9 +521,7 @@ class InterfaceConfiguration:
                             "optional": False,
                         }
                     )
-            bridge_params = get_netplan_bridge_parameters(
-                self._get_bridge_params()
-            )
+            bridge_params = get_netplan_bridge_parameters(self._get_bridge_params())
             if bridge_params:
                 bridge_operation["parameters"] = bridge_params
             bridge_operation.update(addrs)
@@ -705,9 +684,7 @@ class NodeNetworkConfiguration:
                 }
             )
         if version == 1:
-            network_config = {
-                "network": {"version": 1, "config": self.v1_config}
-            }
+            network_config = {"network": {"version": 1, "config": self.v1_config}}
         else:
             if self.v2_ethernets:
                 self.v2_config.append(("ethernets", self.v2_ethernets))
@@ -739,13 +716,9 @@ class NodeNetworkConfiguration:
         if self.default_dns_servers:
             v2_default_nameservers = {}
             if self.default_search_list:
-                v2_default_nameservers.update(
-                    {"search": self.default_search_list}
-                )
+                v2_default_nameservers.update({"search": self.default_search_list})
             if self.default_dns_servers:
-                v2_default_nameservers.update(
-                    {"addresses": self.default_dns_servers}
-                )
+                v2_default_nameservers.update({"addresses": self.default_dns_servers})
             sections = [
                 self.v2_ethernets,
                 self.v2_vlans,
@@ -777,12 +750,8 @@ def compose_curtin_network_config(node, version=1, source_routing=False):
     generator = NodeNetworkConfiguration(
         node, version=version, source_routing=source_routing
     )
-    curtin_config = {
-        "network_commands": {"builtin": ["curtin", "net-meta", "custom"]}
-    }
+    curtin_config = {"network_commands": {"builtin": ["curtin", "net-meta", "custom"]}}
     curtin_config.update(generator.config)
     # Render the resulting YAML.
-    curtin_config_yaml = yaml.safe_dump(
-        curtin_config, default_flow_style=False
-    )
+    curtin_config_yaml = yaml.safe_dump(curtin_config, default_flow_style=False)
     return [curtin_config_yaml]

@@ -20,9 +20,7 @@ class TestSpaceHandler(MAASServerTestCase):
             "description": space.description,
             "updated": dehydrate_datetime(space.updated),
             "created": dehydrate_datetime(space.created),
-            "subnet_ids": sorted(
-                subnet.id for subnet in space.subnet_set.all()
-            ),
+            "subnet_ids": sorted(subnet.id for subnet in space.subnet_set.all()),
             "vlan_ids": sorted(vlan.id for vlan in space.vlan_set.all()),
         }
         return data
@@ -36,17 +34,13 @@ class TestSpaceHandler(MAASServerTestCase):
             interface = node.get_boot_interface()
             subnet = factory.make_Subnet(space=space, vlan=interface.vlan)
             factory.make_StaticIPAddress(subnet=subnet, interface=interface)
-        self.assertEqual(
-            self.dehydrate_space(space), handler.get({"id": space.id})
-        )
+        self.assertEqual(self.dehydrate_space(space), handler.get({"id": space.id}))
 
     def test_list(self):
         user = factory.make_User()
         handler = SpaceHandler(user, {}, None)
         factory.make_Space()
-        expected_spaces = [
-            self.dehydrate_space(space) for space in Space.objects.all()
-        ]
+        expected_spaces = [self.dehydrate_space(space) for space in Space.objects.all()]
         self.assertCountEqual(expected_spaces, handler.list({}))
 
     def test_list_constant_queries(self):

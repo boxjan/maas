@@ -6,32 +6,24 @@ class Migration(migrations.Migration):
     dependencies = [("maasserver", "0023_add_ttl_field")]
 
     operations = [
-        migrations.RemoveField(
-            model_name="downloadprogress", name="nodegroup"
-        ),
+        migrations.RemoveField(model_name="downloadprogress", name="nodegroup"),
         migrations.RemoveField(model_name="nodegroup", name="api_token"),
         migrations.AlterUniqueTogether(
             name="nodegroupinterface", unique_together=set()
         ),
-        migrations.RemoveField(
-            model_name="nodegroupinterface", name="nodegroup"
-        ),
+        migrations.RemoveField(model_name="nodegroupinterface", name="nodegroup"),
         migrations.RemoveField(model_name="nodegroupinterface", name="subnet"),
         migrations.RemoveField(model_name="nodegroupinterface", name="vlan"),
         migrations.RemoveField(model_name="node", name="nodegroup"),
         migrations.AddField(
             model_name="node",
             name="status_expires",
-            field=models.DateTimeField(
-                editable=False, default=None, null=True
-            ),
+            field=models.DateTimeField(editable=False, default=None, null=True),
         ),
         migrations.AddField(
             model_name="node",
             name="power_state_queried",
-            field=models.DateTimeField(
-                editable=False, null=True, default=None
-            ),
+            field=models.DateTimeField(editable=False, null=True, default=None),
         ),
         migrations.AddField(
             model_name="node",

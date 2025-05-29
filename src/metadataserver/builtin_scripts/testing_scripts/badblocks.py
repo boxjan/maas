@@ -65,10 +65,7 @@ TIMEOUT = 60
 def get_block_size(storage):
     """Return the block size for the storage device."""
     cmd = ["sudo", "-n", "blockdev", "--getbsz", storage]
-    print(
-        "INFO: Determining %s block size by running `%s`"
-        % (storage, " ".join(cmd))
-    )
+    print("INFO: Determining %s block size by running `%s`" % (storage, " ".join(cmd)))
     return int(check_output(cmd, timeout=TIMEOUT))
 
 
@@ -184,11 +181,7 @@ def run_badblocks(storage, destructive=False):
     # LP: #1733923 - Badblocks normally returns 0 no matter the result. If any
     # errors are found fail the test.
     if (
-        proc.returncode
-        + badblocks
-        + read_errors
-        + write_errors
-        + comparison_errors
+        proc.returncode + badblocks + read_errors + write_errors + comparison_errors
     ) != 0:
         print("FAILURE: Test FAILED!")
         print("INFO: %s badblocks found" % badblocks)

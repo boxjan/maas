@@ -18,9 +18,7 @@ class TestSpaceForm(MAASServerTestCase):
     def test_creates_space(self):
         space_name = factory.make_name("space")
         space_description = factory.make_name("description")
-        form = SpaceForm(
-            {"name": space_name, "description": space_description}
-        )
+        form = SpaceForm({"name": space_name, "description": space_description})
         self.assertTrue(form.is_valid(), form.errors)
         space = form.save()
         self.assertEqual(space_name, space.get_name())

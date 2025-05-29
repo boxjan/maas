@@ -44,9 +44,7 @@ from provisioningserver.drivers.hardware.ucsm import (
 from provisioningserver.utils.twisted import asynchronous
 
 
-def make_api(
-    url="http://url", user="u", password="p", cookie="foo", mock_call=True
-):
+def make_api(url="http://url", user="u", password="p", cookie="foo", mock_call=True):
     api = UCSM_XML_API(url, user, password)
     api.cookie = cookie
     return api
@@ -290,14 +288,10 @@ class TestProbeLanBootOptions(MAASTestCase):
         mock_get_service_profile.return_value = mock_service_profile
         mock_service_profile.get.return_value = sentinel.profile_get
         fake_result = make_fake_result("tag", "lsbootLan")
-        mock_config_resolve_children = self.patch(
-            api, "config_resolve_children"
-        )
+        mock_config_resolve_children = self.patch(api, "config_resolve_children")
         mock_config_resolve_children.return_value = fake_result
         self.assertEqual(1, len(probe_lan_boot_options(api, server)))
-        mock_config_resolve_children.assert_called_once_with(
-            sentinel.profile_get
-        )
+        mock_config_resolve_children.assert_called_once_with(sentinel.profile_get)
         mock_service_profile.get.assert_called_once_with("operBootPolicyName")
         mock_get_service_profile.assert_called_once_with(api, server)
 
@@ -436,9 +430,7 @@ class TestValidGetPowerCommand(MAASTestCase):
         ),
         (
             "Power On",
-            dict(
-                power_mode="on", current_state="up", command="cycle-immediate"
-            ),
+            dict(power_mode="on", current_state="up", command="cycle-immediate"),
         ),
         (
             "Power Off",
@@ -470,18 +462,12 @@ class TestPowerControlUCSM(MAASTestCase):
         state = "admin-down"
         power_control = Element("lsPower", {"state": state})
         get_servers_mock.return_value = [server]
-        get_server_power_control_mock = self.patch(
-            ucsm, "get_server_power_control"
-        )
+        get_server_power_control_mock = self.patch(ucsm, "get_server_power_control")
         get_server_power_control_mock.return_value = power_control
-        set_server_power_control_mock = self.patch(
-            ucsm, "set_server_power_control"
-        )
+        set_server_power_control_mock = self.patch(ucsm, "set_server_power_control")
         power_control_ucsm("url", "username", "password", uuid, "off")
         get_servers_mock.assert_called_once_with(api, uuid)
-        set_server_power_control_mock.assert_called_once_with(
-            api, power_control, state
-        )
+        set_server_power_control_mock.assert_called_once_with(api, power_control, state)
 
 
 class TestUCSMPowerState(MAASTestCase):
@@ -529,9 +515,7 @@ class TestUCSMPowerState(MAASTestCase):
 
 
 class TestProbeAndEnlistUCSM(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     @inlineCallbacks
     def test_probe_and_enlist(self):
@@ -575,9 +559,7 @@ class TestGetServiceProfile(MAASTestCase):
         server = Element("computeBlade", {"assignedToDn": test_dn})
         api = make_api()
         mock = self.patch(api, "config_resolve_dn")
-        mock.return_value = make_fake_result(
-            "configResolveDn", "lsServer", "outConfig"
-        )
+        mock.return_value = make_fake_result("configResolveDn", "lsServer", "outConfig")
         service_profile = get_service_profile(api, server)
         mock.assert_called_once_with(test_dn)
         self.assertEqual(mock.return_value[0], service_profile)
@@ -620,8 +602,7 @@ class TestsForStripRoKeys(MAASTestCase):
         attributes = {key: "DC" for key in RO_KEYS}
 
         elements = [
-            Element(f"Element{i}", attributes)
-            for i in range(random.randint(0, 10))
+            Element(f"Element{i}", attributes) for i in range(random.randint(0, 10))
         ]
 
         strip_ro_keys(elements)
@@ -634,9 +615,7 @@ class TestsForStripRoKeys(MAASTestCase):
 
 class TestMakePolicyChange(MAASTestCase):
     def test_lan_already_top_priority(self):
-        boot_profile_response = make_fake_result(
-            "configResolveChildren", "lsbootLan"
-        )
+        boot_profile_response = make_fake_result("configResolveChildren", "lsbootLan")
         mock = self.patch(ucsm, "get_first_booter")
         mock.return_value = boot_profile_response[0]
         change = make_policy_change(boot_profile_response)
@@ -652,9 +631,7 @@ class TestMakePolicyChange(MAASTestCase):
         self.patch(ucsm, "strip_ro_keys")
         change = make_policy_change(boot_profile_response)
         lan_boot_order = change.xpath("//lsbootPolicy/lsbootLan/@order")
-        storage_boot_order = change.xpath(
-            "//lsbootPolicy/lsbootStorage/@order"
-        )
+        storage_boot_order = change.xpath("//lsbootPolicy/lsbootStorage/@order")
         self.assertEqual(["first"], lan_boot_order)
         self.assertEqual(["second"], storage_boot_order)
 

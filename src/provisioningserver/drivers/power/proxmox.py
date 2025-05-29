@@ -35,16 +35,13 @@ class ProxmoxPowerDriver(WebhookPowerDriver):
     can_set_boot_order = False
     description = "Proxmox"
     settings = [
-        make_setting_field(
-            "power_address", "Proxmox host name or IP", required=True
-        ),
+        make_setting_field("power_address", "Proxmox host name or IP", required=True),
         make_setting_field(
             "power_user", "Proxmox username, including realm", required=True
         ),
         make_setting_field(
             "power_pass",
-            "Proxmox password, required if a token name and secret aren't "
-            "given",
+            "Proxmox password, required if a token name and secret aren't " "given",
             field_type="password",
             secret=True,
         ),
@@ -68,9 +65,7 @@ class ProxmoxPowerDriver(WebhookPowerDriver):
         ),
     ]
 
-    ip_extractor = make_ip_extractor(
-        "power_address", IP_EXTRACTOR_PATTERNS.URL
-    )
+    ip_extractor = make_ip_extractor("power_address", IP_EXTRACTOR_PATTERNS.URL)
 
     def _get_url(self, context, endpoint, params=None):
         url = urlparse(context["power_address"])
@@ -88,9 +83,7 @@ class ProxmoxPowerDriver(WebhookPowerDriver):
             query = urlencode(params)
         else:
             query = ""
-        url = url._replace(
-            path="/api2/json/%s" % endpoint, query=query, fragment=""
-        )
+        url = url._replace(path="/api2/json/%s" % endpoint, query=query, fragment="")
         return url.geturl().encode()
 
     def _login(self, system_id, context):
@@ -99,9 +92,7 @@ class ProxmoxPowerDriver(WebhookPowerDriver):
             if "!" not in power_token_name:
                 # The username must be included with the token name. Proxmox
                 # docs doesn't make this obvious and the UI includes it.
-                power_token_name = (
-                    f"{context['power_user']}!{power_token_name}"
-                )
+                power_token_name = f"{context['power_user']}!{power_token_name}"
             return succeed(
                 {
                     b"Authorization": [
@@ -137,9 +128,7 @@ class ProxmoxPowerDriver(WebhookPowerDriver):
         def cb(response_data):
             parsed_data = json.loads(response_data)
             return {
-                b"Cookie": [
-                    f"PVEAuthCookie={parsed_data['data']['ticket']}".encode()
-                ],
+                b"Cookie": [f"PVEAuthCookie={parsed_data['data']['ticket']}".encode()],
                 b"CSRFPreventionToken": [
                     parsed_data["data"]["CSRFPreventionToken"].encode()
                 ],
@@ -182,8 +171,7 @@ class ProxmoxPowerDriver(WebhookPowerDriver):
                 b"POST",
                 self._get_url(
                     context,
-                    f"nodes/{vm['node']}/{vm['type']}/{vm['vmid']}/"
-                    "status/start",
+                    f"nodes/{vm['node']}/{vm['type']}/{vm['vmid']}/" "status/start",
                 ),
                 self._make_auth_headers(system_id, {}, extra_headers),
                 context.get("power_verify_ssl") == SSL_INSECURE_YES,
@@ -199,8 +187,7 @@ class ProxmoxPowerDriver(WebhookPowerDriver):
                 b"POST",
                 self._get_url(
                     context,
-                    f"nodes/{vm['node']}/{vm['type']}/{vm['vmid']}/"
-                    "status/stop",
+                    f"nodes/{vm['node']}/{vm['type']}/{vm['vmid']}/" "status/stop",
                 ),
                 self._make_auth_headers(system_id, {}, extra_headers),
                 context.get("power_verify_ssl") == SSL_INSECURE_YES,
@@ -251,9 +238,7 @@ def probe_proxmox_and_enlist(
         "power_pass": password,
         "power_token_name": token_name,
         "power_token_secret": token_secret,
-        "power_verify_ssl": SSL_INSECURE_YES
-        if verify_ssl
-        else SSL_INSECURE_NO,
+        "power_verify_ssl": SSL_INSECURE_YES if verify_ssl else SSL_INSECURE_NO,
     }
     mac_regex = re.compile(r"(([\dA-F]{2}[:]){5}[\dA-F]{2})", re.I)
 
@@ -276,9 +261,7 @@ def probe_proxmox_and_enlist(
         extra_headers, response_data = data
         vms = json.loads(response_data)["data"]
         if not vms:
-            raise PowerActionError(
-                "No VMs returned! Are permissions set correctly?"
-            )
+            raise PowerActionError("No VMs returned! Are permissions set correctly?")
         for vm in vms:
             if prefix_filter and not vm["name"].startswith(prefix_filter):
                 continue
@@ -293,9 +276,7 @@ def probe_proxmox_and_enlist(
                 proxmox._make_auth_headers("", {}, extra_headers),
                 verify_ssl,
             )
-            macs = [
-                mac[0] for mac in mac_regex.findall(vm_config_data.decode())
-            ]
+            macs = [mac[0] for mac in mac_regex.findall(vm_config_data.decode())]
 
             system_id = yield create_node(
                 macs,
@@ -316,8 +297,7 @@ def probe_proxmox_and_enlist(
                     b"POST",
                     proxmox._get_url(
                         context,
-                        f"nodes/{vm['node']}/{vm['type']}/{vm['vmid']}/"
-                        "status/stop",
+                        f"nodes/{vm['node']}/{vm['type']}/{vm['vmid']}/" "status/stop",
                     ),
                     proxmox._make_auth_headers(system_id, {}, extra_headers),
                     context.get("power_verify_ssl") == SSL_INSECURE_YES,

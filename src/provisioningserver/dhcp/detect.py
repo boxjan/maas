@@ -52,9 +52,7 @@ class DHCPDiscoverPacket:
         request.
     """
 
-    def __init__(
-        self, mac: str = None, transaction_id: bytes = None, seconds: int = 0
-    ):
+    def __init__(self, mac: str = None, transaction_id: bytes = None, seconds: int = 0):
         super().__init__()
         self.mac_bytes = None
         self.mac_str = None
@@ -191,8 +189,7 @@ def get_interface_mac(sock: socket.socket, ifname: str) -> str:
             raise InterfaceNotFound("Interface not found: '%s'." % ifname)
         else:
             raise MACAddressNotAvailable(
-                "Failed to get MAC address for '%s': %s."
-                % (ifname, strerror(e.errno))
+                "Failed to get MAC address for '%s': %s." % (ifname, strerror(e.errno))
             )
     else:
         # Of course we're sure these are the correct indexes into the `ifreq`.
@@ -216,8 +213,7 @@ def get_interface_ip(sock: socket.socket, ifname: str) -> str:
             )
         else:
             raise IPAddressNotAvailable(
-                "Failed to get IP address for '%s': %s."
-                % (ifname, strerror(e.errno))
+                "Failed to get IP address for '%s': %s." % (ifname, strerror(e.errno))
             )
     else:
         (  # Parse the `struct ifreq` that comes back from the ioctl() call.
@@ -375,9 +371,7 @@ class DHCPRequestMonitor:
         for deferred in deferreds:
             deferred.cancel()
 
-    def deferredDHCPRequestErrback(
-        self, failure: Failure
-    ) -> Optional[Failure]:
+    def deferredDHCPRequestErrback(self, failure: Failure) -> Optional[Failure]:
         if failure.check(FirstError):
             # If an error occurred, cancel any other pending requests.
             # (The error is likely to occur for those requests, too.)
@@ -396,8 +390,7 @@ class DHCPRequestMonitor:
         else:
             log.err(
                 failure,
-                "DHCP probe on '%s' failed with an unknown error."
-                % (self.ifname),
+                "DHCP probe on '%s' failed with an unknown error." % (self.ifname),
             )
         # Make sure the error is propagated to the DeferredList.
         # We need this so that the DeferredList knows to call us with
@@ -440,9 +433,7 @@ class DHCPRequestMonitor:
             fireOnOneErrback=True,
             consumeErrors=True,
         )
-        self.dhcpRequestsDeferredList.addErrback(
-            self.deferredDHCPRequestErrback
-        )
+        self.dhcpRequestsDeferredList.addErrback(self.deferredDHCPRequestErrback)
 
     @inlineCallbacks
     def run(self) -> Deferred:
@@ -463,9 +454,7 @@ class DHCPRequestMonitor:
                 "External DHCP server(s) discovered on interface '{ifname}': "
                 "{servers}",
                 ifname=self.ifname,
-                servers=", ".join(
-                    str(server) for server in sorted(list(servers))
-                ),
+                servers=", ".join(str(server) for server in sorted(list(servers))),
             )
         self.servers = servers
 

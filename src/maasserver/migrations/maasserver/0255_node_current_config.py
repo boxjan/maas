@@ -9,9 +9,9 @@ def link_current_node_configs(apps, schema_editor):
     NodeConfig = apps.get_model("maasserver", "NodeConfig")
 
     # currently there's only one
-    node_config_entries = NodeConfig.objects.filter(
-        name="discovered"
-    ).values_list("id", "node_id")
+    node_config_entries = NodeConfig.objects.filter(name="discovered").values_list(
+        "id", "node_id"
+    )
     for config_id, node_id in node_config_entries:
         Node.objects.filter(id=node_id).update(current_config_id=config_id)
 

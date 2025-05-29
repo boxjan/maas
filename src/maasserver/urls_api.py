@@ -124,27 +124,19 @@ from maasserver.api.zones import ZoneHandler, ZonesHandler
 
 maas_handler = RestrictedResource(MaasHandler, authentication=api_auth)
 account_handler = RestrictedResource(AccountHandler, authentication=api_auth)
-boot_resource_handler = RestrictedResource(
-    BootResourceHandler, authentication=api_auth
-)
+boot_resource_handler = RestrictedResource(BootResourceHandler, authentication=api_auth)
 boot_resource_file_upload_handler = RestrictedResource(
     BootResourceFileUploadHandler, authentication=api_auth
 )
 boot_resources_handler = RestrictedResource(
     BootResourcesHandler, authentication=api_auth
 )
-discovery_handler = RestrictedResource(
-    DiscoveryHandler, authentication=api_auth
-)
-discoveries_handler = RestrictedResource(
-    DiscoveriesHandler, authentication=api_auth
-)
+discovery_handler = RestrictedResource(DiscoveryHandler, authentication=api_auth)
+discoveries_handler = RestrictedResource(DiscoveriesHandler, authentication=api_auth)
 events_handler = RestrictedResource(EventsHandler, authentication=api_auth)
 files_handler = RestrictedResource(FilesHandler, authentication=api_auth)
 file_handler = RestrictedResource(FileHandler, authentication=api_auth)
-ipaddresses_handler = RestrictedResource(
-    IPAddressesHandler, authentication=api_auth
-)
+ipaddresses_handler = RestrictedResource(IPAddressesHandler, authentication=api_auth)
 network_handler = RestrictedResource(NetworkHandler, authentication=api_auth)
 networks_handler = RestrictedResource(NetworksHandler, authentication=api_auth)
 node_handler = RestrictedResource(NodeHandler, authentication=api_auth)
@@ -167,12 +159,8 @@ device_handler = RestrictedResource(DeviceHandler, authentication=api_auth)
 devices_handler = RestrictedResource(DevicesHandler, authentication=api_auth)
 pod_handler = RestrictedResource(PodHandler, authentication=api_auth)
 pods_handler = RestrictedResource(PodsHandler, authentication=api_auth)
-vm_cluster_handler = RestrictedResource(
-    VmClusterHandler, authentication=api_auth
-)
-vm_clusters_handler = RestrictedResource(
-    VmClustersHandler, authentication=api_auth
-)
+vm_cluster_handler = RestrictedResource(VmClusterHandler, authentication=api_auth)
+vm_clusters_handler = RestrictedResource(VmClustersHandler, authentication=api_auth)
 vm_host_handler = RestrictedResource(VmHostHandler, authentication=api_auth)
 vm_hosts_handler = RestrictedResource(VmHostsHandler, authentication=api_auth)
 virtual_machine_handler = RestrictedResource(
@@ -181,12 +169,8 @@ virtual_machine_handler = RestrictedResource(
 virtual_machines_handler = RestrictedResource(
     VirtualMachinesHandler, authentication=api_auth
 )
-dhcp_snippet_handler = RestrictedResource(
-    DHCPSnippetHandler, authentication=api_auth
-)
-dhcp_snippets_handler = RestrictedResource(
-    DHCPSnippetsHandler, authentication=api_auth
-)
+dhcp_snippet_handler = RestrictedResource(DHCPSnippetHandler, authentication=api_auth)
+dhcp_snippets_handler = RestrictedResource(DHCPSnippetsHandler, authentication=api_auth)
 package_repository_handler = RestrictedResource(
     PackageRepositoryHandler, authentication=api_auth
 )
@@ -199,42 +183,20 @@ dnsresourcerecord_handler = RestrictedResource(
 dnsresourcerecords_handler = RestrictedResource(
     DNSResourceRecordsHandler, authentication=api_auth
 )
-dnsresource_handler = RestrictedResource(
-    DNSResourceHandler, authentication=api_auth
-)
-dnsresources_handler = RestrictedResource(
-    DNSResourcesHandler, authentication=api_auth
-)
+dnsresource_handler = RestrictedResource(DNSResourceHandler, authentication=api_auth)
+dnsresources_handler = RestrictedResource(DNSResourcesHandler, authentication=api_auth)
 domain_handler = RestrictedResource(DomainHandler, authentication=api_auth)
 domains_handler = RestrictedResource(DomainsHandler, authentication=api_auth)
-blockdevices_handler = RestrictedResource(
-    BlockDevicesHandler, authentication=api_auth
-)
-blockdevice_handler = RestrictedResource(
-    BlockDeviceHandler, authentication=api_auth
-)
-partition_handler = RestrictedResource(
-    PartitionHandler, authentication=api_auth
-)
-partitions_handler = RestrictedResource(
-    PartitionsHandler, authentication=api_auth
-)
-volume_group_handler = RestrictedResource(
-    VolumeGroupHandler, authentication=api_auth
-)
-volume_groups_handler = RestrictedResource(
-    VolumeGroupsHandler, authentication=api_auth
-)
+blockdevices_handler = RestrictedResource(BlockDevicesHandler, authentication=api_auth)
+blockdevice_handler = RestrictedResource(BlockDeviceHandler, authentication=api_auth)
+partition_handler = RestrictedResource(PartitionHandler, authentication=api_auth)
+partitions_handler = RestrictedResource(PartitionsHandler, authentication=api_auth)
+volume_group_handler = RestrictedResource(VolumeGroupHandler, authentication=api_auth)
+volume_groups_handler = RestrictedResource(VolumeGroupsHandler, authentication=api_auth)
 raid_device_handler = RestrictedResource(RaidHandler, authentication=api_auth)
-raid_devices_handler = RestrictedResource(
-    RaidsHandler, authentication=api_auth
-)
-bcache_device_handler = RestrictedResource(
-    BcacheHandler, authentication=api_auth
-)
-bcache_devices_handler = RestrictedResource(
-    BcachesHandler, authentication=api_auth
-)
+raid_devices_handler = RestrictedResource(RaidsHandler, authentication=api_auth)
+bcache_device_handler = RestrictedResource(BcacheHandler, authentication=api_auth)
+bcache_devices_handler = RestrictedResource(BcachesHandler, authentication=api_auth)
 bcache_cache_set_handler = RestrictedResource(
     BcacheCacheSetHandler, authentication=api_auth
 )
@@ -247,18 +209,12 @@ vmfs_datastore_handler = RestrictedResource(
 vmfs_datastores_handler = RestrictedResource(
     VmfsDatastoresHandler, authentication=api_auth
 )
-interface_handler = RestrictedResource(
-    InterfaceHandler, authentication=api_auth
-)
-interfaces_handler = RestrictedResource(
-    InterfacesHandler, authentication=api_auth
-)
+interface_handler = RestrictedResource(InterfaceHandler, authentication=api_auth)
+interfaces_handler = RestrictedResource(InterfacesHandler, authentication=api_auth)
 tag_handler = RestrictedResource(TagHandler, authentication=api_auth)
 tags_handler = RestrictedResource(TagsHandler, authentication=api_auth)
 version_handler = OperationsResource(VersionHandler)  # Allow anon.
-node_results_handler = RestrictedResource(
-    NodeResultsHandler, authentication=api_auth
-)
+node_results_handler = RestrictedResource(NodeResultsHandler, authentication=api_auth)
 sshkey_handler = RestrictedResource(SSHKeyHandler, authentication=api_auth)
 sshkeys_handler = RestrictedResource(SSHKeysHandler, authentication=api_auth)
 sslkey_handler = RestrictedResource(SSLKeyHandler, authentication=api_auth)
@@ -277,40 +233,26 @@ subnet_handler = RestrictedResource(SubnetHandler, authentication=api_auth)
 subnets_handler = RestrictedResource(SubnetsHandler, authentication=api_auth)
 iprange_handler = RestrictedResource(IPRangeHandler, authentication=api_auth)
 ipranges_handler = RestrictedResource(IPRangesHandler, authentication=api_auth)
-staticroute_handler = RestrictedResource(
-    StaticRouteHandler, authentication=api_auth
-)
-staticroutes_handler = RestrictedResource(
-    StaticRoutesHandler, authentication=api_auth
-)
-notification_handler = RestrictedResource(
-    NotificationHandler, authentication=api_auth
-)
+staticroute_handler = RestrictedResource(StaticRouteHandler, authentication=api_auth)
+staticroutes_handler = RestrictedResource(StaticRoutesHandler, authentication=api_auth)
+notification_handler = RestrictedResource(NotificationHandler, authentication=api_auth)
 notifications_handler = RestrictedResource(
     NotificationsHandler, authentication=api_auth
 )
 script_handler = RestrictedResource(NodeScriptHandler, authentication=api_auth)
-scripts_handler = RestrictedResource(
-    NodeScriptsHandler, authentication=api_auth
-)
+scripts_handler = RestrictedResource(NodeScriptsHandler, authentication=api_auth)
 script_result_handler = RestrictedResource(
     NodeScriptResultHandler, authentication=api_auth
 )
 script_results_handler = RestrictedResource(
     NodeScriptResultsHandler, authentication=api_auth
 )
-resourcepool_handler = RestrictedResource(
-    ResourcePoolHandler, authentication=api_auth
-)
+resourcepool_handler = RestrictedResource(ResourcePoolHandler, authentication=api_auth)
 resourcepools_handler = RestrictedResource(
     ResourcePoolsHandler, authentication=api_auth
 )
-node_device_handler = RestrictedResource(
-    NodeDeviceHandler, authentication=api_auth
-)
-node_devices_handler = RestrictedResource(
-    NodeDevicesHandler, authentication=api_auth
-)
+node_device_handler = RestrictedResource(NodeDeviceHandler, authentication=api_auth)
+node_devices_handler = RestrictedResource(NodeDevicesHandler, authentication=api_auth)
 
 # Admin handlers.
 commissioning_script_handler = AdminRestrictedResource(
@@ -486,9 +428,7 @@ patterns += [
         node_device_handler,
         name="node_device_handler",
     ),
-    re_path(
-        r"^nodes/(?P<system_id>[^/]+)/$", node_handler, name="node_handler"
-    ),
+    re_path(r"^nodes/(?P<system_id>[^/]+)/$", node_handler, name="node_handler"),
     re_path(r"^nodes/$", nodes_handler, name="nodes_handler"),
     re_path(
         r"^machines/(?P<system_id>[^/]+)/$",
@@ -526,9 +466,7 @@ patterns += [
     re_path(r"^pods/$", pods_handler, name="pods_handler"),
     # XXX: ltrager 2020-05-11 - Pods are being renamed vm-hosts. For now keep
     # pods to not break API compatibility.
-    re_path(
-        r"^vm-hosts/(?P<id>[^/]+)/$", vm_host_handler, name="vm_host_handler"
-    ),
+    re_path(r"^vm-hosts/(?P<id>[^/]+)/$", vm_host_handler, name="vm_host_handler"),
     re_path(r"^vm-hosts/$", vm_hosts_handler, name="vm_hosts_handler"),
     re_path(
         r"^virtual-machines/(?P<id>[^/]+)$",
@@ -557,9 +495,7 @@ patterns += [
         discovery_handler,
         name="discovery_handler",
     ),
-    re_path(
-        r"^networks/(?P<name>[^/]+)/$", network_handler, name="network_handler"
-    ),
+    re_path(r"^networks/(?P<name>[^/]+)/$", network_handler, name="network_handler"),
     re_path(r"^networks/$", networks_handler, name="networks_handler"),
     re_path(r"^files/$", files_handler, name="files_handler"),
     re_path(r"^files/(?P<filename>.+)/$", file_handler, name="file_handler"),
@@ -569,17 +505,13 @@ patterns += [
         sslkey_handler,
         name="sslkey_handler",
     ),
-    re_path(
-        r"^account/prefs/sslkeys/$", sslkeys_handler, name="sslkeys_handler"
-    ),
+    re_path(r"^account/prefs/sslkeys/$", sslkeys_handler, name="sslkeys_handler"),
     re_path(
         r"^account/prefs/sshkeys/(?P<id>[^/]+)/$",
         sshkey_handler,
         name="sshkey_handler",
     ),
-    re_path(
-        r"^account/prefs/sshkeys/$", sshkeys_handler, name="sshkeys_handler"
-    ),
+    re_path(r"^account/prefs/sshkeys/$", sshkeys_handler, name="sshkeys_handler"),
     re_path(r"^tags/(?P<name>[^/]+)/$", tag_handler, name="tag_handler"),
     re_path(r"^tags/$", tags_handler, name="tags_handler"),
     re_path(
@@ -593,23 +525,17 @@ patterns += [
         name="node_results_handler",
     ),
     re_path(r"^users/$", users_handler, name="users_handler"),
-    re_path(
-        r"^users/(?P<username>[^/]+)/$", user_handler, name="user_handler"
-    ),
+    re_path(r"^users/(?P<username>[^/]+)/$", user_handler, name="user_handler"),
     re_path(r"^zones/(?P<name>[^/]+)/$", zone_handler, name="zone_handler"),
     re_path(r"^zones/$", zones_handler, name="zones_handler"),
     re_path(r"^fabrics/$", fabrics_handler, name="fabrics_handler"),
-    re_path(
-        r"^fabrics/(?P<id>[^/]+)/$", fabric_handler, name="fabric_handler"
-    ),
+    re_path(r"^fabrics/(?P<id>[^/]+)/$", fabric_handler, name="fabric_handler"),
     re_path(
         r"^fabrics/(?P<fabric_id>[^/]+)/vlans/$",
         vlans_handler,
         name="vlans_handler",
     ),
-    re_path(
-        r"^vlans/(?P<vlan_id>[^/]+)/$", vlan_handler, name="vlanid_handler"
-    ),
+    re_path(r"^vlans/(?P<vlan_id>[^/]+)/$", vlan_handler, name="vlanid_handler"),
     re_path(
         r"^fabrics/(?P<fabric_id>[^/]+)/vlans/(?P<vid>[^/]+)/$",
         vlan_handler,
@@ -625,16 +551,10 @@ patterns += [
         subnet_handler,
         name="subnet_handler",
     ),
-    re_path(
-        r"^ipaddresses/$", ipaddresses_handler, name="ipaddresses_handler"
-    ),
+    re_path(r"^ipaddresses/$", ipaddresses_handler, name="ipaddresses_handler"),
     re_path(r"^ipranges/$", ipranges_handler, name="ipranges_handler"),
-    re_path(
-        r"^ipranges/(?P<id>[^/]+)/$", iprange_handler, name="iprange_handler"
-    ),
-    re_path(
-        r"^static-routes/$", staticroutes_handler, name="staticroutes_handler"
-    ),
+    re_path(r"^ipranges/(?P<id>[^/]+)/$", iprange_handler, name="iprange_handler"),
+    re_path(r"^static-routes/$", staticroutes_handler, name="staticroutes_handler"),
     re_path(
         r"^static-routes/(?P<id>[^/]+)/$",
         staticroute_handler,
@@ -650,18 +570,14 @@ patterns += [
         dnsresourcerecord_handler,
         name="dnsresourcerecord_handler",
     ),
-    re_path(
-        r"^dnsresources/$", dnsresources_handler, name="dnsresources_handler"
-    ),
+    re_path(r"^dnsresources/$", dnsresources_handler, name="dnsresources_handler"),
     re_path(
         r"^dnsresources/(?P<id>[^/]+)/$",
         dnsresource_handler,
         name="dnsresource_handler",
     ),
     re_path(r"^domains/$", domains_handler, name="domains_handler"),
-    re_path(
-        r"^domains/(?P<id>[^/]+)/$", domain_handler, name="domain_handler"
-    ),
+    re_path(r"^domains/(?P<id>[^/]+)/$", domain_handler, name="domain_handler"),
     re_path(
         r"^boot-resources/$",
         boot_resources_handler,
@@ -708,9 +624,7 @@ patterns += [
         name="notification_handler",
     ),
     re_path(r"^scripts/$", scripts_handler, name="scripts_handler"),
-    re_path(
-        r"^scripts/(?P<name>[^/]+)$", script_handler, name="script_handler"
-    ),
+    re_path(r"^scripts/(?P<name>[^/]+)$", script_handler, name="script_handler"),
     re_path(
         r"^resourcepool/(?P<id>[^/]+)/$",
         resourcepool_handler,
@@ -736,17 +650,13 @@ patterns += [
         commissioning_script_handler,
         name="commissioning_script_handler",
     ),
-    re_path(
-        r"^license-keys/$", license_keys_handler, name="license_keys_handler"
-    ),
+    re_path(r"^license-keys/$", license_keys_handler, name="license_keys_handler"),
     re_path(
         r"^license-key/(?P<osystem>[^/]+)/(?P<distro_series>[^/]+)$",
         license_key_handler,
         name="license_key_handler",
     ),
-    re_path(
-        r"^boot-sources/$", boot_sources_handler, name="boot_sources_handler"
-    ),
+    re_path(r"^boot-sources/$", boot_sources_handler, name="boot_sources_handler"),
     re_path(
         r"^boot-sources/(?P<id>[^/]+)/$",
         boot_source_handler,

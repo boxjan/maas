@@ -60,8 +60,7 @@ def validate_ubuntu(data, product_name):
         # It's not an Ubuntu product, nothing to validate.
         return True
     elif (
-        osystem == "ubuntu-core"
-        and UBUNTU_CORE_REGEX.search(product_name) is not None
+        osystem == "ubuntu-core" and UBUNTU_CORE_REGEX.search(product_name) is not None
     ):
         return True
     elif UBUNTU_REGEX.search(product_name) is None:
@@ -317,9 +316,7 @@ def download_image_descriptions(
         # from the Images repository *by* the Region.
         maaslog.info("Region downloading image descriptions from '%s'.", path)
         try:
-            reader = UrlMirrorReader(
-                mirror, policy=policy, user_agent=user_agent
-            )
+            reader = UrlMirrorReader(mirror, policy=policy, user_agent=user_agent)
         except TypeError:
             # UrlMirrorReader doesn't support the user_agent argument.
             # simplestream >=bzr429 is required for this feature.
@@ -331,9 +328,7 @@ def download_image_descriptions(
     return boot_images_dict
 
 
-def download_all_image_descriptions(
-    sources, user_agent=None, validate_products=True
-):
+def download_all_image_descriptions(sources, user_agent=None, validate_products=True):
     """Download image metadata for all sources in `config`."""
     boot = BootImageMapping()
     for source in sources:

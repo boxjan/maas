@@ -66,9 +66,7 @@ class TestAbsoluteReverse(MAASServerTestCase):
         parameters = {factory.make_string(): factory.make_string()}
         absolute_url = absolute_reverse("login", query=parameters)
         reversed_url = "{}?{}".format(reverse("login"), urlencode(parameters))
-        expected_url = self.expected_from_maas_url_and_reverse(
-            maas_url, reversed_url
-        )
+        expected_url = self.expected_from_maas_url_and_reverse(maas_url, reversed_url)
         self.assertEqual(expected_url, absolute_url)
 
     def test_absolute_reverse_uses_kwargs(self):
@@ -78,9 +76,7 @@ class TestAbsoluteReverse(MAASServerTestCase):
             "metadata-version", kwargs={"version": "lastest"}
         )
         reversed_url = reverse("metadata-version", args=["lastest"])
-        expected_url = self.expected_from_maas_url_and_reverse(
-            maas_url, reversed_url
-        )
+        expected_url = self.expected_from_maas_url_and_reverse(maas_url, reversed_url)
         self.assertEqual(expected_url, absolute_url)
 
     def test_absolute_reverse_uses_args(self):
@@ -92,9 +88,7 @@ class TestAbsoluteReverse(MAASServerTestCase):
         )
 
         reversed_url = reverse("metadata-version", args=["lastest"])
-        expected_url = self.expected_from_maas_url_and_reverse(
-            maas_url, reversed_url
-        )
+        expected_url = self.expected_from_maas_url_and_reverse(maas_url, reversed_url)
         self.assertEqual(expected_url, observed_url)
 
 
@@ -199,16 +193,12 @@ def make_request(origin_ip, http_host=None):
 
 class TestFindRackController(MAASServerTestCase):
     def test_returns_None_when_unknown_subnet(self):
-        self.assertIsNone(
-            find_rack_controller(make_request(factory.make_ip_address()))
-        )
+        self.assertIsNone(find_rack_controller(make_request(factory.make_ip_address())))
 
     def test_returns_None_when_subnet_is_not_managed(self):
         subnet = factory.make_Subnet()
         self.assertIsNone(
-            find_rack_controller(
-                make_request(factory.pick_ip_in_Subnet(subnet))
-            )
+            find_rack_controller(make_request(factory.pick_ip_in_Subnet(subnet)))
         )
 
     def test_returns_primary_rack_when_subnet_is_managed(self):
@@ -311,9 +301,7 @@ class TestGetRemoteIP(MAASTestCase):
         proxy1 = factory.make_ipv4_address()
         proxy2 = factory.make_ipv4_address()
         request = HttpRequest()
-        request.META = {
-            "HTTP_X_FORWARDED_FOR": f"{ip_address}, {proxy1}, {proxy2}"
-        }
+        request.META = {"HTTP_X_FORWARDED_FOR": f"{ip_address}, {proxy1}, {proxy2}"}
         self.assertEqual(ip_address, get_remote_ip(request))
 
     def test_gets_client_ipv4_for_REMOTE_ADDR(self):

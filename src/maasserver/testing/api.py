@@ -54,9 +54,7 @@ class APITestType(abc.ABCMeta):
 
         :param users: A mapping from a descriptive name to a user factory.
         """
-        name = "{}[for={}]".format(
-            cls.__name__, ",".join(sorted(userfactories))
-        )
+        name = "{}[for={}]".format(cls.__name__, ",".join(sorted(userfactories)))
         return type(name, (cls,), {"userfactories": userfactories})
 
     @property
@@ -167,9 +165,7 @@ class APITestCaseBase(MAASTestCase, metaclass=APITestType):
                 "No client factory; set clientfactory or clientfactories."
             )
         if self.client is not None:
-            raise AssertionError(
-                "Do not set client; set clientfactory instead."
-            )
+            raise AssertionError("Do not set client; set clientfactory instead.")
         super().setUp()
         self.user = self.userfactory()
         self.client = self.clientfactory()

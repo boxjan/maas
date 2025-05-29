@@ -57,9 +57,7 @@ class RBACClient(MacaroonClient):
 
     def _get_resource_type_url(self, resource_type: str):
         """Return the URL for `resource_type`."""
-        return self._url + quote(
-            f"{self.API_BASE_URL}/resources/{resource_type}"
-        )
+        return self._url + quote(f"{self.API_BASE_URL}/resources/{resource_type}")
 
     def get_user_details(self, username: str) -> UserDetails:
         """Return details about a user."""
@@ -73,12 +71,9 @@ class RBACClient(MacaroonClient):
 
     def get_resources(self, resource_type: str) -> Sequence[Resource]:
         """Return list of resources with `resource_type`."""
-        result = self._request(
-            "GET", self._get_resource_type_url(resource_type)
-        )
+        result = self._request("GET", self._get_resource_type_url(resource_type))
         return [
-            Resource(identifier=res["identifier"], name=res["name"])
-            for res in result
+            Resource(identifier=res["identifier"], name=res["name"]) for res in result
         ]
 
     def update_resources(
@@ -96,8 +91,7 @@ class RBACClient(MacaroonClient):
         resources_removals = []
         if updates:
             resources_updates = [
-                {"identifier": str(res.identifier), "name": res.name}
-                for res in updates
+                {"identifier": str(res.identifier), "name": res.name} for res in updates
             ]
         if removals and last_sync_id:
             resources_removals = [str(id) for id in removals]
@@ -131,9 +125,7 @@ class RBACClient(MacaroonClient):
             resource_type
         ) + "/allowed-for-user?u={}&{}".format(
             quote(user),
-            "&".join(
-                ["p=%s" % quote(permission) for permission in permissions]
-            ),
+            "&".join(["p=%s" % quote(permission) for permission in permissions]),
         )
         result = self._request("GET", url)
         for permission, res in result.items():
@@ -371,9 +363,7 @@ class RBACWrapper:
                 results[permission] = identifiers
 
         if missing:
-            fetched = self.client.allowed_for_user(
-                "resource-pool", user, *missing
-            )
+            fetched = self.client.allowed_for_user("resource-pool", user, *missing)
             for permission in missing:
                 identifiers = fetched.get(permission, {})
                 cache[permission] = results[permission] = identifiers
@@ -422,9 +412,7 @@ class RBACUserClient(MacaroonClient):
         """Return details for the maas product."""
         if self._maas_product is None:
             products = self._api_request("GET", "/product")
-            [maas] = [
-                product for product in products if product["label"] == "maas"
-            ]
+            [maas] = [product for product in products if product["label"] == "maas"]
             self._maas_product = maas
         return self._maas_product
 

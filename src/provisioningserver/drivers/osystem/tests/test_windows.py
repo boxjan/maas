@@ -34,9 +34,7 @@ class TestWindowsOS(MAASTestCase):
     def test_get_release_title(self):
         osystem = WindowsOS()
         release = random.choice(list(WINDOWS_CHOICES))
-        self.assertEqual(
-            WINDOWS_CHOICES[release], osystem.get_release_title(release)
-        )
+        self.assertEqual(WINDOWS_CHOICES[release], osystem.get_release_title(release))
 
     def test_requires_license_key_True(self):
         osystem = WindowsOS()
@@ -45,9 +43,7 @@ class TestWindowsOS(MAASTestCase):
 
     def test_requires_license_key_False(self):
         osystem = WindowsOS()
-        not_required = set(WINDOWS_CHOICES.keys()).difference(
-            REQUIRE_LICENSE_KEY
-        )
+        not_required = set(WINDOWS_CHOICES.keys()).difference(REQUIRE_LICENSE_KEY)
         for release in not_required:
             self.assertFalse(osystem.requires_license_key(release))
 
@@ -55,26 +51,20 @@ class TestWindowsOS(MAASTestCase):
         osystem = WindowsOS()
         parts = [factory.make_string(size=5) for _ in range(5)]
         key = "-".join(parts)
-        self.assertTrue(
-            osystem.validate_license_key(REQUIRE_LICENSE_KEY[0], key)
-        )
+        self.assertTrue(osystem.validate_license_key(REQUIRE_LICENSE_KEY[0], key))
 
     def test_validate_license_key_invalid(self):
         osystem = WindowsOS()
         keys = [factory.make_string() for _ in range(3)]
         for key in keys:
-            self.assertFalse(
-                osystem.validate_license_key(REQUIRE_LICENSE_KEY[0], key)
-            )
+            self.assertFalse(osystem.validate_license_key(REQUIRE_LICENSE_KEY[0], key))
 
     def make_node(self, hostname=None):
         if hostname is None:
             machine = factory.make_name("hostname")
             dns = factory.make_name("dns")
             hostname = f"{machine}.{dns}"
-        return Node(
-            system_id=factory.make_name("system_id"), hostname=hostname
-        )
+        return Node(system_id=factory.make_name("system_id"), hostname=hostname)
 
     def make_token(self, consumer_key=None, token_key=None, token_secret=None):
         if consumer_key is None:

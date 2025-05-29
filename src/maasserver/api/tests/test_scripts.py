@@ -64,9 +64,7 @@ class TestScriptsAPI(APITestCase.ForUser):
                 "packages": json.dumps(packages),
                 "timeout": timeout,
                 "destructive": destructive,
-                "script": factory.make_file_upload(
-                    content=script_content.encode()
-                ),
+                "script": factory.make_file_upload(content=script_content.encode()),
                 "comment": comment,
             },
         )
@@ -159,15 +157,11 @@ class TestScriptsAPI(APITestCase.ForUser):
                 )
             )
 
-        response = self.client.get(
-            self.get_scripts_uri(), {"type": script.script_type}
-        )
+        response = self.client.get(self.get_scripts_uri(), {"type": script.script_type})
         self.assertEqual(response.status_code, http.client.OK)
         parsed_results = json_load_bytes(response.content)
 
-        self.assertEqual(
-            [script.id], [result["id"] for result in parsed_results]
-        )
+        self.assertEqual([script.id], [result["id"] for result in parsed_results])
 
     def test_GET_filters_by_hardware_type(self):
         script = factory.make_Script()
@@ -184,9 +178,7 @@ class TestScriptsAPI(APITestCase.ForUser):
         self.assertEqual(response.status_code, http.client.OK)
         parsed_results = json_load_bytes(response.content)
 
-        self.assertEqual(
-            [script.id], [result["id"] for result in parsed_results]
-        )
+        self.assertEqual([script.id], [result["id"] for result in parsed_results])
 
     def test_GET_filters(self):
         tags = [factory.make_name("tag") for _ in range(3)]
@@ -214,9 +206,7 @@ class TestScriptsAPI(APITestCase.ForUser):
             script = factory.make_Script()
             scripts[script.name] = script
 
-        response = self.client.get(
-            self.get_scripts_uri(), {"include_script": True}
-        )
+        response = self.client.get(self.get_scripts_uri(), {"include_script": True})
         self.assertEqual(response.status_code, http.client.OK)
         parsed_results = response.json()
 
@@ -246,9 +236,7 @@ class TestScriptAPI(APITestCase.ForUser):
             name = script.name
         else:
             name = script.id
-        self.assertEqual(
-            "/MAAS/api/2.0/scripts/%s" % name, self.get_script_uri(script)
-        )
+        self.assertEqual("/MAAS/api/2.0/scripts/%s" % name, self.get_script_uri(script))
 
     def test_GET(self):
         script = factory.make_Script()
@@ -369,9 +357,7 @@ class TestScriptAPI(APITestCase.ForUser):
         self.assertIsNone(reload_object(script))
         event = Event.objects.get(type__level=AUDIT)
         self.assertIsNotNone(event)
-        self.assertEqual(
-            event.description, "Deleted script '%s'." % script.name
-        )
+        self.assertEqual(event.description, "Deleted script '%s'." % script.name)
 
     def test_DELETE_admin_only(self):
         script = factory.make_Script()
@@ -416,9 +402,7 @@ class TestScriptAPI(APITestCase.ForUser):
                 "packages": json.dumps(packages),
                 "timeout": timeout,
                 "destructive": destructive,
-                "script": factory.make_file_upload(
-                    content=script_content.encode()
-                ),
+                "script": factory.make_file_upload(content=script_content.encode()),
                 "comment": comment,
             },
         )
@@ -496,9 +480,7 @@ class TestScriptAPI(APITestCase.ForUser):
         script = factory.make_Script()
         script.script = script.script.update(factory.make_string())
         script.save()
-        response = self.client.get(
-            self.get_script_uri(script), {"op": "download"}
-        )
+        response = self.client.get(self.get_script_uri(script), {"op": "download"})
         self.assertEqual(response.status_code, http.client.OK)
         self.assertEqual(script.script.data, response.content.decode())
 
@@ -511,9 +493,7 @@ class TestScriptAPI(APITestCase.ForUser):
             {"op": "download", "revision": script.script.previous_version.id},
         )
         self.assertEqual(response.status_code, http.client.OK)
-        self.assertEqual(
-            script.script.previous_version.data, response.content.decode()
-        )
+        self.assertEqual(script.script.previous_version.data, response.content.decode())
 
     def test_download_gets_previous_rev(self):
         script = factory.make_Script()
@@ -524,9 +504,7 @@ class TestScriptAPI(APITestCase.ForUser):
             {"op": "download", "rev": script.script.previous_version.id},
         )
         self.assertEqual(response.status_code, http.client.OK)
-        self.assertEqual(
-            script.script.previous_version.data, response.content.decode()
-        )
+        self.assertEqual(script.script.previous_version.data, response.content.decode())
 
     def test_download_errors_on_unknown_revision(self):
         script = factory.make_Script()
@@ -568,23 +546,18 @@ class TestScriptAPI(APITestCase.ForUser):
         self.assertIsNotNone(event)
         self.assertEqual(
             event.description,
-            "Reverted script '%s' to revision '%s'."
-            % (script.name, revert_to),
+            "Reverted script '%s' to revision '%s'." % (script.name, revert_to),
         )
 
     def test_revert_admin_only(self):
         script = factory.make_Script()
-        response = self.client.post(
-            self.get_script_uri(script), {"op": "revert"}
-        )
+        response = self.client.post(self.get_script_uri(script), {"op": "revert"})
         self.assertEqual(response.status_code, http.client.FORBIDDEN)
 
     def test_revert_requires_to(self):
         self.become_admin()
         script = factory.make_Script()
-        response = self.client.post(
-            self.get_script_uri(script), {"op": "revert"}
-        )
+        response = self.client.post(self.get_script_uri(script), {"op": "revert"})
         self.assertEqual(response.status_code, http.client.BAD_REQUEST)
 
     def test_revert_requires_to_to_be_an_int(self):
@@ -654,9 +627,7 @@ class TestScriptAPI(APITestCase.ForUser):
     def test_remove_tag(self):
         self.become_admin()
         script = factory.make_Script(destructive=False)
-        removed_tag = random.choice(
-            [tag for tag in script.tags if "tag" in tag]
-        )
+        removed_tag = random.choice([tag for tag in script.tags if "tag" in tag])
         response = self.client.post(
             self.get_script_uri(script),
             {"op": "remove_tag", "tag": removed_tag},

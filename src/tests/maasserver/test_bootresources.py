@@ -149,9 +149,7 @@ class TestExportImagesFromDB:
             sha256(content2).hexdigest()[:7],
         }
 
-    def test_export_overwrite_changed(
-        self, controller, image_store_dir, factory
-    ):
+    def test_export_overwrite_changed(self, controller, image_store_dir, factory):
         content = b"ubuntu-jammy"
         image = image_store_dir / sha256(content).hexdigest()[:7]
         image.write_bytes(b"old")
@@ -277,9 +275,7 @@ class TestInitialiseImageStorage:
         assert not extra_dir.exists()
         assert not extra_symlink.exists()
 
-    def test_remove_extra_symlink(
-        self, controller, image_store_dir: Path, tmp_path
-    ):
+    def test_remove_extra_symlink(self, controller, image_store_dir: Path, tmp_path):
         extra_dir = tmp_path / "somedir"
         extra_dir.mkdir(parents=True)
         extra_symlink = image_store_dir / "somelink"
@@ -288,9 +284,7 @@ class TestInitialiseImageStorage:
         initialize_image_storage(controller)
         assert not extra_symlink.exists()
 
-    def test_missing_local_files(
-        self, controller, image_store_dir: Path, factory
-    ):
+    def test_missing_local_files(self, controller, image_store_dir: Path, factory):
         resource = factory.make_usable_boot_resource()
         other = factory.make_usable_boot_resource()
         rset = resource.sets.first()
@@ -304,9 +298,7 @@ class TestInitialiseImageStorage:
         assert resource.get_latest_complete_set() is None
         assert other.get_latest_complete_set() is not None
 
-    def test_booloaders_export(
-        self, controller, tmpdir, image_store_dir, factory
-    ):
+    def test_booloaders_export(self, controller, tmpdir, image_store_dir, factory):
         resource = factory.make_BootResource(
             rtype=BOOT_RESOURCE_TYPE.SYNCED,
             name="grub-efi/uefi",

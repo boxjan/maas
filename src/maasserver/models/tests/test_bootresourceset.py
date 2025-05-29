@@ -136,9 +136,7 @@ class TestBootResourceSet(MAASServerTestCase):
         ]
         resource = factory.make_BootResource()
         resource_set = factory.make_BootResourceSet(resource)
-        factory.make_BootResourceFile(
-            resource_set, size=file_size, synced=sync_status
-        )
+        factory.make_BootResourceFile(resource_set, size=file_size, synced=sync_status)
         self.assertFalse(resource_set.complete)
 
     def test_complete_returns_true_for_synced_set(self):

@@ -82,9 +82,7 @@ class TestThawZone(MAASTestCase):
         self.patch_autospec(actions, "execute_rndc_command")
         zone = factory.make_name()
         actions.bind_thaw_zone(zone=zone)
-        actions.execute_rndc_command.assert_called_once_with(
-            ("thaw", zone), timeout=2
-        )
+        actions.execute_rndc_command.assert_called_once_with(("thaw", zone), timeout=2)
 
 
 class TestReload(MAASTestCase):
@@ -93,9 +91,7 @@ class TestReload(MAASTestCase):
     def test_executes_rndc_command(self):
         self.patch_autospec(actions, "execute_rndc_command")
         actions.bind_reload()
-        actions.execute_rndc_command.assert_called_once_with(
-            ("reload",), timeout=2
-        )
+        actions.execute_rndc_command.assert_called_once_with(("reload",), timeout=2)
 
     def test_logs_subprocess_error(self):
         erc = self.patch_autospec(actions, "execute_rndc_command")
@@ -142,9 +138,7 @@ class TestReloadWithRetries(MAASTestCase):
         bind_reload = self.patch_autospec(actions, "bind_reload")
         bind_reload.return_value = False
         attempts = randint(3, 13)
-        actions.bind_reload_with_retries(
-            attempts=attempts, interval=sentinel.interval
-        )
+        actions.bind_reload_with_retries(attempts=attempts, interval=sentinel.interval)
         expected_sleep_calls = [call(sentinel.interval)] * (attempts - 1)
         actions.sleep.assert_has_calls(expected_sleep_calls)
 
@@ -155,9 +149,7 @@ class TestReloadZone(MAASTestCase):
     def test_executes_rndc_command(self):
         self.patch_autospec(actions, "execute_rndc_command")
         self.assertTrue(actions.bind_reload_zones(sentinel.zone))
-        actions.execute_rndc_command.assert_called_once_with(
-            ("reload", sentinel.zone)
-        )
+        actions.execute_rndc_command.assert_called_once_with(("reload", sentinel.zone))
 
     def test_logs_subprocess_error(self):
         erc = self.patch_autospec(actions, "execute_rndc_command")
@@ -202,9 +194,7 @@ class TestConfiguration(MAASTestCase):
         ]
         actions.bind_write_configuration(zones=zones, trusted_networks=[])
         self.assertTrue(
-            os.path.exists(
-                os.path.join(self.dns_conf_dir, MAAS_NAMED_CONF_NAME)
-            )
+            os.path.exists(os.path.join(self.dns_conf_dir, MAAS_NAMED_CONF_NAME))
         )
 
     def test_bind_write_configuration_writes_file_with_acl(self):
@@ -212,9 +202,7 @@ class TestConfiguration(MAASTestCase):
             factory.make_ipv4_network(),
             factory.make_ipv6_network(),
         ]
-        actions.bind_write_configuration(
-            zones=[], trusted_networks=trusted_networks
-        )
+        actions.bind_write_configuration(zones=[], trusted_networks=trusted_networks)
         expected_file = os.path.join(self.dns_conf_dir, MAAS_NAMED_CONF_NAME)
         self.assertTrue(os.path.exists(expected_file))
         expected_content = dedent(
@@ -242,9 +230,7 @@ class TestConfiguration(MAASTestCase):
         forward_zone = DNSForwardZoneConfig(
             domain,
             serial=random.randint(1, 100),
-            mapping={
-                factory.make_string(): HostnameIPMapping(None, ttl, {ip})
-            },
+            mapping={factory.make_string(): HostnameIPMapping(None, ttl, {ip})},
             dns_ip_list=dns_ip_list,
         )
         reverse_zone = DNSReverseZoneConfig(
@@ -287,9 +273,7 @@ class TestConfiguration(MAASTestCase):
         allow-query-cache { trusted; };
         """
         )
-        expected_options_content %= tuple(upstream_dns) + (
-            expected_dnssec_validation,
-        )
+        expected_options_content %= tuple(upstream_dns) + (expected_dnssec_validation,)
         with open(expected_options_file, "r") as fh:
             contents = fh.read()
         self.assertIn(expected_options_content, contents)
@@ -310,9 +294,7 @@ class TestNSUpdateCommand(MAASTestCase):
             serial=random.randint(1, 100),
             ttl=random.randint(1, 100),
         )
-        self.assertEqual(
-            f"update delete {update.name} A", cmd._format_update(update)
-        )
+        self.assertEqual(f"update delete {update.name} A", cmd._format_update(update))
 
     def test_format_update_addition(self):
         domain = factory.make_name()
@@ -324,9 +306,7 @@ class TestNSUpdateCommand(MAASTestCase):
             answer=factory.make_ip_address(),
         )
         ttl = random.randint(1, 100)
-        cmd = NSUpdateCommand(
-            domain, [update], serial=random.randint(1, 100), ttl=ttl
-        )
+        cmd = NSUpdateCommand(domain, [update], serial=random.randint(1, 100), ttl=ttl)
         self.assertEqual(
             f"update add {update.name} {ttl} A {update.answer}",
             cmd._format_update(update),

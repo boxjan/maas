@@ -44,8 +44,7 @@ def send_event(system_id, type_name, description, timestamp):
         # that we don't know about yet. This is most likely to happen when a
         # new node is trying to enlist.
         log.debug(
-            "Event '{type}: {description}' sent for non-existent "
-            "node '{node_id}'.",
+            "Event '{type}: {description}' sent for non-existent " "node '{node_id}'.",
             type=type_name,
             description=description,
             node_id=system_id,

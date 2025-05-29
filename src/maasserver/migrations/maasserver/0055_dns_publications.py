@@ -27,9 +27,7 @@ class Migration(migrations.Migration):
                         default=maasserver.models.dnspublication.next_serial,
                         validators=(
                             django.core.validators.MinValueValidator(1),
-                            django.core.validators.MaxValueValidator(
-                                4294967295
-                            ),
+                            django.core.validators.MaxValueValidator(4294967295),
                         ),
                     ),
                 ),

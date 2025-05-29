@@ -4,16 +4,12 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0122_make_virtualblockdevice_uuid_editable")
-    ]
+    dependencies = [("maasserver", "0122_make_virtualblockdevice_uuid_editable")]
 
     operations = [
         migrations.AlterField(
             model_name="iprange",
             name="comment",
-            field=models.CharField(
-                blank=True, default="", max_length=255, null=True
-            ),
+            field=models.CharField(blank=True, default="", max_length=255, null=True),
         )
     ]

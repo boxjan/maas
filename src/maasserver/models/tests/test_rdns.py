@@ -114,9 +114,7 @@ class TestRDNSManager(MAASServerTestCase):
         with self.assertRaisesRegex(
             AssertionError, "Results must be non-empty to set RDNS entry"
         ):
-            RDNS.objects.set_current_entry(
-                factory.make_ip_address(), [], region
-            )
+            RDNS.objects.set_current_entry(factory.make_ip_address(), [], region)
 
     def test_delete_current_entry_ignores_missing_entries(self):
         region = factory.make_RegionController()

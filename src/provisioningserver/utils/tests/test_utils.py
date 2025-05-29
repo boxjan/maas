@@ -56,15 +56,11 @@ class TestLocateConfig(MAASTestCase):
 
     def test_locates_config_file(self):
         filename = factory.make_string()
-        self.assertEqual(
-            get_run_path("etc/maas/", filename), locate_config(filename)
-        )
+        self.assertEqual(get_run_path("etc/maas/", filename), locate_config(filename))
 
     def test_locates_full_path(self):
         path = [factory.make_string() for counter in range(3)]
-        self.assertEqual(
-            get_run_path("etc/maas/", *path), locate_config(*path)
-        )
+        self.assertEqual(get_run_path("etc/maas/", *path), locate_config(*path))
 
     def test_normalizes_path(self):
         self.assertEqual(
@@ -79,9 +75,7 @@ class TestLocateTemplate(MAASTestCase):
     def test_returns_test_path(self):
         self.assertEqual(
             os.path.abspath(
-                os.path.join(
-                    os.path.dirname(__file__), "..", "..", "templates"
-                )
+                os.path.join(os.path.dirname(__file__), "..", "..", "templates")
             ),
             locate_template(""),
         )
@@ -127,9 +121,7 @@ class TestFlatten(MAASTestCase):
         )
 
     def test_flattens_other_iterables(self):
-        self.assertEqual(
-            [1, 2, 3.3, 4, 5, 6], list(flatten([1, 2, {3.3, 4, (5, 6)}]))
-        )
+        self.assertEqual([1, 2, 3.3, 4, 5, 6], list(flatten([1, 2, {3.3, 4, (5, 6)}])))
 
     def test_treats_string_like_objects_as_leaves(self):
         # Strings are iterable, but we know they cannot be flattened further.
@@ -280,9 +272,5 @@ class TestIsInstanceOrSubclass(MAASTestCase):
         self.assertFalse(is_instance_or_subclass(self.foo, Baz, Bar))
 
     def test_accepts_non_flat_list(self):
-        self.assertTrue(
-            is_instance_or_subclass(self.foo, (Baz, (Bar, (Foo,))))
-        )
-        self.assertTrue(
-            is_instance_or_subclass(self.bar, *[Baz, [Bar, [Foo]]])
-        )
+        self.assertTrue(is_instance_or_subclass(self.foo, (Baz, (Bar, (Foo,)))))
+        self.assertTrue(is_instance_or_subclass(self.bar, *[Baz, [Bar, [Foo]]]))

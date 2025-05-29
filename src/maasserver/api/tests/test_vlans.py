@@ -68,9 +68,7 @@ class TestVlansAPI(APITestCase.ForUser):
                     vlan.primary_rack.system_id if vlan.primary_rack else None
                 ),
                 "secondary_rack": (
-                    vlan.secondary_rack.system_id
-                    if vlan.secondary_rack
-                    else None
+                    vlan.secondary_rack.system_id if vlan.secondary_rack else None
                 ),
                 "dhcp_on": vlan.dhcp_on,
                 "external_dhcp": None,
@@ -89,9 +87,7 @@ class TestVlansAPI(APITestCase.ForUser):
             response = self.client.get(uri)
         base_count = counter.count
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         # It's three VLANs, since when creating a fabric, a default VLAN
         # is always created.
@@ -115,15 +111,9 @@ class TestVlansAPI(APITestCase.ForUser):
         vid = random.randint(1, 1000)
         mtu = random.randint(552, 1500)
         uri = get_vlans_uri(fabric)
-        response = self.client.post(
-            uri, {"name": vlan_name, "vid": vid, "mtu": mtu}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        response_data = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        response = self.client.post(uri, {"name": vlan_name, "vid": vid, "mtu": mtu})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        response_data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(vlan_name, response_data["name"])
         self.assertEqual(vid, response_data["vid"])
         self.assertEqual(mtu, response_data["mtu"])
@@ -145,12 +135,8 @@ class TestVlansAPI(APITestCase.ForUser):
                 "relay_vlan": relay_vlan.id,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        response_data = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        response_data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(vlan_name, response_data["name"])
         self.assertEqual(vid, response_data["vid"])
         self.assertEqual(mtu, response_data["mtu"])
@@ -163,15 +149,9 @@ class TestVlansAPI(APITestCase.ForUser):
         vid = random.randint(1, 1000)
         mtu = random.randint(552, 1500)
         uri = get_vlans_uri(fabric)
-        response = self.client.post(
-            uri, {"name": vlan_name, "vid": vid, "mtu": mtu}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        response_data = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        response = self.client.post(uri, {"name": vlan_name, "vid": vid, "mtu": mtu})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        response_data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(vlan_name, response_data["name"])
         self.assertEqual(vid, response_data["vid"])
         self.assertEqual(mtu, response_data["mtu"])
@@ -188,12 +168,8 @@ class TestVlansAPI(APITestCase.ForUser):
         response = self.client.post(
             uri, {"name": vlan_name, "vid": vid, "mtu": mtu, "space": space.id}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        response_data = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        response_data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(vlan_name, response_data["name"])
         self.assertEqual(vid, response_data["vid"])
         self.assertEqual(mtu, response_data["mtu"])
@@ -205,9 +181,7 @@ class TestVlansAPI(APITestCase.ForUser):
         vid = random.randint(1, 1000)
         uri = get_vlans_uri(fabric)
         response = self.client.post(uri, {"name": vlan_name, "vid": vid})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_create_requires_vid(self):
         self.become_admin()
@@ -232,24 +206,16 @@ class TestVlanAPI(APITestCase.ForUser):
     def test_handler_path(self):
         fabric = factory.make_Fabric()
         vlan = factory.make_VLAN(fabric=fabric)
-        self.assertEqual(
-            "/MAAS/api/2.0/vlans/%s/" % vlan.id, get_vlan_uri(vlan)
-        )
+        self.assertEqual("/MAAS/api/2.0/vlans/%s/" % vlan.id, get_vlan_uri(vlan))
 
     def test_read_basic(self):
         fabric = factory.make_Fabric(name="my-fabric")
-        vlan = factory.make_VLAN(
-            fabric=fabric, name="my-vlan", vid=123, mtu=1234
-        )
+        vlan = factory.make_VLAN(fabric=fabric, name="my-vlan", vid=123, mtu=1234)
         uri = get_vlan_uri(vlan)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(
             parsed_vlan,
             {
@@ -275,12 +241,8 @@ class TestVlanAPI(APITestCase.ForUser):
         uri = get_vlan_uri(vlan, vlan.fabric)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(parsed_vlan["space"], "my-space")
 
     def test_read_with_dhcp(self):
@@ -297,17 +259,11 @@ class TestVlanAPI(APITestCase.ForUser):
         uri = get_vlan_uri(vlan, vlan.fabric)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertTrue(parsed_vlan["dhcp_on"])
         self.assertEqual(primary_rack.system_id, parsed_vlan["primary_rack"])
-        self.assertEqual(
-            secondary_rack.system_id, parsed_vlan["secondary_rack"]
-        )
+        self.assertEqual(secondary_rack.system_id, parsed_vlan["secondary_rack"])
 
     def test_read_with_relay_vlan(self):
         relay_vlan = factory.make_VLAN(name="my-relay")
@@ -315,12 +271,8 @@ class TestVlanAPI(APITestCase.ForUser):
         uri = get_vlan_uri(vlan, vlan.fabric)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(
             {
                 "id": relay_vlan.id,
@@ -342,13 +294,9 @@ class TestVlanAPI(APITestCase.ForUser):
 
     def test_read_404_when_bad_id(self):
         fabric = factory.make_Fabric()
-        uri = reverse(
-            "vlan_handler", args=[fabric.id, random.randint(100, 1000)]
-        )
+        uri = reverse("vlan_handler", args=[fabric.id, random.randint(100, 1000)])
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_update(self):
         self.become_admin()
@@ -358,12 +306,8 @@ class TestVlanAPI(APITestCase.ForUser):
         new_name = factory.make_name("vlan")
         new_vid = random.randint(1, 1000)
         response = self.client.put(uri, {"name": new_name, "vid": new_vid})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         vlan = reload_object(vlan)
         self.assertEqual(new_name, parsed_vlan["name"])
         self.assertEqual(new_name, vlan.name)
@@ -377,12 +321,8 @@ class TestVlanAPI(APITestCase.ForUser):
         uri = get_vlan_uri(vlan)
         relay_vlan = factory.make_VLAN()
         response = self.client.put(uri, {"relay_vlan": relay_vlan.id})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         vlan = reload_object(vlan)
         self.assertEqual(relay_vlan.vid, parsed_vlan["relay_vlan"]["vid"])
         self.assertEqual(relay_vlan, vlan.relay_vlan)
@@ -395,12 +335,8 @@ class TestVlanAPI(APITestCase.ForUser):
         new_name = factory.make_name("vlan")
         new_vid = random.randint(1, 1000)
         response = self.client.put(uri, {"name": new_name, "vid": new_vid})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         vlan = reload_object(vlan)
         self.assertEqual(new_name, parsed_vlan["name"])
         self.assertEqual(new_name, vlan.name)
@@ -414,12 +350,8 @@ class TestVlanAPI(APITestCase.ForUser):
         self.assertIsNotNone(vlan.space)
         uri = get_vlan_uri(vlan, fabric)
         response = self.client.put(uri, {"space": ""})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         vlan = reload_object(vlan)
         self.assertIsNone(vlan.space)
         self.assertEqual(Space.UNDEFINED, parsed_vlan["space"])
@@ -431,12 +363,8 @@ class TestVlanAPI(APITestCase.ForUser):
         self.assertIsNotNone(vlan.space)
         uri = get_vlan_uri(vlan, fabric)
         response = self.client.put(uri, {"space": Space.UNDEFINED})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_vlan = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_vlan = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         vlan = reload_object(vlan)
         self.assertIsNone(vlan.space)
         self.assertEqual(Space.UNDEFINED, parsed_vlan["space"])
@@ -447,9 +375,7 @@ class TestVlanAPI(APITestCase.ForUser):
         uri = get_vlan_uri(vlan)
         new_name = factory.make_name("vlan")
         response = self.client.put(uri, {"name": new_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_update_400_when_bad_primary_rack(self):
         self.become_admin()
@@ -480,9 +406,7 @@ class TestVlanAPI(APITestCase.ForUser):
         vlan = factory.make_VLAN()
         uri = get_vlan_uri(vlan)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(vlan))
 
     def test_delete_with_fabric_deletes_vlan(self):
@@ -490,44 +414,32 @@ class TestVlanAPI(APITestCase.ForUser):
         vlan = factory.make_VLAN()
         uri = get_vlan_uri(vlan, vlan.fabric)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(vlan))
 
     def test_delete_403_when_not_admin(self):
         vlan = factory.make_VLAN()
         uri = get_vlan_uri(vlan)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(vlan))
 
     def test_delete_403_when_not_admin_using_fabric_vid(self):
         vlan = factory.make_VLAN()
         uri = get_vlan_uri(vlan, vlan.fabric)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(vlan))
 
     def test_delete_404_when_invalid_id(self):
         self.become_admin()
         uri = reverse("vlanid_handler", args=[random.randint(100, 1000)])
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_delete_404_when_invalid_fabric_vid(self):
         fabric = factory.make_Fabric()
         self.become_admin()
-        uri = reverse(
-            "vlan_handler", args=[fabric.id, random.randint(100, 1000)]
-        )
+        uri = reverse("vlan_handler", args=[fabric.id, random.randint(100, 1000)])
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)

@@ -81,9 +81,7 @@ def transactional_reload_object(obj):
 class TestRegionProtocol(MAASTestCase):
     def test_unauthenticated_allowed_commands(self):
         protocol = Region()
-        self.assertEqual(
-            [Authenticate.commandName], protocol.unauthenticated_commands
-        )
+        self.assertEqual([Authenticate.commandName], protocol.unauthenticated_commands)
 
     def test_default_auth_status(self):
         protocol = Region()
@@ -141,9 +139,7 @@ class TestRegionProtocol_StartTLS(MAASTestCase):
         protocol = Region()
         cls, func = protocol._commandDispatch[amp.StartTLS.commandName]
         result = func(protocol)
-        self.assertIsInstance(
-            result["tls_localCertificate"], ssl.PrivateCertificate
-        )
+        self.assertIsInstance(result["tls_localCertificate"], ssl.PrivateCertificate)
         for certificate in result["tls_verifyAuthorities"]:
             self.assertIsInstance(certificate, ssl.Certificate)
 
@@ -177,9 +173,7 @@ class TestRegionProtocol_UpdateLease(MAASTransactionServerTestCase):
     @inlineCallbacks
     def test_doesnt_raises_other_errors(self):
         # Cause a random exception
-        self.patch(
-            leases_module, "update_lease"
-        ).side_effect = factory.make_exception()
+        self.patch(leases_module, "update_lease").side_effect = factory.make_exception()
 
         yield eventloop.start()
         try:
@@ -461,9 +455,7 @@ class TestRegionProtocol_MarkNodeFailed(MAASTransactionServerTestCase):
         return d.addErrback(check)
 
 
-class TestRegionProtocol_ListNodePowerParameters(
-    MAASTransactionServerTestCase
-):
+class TestRegionProtocol_ListNodePowerParameters(MAASTransactionServerTestCase):
     @transactional
     def create_node(self, **kwargs):
         node = factory.make_Node(**kwargs)
@@ -480,9 +472,7 @@ class TestRegionProtocol_ListNodePowerParameters(
 
     def test_is_registered(self):
         protocol = Region()
-        responder = protocol.locateResponder(
-            ListNodePowerParameters.commandName
-        )
+        responder = protocol.locateResponder(ListNodePowerParameters.commandName)
         self.assertIsNotNone(responder)
 
     @wait_for_reactor
@@ -498,9 +488,7 @@ class TestRegionProtocol_ListNodePowerParameters(
                 power_state_updated=None,
                 bmc_connected_to=rack,
             )
-            power_params = yield deferToDatabase(
-                self.get_node_power_parameters, node
-            )
+            power_params = yield deferToDatabase(self.get_node_power_parameters, node)
             nodes.append(
                 {
                     "system_id": node.system_id,
@@ -567,9 +555,7 @@ class TestRegionProtocol_UpdateNodePowerState(MAASTransactionServerTestCase):
             {"system_id": node.system_id, "power_state": new_state},
         )
 
-        db_state = yield deferToDatabase(
-            self.get_node_power_state, node.system_id
-        )
+        db_state = yield deferToDatabase(self.get_node_power_state, node.system_id)
         self.assertEqual(new_state, db_state)
 
     @wait_for_reactor
@@ -661,16 +647,12 @@ class TestRegionProtocol_SendEvent(MAASTransactionServerTestCase):
         # runs in the event-loop and this can't dereference related
         # objects (unless they have been prefetched).
         all_events_qs = Event.objects.all().select_related("node", "type")
-        event = all_events_qs.get(
-            node__system_id=system_id, type__name=type_name
-        )
+        event = all_events_qs.get(node__system_id=system_id, type__name=type_name)
         return event
 
     @transactional
     def create_event_type(self, name, description, level):
-        EventType.objects.create(
-            name=name, description=description, level=level
-        )
+        EventType.objects.create(name=name, description=description, level=level)
 
     @transactional
     def create_node(self):
@@ -798,8 +780,7 @@ class TestRegionProtocol_SendEvent(MAASTransactionServerTestCase):
             yield eventloop.reset()
 
         log.debug.assert_called_once_with(
-            "Event '{type}: {description}' sent for "
-            "non-existent node '{node_id}'.",
+            "Event '{type}: {description}' sent for " "non-existent node '{node_id}'.",
             type=name,
             description=event_description,
             node_id=system_id,
@@ -822,17 +803,13 @@ class TestRegionProtocol_SendEventMACAddress(MAASTransactionServerTestCase):
         # runs in the event-loop and this can't dereference related
         # objects (unless they have been prefetched).
         all_events_qs = Event.objects.all().select_related("node", "type")
-        node = PhysicalInterface.objects.get(
-            mac_address=mac_address
-        ).node_config.node
+        node = PhysicalInterface.objects.get(mac_address=mac_address).node_config.node
         event = all_events_qs.get(node=node, type__name=type_name)
         return event
 
     @transactional
     def create_event_type(self, name, description, level):
-        EventType.objects.create(
-            name=name, description=description, level=level
-        )
+        EventType.objects.create(name=name, description=description, level=level)
 
     @transactional
     def make_interface(self):
@@ -868,9 +845,7 @@ class TestRegionProtocol_SendEventMACAddress(MAASTransactionServerTestCase):
 
         self.assertEqual({}, response)
         event = yield deferToDatabase(self.get_event, mac_address, name)
-        self.assertEqual(
-            event.node.system_id, interface.node_config.node.system_id
-        )
+        self.assertEqual(event.node.system_id, interface.node_config.node.system_id)
         self.assertEqual(event.description, event_description)
         self.assertEqual(event.type.name, name)
 
@@ -1008,19 +983,13 @@ class TestRegionProtocol_UpdateServices(MAASTransactionServerTestCase):
         finally:
             yield eventloop.reset()
 
-        mock_deferToDatabase.assert_called_with(
-            update_services, system_id, services
-        )
+        mock_deferToDatabase.assert_called_with(update_services, system_id, services)
 
 
-class TestRegionProtocol_ReportForeignDHCPServer(
-    MAASTransactionServerTestCase
-):
+class TestRegionProtocol_ReportForeignDHCPServer(MAASTransactionServerTestCase):
     def test_is_registered(self):
         protocol = Region()
-        responder = protocol.locateResponder(
-            ReportForeignDHCPServer.commandName
-        )
+        responder = protocol.locateResponder(ReportForeignDHCPServer.commandName)
         self.assertIsNotNone(responder)
 
     @transactional
@@ -1070,9 +1039,7 @@ class TestRegionProtocol_CreateNode(MAASTransactionServerTestCase):
     @inlineCallbacks
     def test_calls_create_node_function(self):
         create_node_function = self.patch(regionservice, "create_node")
-        create_node_function.return_value = yield deferToDatabase(
-            self.create_node
-        )
+        create_node_function.return_value = yield deferToDatabase(self.create_node)
 
         params = {
             "architecture": factory.make_name("arch"),
@@ -1149,14 +1116,10 @@ class TestRegionProtocol_ReportNeighbours(MAASTestCase):
         )
 
 
-class TestRegionProtocol_RequestNodeInforByMACAddress(
-    MAASTransactionServerTestCase
-):
+class TestRegionProtocol_RequestNodeInforByMACAddress(MAASTransactionServerTestCase):
     def test_request_node_info_by_mac_address_is_registered(self):
         protocol = Region()
-        responder = protocol.locateResponder(
-            RequestNodeInfoByMACAddress.commandName
-        )
+        responder = protocol.locateResponder(RequestNodeInfoByMACAddress.commandName)
         self.assertIsNotNone(responder)
 
     @transactional
@@ -1180,9 +1143,7 @@ class TestRegionProtocol_RequestNodeInforByMACAddress(
 
         params = {"mac_address": interface.mac_address}
 
-        response = yield call_responder(
-            Region(), RequestNodeInfoByMACAddress, params
-        )
+        response = yield call_responder(Region(), RequestNodeInfoByMACAddress, params)
         self.assertIsNotNone(response)
         node_info_function.assert_called_once_with(params["mac_address"])
         response_purpose = response.pop("purpose")
@@ -1220,9 +1181,7 @@ class TestRegionProtocol_RequestRefresh(MAASTransactionServerTestCase):
         def get_events(rack):
             return [
                 event.type.name
-                for event in Event.objects.filter(
-                    node_system_id=rack.system_id
-                )
+                for event in Event.objects.filter(node_system_id=rack.system_id)
             ]
 
         rack = yield deferToDatabase(factory.make_RackController)
@@ -1300,9 +1259,7 @@ class TestRegionProtocol_GetTimeConfiguration(MAASTransactionServerTestCase):
             Region(), GetTimeConfiguration, {"system_id": system_id}
         )
         self.assertEqual(example_response, response)
-        deferToDatabase.assert_called_once_with(
-            get_time_configuration, system_id
-        )
+        deferToDatabase.assert_called_once_with(get_time_configuration, system_id)
 
     @wait_for_reactor
     @inlineCallbacks
@@ -1349,9 +1306,7 @@ class TestRegionProtocol_GetProxyConfiguration(MAASTransactionServerTestCase):
     @inlineCallbacks
     def test_returns_proxy_configuration(self):
         def _db_work():
-            cidrs = [
-                factory.make_Subnet(allow_proxy=True).cidr for _ in range(3)
-            ]
+            cidrs = [factory.make_Subnet(allow_proxy=True).cidr for _ in range(3)]
             for _ in range(3):
                 factory.make_Subnet(allow_proxy=False)
             enabled = factory.pick_bool()
@@ -1382,9 +1337,7 @@ class TestRegionProtocol_GetProxyConfiguration(MAASTransactionServerTestCase):
 class TestRegionProtocol_GetSyslogConfiguration(MAASTransactionServerTestCase):
     def test_get_proxy_configuration_is_registered(self):
         protocol = Region()
-        responder = protocol.locateResponder(
-            GetSyslogConfiguration.commandName
-        )
+        responder = protocol.locateResponder(GetSyslogConfiguration.commandName)
         self.assertIsNotNone(responder)
 
     @wait_for_reactor

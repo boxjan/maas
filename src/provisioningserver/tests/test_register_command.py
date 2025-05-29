@@ -97,9 +97,7 @@ class TestRegisterMAASRack(MAASTestCase):
     def test_sets_url(self):
         secret = factory.make_bytes()
         expected_url = factory.make_simple_http_url()
-        register_command.run(
-            self.make_args(url=expected_url, secret=to_hex(secret))
-        )
+        register_command.run(self.make_args(url=expected_url, secret=to_hex(secret)))
         with ClusterConfiguration.open() as config:
             observed = config.maas_url
         self.assertEqual([expected_url], observed)

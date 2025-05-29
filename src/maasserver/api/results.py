@@ -79,10 +79,7 @@ class NodeResultsHandler(OperationsHandler):
 
         results = []
         for script_set in script_sets:
-            if (
-                result_type is not None
-                and script_set.result_type != result_type
-            ):
+            if result_type is not None and script_set.result_type != result_type:
                 continue
             for script_result in script_set.scriptresult_set.filter(
                 status__in=(

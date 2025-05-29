@@ -9,9 +9,7 @@ import signal
 import sys
 
 # Set the default so on installed system running regiond directly just works.
-os.environ.setdefault(
-    "DJANGO_SETTINGS_MODULE", "maasserver.djangosettings.settings"
-)
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "maasserver.djangosettings.settings")
 
 
 def runMasterServices():
@@ -37,9 +35,7 @@ def runWorkerServices():
 
 def parse():
     """Parse the command-line arguments."""
-    parser = argparse.ArgumentParser(
-        description="MAAS region controller process"
-    )
+    parser = argparse.ArgumentParser(description="MAAS region controller process")
     parser.add_argument(
         "-d",
         "--debug",

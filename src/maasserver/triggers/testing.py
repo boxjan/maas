@@ -755,9 +755,7 @@ class TransactionalHelpersMixin:
 
     @transactional
     def update_region_controller_process(self, id, params, **kwargs):
-        return apply_update_to_model(
-            RegionControllerProcess, id, params, **kwargs
-        )
+        return apply_update_to_model(RegionControllerProcess, id, params, **kwargs)
 
     @transactional
     def delete_region_controller_process(self, id):
@@ -789,9 +787,7 @@ class TransactionalHelpersMixin:
 
     @transactional
     def update_region_rack_rpc_connection(self, id, params, **kwargs):
-        return apply_update_to_model(
-            RegionRackRPCConnection, id, params, **kwargs
-        )
+        return apply_update_to_model(RegionRackRPCConnection, id, params, **kwargs)
 
     @transactional
     def delete_region_rack_rpc_connection(self, id):

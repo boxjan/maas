@@ -91,9 +91,7 @@ def migrate_staticipaddress_hostname(apps, schema_editor):
     DNSResource = apps.get_model("maasserver", "DNSResource")
 
     # move hostname from StaticIPAddress to DNSResource
-    ips = StaticIPAddress.objects.filter(hostname__isnull=False).exclude(
-        hostname=""
-    )
+    ips = StaticIPAddress.objects.filter(hostname__isnull=False).exclude(hostname="")
     for ip in ips:
         hostname = ip.hostname.split(".")[0]
         domains = {

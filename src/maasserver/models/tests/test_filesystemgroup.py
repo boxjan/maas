@@ -86,9 +86,7 @@ class TestManagersGetObjectOr404(MAASServerTestCase):
     def test_view_raises_PermissionDenied_when_user_not_owner(self):
         user = factory.make_User()
         node = factory.make_Node(owner=factory.make_User())
-        filesystem_group = factory.make_FilesystemGroup(
-            node=node, group_type=self.type
-        )
+        filesystem_group = factory.make_FilesystemGroup(node=node, group_type=self.type)
         self.assertRaises(
             PermissionDenied,
             self.model.objects.get_object_or_404,
@@ -101,9 +99,7 @@ class TestManagersGetObjectOr404(MAASServerTestCase):
     def test_view_returns_device_by_name(self):
         user = factory.make_User()
         node = factory.make_Node()
-        filesystem_group = factory.make_FilesystemGroup(
-            node=node, group_type=self.type
-        )
+        filesystem_group = factory.make_FilesystemGroup(node=node, group_type=self.type)
         self.assertEqual(
             filesystem_group.id,
             self.model.objects.get_object_or_404(
@@ -117,9 +113,7 @@ class TestManagersGetObjectOr404(MAASServerTestCase):
     def test_view_returns_device_when_no_owner(self):
         user = factory.make_User()
         node = factory.make_Node()
-        filesystem_group = factory.make_FilesystemGroup(
-            node=node, group_type=self.type
-        )
+        filesystem_group = factory.make_FilesystemGroup(node=node, group_type=self.type)
         self.assertEqual(
             filesystem_group.id,
             self.model.objects.get_object_or_404(
@@ -130,9 +124,7 @@ class TestManagersGetObjectOr404(MAASServerTestCase):
     def test_view_returns_device_when_owner(self):
         user = factory.make_User()
         node = factory.make_Node(owner=user)
-        filesystem_group = factory.make_FilesystemGroup(
-            node=node, group_type=self.type
-        )
+        filesystem_group = factory.make_FilesystemGroup(node=node, group_type=self.type)
         self.assertEqual(
             filesystem_group.id,
             self.model.objects.get_object_or_404(
@@ -143,9 +135,7 @@ class TestManagersGetObjectOr404(MAASServerTestCase):
     def test_edit_raises_PermissionDenied_when_user_not_owner(self):
         user = factory.make_User()
         node = factory.make_Node(owner=factory.make_User())
-        filesystem_group = factory.make_FilesystemGroup(
-            node=node, group_type=self.type
-        )
+        filesystem_group = factory.make_FilesystemGroup(node=node, group_type=self.type)
         self.assertRaises(
             PermissionDenied,
             self.model.objects.get_object_or_404,
@@ -158,9 +148,7 @@ class TestManagersGetObjectOr404(MAASServerTestCase):
     def test_edit_returns_device_when_user_is_owner(self):
         user = factory.make_User()
         node = factory.make_Node(owner=user)
-        filesystem_group = factory.make_FilesystemGroup(
-            node=node, group_type=self.type
-        )
+        filesystem_group = factory.make_FilesystemGroup(node=node, group_type=self.type)
         self.assertEqual(
             filesystem_group.id,
             self.model.objects.get_object_or_404(
@@ -171,9 +159,7 @@ class TestManagersGetObjectOr404(MAASServerTestCase):
     def test_admin_raises_PermissionDenied_when_user_requests_admin(self):
         user = factory.make_User()
         node = factory.make_Node()
-        filesystem_group = factory.make_FilesystemGroup(
-            node=node, group_type=self.type
-        )
+        filesystem_group = factory.make_FilesystemGroup(node=node, group_type=self.type)
         self.assertRaises(
             PermissionDenied,
             self.model.objects.get_object_or_404,
@@ -186,9 +172,7 @@ class TestManagersGetObjectOr404(MAASServerTestCase):
     def test_admin_returns_device_when_admin(self):
         user = factory.make_admin()
         node = factory.make_Node()
-        filesystem_group = factory.make_FilesystemGroup(
-            node=node, group_type=self.type
-        )
+        filesystem_group = factory.make_FilesystemGroup(node=node, group_type=self.type)
         self.assertEqual(
             filesystem_group.id,
             self.model.objects.get_object_or_404(
@@ -208,19 +192,13 @@ class TestManagersFilterByBlockDevice(MAASServerTestCase):
         filesystem_group = factory.make_FilesystemGroup(
             group_type=FILESYSTEM_GROUP_TYPE.LVM_VG, filesystems=[filesystem]
         )
-        filesystem_groups = VolumeGroup.objects.filter_by_block_device(
-            block_device
-        )
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        filesystem_groups = VolumeGroup.objects.filter_by_block_device(block_device)
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_volume_group_on_partition(self):
         block_device = factory.make_PhysicalBlockDevice(size=10 * 1024**3)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(
             size=5 * 1024**3, partition_table=partition_table
         )
@@ -230,19 +208,13 @@ class TestManagersFilterByBlockDevice(MAASServerTestCase):
         filesystem_group = factory.make_FilesystemGroup(
             group_type=FILESYSTEM_GROUP_TYPE.LVM_VG, filesystems=[filesystem]
         )
-        filesystem_groups = VolumeGroup.objects.filter_by_block_device(
-            block_device
-        )
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        filesystem_groups = VolumeGroup.objects.filter_by_block_device(block_device)
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_volume_group_on_two_partitions(self):
         block_device = factory.make_PhysicalBlockDevice()
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition_one = factory.make_Partition(partition_table=partition_table)
         partition_two = factory.make_Partition(partition_table=partition_table)
         filesystem_one = factory.make_Filesystem(
@@ -255,12 +227,8 @@ class TestManagersFilterByBlockDevice(MAASServerTestCase):
             group_type=FILESYSTEM_GROUP_TYPE.LVM_VG,
             filesystems=[filesystem_one, filesystem_two],
         )
-        filesystem_groups = VolumeGroup.objects.filter_by_block_device(
-            block_device
-        )
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        filesystem_groups = VolumeGroup.objects.filter_by_block_device(block_device)
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_raid_on_block_devices(self):
@@ -277,19 +245,13 @@ class TestManagersFilterByBlockDevice(MAASServerTestCase):
             group_type=FILESYSTEM_GROUP_TYPE.RAID_0,
             filesystems=[filesystem_one, filesystem_two],
         )
-        filesystem_groups = RAID.objects.filter_by_block_device(
-            block_device_one
-        )
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        filesystem_groups = RAID.objects.filter_by_block_device(block_device_one)
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_raid_on_partitions(self):
         block_device = factory.make_PhysicalBlockDevice()
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition_one = factory.make_Partition(partition_table=partition_table)
         partition_two = factory.make_Partition(partition_table=partition_table)
         filesystem_one = factory.make_Filesystem(
@@ -303,9 +265,7 @@ class TestManagersFilterByBlockDevice(MAASServerTestCase):
             filesystems=[filesystem_one, filesystem_two],
         )
         filesystem_groups = RAID.objects.filter_by_block_device(block_device)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_bcache_on_block_devices(self):
@@ -323,12 +283,8 @@ class TestManagersFilterByBlockDevice(MAASServerTestCase):
             cache_set=cache_set,
             filesystems=[filesystem_backing],
         )
-        filesystem_groups = Bcache.objects.filter_by_block_device(
-            block_device_one
-        )
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        filesystem_groups = Bcache.objects.filter_by_block_device(block_device_one)
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_bcache_on_partitions(self):
@@ -338,9 +294,7 @@ class TestManagersFilterByBlockDevice(MAASServerTestCase):
         block_device = factory.make_PhysicalBlockDevice(
             size=device_size + PARTITION_TABLE_EXTRA_SPACE
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition_one = factory.make_Partition(
             partition_table=partition_table, size=device_size // 2
         )
@@ -358,9 +312,7 @@ class TestManagersFilterByBlockDevice(MAASServerTestCase):
             filesystems=[filesystem_backing],
         )
         filesystem_groups = Bcache.objects.filter_by_block_device(block_device)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
 
@@ -377,17 +329,13 @@ class TestManagersFilterByNode(MAASServerTestCase):
             group_type=FILESYSTEM_GROUP_TYPE.LVM_VG, filesystems=[filesystem]
         )
         filesystem_groups = VolumeGroup.objects.filter_by_node(node)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_volume_group_on_partition(self):
         node = factory.make_Node()
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         filesystem = factory.make_Filesystem(
             fstype=FILESYSTEM_TYPE.LVM_PV, partition=partition
@@ -396,17 +344,13 @@ class TestManagersFilterByNode(MAASServerTestCase):
             group_type=FILESYSTEM_GROUP_TYPE.LVM_VG, filesystems=[filesystem]
         )
         filesystem_groups = VolumeGroup.objects.filter_by_node(node)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_volume_group_on_two_partitions(self):
         node = factory.make_Node()
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition_one = factory.make_Partition(partition_table=partition_table)
         partition_two = factory.make_Partition(partition_table=partition_table)
         filesystem_one = factory.make_Filesystem(
@@ -420,9 +364,7 @@ class TestManagersFilterByNode(MAASServerTestCase):
             filesystems=[filesystem_one, filesystem_two],
         )
         filesystem_groups = VolumeGroup.objects.filter_by_node(node)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_raid_on_block_devices(self):
@@ -440,17 +382,13 @@ class TestManagersFilterByNode(MAASServerTestCase):
             filesystems=[filesystem_one, filesystem_two],
         )
         filesystem_groups = RAID.objects.filter_by_node(node)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_raid_on_partitions(self):
         node = factory.make_Node()
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition_one = factory.make_Partition(partition_table=partition_table)
         partition_two = factory.make_Partition(partition_table=partition_table)
         filesystem_one = factory.make_Filesystem(
@@ -464,9 +402,7 @@ class TestManagersFilterByNode(MAASServerTestCase):
             filesystems=[filesystem_one, filesystem_two],
         )
         filesystem_groups = RAID.objects.filter_by_node(node)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_bcache_on_block_devices(self):
@@ -485,17 +421,13 @@ class TestManagersFilterByNode(MAASServerTestCase):
             filesystems=[filesystem_backing],
         )
         filesystem_groups = Bcache.objects.filter_by_node(node)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
     def test_bcache_on_partitions(self):
         node = factory.make_Node()
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition_one = factory.make_Partition(partition_table=partition_table)
         partition_two = factory.make_Partition(partition_table=partition_table)
         cache_set = factory.make_CacheSet(partition=partition_one)
@@ -509,9 +441,7 @@ class TestManagersFilterByNode(MAASServerTestCase):
             filesystems=[filesystem_backing],
         )
         filesystem_groups = Bcache.objects.filter_by_node(node)
-        result_filesystem_group_ids = [
-            fsgroup.id for fsgroup in filesystem_groups
-        ]
+        result_filesystem_group_ids = [fsgroup.id for fsgroup in filesystem_groups]
         self.assertEqual([filesystem_group.id], result_filesystem_group_ids)
 
 
@@ -559,13 +489,9 @@ class TestVolumeGroupManager(MAASServerTestCase):
 
     def test_create_volume_group_with_block_devices(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         name = factory.make_name("vg")
-        volume_group = VolumeGroup.objects.create_volume_group(
-            name, block_devices, []
-        )
+        volume_group = VolumeGroup.objects.create_volume_group(name, block_devices, [])
         block_devices_in_vg = [
             filesystem.block_device.actual_instance
             for filesystem in volume_group.filesystems.all()
@@ -578,38 +504,27 @@ class TestVolumeGroupManager(MAASServerTestCase):
             node=node,
             size=(MIN_BLOCK_DEVICE_SIZE * 3) + PARTITION_TABLE_EXTRA_SPACE,
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = [
-            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE) for _ in range(2)
         ]
         name = factory.make_name("vg")
-        volume_group = VolumeGroup.objects.create_volume_group(
-            name, [], partitions
-        )
+        volume_group = VolumeGroup.objects.create_volume_group(name, [], partitions)
         partitions_in_vg = [
-            filesystem.partition
-            for filesystem in volume_group.filesystems.all()
+            filesystem.partition for filesystem in volume_group.filesystems.all()
         ]
         self.assertCountEqual(partitions, partitions_in_vg)
 
     def test_create_volume_group_with_block_devices_and_partitions(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         block_device = factory.make_PhysicalBlockDevice(
             node=node,
             size=(MIN_BLOCK_DEVICE_SIZE * 3) + PARTITION_TABLE_EXTRA_SPACE,
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = [
-            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE) for _ in range(2)
         ]
         name = factory.make_name("vg")
         volume_group = VolumeGroup.objects.create_volume_group(
@@ -633,9 +548,7 @@ class TestFilesystemGroup(MAASServerTestCase):
     """Tests for the `FilesystemGroup` model."""
 
     def test_virtual_device_raises_AttributeError_for_lvm(self):
-        fsgroup = factory.make_FilesystemGroup(
-            group_type=FILESYSTEM_GROUP_TYPE.LVM_VG
-        )
+        fsgroup = factory.make_FilesystemGroup(group_type=FILESYSTEM_GROUP_TYPE.LVM_VG)
         with self.assertRaisesRegex(
             AttributeError, "should not be called when group_type = LVM_VG"
         ):
@@ -697,9 +610,7 @@ class TestFilesystemGroup(MAASServerTestCase):
         filesystems = [
             factory.make_Filesystem(
                 fstype=FILESYSTEM_TYPE.LVM_PV,
-                block_device=factory.make_PhysicalBlockDevice(
-                    numa_node=numa_node
-                ),
+                block_device=factory.make_PhysicalBlockDevice(numa_node=numa_node),
             )
             for numa_node in numa_nodes[:2]
         ]
@@ -709,9 +620,7 @@ class TestFilesystemGroup(MAASServerTestCase):
         nested_filesystems = [
             factory.make_Filesystem(
                 fstype=FILESYSTEM_TYPE.LVM_PV,
-                block_device=factory.make_PhysicalBlockDevice(
-                    numa_node=numa_node
-                ),
+                block_device=factory.make_PhysicalBlockDevice(numa_node=numa_node),
             )
             for numa_node in numa_nodes[2:]
         ]
@@ -739,9 +648,7 @@ class TestFilesystemGroup(MAASServerTestCase):
 
     def test_get_node_returns_first_filesystem_node(self):
         fsgroup = factory.make_FilesystemGroup()
-        self.assertEqual(
-            fsgroup.filesystems.first().get_node(), fsgroup.get_node()
-        )
+        self.assertEqual(fsgroup.filesystems.first().get_node(), fsgroup.get_node())
 
     def test_get_node_returns_None_if_no_filesystems(self):
         fsgroup = FilesystemGroup()
@@ -757,9 +664,7 @@ class TestFilesystemGroup(MAASServerTestCase):
         total_size = 0
         filesystems = []
         for _ in range(3):
-            size = random.randint(
-                MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2
-            )
+            size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2)
             total_size += size
             block_device = factory.make_PhysicalBlockDevice(
                 node=node, size=size, block_size=block_size
@@ -782,9 +687,7 @@ class TestFilesystemGroup(MAASServerTestCase):
 
     def test_get_size_returns_sum_of_disk_size_for_raid_0(self):
         node = factory.make_Node()
-        small_size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2
-        )
+        small_size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2)
         large_size = random.randint(small_size + 1, small_size + (10**5))
         filesystems = [
             factory.make_Filesystem(
@@ -810,9 +713,7 @@ class TestFilesystemGroup(MAASServerTestCase):
 
     def test_get_size_returns_smallest_disk_size_for_raid_1(self):
         node = factory.make_Node()
-        small_size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2
-        )
+        small_size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2)
         large_size = random.randint(small_size + 1, small_size + (10**5))
         filesystems = [
             factory.make_Filesystem(
@@ -831,15 +732,11 @@ class TestFilesystemGroup(MAASServerTestCase):
         fsgroup = factory.make_FilesystemGroup(
             group_type=FILESYSTEM_GROUP_TYPE.RAID_1, filesystems=filesystems
         )
-        self.assertEqual(
-            small_size - RAID_SUPERBLOCK_OVERHEAD, fsgroup.get_size()
-        )
+        self.assertEqual(small_size - RAID_SUPERBLOCK_OVERHEAD, fsgroup.get_size())
 
     def test_get_size_returns_correct_disk_size_for_raid_5(self):
         node = factory.make_Node()
-        small_size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2
-        )
+        small_size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2)
         other_size = random.randint(small_size + 1, small_size + (10**5))
         number_of_raid_devices = random.randint(2, 9)
         filesystems = [
@@ -879,9 +776,7 @@ class TestFilesystemGroup(MAASServerTestCase):
 
     def test_get_size_returns_correct_disk_size_for_raid_6(self):
         node = factory.make_Node()
-        small_size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2
-        )
+        small_size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2)
         other_size = random.randint(small_size + 1, small_size + (10**5))
         number_of_raid_devices = random.randint(3, 9)
         filesystems = [
@@ -915,17 +810,14 @@ class TestFilesystemGroup(MAASServerTestCase):
             group_type=FILESYSTEM_GROUP_TYPE.RAID_6, filesystems=filesystems
         )
         self.assertEqual(
-            (small_size * (number_of_raid_devices - 1))
-            - RAID_SUPERBLOCK_OVERHEAD,
+            (small_size * (number_of_raid_devices - 1)) - RAID_SUPERBLOCK_OVERHEAD,
             fsgroup.get_size(),
         )
 
     @skip("XXX: GavinPanella 2015-12-04 bug=1522965: Fails spuriously.")
     def test_get_size_returns_correct_disk_size_for_raid_10(self):
         node = factory.make_Node()
-        small_size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2
-        )
+        small_size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2)
         other_size = random.randint(small_size + 1, small_size + (10**5))
         number_of_raid_devices = random.randint(3, 9)
         filesystems = [
@@ -959,8 +851,7 @@ class TestFilesystemGroup(MAASServerTestCase):
             group_type=FILESYSTEM_GROUP_TYPE.RAID_10, filesystems=filesystems
         )
         self.assertEqual(
-            (small_size * (number_of_raid_devices + 1) // 2)
-            - RAID_SUPERBLOCK_OVERHEAD,
+            (small_size * (number_of_raid_devices + 1) // 2) - RAID_SUPERBLOCK_OVERHEAD,
             fsgroup.get_size(),
         )
 
@@ -970,9 +861,7 @@ class TestFilesystemGroup(MAASServerTestCase):
 
     def test_get_size_returns_size_of_backing_device_with_bcache(self):
         node = factory.make_Node()
-        backing_size = random.randint(
-            MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2
-        )
+        backing_size = random.randint(MIN_BLOCK_DEVICE_SIZE, MIN_BLOCK_DEVICE_SIZE**2)
         cache_set = factory.make_CacheSet(node=node)
         backing_block_device = factory.make_PhysicalBlockDevice(
             node=node, size=backing_size
@@ -1074,8 +963,7 @@ class TestFilesystemGroup(MAASServerTestCase):
         with self.assertRaisesRegex(
             ValidationError,
             re.escape(
-                "{'__all__': ['At least one filesystem must have "
-                "been added.']}"
+                "{'__all__': ['At least one filesystem must have " "been added.']}"
             ),
         ):
             fsgroup.save(force_update=True)
@@ -1156,8 +1044,7 @@ class TestFilesystemGroup(MAASServerTestCase):
         with self.assertRaisesRegex(
             ValidationError,
             re.escape(
-                "['Volume group cannot be smaller than its "
-                "logical volumes.']"
+                "['Volume group cannot be smaller than its " "logical volumes.']"
             ),
         ):
             volume_group.save()
@@ -1448,9 +1335,7 @@ class TestFilesystemGroup(MAASServerTestCase):
         ]
         with self.assertRaisesRegex(
             ValidationError,
-            re.escape(
-                "{'__all__': ['Bcache requires an assigned cache set.']}"
-            ),
+            re.escape("{'__all__': ['Bcache requires an assigned cache set.']}"),
         ):
             filesystem_group = factory.make_FilesystemGroup(
                 group_type=FILESYSTEM_GROUP_TYPE.BCACHE,
@@ -1465,8 +1350,7 @@ class TestFilesystemGroup(MAASServerTestCase):
         with self.assertRaisesRegex(
             ValidationError,
             re.escape(
-                "{'__all__': ['At least one filesystem must have "
-                "been added.']}"
+                "{'__all__': ['At least one filesystem must have " "been added.']}"
             ),
         ):
             factory.make_FilesystemGroup(
@@ -1526,8 +1410,7 @@ class TestFilesystemGroup(MAASServerTestCase):
         with self.assertRaisesRegex(
             ValidationError,
             re.escape(
-                "{'__all__': ['Bcache can only contain one backing "
-                "device.']}"
+                "{'__all__': ['Bcache can only contain one backing " "device.']}"
             ),
         ):
             factory.make_FilesystemGroup(
@@ -1585,20 +1468,14 @@ class TestFilesystemGroup(MAASServerTestCase):
         self.assertEqual(usable_size, fsgroup.get_size())
 
         # Allocate two VirtualBlockDevice's
-        factory.make_VirtualBlockDevice(
-            filesystem_group=fsgroup, size=35 * 1000**3
-        )
-        factory.make_VirtualBlockDevice(
-            filesystem_group=fsgroup, size=5 * 1000**3
-        )
+        factory.make_VirtualBlockDevice(filesystem_group=fsgroup, size=35 * 1000**3)
+        factory.make_VirtualBlockDevice(filesystem_group=fsgroup, size=5 * 1000**3)
 
         expected_size = round_size_to_nearest_block(
             40 * 1000**3, PARTITION_ALIGNMENT_SIZE, False
         )
         self.assertEqual(expected_size, fsgroup.get_lvm_allocated_size())
-        self.assertEqual(
-            usable_size - expected_size, fsgroup.get_lvm_free_space()
-        )
+        self.assertEqual(usable_size - expected_size, fsgroup.get_lvm_free_space())
 
     def test_get_virtual_block_device_block_size_returns_backing_for_bc(self):
         # This test is not included in the scenario below
@@ -1615,13 +1492,9 @@ class TestFilesystemGroup(MAASServerTestCase):
 
     def test_delete_deletes_filesystems_not_block_devices(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         filesystems = [
-            factory.make_Filesystem(
-                fstype=FILESYSTEM_TYPE.LVM_PV, block_device=bd
-            )
+            factory.make_Filesystem(fstype=FILESYSTEM_TYPE.LVM_PV, block_device=bd)
             for bd in block_devices
         ]
         filesystem_group = factory.make_FilesystemGroup(
@@ -1635,9 +1508,7 @@ class TestFilesystemGroup(MAASServerTestCase):
 
     def test_delete_deletes_lvm_without_lvs_on_raid(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         raid = RAID.objects.create_raid(
             level=FILESYSTEM_GROUP_TYPE.RAID_0,
             block_devices=block_devices,
@@ -1717,9 +1588,7 @@ class TestFilesystemGroupGetNiceName(MAASServerTestCase):
     ]
 
     def test_returns_prefix(self):
-        filesystem_group = factory.make_FilesystemGroup(
-            group_type=self.group_type
-        )
+        filesystem_group = factory.make_FilesystemGroup(group_type=self.group_type)
         self.assertEqual(self.name, filesystem_group.get_nice_name())
 
 
@@ -1760,9 +1629,7 @@ class TestFilesystemGroupGetNamePrefix(MAASServerTestCase):
     ]
 
     def test_returns_prefix(self):
-        filesystem_group = factory.make_FilesystemGroup(
-            group_type=self.group_type
-        )
+        filesystem_group = factory.make_FilesystemGroup(group_type=self.group_type)
         self.assertEqual(self.prefix, filesystem_group.get_name_prefix())
 
 
@@ -1802,9 +1669,7 @@ class TestFilesystemGroupGetVirtualBlockDeviceBlockSize(MAASServerTestCase):
     ]
 
     def test_returns_block_size(self):
-        filesystem_group = factory.make_FilesystemGroup(
-            group_type=self.group_type
-        )
+        filesystem_group = factory.make_FilesystemGroup(group_type=self.group_type)
         self.assertEqual(
             self.block_size,
             filesystem_group.get_virtual_block_device_block_size(),
@@ -1821,9 +1686,7 @@ class TestVolumeGroup(MAASServerTestCase):
 
     def test_update_block_devices_and_partitions(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         new_block_device = factory.make_PhysicalBlockDevice(node=node)
         partition_block_device = factory.make_PhysicalBlockDevice(
             node=node,
@@ -1833,22 +1696,15 @@ class TestVolumeGroup(MAASServerTestCase):
             block_device=partition_block_device
         )
         partitions = [
-            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE) for _ in range(2)
         ]
-        new_partition = partition_table.add_partition(
-            size=MIN_BLOCK_DEVICE_SIZE
-        )
+        new_partition = partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
         initial_bd_filesystems = [
-            factory.make_Filesystem(
-                fstype=FILESYSTEM_TYPE.LVM_PV, block_device=bd
-            )
+            factory.make_Filesystem(fstype=FILESYSTEM_TYPE.LVM_PV, block_device=bd)
             for bd in block_devices
         ]
         initial_part_filesystems = [
-            factory.make_Filesystem(
-                fstype=FILESYSTEM_TYPE.LVM_PV, partition=part
-            )
+            factory.make_Filesystem(fstype=FILESYSTEM_TYPE.LVM_PV, partition=part)
             for part in partitions
         ]
         volume_group = factory.make_VolumeGroup(
@@ -1903,9 +1759,7 @@ class TestRAID(MAASServerTestCase):
         self.assertIsInstance(RAID.objects, RAIDManager)
 
     def test_init_raises_ValueError_if_group_type_not_set_to_raid_type(self):
-        self.assertRaises(
-            ValueError, RAID, group_type=FILESYSTEM_GROUP_TYPE.LVM_VG
-        )
+        self.assertRaises(ValueError, RAID, group_type=FILESYSTEM_GROUP_TYPE.LVM_VG)
 
     def test_create_raid(self):
         node = factory.make_Node()
@@ -1976,8 +1830,7 @@ class TestRAID(MAASServerTestCase):
         with self.assertRaisesRegex(
             ValidationError,
             re.escape(
-                "{'__all__': ['At least one filesystem must have been "
-                "added.']}"
+                "{'__all__': ['At least one filesystem must have been " "added.']}"
             ),
         ):
             RAID.objects.create_raid(
@@ -2037,9 +1890,7 @@ class TestRAID(MAASServerTestCase):
             spare_partitions=[spare_partition],
         )
         self.assertEqual("md0", raid.name)
-        self.assertEqual(
-            partitions[1].size - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual(partitions[1].size - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
         self.assertEqual(FILESYSTEM_GROUP_TYPE.RAID_1, raid.group_type)
         self.assertEqual(uuid, raid.uuid)
         self.assertEqual(10, raid.filesystems.count())
@@ -2138,9 +1989,7 @@ class TestRAID(MAASServerTestCase):
 
     def test_create_raid_6_with_3_elements_fails(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         uuid = str(uuid4())
         with self.assertRaisesRegex(
             ValidationError,
@@ -2161,9 +2010,7 @@ class TestRAID(MAASServerTestCase):
 
     def test_create_raid_10_with_2_elements_fails(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(2)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(2)]
         uuid = str(uuid4())
         with self.assertRaisesRegex(
             ValidationError,
@@ -2226,9 +2073,7 @@ class TestRAID(MAASServerTestCase):
         device = factory.make_PhysicalBlockDevice(node=node, size=device_size)
         raid.add_device(device, FILESYSTEM_TYPE.RAID)
         self.assertEqual(11, raid.filesystems.count())
-        self.assertEqual(
-            (10 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual((10 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
 
     def test_add_spare_device_to_array(self):
         node = factory.make_Node()
@@ -2247,9 +2092,7 @@ class TestRAID(MAASServerTestCase):
         device = factory.make_PhysicalBlockDevice(node=node, size=device_size)
         raid.add_device(device, FILESYSTEM_TYPE.RAID_SPARE)
         self.assertEqual(11, raid.filesystems.count())
-        self.assertEqual(
-            (9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual((9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
 
     def test_add_partition_to_array(self):
         node = factory.make_Node()
@@ -2266,9 +2109,7 @@ class TestRAID(MAASServerTestCase):
             block_devices=block_devices,
         )
         partition = factory.make_PartitionTable(
-            block_device=factory.make_PhysicalBlockDevice(
-                node=node, size=device_size
-            )
+            block_device=factory.make_PhysicalBlockDevice(node=node, size=device_size)
         ).add_partition()
         raid.add_partition(partition, FILESYSTEM_TYPE.RAID)
         self.assertEqual(11, raid.filesystems.count())
@@ -2291,9 +2132,7 @@ class TestRAID(MAASServerTestCase):
             block_devices=block_devices,
         )
         partition = factory.make_PartitionTable(
-            block_device=factory.make_PhysicalBlockDevice(
-                node=node, size=device_size
-            )
+            block_device=factory.make_PhysicalBlockDevice(node=node, size=device_size)
         ).add_partition()
         raid.add_partition(partition, FILESYSTEM_TYPE.RAID_SPARE)
         self.assertEqual(11, raid.filesystems.count())
@@ -2316,9 +2155,7 @@ class TestRAID(MAASServerTestCase):
             uuid=uuid,
             block_devices=block_devices,
         )
-        device = factory.make_PhysicalBlockDevice(
-            node=other_node, size=device_size
-        )
+        device = factory.make_PhysicalBlockDevice(node=other_node, size=device_size)
         with self.assertRaisesRegex(
             ValidationError,
             re.escape(
@@ -2328,9 +2165,7 @@ class TestRAID(MAASServerTestCase):
         ):
             raid.add_device(device, FILESYSTEM_TYPE.RAID)
         self.assertEqual(10, raid.filesystems.count())  # Still 10 devices
-        self.assertEqual(
-            (9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual((9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
 
     def test_add_partition_from_another_node_to_array_fails(self):
         node = factory.make_Node()
@@ -2361,9 +2196,7 @@ class TestRAID(MAASServerTestCase):
         ):
             raid.add_partition(partition, FILESYSTEM_TYPE.RAID)
         self.assertEqual(10, raid.filesystems.count())  # Nothing added
-        self.assertEqual(
-            (9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual((9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
 
     def test_add_already_used_device_to_array_fails(self):
         node = factory.make_Node()
@@ -2392,9 +2225,7 @@ class TestRAID(MAASServerTestCase):
         ):
             raid.add_device(device, FILESYSTEM_TYPE.RAID)
         self.assertEqual(10, raid.filesystems.count())  # Nothing added.
-        self.assertEqual(
-            (9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual((9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
 
     def test_remove_device_from_array_invalidates_array_fails(self):
         """Checks it's not possible to remove a device from an RAID in such way
@@ -2424,13 +2255,9 @@ class TestRAID(MAASServerTestCase):
         ):
             raid.remove_device(block_devices[0])
         self.assertEqual(4, raid.filesystems.count())
-        self.assertEqual(
-            (2 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual((2 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
         # Ensure the filesystems are the exact same before and after.
-        self.assertCountEqual(
-            fsids_before, [fs.id for fs in raid.filesystems.all()]
-        )
+        self.assertCountEqual(fsids_before, [fs.id for fs in raid.filesystems.all()])
 
     def test_remove_partition_from_array_invalidates_array_fails(self):
         """Checks it's not possible to remove a partition from an RAID in such
@@ -2470,9 +2297,7 @@ class TestRAID(MAASServerTestCase):
             raid.get_size(),
         )
         # Ensure the filesystems are the exact same before and after.
-        self.assertCountEqual(
-            fsids_before, [fs.id for fs in raid.filesystems.all()]
-        )
+        self.assertCountEqual(fsids_before, [fs.id for fs in raid.filesystems.all()])
 
     def test_remove_device_from_array(self):
         node = factory.make_Node()
@@ -2491,9 +2316,7 @@ class TestRAID(MAASServerTestCase):
         )
         raid.remove_device(block_devices[0])
         self.assertEqual(9, raid.filesystems.count())
-        self.assertEqual(
-            (6 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual((6 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
 
     def test_remove_partition_from_array(self):
         node = factory.make_Node()
@@ -2579,9 +2402,7 @@ class TestRAID(MAASServerTestCase):
                 factory.make_PhysicalBlockDevice(node=node, size=device_size)
             )
         self.assertEqual(10, raid.filesystems.count())
-        self.assertEqual(
-            (9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size()
-        )
+        self.assertEqual((9 * device_size) - RAID_SUPERBLOCK_OVERHEAD, raid.get_size())
 
 
 class TestBcache(MAASServerTestCase):
@@ -2598,9 +2419,7 @@ class TestBcache(MAASServerTestCase):
         node = factory.make_Node()
         backing_size = 10 * 1000**4
         cache_set = factory.make_CacheSet(node=node)
-        backing_device = factory.make_PhysicalBlockDevice(
-            node=node, size=backing_size
-        )
+        backing_device = factory.make_PhysicalBlockDevice(node=node, size=backing_size)
         uuid = str(uuid4())
         bcache = Bcache.objects.create_bcache(
             name="bcache0",
@@ -2676,15 +2495,11 @@ class TestBcache(MAASServerTestCase):
         backing_size = 10 * 1000**4
         cache_size = 1000**4
         cache_partition = factory.make_PartitionTable(
-            block_device=factory.make_PhysicalBlockDevice(
-                node=node, size=cache_size
-            )
+            block_device=factory.make_PhysicalBlockDevice(node=node, size=cache_size)
         ).add_partition()
         cache_set = factory.make_CacheSet(partition=cache_partition)
         backing_partition = factory.make_PartitionTable(
-            block_device=factory.make_PhysicalBlockDevice(
-                node=node, size=backing_size
-            )
+            block_device=factory.make_PhysicalBlockDevice(node=node, size=backing_size)
         ).add_partition()
         uuid = str(uuid4())
         bcache = Bcache.objects.create_bcache(
@@ -2718,14 +2533,10 @@ class TestBcache(MAASServerTestCase):
         backing_size = 10 * 1000**4
         cache_size = 1000**4
         cache_partition = factory.make_PartitionTable(
-            block_device=factory.make_PhysicalBlockDevice(
-                node=node, size=cache_size
-            )
+            block_device=factory.make_PhysicalBlockDevice(node=node, size=cache_size)
         ).add_partition()
         cache_set = factory.make_CacheSet(partition=cache_partition)
-        backing_device = factory.make_PhysicalBlockDevice(
-            node=node, size=backing_size
-        )
+        backing_device = factory.make_PhysicalBlockDevice(node=node, size=backing_size)
         uuid = str(uuid4())
         bcache = Bcache.objects.create_bcache(
             name="bcache0",
@@ -2756,9 +2567,7 @@ class TestBcache(MAASServerTestCase):
         node = factory.make_Node()
         backing_size = 10 * 1000**4
         cache_set = factory.make_CacheSet(node=node)
-        backing_device = factory.make_PhysicalBlockDevice(
-            node=node, size=backing_size
-        )
+        backing_device = factory.make_PhysicalBlockDevice(node=node, size=backing_size)
         bcache = Bcache.objects.create_bcache(
             cache_set=cache_set,
             backing_device=backing_device,

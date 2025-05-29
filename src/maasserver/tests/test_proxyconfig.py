@@ -75,9 +75,7 @@ class TestProxyUpdateConfig(MAASTransactionServerTestCase):
         yield deferToDatabase(self.make_subnet, allow_proxy=False)
         yield deferToDatabase(self.make_subnet)
         yield proxyconfig.proxy_update_config(reload_proxy=False)
-        cache_peer_line = (
-            "cache_peer example.com parent 8000 0 no-query default"
-        )
+        cache_peer_line = "cache_peer example.com parent 8000 0 no-query default"
         with self.proxy_path.open() as proxy_file:
             lines = [line.strip() for line in proxy_file.readlines()]
         self.assertIn("never_direct allow all", lines)
@@ -170,9 +168,7 @@ class TestProxyUpdateConfig(MAASTransactionServerTestCase):
         self.patch(settings, "PROXY_CONNECT", True)
         yield deferToDatabase(self.make_subnet)
         yield proxyconfig.proxy_update_config()
-        self.service_monitor.reloadService.assert_called_once_with(
-            "proxy", if_on=True
-        )
+        self.service_monitor.reloadService.assert_called_once_with("proxy", if_on=True)
 
     @wait_for_reactor
     @inlineCallbacks
@@ -181,9 +177,7 @@ class TestProxyUpdateConfig(MAASTransactionServerTestCase):
         self.patch(snap, "running_in_snap").return_value = True
         yield deferToDatabase(self.make_subnet)
         yield proxyconfig.proxy_update_config()
-        self.service_monitor.restartService.assert_called_once_with(
-            "proxy", if_on=True
-        )
+        self.service_monitor.restartService.assert_called_once_with("proxy", if_on=True)
 
     @wait_for_reactor
     @inlineCallbacks

@@ -182,9 +182,7 @@ class RequestFixture:
         if user is None:
             user = factory.make_User()
         self.user = user
-        self.GET = get_overridden_query_dict(
-            dict, QueryDict(mutable=True), fields
-        )
+        self.GET = get_overridden_query_dict(dict, QueryDict(mutable=True), fields)
 
 
 class TestFilteredNodesListFromRequest(APITestCase.ForUser):
@@ -196,9 +194,7 @@ class TestFilteredNodesListFromRequest(APITestCase.ForUser):
         query = RequestFixture({"id": [matching_id]}, "id")
         node_list = nodes_module.filtered_nodes_list_from_request(query)
 
-        self.assertEqual(
-            [matching_id], extract_system_ids_from_nodes(node_list)
-        )
+        self.assertEqual([matching_id], extract_system_ids_from_nodes(node_list))
 
     def test_node_list_with_nonexistent_id_returns_empty_list(self):
         # Trying to list a nonexistent node id returns a list containing
@@ -221,8 +217,7 @@ class TestFilteredNodesListFromRequest(APITestCase.ForUser):
         node_list = nodes_module.filtered_nodes_list_from_request(query)
 
         sorted_system_ids = [
-            node.system_id
-            for node in sorted(all_nodes, key=lambda node: node.id)
+            node.system_id for node in sorted(all_nodes, key=lambda node: node.id)
         ]
         self.assertCountEqual(
             sorted_system_ids, extract_system_ids_from_nodes(node_list)
@@ -237,9 +232,7 @@ class TestFilteredNodesListFromRequest(APITestCase.ForUser):
         query = RequestFixture({"id": [existing_id, nonexistent_id]}, "id")
         node_list = nodes_module.filtered_nodes_list_from_request(query)
 
-        self.assertEqual(
-            [existing_id], extract_system_ids_from_nodes(node_list)
-        )
+        self.assertEqual([existing_id], extract_system_ids_from_nodes(node_list))
 
     def test_node_list_with_hostname_returns_matching_nodes(self):
         # The list operation takes optional "hostname" parameters. Only nodes
@@ -251,25 +244,19 @@ class TestFilteredNodesListFromRequest(APITestCase.ForUser):
         query = RequestFixture({"hostname": [matching_hostname]}, "hostname")
         node_list = nodes_module.filtered_nodes_list_from_request(query)
 
-        self.assertEqual(
-            [matching_system_id], extract_system_ids_from_nodes(node_list)
-        )
+        self.assertEqual([matching_system_id], extract_system_ids_from_nodes(node_list))
 
     def test_node_list_with_macs_returns_matching_nodes(self):
         # The "list" operation takes optional "mac_address" parameters. Only
         # nodes with matching MAC addresses will be returned.
-        interfaces = [
-            factory.make_Interface(INTERFACE_TYPE.PHYSICAL) for _ in range(3)
-        ]
+        interfaces = [factory.make_Interface(INTERFACE_TYPE.PHYSICAL) for _ in range(3)]
         matching_mac = str(interfaces[0].mac_address)
         matching_system_id = interfaces[0].node_config.node.system_id
 
         query = RequestFixture({"mac_address": [matching_mac]}, "mac_address")
         node_list = nodes_module.filtered_nodes_list_from_request(query)
 
-        self.assertEqual(
-            [matching_system_id], extract_system_ids_from_nodes(node_list)
-        )
+        self.assertEqual([matching_system_id], extract_system_ids_from_nodes(node_list))
 
     def test_node_list_with_invalid_macs_returns_sensible_error(self):
         # If specifying an invalid MAC, make sure the error that's
@@ -277,15 +264,11 @@ class TestFilteredNodesListFromRequest(APITestCase.ForUser):
         # humans.
         bad_mac1 = "00:E0:81:DD:D1:ZZ"  # ZZ is bad.
         bad_mac2 = "00:E0:81:DD:D1:XX"  # XX is bad.
-        ok_mac = str(
-            factory.make_Interface(INTERFACE_TYPE.PHYSICAL).mac_address
-        )
+        ok_mac = str(factory.make_Interface(INTERFACE_TYPE.PHYSICAL).mac_address)
         mac_list = [bad_mac1, bad_mac2, ok_mac]
 
         query = RequestFixture({"mac_address": mac_list}, "mac_address")
-        expected_msg = [
-            "Invalid MAC address(es): 00:E0:81:DD:D1:ZZ, 00:E0:81:DD:D1:XX"
-        ]
+        expected_msg = ["Invalid MAC address(es): 00:E0:81:DD:D1:ZZ, 00:E0:81:DD:D1:XX"]
         with self.assertRaises(MAASAPIValidationError) as cm:
             nodes_module.filtered_nodes_list_from_request(query)
         self.assertEqual(expected_msg, cm.exception.messages)
@@ -383,10 +366,7 @@ class TestFilteredNodesListFromRequest(APITestCase.ForUser):
         )
 
     def test_node_list_without_pool_does_not_filter(self):
-        nodes = [
-            factory.make_Node(pool=factory.make_ResourcePool())
-            for _ in range(3)
-        ]
+        nodes = [factory.make_Node(pool=factory.make_ResourcePool()) for _ in range(3)]
 
         query = RequestFixture({}, "", self.user)
         node_list = nodes_module.filtered_nodes_list_from_request(query)
@@ -406,13 +386,9 @@ class TestNodesAPI(APITestCase.ForUser):
     def test_GET_lists_nodes(self):
         # The api allows for fetching the list of Nodes.
         node1 = factory.make_Node()
-        node2 = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, owner=self.user
-        )
+        node2 = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         response = self.client.get(reverse("nodes_handler"))
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(http.client.OK, response.status_code)
         self.assertCountEqual(
             [node1.system_id, node2.system_id],
@@ -423,15 +399,11 @@ class TestNodesAPI(APITestCase.ForUser):
         # Only admins can see controllers
         self.become_admin()
         system_ids = [
-            factory.make_Node(
-                node_type=node_type[0], owner=self.user
-            ).system_id
+            factory.make_Node(node_type=node_type[0], owner=self.user).system_id
             for node_type in NODE_TYPE_CHOICES
         ]
         response = self.client.get(reverse("nodes_handler"))
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(http.client.OK, response.status_code)
         self.assertCountEqual(system_ids, extract_system_ids(parsed_result))
 
@@ -447,9 +419,7 @@ class TestNodesAPI(APITestCase.ForUser):
         # Nodes are returned in id order.
         nodes = [factory.make_Node() for counter in range(3)]
         response = self.client.get(reverse("nodes_handler"))
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertSequenceEqual(
             [node.system_id for node in nodes],
             extract_system_ids(parsed_result),
@@ -460,12 +430,8 @@ class TestNodesAPI(APITestCase.ForUser):
         # nodes with matching ids will be returned.
         ids = [factory.make_Node().system_id for counter in range(3)]
         matching_id = ids[0]
-        response = self.client.get(
-            reverse("nodes_handler"), {"id": [matching_id]}
-        )
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        response = self.client.get(reverse("nodes_handler"), {"id": [matching_id]})
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual([matching_id], extract_system_ids(parsed_result))
 
     def test_GET_list_with_nonexistent_id_returns_empty_list(self):
@@ -473,9 +439,7 @@ class TestNodesAPI(APITestCase.ForUser):
         # no nodes -- even if other (non-matching) nodes exist.
         existing_id = factory.make_Node().system_id
         nonexistent_id = existing_id + factory.make_string()
-        response = self.client.get(
-            reverse("nodes_handler"), {"id": [nonexistent_id]}
-        )
+        response = self.client.get(reverse("nodes_handler"), {"id": [nonexistent_id]})
         self.assertEqual(
             [], json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         )
@@ -487,9 +451,7 @@ class TestNodesAPI(APITestCase.ForUser):
         response = self.client.get(
             reverse("nodes_handler"), {"id": list(reversed(ids))}
         )
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertSequenceEqual(ids, extract_system_ids(parsed_result))
 
     def test_GET_with_some_matching_ids_returns_matching_nodes(self):
@@ -500,9 +462,7 @@ class TestNodesAPI(APITestCase.ForUser):
         response = self.client.get(
             reverse("nodes_handler"), {"id": [existing_id, nonexistent_id]}
         )
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual([existing_id], extract_system_ids(parsed_result))
 
     def test_GET_with_hostname_returns_matching_nodes(self):
@@ -514,30 +474,20 @@ class TestNodesAPI(APITestCase.ForUser):
         response = self.client.get(
             reverse("nodes_handler"), {"hostname": [matching_hostname]}
         )
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            [matching_system_id], extract_system_ids(parsed_result)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual([matching_system_id], extract_system_ids(parsed_result))
 
     def test_GET_with_macs_returns_matching_nodes(self):
         # The "list" operation takes optional "mac_address" parameters. Only
         # nodes with matching MAC addresses will be returned.
-        interfaces = [
-            factory.make_Interface(INTERFACE_TYPE.PHYSICAL) for _ in range(3)
-        ]
+        interfaces = [factory.make_Interface(INTERFACE_TYPE.PHYSICAL) for _ in range(3)]
         matching_mac = interfaces[0].mac_address
         matching_system_id = interfaces[0].node_config.node.system_id
         response = self.client.get(
             reverse("nodes_handler"), {"mac_address": [matching_mac]}
         )
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            [matching_system_id], extract_system_ids(parsed_result)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual([matching_system_id], extract_system_ids(parsed_result))
 
     def test_GET_with_invalid_macs_returns_sensible_error(self):
         # If specifying an invalid MAC, make sure the error that's
@@ -545,54 +495,34 @@ class TestNodesAPI(APITestCase.ForUser):
         # humans.
         bad_mac1 = "00:E0:81:DD:D1:ZZ"  # ZZ is bad.
         bad_mac2 = "00:E0:81:DD:D1:XX"  # XX is bad.
-        ok_mac = str(
-            factory.make_Interface(INTERFACE_TYPE.PHYSICAL).mac_address
-        )
+        ok_mac = str(factory.make_Interface(INTERFACE_TYPE.PHYSICAL).mac_address)
         response = self.client.get(
             reverse("nodes_handler"),
             {"mac_address": [bad_mac1, bad_mac2, ok_mac]},
         )
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(
             parsed_result,
-            {
-                "mac_address": [
-                    "'00:E0:81:DD:D1:ZZ' is not a valid MAC address."
-                ]
-            },
+            {"mac_address": ["'00:E0:81:DD:D1:ZZ' is not a valid MAC address."]},
         )
 
     def test_GET_with_agent_name_filters_by_agent_name(self):
         factory.make_Node(agent_name=factory.make_name("other_agent_name"))
         agent_name = factory.make_name("agent-name")
         node = factory.make_Node(agent_name=agent_name)
-        response = self.client.get(
-            reverse("nodes_handler"), {"agent_name": agent_name}
-        )
+        response = self.client.get(reverse("nodes_handler"), {"agent_name": agent_name})
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertSequenceEqual(
-            [node.system_id], extract_system_ids(parsed_result)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertSequenceEqual([node.system_id], extract_system_ids(parsed_result))
 
     def test_GET_with_agent_name_filters_with_empty_string(self):
         factory.make_Node(agent_name=factory.make_name("agent-name"))
         node = factory.make_Node(agent_name="")
-        response = self.client.get(
-            reverse("nodes_handler"), {"agent_name": ""}
-        )
+        response = self.client.get(reverse("nodes_handler"), {"agent_name": ""})
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertSequenceEqual(
-            [node.system_id], extract_system_ids(parsed_result)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertSequenceEqual([node.system_id], extract_system_ids(parsed_result))
 
     def test_GET_without_agent_name_does_not_filter(self):
         nodes = [
@@ -601,9 +531,7 @@ class TestNodesAPI(APITestCase.ForUser):
         ]
         response = self.client.get(reverse("nodes_handler"))
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertSequenceEqual(
             [node.system_id for node in nodes],
             extract_system_ids(parsed_result),
@@ -614,9 +542,7 @@ class TestNodesAPI(APITestCase.ForUser):
         factory.make_Node()
         factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         response = self.client.get(reverse("nodes_handler"))
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(http.client.OK, response.status_code)
         disable_ipv4 = [node.get("disable_ipv4") for node in parsed_result]
         self.assertEqual([False, False], disable_ipv4)
@@ -637,9 +563,7 @@ class TestNodesAPI(APITestCase.ForUser):
         ]
         response = self.client.get(reverse("nodes_handler"))
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertCountEqual(
             [node.system_id for node in machines + devices + rack_controllers],
             extract_system_ids(parsed_result),
@@ -650,24 +574,16 @@ class TestNodesAPI(APITestCase.ForUser):
         factory.make_Node(zone=factory.make_Zone(name="twilight"))
         zone = factory.make_Zone()
         node = factory.make_Node(zone=zone)
-        response = self.client.get(
-            reverse("nodes_handler"), {"zone": zone.name}
-        )
+        response = self.client.get(reverse("nodes_handler"), {"zone": zone.name})
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertSequenceEqual(
-            [node.system_id], extract_system_ids(parsed_result)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertSequenceEqual([node.system_id], extract_system_ids(parsed_result))
 
     def test_GET_without_zone_does_not_filter(self):
         nodes = [factory.make_Node(zone=factory.make_Zone()) for _ in range(3)]
         response = self.client.get(reverse("nodes_handler"))
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertSequenceEqual(
             [node.system_id for node in nodes],
             extract_system_ids(parsed_result),
@@ -763,9 +679,7 @@ class TestPowersMixin(APITestCase.ForUser):
         response = self.client.get(
             reverse("machines_handler"), {"op": "power_parameters"}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_GET_power_parameters_without_ids_does_not_filter(self):
         self.become_admin()
@@ -778,13 +692,10 @@ class TestPowersMixin(APITestCase.ForUser):
         response = self.client.get(
             reverse("machines_handler"), {"op": "power_parameters"}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         expected = {
-            machine.system_id: machine.get_power_parameters()
-            for machine in machines
+            machine.system_id: machine.get_power_parameters() for machine in machines
         }
         self.assertEqual(expected, parsed)
 
@@ -804,9 +715,7 @@ class TestPowersMixin(APITestCase.ForUser):
                 "id": [machine.system_id for machine in expected_machines],
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         expected = {
             machine.system_id: machine.get_power_parameters()

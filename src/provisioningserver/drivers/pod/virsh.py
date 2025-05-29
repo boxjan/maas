@@ -356,16 +356,13 @@ class VirshSSH(pexpect.spawn):
         parsed = urlparse(poweraddr)
         if parsed.query:
             raise VirshError(
-                "Supplying extra parameters to the Virsh address"
-                " is not supported."
+                "Supplying extra parameters to the Virsh address" " is not supported."
             )
 
         # Append unverified-ssh command. See,
         # https://bugs.launchpad.net/maas/+bug/1807231
         # for more details.
-        poweraddr = (
-            poweraddr + "?command=" + get_path("/usr/lib/maas/unverified-ssh")
-        )
+        poweraddr = poweraddr + "?command=" + get_path("/usr/lib/maas/unverified-ssh")
         self._execute(poweraddr)
         i = self.expect(self.PROMPTS, timeout=self.timeout)
         if i == self.I_PROMPT_SSHKEY:
@@ -423,9 +420,7 @@ class VirshSSH(pexpect.spawn):
         indexes = [columns.index(key) for key in keys]
         # skip header lines
         entries = entries[2:]
-        return tuple(
-            tuple(entry[index] for index in indexes) for entry in entries
-        )
+        return tuple(tuple(entry[index] for index in indexes) for entry in entries)
 
     def get_key_value(self, data, key):
         """Return value based off of key."""
@@ -453,18 +448,14 @@ class VirshSSH(pexpect.spawn):
 
     def list_pools(self):
         """Lists supported pools in the host."""
-        output = self.run(
-            ["pool-list", "--type", ",".join(SUPPORTED_STORAGE_TYPES)]
-        )
+        output = self.run(["pool-list", "--type", ",".join(SUPPORTED_STORAGE_TYPES)])
         pools = self._get_column_values(output, ["Name"])
         return [p[0] for p in pools]
 
     def list_machine_block_devices(self, machine):
         """Lists all devices for VM."""
         output = self.run(["domblklist", machine, "--details"])
-        devices = self._get_column_values(
-            output, ["Device", "Target", "Source"]
-        )
+        devices = self._get_column_values(output, ["Device", "Target", "Source"])
         return [(d[1], d[2]) for d in devices if d[0] == "disk"]
 
     def get_machine_state(self, machine):
@@ -598,9 +589,7 @@ class VirshSSH(pexpect.spawn):
         arch = self.get_key_value(nodeinfo, "CPU model")
         if arch is None:
             maaslog.error("Failed to get pod architecture")
-            raise PodInvalidResources(
-                "Pod architecture is not supported: %s" % arch
-            )
+            raise PodInvalidResources("Pod architecture is not supported: %s" % arch)
         return kernel_to_debian_architecture(arch)
 
     def get_machine_arch(self, machine):
@@ -632,9 +621,7 @@ class VirshSSH(pexpect.spawn):
             cpu_speed=0,
             memory=0,
             local_storage=0,
-            hints=DiscoveredPodHints(
-                cores=0, cpu_speed=0, memory=0, local_storage=0
-            ),
+            hints=DiscoveredPodHints(cores=0, cpu_speed=0, memory=0, local_storage=0),
         )
         discovered_pod.capabilities = [
             Capabilities.COMPOSABLE,
@@ -666,14 +653,10 @@ class VirshSSH(pexpect.spawn):
         discovered_pod_hints.cores = self.get_pod_cpu_count(nodeinfo)
         discovered_pod_hints.cpu_speed = self.get_pod_cpu_speed(nodeinfo)
         discovered_pod_hints.memory = self.get_pod_memory(nodeinfo)
-        discovered_pod_hints.local_storage = (
-            self.get_pod_available_local_storage()
-        )
+        discovered_pod_hints.local_storage = self.get_pod_available_local_storage()
         return discovered_pod_hints
 
-    def get_discovered_machine(
-        self, machine, request=None, storage_pools=None
-    ):
+    def get_discovered_machine(self, machine, request=None, storage_pools=None):
         """Gets the discovered machine."""
         # Discovered machine.
         discovered_machine = DiscoveredMachine(
@@ -716,8 +699,7 @@ class VirshSSH(pexpect.spawn):
                 # to MAAS.
                 maaslog.error(
                     "Unable to discover machine '%s' in virsh pod: storage "
-                    "device '%s' is missing its storage backing."
-                    % (machine, device)
+                    "device '%s' is missing its storage backing." % (machine, device)
                 )
                 return None
 
@@ -851,24 +833,17 @@ class VirshSSH(pexpect.spawn):
                 % (", ".join([pool.name for pool in filtered_pools]))
             )
         if default_pool:
-            filtered_pools = [
-                pool for pool in pools if pool.id == default_pool
-            ]
+            filtered_pools = [pool for pool in pools if pool.id == default_pool]
             if not filtered_pools:
-                filtered_pools = [
-                    pool for pool in pools if pool.name == default_pool
-                ]
+                filtered_pools = [pool for pool in pools if pool.name == default_pool]
             if filtered_pools:
                 default_pool = filtered_pools[0]
                 if disk.size <= default_pool.available:
                     return default_pool.type, default_pool.name
                 raise PodInvalidResources(
-                    "Not enough space in default storage pool: %s"
-                    % (default_pool.name)
+                    "Not enough space in default storage pool: %s" % (default_pool.name)
                 )
-            raise VirshError(
-                "Default storage pool '%s' doesn't exist." % default_pool
-            )
+            raise VirshError("Default storage pool '%s' doesn't exist." % default_pool)
         for pool in pools:
             if disk.size <= pool.available:
                 return pool.type, pool.name
@@ -879,9 +854,7 @@ class VirshSSH(pexpect.spawn):
 
     def _create_local_volume(self, disk, default_pool=None):
         """Create a local volume with `disk.size`."""
-        usable_pool_type, usable_pool = self.get_usable_pool(
-            disk, default_pool
-        )
+        usable_pool_type, usable_pool = self.get_usable_pool(disk, default_pool)
         if usable_pool is None:
             return None
         volume = str(uuid4())
@@ -1154,9 +1127,7 @@ class VirshSSH(pexpect.spawn):
                 raise
             else:
                 if disk_info is None:
-                    raise PodInvalidResources(
-                        "not enough space for disk %d." % idx
-                    )
+                    raise PodInvalidResources("not enough space for disk %d." % idx)
                 else:
                     created_disks.append(disk_info)
 
@@ -1164,9 +1135,7 @@ class VirshSSH(pexpect.spawn):
         domain_params = self.get_domain_capabilities()
         domain_params["name"] = request.hostname
         domain_params["uuid"] = str(uuid4())
-        domain_params["arch"] = debian_to_kernel_architecture(
-            request.architecture
-        )
+        domain_params["arch"] = debian_to_kernel_architecture(request.architecture)
         domain_params["cores"] = str(request.cores)
         domain_params["memory"] = str(request.memory)
 
@@ -1207,9 +1176,7 @@ class VirshSSH(pexpect.spawn):
         # Attach the created disks in order.
         for idx, (pool, volume) in enumerate(created_disks):
             block_name = self.get_block_name_from_idx(idx)
-            self.attach_local_volume(
-                request.hostname, pool, volume, block_name
-            )
+            self.attach_local_volume(request.hostname, pool, volume, block_name)
 
         # Check machine for any startup errors.
         self.check_machine_can_startup(request.hostname)
@@ -1243,9 +1210,7 @@ class VirshSSH(pexpect.spawn):
             raise_error=False,
         )
 
-    @PROMETHEUS_METRICS.failure_counter(
-        "maas_virsh_storage_pool_creation_failure"
-    )
+    @PROMETHEUS_METRICS.failure_counter("maas_virsh_storage_pool_creation_failure")
     def _create_storage_pool(self):
         commands = [
             [
@@ -1289,9 +1254,7 @@ class VirshPodDriver(PodDriver):
             "power_id", "Virsh VM ID", scope=SETTING_SCOPE.NODE, required=True
         ),
     ]
-    ip_extractor = make_ip_extractor(
-        "power_address", IP_EXTRACTOR_PATTERNS.URL
-    )
+    ip_extractor = make_ip_extractor("power_address", IP_EXTRACTOR_PATTERNS.URL)
 
     def detect_missing_packages(self):
         missing_packages = set()
@@ -1332,9 +1295,7 @@ class VirshPodDriver(PodDriver):
                     raise VirshError("%s: Failed to power off VM" % power_id)
 
     @inlineCallbacks
-    def power_state_virsh(
-        self, power_address, power_id, power_pass=None, **kwargs
-    ):
+    def power_state_virsh(self, power_address, power_id, power_pass=None, **kwargs):
         """Return the power state for the VM using virsh."""
 
         # Force password to None if blank, as the power control
@@ -1429,9 +1390,7 @@ class VirshPodDriver(PodDriver):
         default_pool = context.get(
             "default_storage_pool_id", context.get("default_storage_pool")
         )
-        created_machine = yield deferToThread(
-            conn.create_domain, request, default_pool
-        )
+        created_machine = yield deferToThread(conn.create_domain, request, default_pool)
         hints = yield deferToThread(conn.get_pod_hints)
         return created_machine, hints
 

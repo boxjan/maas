@@ -130,9 +130,7 @@ class DomainInfo:
         self.subnetwork = subnetwork
         self.zone_name = zone_name
         if target_path is None:
-            self.target_path = compose_zone_file_config_path(
-                "zone.%s" % zone_name
-            )
+            self.target_path = compose_zone_file_config_path("zone.%s" % zone_name)
         else:
             self.target_path = target_path
 
@@ -254,9 +252,7 @@ class DNSForwardZoneConfig(DomainConfigBase):
         self._other_mapping = kwargs.pop("other_mapping", {})
         self._ipv4_ttl = kwargs.pop("ipv4_ttl", None)
         self._ipv6_ttl = kwargs.pop("ipv6_ttl", None)
-        super().__init__(
-            domain, zone_info=[DomainInfo(None, domain)], **kwargs
-        )
+        super().__init__(domain, zone_info=[DomainInfo(None, domain)], **kwargs)
 
     @classmethod
     def get_mapping(cls, mapping, addr_ttl):
@@ -363,9 +359,7 @@ class DNSForwardZoneConfig(DomainConfigBase):
                         self.make_parameters(),
                         {
                             "mappings": {
-                                "A": self.get_A_mapping(
-                                    self._mapping, self._ipv4_ttl
-                                ),
+                                "A": self.get_A_mapping(self._mapping, self._ipv4_ttl),
                                 "AAAA": self.get_AAAA_mapping(
                                     self._mapping, self._ipv6_ttl
                                 ),
@@ -560,9 +554,7 @@ class DNSReverseZoneConfig(DomainConfigBase):
                     # Let the zone declaration provide the suffix.
                     # rather than trying to calculate it.
                     rdns = "$"
-                generate_directives.add(
-                    (iterator, rdns, f"{hostname}.{domain}.")
-                )
+                generate_directives.add((iterator, rdns, f"{hostname}.{domain}."))
 
         return sorted(generate_directives, key=lambda directive: directive[2])
 
@@ -602,9 +594,7 @@ class DNSReverseZoneConfig(DomainConfigBase):
         for zi in self.zone_info:
             generate_directives = list(
                 chain.from_iterable(
-                    self.get_GENERATE_directives(
-                        dynamic_range, self.domain, zi
-                    )
+                    self.get_GENERATE_directives(dynamic_range, self.domain, zi)
                     for dynamic_range in self._dynamic_ranges
                     if dynamic_range.version == 4
                 )

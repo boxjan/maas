@@ -167,9 +167,7 @@ def render_api_docs():
         line()
         for (http_method, op), function in sorted(exports, key=export_key):
             operation = " op=%s" % op if op is not None else ""
-            subsection = (
-                f"<code>{http_method} {uri_template}{operation}</code>"
-            )
+            subsection = f"<code>{http_method} {uri_template}{operation}</code>"
             docstring = getdoc(function)
             if docstring is not None:
                 if APIDocstringParser.is_annotated_docstring(docstring):

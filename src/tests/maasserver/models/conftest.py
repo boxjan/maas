@@ -43,9 +43,7 @@ def bootres_file(factory, bootres_set, bootresfile_size) -> BootResourceFile:
 
 
 @pytest.fixture
-def bootres_file_shared(
-    factory, bootres_set, bootres_file
-) -> BootResourceFile:
+def bootres_file_shared(factory, bootres_set, bootres_file) -> BootResourceFile:
     rfile = factory.make_BootResourceFile(
         bootres_set,
         sha256=bootres_file.sha256,

@@ -149,9 +149,7 @@ class VmfsDatastoreHandler(OperationsHandler):
 
     @classmethod
     def devices(cls, vmfs):
-        return [
-            filesystem.get_device() for filesystem in vmfs.filesystems.all()
-        ]
+        return [filesystem.get_device() for filesystem in vmfs.filesystems.all()]
 
     @classmethod
     def filesystem(cls, vmfs):
@@ -232,8 +230,7 @@ class VmfsDatastoreHandler(OperationsHandler):
         node = vmfs.get_node()
         if node.status != NODE_STATUS.READY:
             raise NodeStateViolation(
-                "Cannot update the VMFS datastore because the machine is not "
-                "Ready."
+                "Cannot update the VMFS datastore because the machine is not " "Ready."
             )
         form = UpdateVMFSForm(vmfs, data=request.data)
         if not form.is_valid():
@@ -266,8 +263,7 @@ class VmfsDatastoreHandler(OperationsHandler):
         node = vmfs.get_node()
         if node.status != NODE_STATUS.READY:
             raise NodeStateViolation(
-                "Cannot delete VMFS datastore because the machine is not "
-                "Ready."
+                "Cannot delete VMFS datastore because the machine is not " "Ready."
             )
         vmfs.delete()
         return rc.DELETED

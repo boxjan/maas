@@ -25,9 +25,7 @@ class TestCustomOS(MAASTestCase):
         release = factory.make_name("release")
         label = factory.make_name("label")
         current_dir = os.path.join(tmpdir, "current") + "/"
-        dirpath = os.path.join(
-            current_dir, "custom", arch, subarch, release, label
-        )
+        dirpath = os.path.join(current_dir, "custom", arch, subarch, release, label)
         os.makedirs(dirpath)
         factory.make_file(dirpath, filename)
         with ClusterConfiguration.open_for_update() as config:

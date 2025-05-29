@@ -62,9 +62,7 @@ class MAASAPIAuthentication(OAuthAuthentication):
         if user.is_authenticated:
             # only authenticate if user is local and external auth is disabled
             # or viceversa
-            return xor(
-                bool(request.external_auth_info), user.userprofile.is_local
-            )
+            return xor(bool(request.external_auth_info), user.userprofile.is_local)
 
         # The following is much the same as is_authenticated from Piston's
         # OAuthAuthentication, with the difference that an OAuth request that
@@ -85,9 +83,7 @@ class MAASAPIAuthentication(OAuthAuthentication):
                     if external_auth_info:
                         if is_local_user:
                             return False
-                        if not validate_user_external_auth(
-                            user, external_auth_info
-                        ):
+                        if not validate_user_external_auth(user, external_auth_info):
                             return False
                     elif not is_local_user:
                         return False

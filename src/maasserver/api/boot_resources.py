@@ -188,9 +188,9 @@ class BootResourcesHandler(OperationsHandler):
                 "rtype", "name", "architecture"
             )
         elif rtype in TYPE_MAPPING:
-            resources = BootResource.objects.filter(
-                rtype=TYPE_MAPPING[rtype]
-            ).order_by("name", "architecture")
+            resources = BootResource.objects.filter(rtype=TYPE_MAPPING[rtype]).order_by(
+                "name", "architecture"
+            )
         else:
             raise MAASAPIBadRequest(
                 "'%s' is not a valid boot resource type. Available "
@@ -204,9 +204,7 @@ class BootResourcesHandler(OperationsHandler):
             resource_list.append(
                 boot_resource_to_dict(
                     resource,
-                    last_deployed=last_deployments.get(
-                        f"{resource.name}/{arch}"
-                    ),
+                    last_deployed=last_deployments.get(f"{resource.name}/{arch}"),
                 )
             )
         stream = json_object(resource_list, request)
@@ -280,9 +278,7 @@ class BootResourcesHandler(OperationsHandler):
             rfile = resource.sets.first().files.first()
             post_commit_do(filestore_add_file, rfile)
 
-        stream = json_object(
-            boot_resource_to_dict(resource, with_sets=True), request
-        )
+        stream = json_object(boot_resource_to_dict(resource, with_sets=True), request)
         return HttpResponse(
             stream,
             content_type="application/json; charset=utf-8",
@@ -459,9 +455,7 @@ class BootResourceFileUploadHandler(OperationsHandler):
         except LocalStoreWriteBeyondEOF:
             raise MAASAPIBadRequest("Too much data received.")
         except LocalStoreInvalidHash:
-            raise MAASAPIBadRequest(
-                "Saved content does not match given SHA256 value."
-            )
+            raise MAASAPIBadRequest("Saved content does not match given SHA256 value.")
         return rc.ALL_OK
 
     @classmethod

@@ -80,9 +80,7 @@ class TestResourcePoolHandler(MAASServerTestCase):
         handler = ResourcePoolHandler(user, {}, None)
         pool = factory.make_ResourcePool()
         self.rbac_store.add_pool(pool)
-        self.assertRaises(
-            HandlerDoesNotExistError, handler.get, {"id": pool.id}
-        )
+        self.assertRaises(HandlerDoesNotExistError, handler.get, {"id": pool.id})
 
     def test_get_machine_count(self):
         user = factory.make_User()
@@ -176,9 +174,7 @@ class TestResourcePoolHandler(MAASServerTestCase):
     def test_update_not_admin(self):
         handler = ResourcePoolHandler(factory.make_User(), {}, None)
         pool = factory.make_ResourcePool()
-        self.assertRaises(
-            HandlerPermissionError, handler.update, {"id": pool.id}
-        )
+        self.assertRaises(HandlerPermissionError, handler.update, {"id": pool.id})
 
     def test_update_rbac(self):
         self.enable_rbac()
@@ -200,9 +196,7 @@ class TestResourcePoolHandler(MAASServerTestCase):
         self.rbac_store.add_pool(pool)
         self.rbac_store.allow(user.username, pool, "view")
         handler = ResourcePoolHandler(user, {}, None)
-        self.assertRaises(
-            HandlerPermissionError, handler.update, {"id": pool.id}
-        )
+        self.assertRaises(HandlerPermissionError, handler.update, {"id": pool.id})
 
     def test_delete(self):
         handler = ResourcePoolHandler(factory.make_admin(), {}, None)
@@ -213,9 +207,7 @@ class TestResourcePoolHandler(MAASServerTestCase):
     def test_delete_not_admin(self):
         handler = ResourcePoolHandler(factory.make_User(), {}, None)
         pool = factory.make_ResourcePool()
-        self.assertRaises(
-            HandlerPermissionError, handler.delete, {"id": pool.id}
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete, {"id": pool.id})
 
     def test_delete_default_fails(self):
         pool = ResourcePool.objects.get_default_resource_pool()
@@ -241,6 +233,4 @@ class TestResourcePoolHandler(MAASServerTestCase):
         self.rbac_store.allow(user.username, pool, "view")
         self.rbac_store.allow(user.username, pool, "edit")
         handler = ResourcePoolHandler(user, {}, None)
-        self.assertRaises(
-            HandlerPermissionError, handler.delete, {"id": pool.id}
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete, {"id": pool.id})

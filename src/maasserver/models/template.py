@@ -17,9 +17,7 @@ class TemplateManager(Manager):
     def get_by_filename(self, filename):
         return get_one(Template.objects.filter(filename=filename))
 
-    def create_or_update_default(
-        self, filename, data, verbosity=0, stdout=sys.stdout
-    ):
+    def create_or_update_default(self, filename, data, verbosity=0, stdout=sys.stdout):
         """Updates the template indexed with the specified filename with
         the specified data. Creates the template file if it does not exist yet.
         Optionally writes status to stdout (if verbosity > 0).

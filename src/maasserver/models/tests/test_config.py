@@ -140,9 +140,7 @@ class TestConfig(MAASServerTestCase):
 
     def test_manager_set_config_for_secret_creates_secret(self):
         Config.objects.set_config("rpc_shared_secret", "abcd")
-        self.assertEqual(
-            SecretManager().get_simple_secret("rpc-shared"), "abcd"
-        )
+        self.assertEqual(SecretManager().get_simple_secret("rpc-shared"), "abcd")
 
     def test_manager_set_config_creates_audit_event(self):
         user = factory.make_User()

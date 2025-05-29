@@ -37,9 +37,7 @@ from provisioningserver.certificates import Certificate
 _vlan_ids_aggr = ArrayAgg(
     "current_config__interface__ip_addresses__subnet__vlan__id",
     distinct=True,
-    filter=Q(
-        current_config__interface__ip_addresses__subnet__vlan__isnull=False
-    ),
+    filter=Q(current_config__interface__ip_addresses__subnet__vlan__isnull=False),
 )
 
 
@@ -151,9 +149,7 @@ class ControllerHandler(NodeHandler):
         # the default view permission check is enough at this level.
         obj = self.get_object(params)
         action_name = params.get("action")
-        action = get_node_action(
-            obj, action_name, self.user, request=self.request
-        )
+        action = get_node_action(obj, action_name, self.user, request=self.request)
         if action is None:
             raise NodeActionError(
                 f"{action_name} action is not available for this node."
@@ -182,9 +178,7 @@ class ControllerHandler(NodeHandler):
                     "false": vlan_counts[False],
                 },
                 "versions": self.dehydrate_versions(obj.info),
-                "service_ids": [
-                    service.id for service in obj.service_set.all()
-                ],
+                "service_ids": [service.id for service in obj.service_set.all()],
                 "vault_configured": self.dehydrate_vault_flag(obj.info),
             }
         )
@@ -274,8 +268,7 @@ class ControllerHandler(NodeHandler):
         return dict(
             VLAN.objects.values_list("id").annotate(
                 is_ha=ExpressionWrapper(
-                    Q(primary_rack__isnull=False)
-                    & Q(secondary_rack__isnull=False),
+                    Q(primary_rack__isnull=False) & Q(secondary_rack__isnull=False),
                     output_field=BooleanField(),
                 )
             )

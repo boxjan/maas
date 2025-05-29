@@ -24,9 +24,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="notification",
             name="ident",
-            field=models.CharField(
-                null=True, default=None, max_length=40, blank=True
-            ),
+            field=models.CharField(null=True, default=None, max_length=40, blank=True),
         ),
         migrations.AlterField(
             model_name="notification", name="message", field=models.TextField()

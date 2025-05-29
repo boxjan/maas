@@ -74,9 +74,7 @@ class InterfaceForm(MAASModelForm):
         try:
             return INTERFACE_FORM_MAPPING[type]
         except KeyError:
-            raise ValidationError(
-                {"type": ["Invalid interface type '%s'." % type]}
-            )
+            raise ValidationError({"type": ["Invalid interface type '%s'." % type]})
 
     class Meta:
         model = Interface
@@ -98,12 +96,8 @@ class InterfaceForm(MAASModelForm):
             self.parents = instance.parents
             self.link_connected = instance.link_connected
         if self.node is None:
-            raise ValueError(
-                "instance or node is required for the InterfaceForm"
-            )
-        self.fields[
-            "parents"
-        ].queryset = self.node.current_config.interface_set.all()
+            raise ValueError("instance or node is required for the InterfaceForm")
+        self.fields["parents"].queryset = self.node.current_config.interface_set.all()
 
     def _get_validation_exclusions(self):
         # The instance is created just before this in django. The only way to
@@ -123,14 +117,10 @@ class InterfaceForm(MAASModelForm):
             if parents:
                 parents = set(parents)
                 for parent_to_add in parents.difference(existing_parents):
-                    rel = InterfaceRelationship(
-                        child=interface, parent=parent_to_add
-                    )
+                    rel = InterfaceRelationship(child=interface, parent=parent_to_add)
                     rel.save()
                 for parent_to_del in existing_parents.difference(parents):
-                    rel = interface.parent_relationships.filter(
-                        parent=parent_to_del
-                    )
+                    rel = interface.parent_relationships.filter(parent=parent_to_del)
                     rel.delete()
         # Allow setting the VLAN to None.
         new_vlan = self.cleaned_data.get("vlan")
@@ -155,9 +145,7 @@ class InterfaceForm(MAASModelForm):
         return parents
 
     def clean_interface_name_uniqueness(self, name):
-        node_interfaces = self.node.current_config.interface_set.filter(
-            name=name
-        )
+        node_interfaces = self.node.current_config.interface_set.filter(name=name)
         if self.instance is not None and self.instance.id is not None:
             node_interfaces = node_interfaces.exclude(id=self.instance.id)
         if node_interfaces.exists():
@@ -315,9 +303,7 @@ class PhysicalInterfaceForm(InterfaceForm, NUMANodeFormMixin):
     """Form used to create/edit a physical interface."""
 
     enabled = forms.NullBooleanField(required=False)
-    numa_node = forms.IntegerField(
-        required=False, min_value=0, label="NUMA node"
-    )
+    numa_node = forms.IntegerField(required=False, min_value=0, label="NUMA node")
 
     class Meta:
         model = PhysicalInterface
@@ -370,13 +356,10 @@ class VLANInterfaceForm(InterfaceForm):
         if parents is None:
             return
         if len(parents) != 1:
-            raise ValidationError(
-                "A VLAN interface must have exactly one parent."
-            )
+            raise ValidationError("A VLAN interface must have exactly one parent.")
         if parents[0].type == INTERFACE_TYPE.VLAN:
             raise ValidationError(
-                "A VLAN interface can't have another VLAN interface as "
-                "parent."
+                "A VLAN interface can't have another VLAN interface as " "parent."
             )
         parent_has_bond_children = [
             rel.child
@@ -385,8 +368,7 @@ class VLANInterfaceForm(InterfaceForm):
         ]
         if parent_has_bond_children:
             raise ValidationError(
-                "A VLAN interface can't have a parent that is already "
-                "in a bond."
+                "A VLAN interface can't have a parent that is already " "in a bond."
             )
         return parents
 
@@ -401,9 +383,7 @@ class VLANInterfaceForm(InterfaceForm):
                 "A VLAN interface must be connected to a tagged VLAN."
             )
         if new_vlan and new_vlan.vid == 0:
-            raise ValidationError(
-                "A VLAN interface can only belong to a tagged VLAN."
-            )
+            raise ValidationError("A VLAN interface can only belong to a tagged VLAN.")
         return new_vlan
 
     def clean(self):
@@ -459,8 +439,7 @@ class ChildInterfaceForm(InterfaceForm):
         """
         if self.instance.id is not None:
             parent_macs = {
-                parent.mac_address: parent
-                for parent in self.instance.parents.all()
+                parent.mac_address: parent for parent in self.instance.parents.all()
             }
         else:
             parent_macs = {}
@@ -512,8 +491,7 @@ class ChildInterfaceForm(InterfaceForm):
             set_form_error(
                 self,
                 "parents",
-                "Interfaces already in-use: %s."
-                % (", ".join(sorted(dilinquents))),
+                "Interfaces already in-use: %s." % (", ".join(sorted(dilinquents))),
             )
 
 
@@ -600,9 +578,7 @@ class BondInterfaceForm(ChildInterfaceForm):
         super().set_extra_parameters(interface, created)
         # Set all the bond_* parameters.
         bond_fields = [
-            field_name
-            for field_name in self.fields
-            if field_name.startswith("bond_")
+            field_name for field_name in self.fields if field_name.startswith("bond_")
         ]
         for bond_field in bond_fields:
             value = self.cleaned_data.get(bond_field)
@@ -650,13 +626,10 @@ class BridgeInterfaceForm(ChildInterfaceForm):
         if parents is None:
             return
         if len(parents) != 1:
-            raise ValidationError(
-                "A bridge interface must have exactly one parent."
-            )
+            raise ValidationError("A bridge interface must have exactly one parent.")
         if parents[0].type == INTERFACE_TYPE.BRIDGE:
             raise ValidationError(
-                "A bridge interface can't have another bridge interface as "
-                "parent."
+                "A bridge interface can't have another bridge interface as " "parent."
             )
         instance_id = None if self.instance is None else self.instance.id
         bond_or_bridge = {INTERFACE_TYPE.BOND, INTERFACE_TYPE.BRIDGE}
@@ -704,9 +677,7 @@ class BridgeInterfaceForm(ChildInterfaceForm):
         super().set_extra_parameters(interface, created)
         # Set all the bridge_* parameters.
         bridge_fields = [
-            field_name
-            for field_name in self.fields
-            if field_name.startswith("bridge_")
+            field_name for field_name in self.fields if field_name.startswith("bridge_")
         ]
         for bridge_field in bridge_fields:
             value = self.cleaned_data.get(bridge_field)
@@ -747,9 +718,7 @@ class AcquiredBridgeInterfaceForm(BridgeInterfaceForm):
         # new bridge.
         saved_ipaddrs = []
         parent = self.get_clean_parents()[0]
-        for sip in parent.ip_addresses.exclude(
-            alloc_type=IPADDRESS_TYPE.DISCOVERED
-        ):
+        for sip in parent.ip_addresses.exclude(alloc_type=IPADDRESS_TYPE.DISCOVERED):
             saved_ipaddrs.append(sip)
             parent.ip_addresses.remove(sip)
 

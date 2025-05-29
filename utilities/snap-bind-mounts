@@ -59,9 +59,7 @@ def get_modified_files():
     parent_commit = get_installed_revision()
     command = ["git", "diff", "--name-only", parent_commit]
 
-    proc = subprocess.run(
-        command, text=True, stdout=subprocess.PIPE, check=True
-    )
+    proc = subprocess.run(command, text=True, stdout=subprocess.PIPE, check=True)
     modified_files = set(Path(path) for path in proc.stdout.splitlines())
 
     return sorted(modified_files)

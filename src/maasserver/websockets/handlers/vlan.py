@@ -119,8 +119,7 @@ class VLANHandler(TimestampedModelHandler):
                     gateway.version == 6 and gateway.is_link_local()
                 ):
                     raise ValueError(
-                        "Gateway IP must be within specified subnet: %s"
-                        % subnet.cidr
+                        "Gateway IP must be within specified subnet: %s" % subnet.cidr
                     )
         if (
             "start" in parameters
@@ -140,8 +139,7 @@ class VLANHandler(TimestampedModelHandler):
                     desired_range = netaddr.IPRange(start_ipaddr, end_ipaddr)
                     if gateway in desired_range:
                         raise ValueError(
-                            "Gateway IP must be outside the specified dynamic "
-                            "range."
+                            "Gateway IP must be outside the specified dynamic " "range."
                         )
                 iprange_form = IPRangeForm(
                     data={
@@ -181,8 +179,7 @@ class VLANHandler(TimestampedModelHandler):
             ).exists()
             if not iprange_exists:
                 raise ValueError(
-                    "Cannot configure DHCP: At least one dynamic range is "
-                    "required."
+                    "Cannot configure DHCP: At least one dynamic range is " "required."
                 )
         controllers = parameters.get("controllers", [])
         data = {

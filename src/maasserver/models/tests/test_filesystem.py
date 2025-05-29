@@ -30,9 +30,7 @@ class TestFilesystemManager(MAASServerTestCase):
         root_fs = root_partition.filesystem_set.first()
         block_device = factory.make_PhysicalBlockDevice(node=node)
         bd_for_partitions = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=bd_for_partitions
-        )
+        partition_table = factory.make_PartitionTable(block_device=bd_for_partitions)
         partition = factory.make_Partition(partition_table=partition_table)
         filesystem_on_bd = factory.make_Filesystem(block_device=block_device)
         filesystem_on_partition = factory.make_Filesystem(partition=partition)
@@ -74,15 +72,11 @@ class TestFilesystem(MAASServerTestCase):
         filesystem = factory.make_Filesystem(
             fstype=FILESYSTEM_TYPE.LVM_PV, block_device=block_device
         )
-        self.assertEqual(
-            filesystem.get_physical_block_devices(), [block_device]
-        )
+        self.assertEqual(filesystem.get_physical_block_devices(), [block_device])
 
     def test_get_physical_block_devices_multiple(self):
         node = factory.make_Node()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         filesystems = [
             factory.make_Filesystem(
                 fstype=FILESYSTEM_TYPE.LVM_PV, block_device=block_device
@@ -94,15 +88,11 @@ class TestFilesystem(MAASServerTestCase):
             filesystems=filesystems,
             group_type=FILESYSTEM_GROUP_TYPE.LVM_VG,
         )
-        virtual_block_device = factory.make_VirtualBlockDevice(
-            filesystem_group=fsgroup
-        )
+        virtual_block_device = factory.make_VirtualBlockDevice(filesystem_group=fsgroup)
         filesystem = factory.make_Filesystem(
             fstype=FILESYSTEM_TYPE.LVM_PV, block_device=virtual_block_device
         )
-        self.assertEqual(
-            filesystem.get_physical_block_devices(), block_devices
-        )
+        self.assertEqual(filesystem.get_physical_block_devices(), block_devices)
 
     def test_get_physical_block_device_raid_on_part(self):
         # Regression test for LP:1849580
@@ -114,9 +104,7 @@ class TestFilesystem(MAASServerTestCase):
             block_devices.append(block_device)
             pt = factory.make_PartitionTable(block_device=block_device)
             partitions.append(
-                factory.make_Partition(
-                    partition_table=pt, size=pt.get_available_size()
-                )
+                factory.make_Partition(partition_table=pt, size=pt.get_available_size())
             )
         fs_group = RAID.objects.create_raid(
             level=FILESYSTEM_GROUP_TYPE.RAID_1, partitions=partitions
@@ -179,9 +167,7 @@ class TestFilesystem(MAASServerTestCase):
         self.assertEqual(partition, filesystem.get_device())
 
     def test_get_device_returns_none_for_special_fs(self):
-        filesystem = factory.make_Filesystem(
-            node_config=factory.make_NodeConfig()
-        )
+        filesystem = factory.make_Filesystem(node_config=factory.make_NodeConfig())
         self.assertIsNone(filesystem.get_device())
 
     def test_cannot_create_filesystem_directly_on_boot_disk(self):
@@ -291,9 +277,7 @@ class TestFilesystemMountableTypes(MAASServerTestCase):
         (
             "partition",
             {
-                "make_substrate": lambda: {
-                    "partition": factory.make_Partition()
-                },
+                "make_substrate": lambda: {"partition": factory.make_Partition()},
                 "can_be_unmounted": True,
             },
         ),
@@ -312,9 +296,7 @@ class TestFilesystemMountableTypes(MAASServerTestCase):
         (
             "node",
             {
-                "make_substrate": lambda: {
-                    "node_config": factory.make_NodeConfig()
-                },
+                "make_substrate": lambda: {"node_config": factory.make_NodeConfig()},
                 "can_be_unmounted": False,
             },
         ),
@@ -423,9 +405,7 @@ class TestFilesystemsUsingStorage(MAASServerTestCase):
             displayname,
             {
                 "fstype": name,
-                "mounts_device_or_partition": (
-                    name != "ramfs" and name != "tmpfs"
-                ),
+                "mounts_device_or_partition": (name != "ramfs" and name != "tmpfs"),
             },
         )
         for name, displayname in FILESYSTEM_FORMAT_TYPE_CHOICES_DICT.items()
@@ -433,6 +413,4 @@ class TestFilesystemsUsingStorage(MAASServerTestCase):
 
     def test_uses_mount_point_is_true_for_real_filesystems(self):
         filesystem = factory.make_Filesystem(fstype=self.fstype)
-        self.assertEqual(
-            self.mounts_device_or_partition, filesystem.uses_storage
-        )
+        self.assertEqual(self.mounts_device_or_partition, filesystem.uses_storage)

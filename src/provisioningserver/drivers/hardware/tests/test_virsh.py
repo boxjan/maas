@@ -131,9 +131,7 @@ class TestVirshSSH(MAASTestCase):
         mock_sendline.assert_called_once_with("yes")
 
     def test_login_with_password(self):
-        virsh_outputs = [
-            "ubuntu@%s's password: " % factory.make_ipv4_address()
-        ]
+        virsh_outputs = ["ubuntu@%s's password: " % factory.make_ipv4_address()]
         conn = self.configure_virshssh_pexpect(virsh_outputs)
         fake_password = factory.make_name("password")
         mock_sendline = self.patch(conn, "sendline")
@@ -141,9 +139,7 @@ class TestVirshSSH(MAASTestCase):
         mock_sendline.assert_called_once_with(fake_password)
 
     def test_login_missing_password(self):
-        virsh_outputs = [
-            "ubuntu@%s's password: " % factory.make_ipv4_address()
-        ]
+        virsh_outputs = ["ubuntu@%s's password: " % factory.make_ipv4_address()]
         conn = self.configure_virshssh_pexpect(virsh_outputs)
         mock_close = self.patch(conn, "close")
         self.assertFalse(conn.login(poweraddr=None, password=None))
@@ -248,9 +244,7 @@ class TestVirshSSH(MAASTestCase):
 class TestVirsh(MAASTestCase):
     """Tests for `probe_virsh_and_enlist`."""
 
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def _probe_and_enlist_mock_run(self, *args):
         args = args[0]
@@ -560,9 +554,7 @@ class TestVirshPowerState(MAASTestCase):
 
         poweraddr = factory.make_name("poweraddr")
         machine = factory.make_name("machine")
-        self.assertRaises(
-            virsh.VirshError, virsh.power_state_virsh, poweraddr, machine
-        )
+        self.assertRaises(virsh.VirshError, virsh.power_state_virsh, poweraddr, machine)
 
     def test_power_state_error_on_unknown_state(self):
         mock_login = self.patch(virsh.VirshSSH, "login")
@@ -572,6 +564,4 @@ class TestVirshPowerState(MAASTestCase):
 
         poweraddr = factory.make_name("poweraddr")
         machine = factory.make_name("machine")
-        self.assertRaises(
-            virsh.VirshError, virsh.power_state_virsh, poweraddr, machine
-        )
+        self.assertRaises(virsh.VirshError, virsh.power_state_virsh, poweraddr, machine)

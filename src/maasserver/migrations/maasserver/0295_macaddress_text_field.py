@@ -21,9 +21,7 @@ class Migration(migrations.Migration):
                 validators=[
                     django.core.validators.RegexValidator(
                         message="'%(value)s' is not a valid MAC address.",
-                        regex=re.compile(
-                            "^([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2}$"
-                        ),
+                        regex=re.compile("^([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2}$"),
                     )
                 ],
             ),
@@ -37,9 +35,7 @@ class Migration(migrations.Migration):
                 validators=[
                     django.core.validators.RegexValidator(
                         message="'%(value)s' is not a valid MAC address.",
-                        regex=re.compile(
-                            "^([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2}$"
-                        ),
+                        regex=re.compile("^([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2}$"),
                     )
                 ],
             ),
@@ -53,9 +49,7 @@ class Migration(migrations.Migration):
                 validators=[
                     django.core.validators.RegexValidator(
                         message="'%(value)s' is not a valid MAC address.",
-                        regex=re.compile(
-                            "^([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2}$"
-                        ),
+                        regex=re.compile("^([0-9a-fA-F]{1,2}:){5}[0-9a-fA-F]{1,2}$"),
                     )
                 ],
             ),

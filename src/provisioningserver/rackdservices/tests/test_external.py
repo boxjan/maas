@@ -71,11 +71,7 @@ def prepareRegion(
         }
     )
     protocol.GetDNSConfiguration.side_effect = always_succeed_with(
-        {
-            "trusted_networks": (
-                [] if trusted_networks is None else trusted_networks
-            )
-        }
+        {"trusted_networks": ([] if trusted_networks is None else trusted_networks)}
     )
     if proxy_allowed_cidrs is None:
         proxy_allowed_cidrs = []
@@ -124,28 +120,20 @@ class TestRackExternalService(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def test_service_uses__tryUpdate_as_periodic_function(self):
-        service = external.RackExternalService(
-            StubClusterClientService(), reactor
-        )
+        service = external.RackExternalService(StubClusterClientService(), reactor)
         self.assertEqual((service._tryUpdate, (), {}), service.call)
 
     def test_service_iterates_on_low_interval(self):
-        service = external.RackExternalService(
-            StubClusterClientService(), reactor
-        )
+        service = external.RackExternalService(StubClusterClientService(), reactor)
         self.assertEqual(service.INTERVAL_LOW, service.step)
 
     @inlineCallbacks
     def test_getConfiguration_updates_interval_to_high(self):
         rpc_service, protocol = yield prepareRegion(self)
-        service = make_startable_RackExternalService(
-            self, rpc_service, reactor, []
-        )
+        service = make_startable_RackExternalService(self, rpc_service, reactor, [])
 
         yield service.startService()
         self.addCleanup((yield service.stopService))
@@ -207,9 +195,7 @@ class TestRackNTP(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def make_RackNTP_ExternalService(self, rpc_service, reactor):
         ntp = external.RackNTP()
@@ -227,9 +213,7 @@ class TestRackNTP(MAASTestCase):
                     factory.make_hostname(),
                 }
             ),
-            frozenset(
-                {factory.make_ipv4_address(), factory.make_ipv6_address()}
-            ),
+            frozenset({factory.make_ipv4_address(), factory.make_ipv6_address()}),
         )
 
     @inlineCallbacks
@@ -259,9 +243,7 @@ class TestRackNTP(MAASTestCase):
     def test_tryUpdate_updates_ntp_server(self):
         self.useFixture(MAASRootFixture())
         servers, peers = self.make_servers_and_peers()
-        rpc_service, _ = yield prepareRegion(
-            self, servers=servers, peers=peers
-        )
+        rpc_service, _ = yield prepareRegion(self, servers=servers, peers=peers)
         service, ntp = self.make_RackNTP_ExternalService(rpc_service, reactor)
         configure_rack = self.patch_autospec(external, "configure_rack")
         restartService = self.patch_autospec(service_monitor, "restartService")
@@ -354,9 +336,7 @@ class TestRackNetworkTimeProtocolService_Errors(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     @inlineCallbacks
     def test_tryUpdate_logs_errors_from_broken_method(self):
@@ -393,14 +373,10 @@ class TestRackDNS(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def make_trusted_networks(self):
-        return frozenset(
-            {factory.make_ipv4_address(), factory.make_ipv6_address()}
-        )
+        return frozenset({factory.make_ipv4_address(), factory.make_ipv6_address()})
 
     def extract_regions(self, rpc_service):
         return frozenset(
@@ -450,20 +426,14 @@ class TestRackDNS(MAASTestCase):
     def test_tryUpdate_updates_dns_server(self):
         self.useFixture(MAASRootFixture())
         trusted_networks = self.make_trusted_networks()
-        rpc_service, _ = yield prepareRegion(
-            self, trusted_networks=trusted_networks
-        )
+        rpc_service, _ = yield prepareRegion(self, trusted_networks=trusted_networks)
         region_ips = self.extract_regions(rpc_service)
         service, _ = self.make_RackDNS_ExternalService(rpc_service, reactor)
 
-        mock_ensureService = self.patch_autospec(
-            service_monitor, "ensureService"
-        )
+        mock_ensureService = self.patch_autospec(service_monitor, "ensureService")
         mock_ensureService.side_effect = always_succeed_with(None)
 
-        bind_write_options = self.patch_autospec(
-            external, "bind_write_options"
-        )
+        bind_write_options = self.patch_autospec(external, "bind_write_options")
         bind_write_configuration = self.patch_autospec(
             external, "bind_write_configuration"
         )
@@ -479,9 +449,7 @@ class TestRackDNS(MAASTestCase):
         bind_write_options.assert_called_once_with(
             upstream_dns=sorted(region_ips), dnssec_validation="no"
         )
-        bind_write_configuration.assert_called_once_with(
-            [], sorted(trusted_networks)
-        )
+        bind_write_configuration.assert_called_once_with([], sorted(trusted_networks))
         mock_ensureService.assert_called_once_with("dns_rack")
         bind_reload_with_retries.assert_called_once_with()
         # If the configuration has not changed then a second call to
@@ -603,9 +571,7 @@ class TestRackProxy(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def make_cidrs(self):
         return frozenset(
@@ -648,9 +614,7 @@ class TestRackProxy(MAASTestCase):
             proxy_prefer_v4_proxy=proxy_prefer_v4_proxy,
         )
         region_ips = self.extract_regions(rpc_service)
-        service, proxy = self.make_RackProxy_ExternalService(
-            rpc_service, reactor
-        )
+        service, proxy = self.make_RackProxy_ExternalService(rpc_service, reactor)
         yield service.startService()
         self.addCleanup((yield service.stopService))
 
@@ -685,9 +649,7 @@ class TestRackProxy(MAASTestCase):
         region_ips = self.extract_regions(rpc_service)
         service, _ = self.make_RackProxy_ExternalService(rpc_service, reactor)
 
-        write_config = self.patch_autospec(
-            external.proxy_config, "write_config"
-        )
+        write_config = self.patch_autospec(external.proxy_config, "write_config")
         service_monitor = self.patch_autospec(external, "service_monitor")
 
         yield service.startService()
@@ -695,9 +657,7 @@ class TestRackProxy(MAASTestCase):
 
         yield service._orig_tryUpdate()
 
-        expected_peers = sorted(
-            f"http://{ip}:{proxy_port}" for ip in region_ips
-        )
+        expected_peers = sorted(f"http://{ip}:{proxy_port}" for ip in region_ips)
         write_config.assert_called_once_with(
             allowed_cidrs,
             peer_proxies=expected_peers,
@@ -723,9 +683,7 @@ class TestRackProxy(MAASTestCase):
         self.patch(common.log, "debug")
         self.useFixture(MAASRootFixture())
         rpc_service, _ = yield prepareRegion(self, is_region=True)
-        service, proxy = self.make_RackProxy_ExternalService(
-            rpc_service, reactor
-        )
+        service, proxy = self.make_RackProxy_ExternalService(rpc_service, reactor)
         self.patch_autospec(proxy, "_configure")  # No-op configuration.
 
         # There is no most recently applied configuration.
@@ -746,9 +704,7 @@ class TestRackProxy(MAASTestCase):
         # actually "applied" because this host was configured as a region+rack
         # controller, and the rack should not attempt to manage the DNS server
         # on a region+rack.
-        self.assertIsInstance(
-            proxy._configuration, external._ProxyConfiguration
-        )
+        self.assertIsInstance(proxy._configuration, external._ProxyConfiguration)
         # The configuration was not applied.
         proxy._configure.assert_not_called()
         # Nothing was logged; there's no need for lots of chatter.
@@ -762,9 +718,7 @@ class TestRackSyslog(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def extract_regions(self, rpc_service):
         return frozenset(
@@ -790,9 +744,7 @@ class TestRackSyslog(MAASTestCase):
             self, is_region=is_region, is_rack=is_rack, syslog_port=port
         )
         forwarders = self.extract_regions(rpc_service)
-        service, syslog = self.make_RackSyslog_ExternalService(
-            rpc_service, reactor
-        )
+        service, syslog = self.make_RackSyslog_ExternalService(rpc_service, reactor)
         yield service.startService()
         self.addCleanup((yield service.stopService))
 
@@ -818,9 +770,7 @@ class TestRackSyslog(MAASTestCase):
         forwarders = self.extract_regions(rpc_service)
         service, _ = self.make_RackSyslog_ExternalService(rpc_service, reactor)
 
-        write_config = self.patch_autospec(
-            external.syslog_config, "write_config"
-        )
+        write_config = self.patch_autospec(external.syslog_config, "write_config")
         service_monitor = self.patch_autospec(external, "service_monitor")
 
         yield service.startService()
@@ -828,9 +778,7 @@ class TestRackSyslog(MAASTestCase):
 
         yield service._orig_tryUpdate()
 
-        expected_forwards = [
-            {"name": name, "ip": ip} for name, ip in forwarders
-        ]
+        expected_forwards = [{"name": name, "ip": ip} for name, ip in forwarders]
         write_config.assert_called_once_with(
             False,
             forwarders=expected_forwards,
@@ -856,9 +804,7 @@ class TestRackSyslog(MAASTestCase):
         self.patch(common.log, "debug")
         self.useFixture(MAASRootFixture())
         rpc_service, _ = yield prepareRegion(self, is_region=True)
-        service, syslog = self.make_RackSyslog_ExternalService(
-            rpc_service, reactor
-        )
+        service, syslog = self.make_RackSyslog_ExternalService(rpc_service, reactor)
         self.patch_autospec(syslog, "_configure")  # No-op configuration.
 
         # There is no most recently applied configuration.
@@ -879,9 +825,7 @@ class TestRackSyslog(MAASTestCase):
         # actually "applied" because this host was configured as a region+rack
         # controller, and the rack should not attempt to manage the DNS server
         # on a region+rack.
-        self.assertIsInstance(
-            syslog._configuration, external._SyslogConfiguration
-        )
+        self.assertIsInstance(syslog._configuration, external._SyslogConfiguration)
         # The configuration was not applied.
         syslog._configure.assert_not_called()
         # Nothing was logged; there's no need for lots of chatter.

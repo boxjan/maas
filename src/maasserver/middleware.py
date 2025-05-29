@@ -96,9 +96,7 @@ class AccessMiddleware:
             return self.get_response(request)
 
         if request.user.is_anonymous:
-            return HttpResponseRedirect(
-                "/MAAS/?next=%s" % quote_plus(request.path)
-            )
+            return HttpResponseRedirect("/MAAS/?next=%s" % quote_plus(request.path))
 
         return self.get_response(request)
 
@@ -382,9 +380,7 @@ class CSRFHelperMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        session_cookie = request.COOKIES.get(
-            settings.SESSION_COOKIE_NAME, None
-        )
+        session_cookie = request.COOKIES.get(settings.SESSION_COOKIE_NAME, None)
         if session_cookie is None:
             # csrf_processing_done is a field used by Django.  We use it here
             # to bypass the CSRF protection when it's not needed (i.e. when the
@@ -420,9 +416,7 @@ class ExternalAuthInfoMiddleware:
         return self.get_response(request)
 
     def _get_external_auth_info(self, request):
-        config = SecretManager().get_composite_secret(
-            "external-auth", default={}
-        )
+        config = SecretManager().get_composite_secret("external-auth", default={})
         candid_endpoint = config.get("url", "")
         rbac_endpoint = config.get("rbac-url", "")
         auth_domain = config.get("domain", "")

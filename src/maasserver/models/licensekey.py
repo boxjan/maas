@@ -33,9 +33,7 @@ class LicenseKeyManager(Manager):
     def has_license_key(self, osystem, distro_series):
         """Checks that a license key exists for the osystem and
         distro_series."""
-        return self.filter(
-            osystem=osystem, distro_series=distro_series
-        ).exists()
+        return self.filter(osystem=osystem, distro_series=distro_series).exists()
 
 
 class LicenseKey(TimestampedModel):

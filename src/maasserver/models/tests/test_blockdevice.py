@@ -60,9 +60,7 @@ class TestBlockDeviceManagerGetBlockDeviceOr404(MAASServerTestCase):
     def test_return_block_device_by_name(self):
         user = factory.make_User()
         node = factory.make_Node()
-        device = factory.make_PhysicalBlockDevice(
-            node_config=node.current_config
-        )
+        device = factory.make_PhysicalBlockDevice(node_config=node.current_config)
         self.assertEqual(
             device.id,
             BlockDevice.objects.get_block_device_or_404(
@@ -86,9 +84,7 @@ class TestBlockDeviceManagerGetBlockDeviceOr404(MAASServerTestCase):
     def test_view_returns_device_when_no_owner(self):
         user = factory.make_User()
         node = factory.make_Node()
-        device = factory.make_PhysicalBlockDevice(
-            node_config=node.current_config
-        )
+        device = factory.make_PhysicalBlockDevice(node_config=node.current_config)
         self.assertEqual(
             device.id,
             BlockDevice.objects.get_block_device_or_404(
@@ -99,9 +95,7 @@ class TestBlockDeviceManagerGetBlockDeviceOr404(MAASServerTestCase):
     def test_view_returns_device_when_owner(self):
         user = factory.make_User()
         node = factory.make_Node(owner=user)
-        device = factory.make_PhysicalBlockDevice(
-            node_config=node.current_config
-        )
+        device = factory.make_PhysicalBlockDevice(node_config=node.current_config)
         self.assertEqual(
             device.id,
             BlockDevice.objects.get_block_device_or_404(
@@ -215,9 +209,7 @@ class TestBlockDeviceManager(MAASServerTestCase):
     def test_filter_by_tags_returns_devices_with_one_tag(self):
         tags = [factory.make_name("tag") for _ in range(3)]
         other_tags = [factory.make_name("tag") for _ in range(3)]
-        devices_with_tags = [
-            factory.make_BlockDevice(tags=tags) for _ in range(3)
-        ]
+        devices_with_tags = [factory.make_BlockDevice(tags=tags) for _ in range(3)]
         for _ in range(3):
             factory.make_BlockDevice(tags=other_tags)
         self.assertCountEqual(
@@ -227,9 +219,7 @@ class TestBlockDeviceManager(MAASServerTestCase):
     def test_filter_by_tags_returns_devices_with_all_tags(self):
         tags = [factory.make_name("tag") for _ in range(3)]
         other_tags = [factory.make_name("tag") for _ in range(3)]
-        devices_with_tags = [
-            factory.make_BlockDevice(tags=tags) for _ in range(3)
-        ]
+        devices_with_tags = [factory.make_BlockDevice(tags=tags) for _ in range(3)]
         for _ in range(3):
             factory.make_BlockDevice(tags=other_tags)
         self.assertCountEqual(
@@ -247,9 +237,7 @@ class TestBlockDeviceManager(MAASServerTestCase):
     def test_filter_by_tags_returns_devices_with_iterable(self):
         tags = [factory.make_name("tag") for _ in range(3)]
         other_tags = [factory.make_name("tag") for _ in range(3)]
-        devices_with_tags = [
-            factory.make_BlockDevice(tags=tags) for _ in range(3)
-        ]
+        devices_with_tags = [factory.make_BlockDevice(tags=tags) for _ in range(3)]
         for _ in range(3):
             factory.make_BlockDevice(tags=other_tags)
 
@@ -262,14 +250,10 @@ class TestBlockDeviceManager(MAASServerTestCase):
         )
 
     def test_filter_by_tags_raise_ValueError_when_unicode(self):
-        self.assertRaises(
-            ValueError, BlockDevice.objects.filter_by_tags, "test"
-        )
+        self.assertRaises(ValueError, BlockDevice.objects.filter_by_tags, "test")
 
     def test_filter_by_tags_raise_ValueError_when_not_iterable(self):
-        self.assertRaises(
-            ValueError, BlockDevice.objects.filter_by_tags, object()
-        )
+        self.assertRaises(ValueError, BlockDevice.objects.filter_by_tags, object())
 
     def test_get_free_block_devices_for_node(self):
         node = factory.make_Node(with_boot_disk=False)
@@ -314,9 +298,7 @@ class TestBlockDeviceManager(MAASServerTestCase):
             filesystem_group=filesystem_group,
         )
         block_devices_in_filesystem_group = (
-            BlockDevice.objects.get_block_devices_in_filesystem_group(
-                filesystem_group
-            )
+            BlockDevice.objects.get_block_devices_in_filesystem_group(filesystem_group)
         )
         self.assertCountEqual(block_devices, block_devices_in_filesystem_group)
         self.assertNotIn(
@@ -329,9 +311,7 @@ class TestBlockDevice(MAASServerTestCase):
 
     def test_path(self):
         block_device = factory.make_PhysicalBlockDevice()
-        self.assertEqual(
-            "/dev/disk/by-dname/%s" % block_device.name, block_device.path
-        )
+        self.assertEqual("/dev/disk/by-dname/%s" % block_device.name, block_device.path)
 
     def test_type_physical(self):
         block_device = factory.make_PhysicalBlockDevice()
@@ -343,9 +323,7 @@ class TestBlockDevice(MAASServerTestCase):
 
     def test_type_raise_ValueError(self):
         block_device = factory.make_BlockDevice()
-        with self.assertRaisesRegex(
-            ValueError, "^BlockDevice is not a subclass of"
-        ):
+        with self.assertRaisesRegex(ValueError, "^BlockDevice is not a subclass of"):
             block_device.type
 
     def test_actual_instance_returns_PhysicalBlockDevice(self):
@@ -369,9 +347,7 @@ class TestBlockDevice(MAASServerTestCase):
         )
         mock_get_effective_filesystem.return_value = sentinel.filesystem
         block_device = factory.make_BlockDevice(node_config=node_config)
-        self.assertEqual(
-            sentinel.filesystem, block_device.get_effective_filesystem()
-        )
+        self.assertEqual(sentinel.filesystem, block_device.get_effective_filesystem())
 
     def test_display_size(self):
         sizes = (
@@ -487,9 +463,7 @@ class TestBlockDevice(MAASServerTestCase):
         self.assertIsNone(reload_object(block_device))
 
     def test_get_available_size_with_partition_table(self):
-        node = factory.make_Node(
-            architecture="amd64/generic", bios_boot_method="uefi"
-        )
+        node = factory.make_Node(architecture="amd64/generic", bios_boot_method="uefi")
         disk = factory.make_PhysicalBlockDevice(node=node, size=100000000)
         factory.make_PartitionTable(block_device=disk)
         self.assertEqual(
@@ -502,9 +476,7 @@ class TestBlockDevice(MAASServerTestCase):
         )
 
     def test_get_available_size_without_partition_table(self):
-        node = factory.make_Node(
-            architecture="amd64/generic", bios_boot_method="uefi"
-        )
+        node = factory.make_Node(architecture="amd64/generic", bios_boot_method="uefi")
         disk = factory.make_PhysicalBlockDevice(node=node, size=100000000)
         # reported available space is the same as if there was a partition table
         self.assertEqual(
@@ -528,20 +500,14 @@ class TestBlockDevice(MAASServerTestCase):
         )
 
     def test_create_partition_raises_ValueError(self):
-        disk = factory.make_PhysicalBlockDevice(
-            node_config=factory.make_NodeConfig()
-        )
+        disk = factory.make_PhysicalBlockDevice(node_config=factory.make_NodeConfig())
         factory.make_PartitionTable(block_device=disk)
-        with self.assertRaisesRegex(
-            ValueError, "already exists on the block device"
-        ):
+        with self.assertRaisesRegex(ValueError, "already exists on the block device"):
             disk.create_partition()
 
     def test_create_partition_if_boot_disk_returns_None_if_not_boot_disk(self):
         node_config = factory.make_NodeConfig()
-        not_boot_disk = factory.make_PhysicalBlockDevice(
-            node_config=node_config
-        )
+        not_boot_disk = factory.make_PhysicalBlockDevice(node_config=node_config)
         self.assertIsNone(not_boot_disk.create_partition_if_boot_disk())
 
     def test_create_partition_if_boot_disk_creates_partition(self):
@@ -574,14 +540,10 @@ class TestBlockDeviceBlockNameIdx(MAASTestCase):
     )
 
     def test_get_block_name_from_idx(self):
-        self.assertEqual(
-            self.name, BlockDevice._get_block_name_from_idx(self.idx)
-        )
+        self.assertEqual(self.name, BlockDevice._get_block_name_from_idx(self.idx))
 
     def test_get_idx_from_block_name(self):
-        self.assertEqual(
-            self.idx, BlockDevice._get_idx_from_block_name(self.name)
-        )
+        self.assertEqual(self.idx, BlockDevice._get_idx_from_block_name(self.name))
 
 
 class TestBlockDevicePostSaveCallsSave(MAASServerTestCase):

@@ -25,9 +25,7 @@ def post_delete_keysource_when_no_more_keys(sender, instance, **kwargs):
                 keysource.delete()
 
 
-signals.watch(
-    post_delete, post_delete_keysource_when_no_more_keys, sender=SSHKey
-)
+signals.watch(post_delete, post_delete_keysource_when_no_more_keys, sender=SSHKey)
 
 
 # Enable all signals by default.

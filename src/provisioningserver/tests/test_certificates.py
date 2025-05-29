@@ -33,9 +33,7 @@ class TestCertificateRequest(MAASTestCase):
 
         self.assertEqual(len(request.csr.get_extensions()), 1)
         subject_alt_name_extension = request.csr.get_extensions()[0]
-        self.assertEqual(
-            subject_alt_name_extension.get_short_name(), b"subjectAltName"
-        )
+        self.assertEqual(subject_alt_name_extension.get_short_name(), b"subjectAltName")
         self.assertEqual(subject_alt_name_extension.get_critical(), False)
 
 
@@ -51,19 +49,13 @@ class TestCertificate(MAASTestCase):
             self.sample_cert.expiration(),
         )
         self.assertTrue(
-            self.sample_cert.certificate_pem().startswith(
-                "-----BEGIN CERTIFICATE-----"
-            )
+            self.sample_cert.certificate_pem().startswith("-----BEGIN CERTIFICATE-----")
         )
         self.assertTrue(
-            self.sample_cert.public_key_pem().startswith(
-                "-----BEGIN PUBLIC KEY-----"
-            )
+            self.sample_cert.public_key_pem().startswith("-----BEGIN PUBLIC KEY-----")
         )
         self.assertTrue(
-            self.sample_cert.private_key_pem().startswith(
-                "-----BEGIN PRIVATE KEY-----"
-            )
+            self.sample_cert.private_key_pem().startswith("-----BEGIN PRIVATE KEY-----")
         )
         self.assertEqual(self.sample_cert.ca_certificates_pem(), "")
         self.assertEqual(
@@ -73,27 +65,18 @@ class TestCertificate(MAASTestCase):
 
     def test_from_pem_single_material(self):
         cert = Certificate.from_pem(
-            self.sample_cert.certificate_pem()
-            + self.sample_cert.private_key_pem()
+            self.sample_cert.certificate_pem() + self.sample_cert.private_key_pem()
         )
-        self.assertEqual(
-            self.sample_cert.certificate_pem(), cert.certificate_pem()
-        )
-        self.assertEqual(
-            self.sample_cert.private_key_pem(), cert.private_key_pem()
-        )
+        self.assertEqual(self.sample_cert.certificate_pem(), cert.certificate_pem())
+        self.assertEqual(self.sample_cert.private_key_pem(), cert.private_key_pem())
 
     def test_from_pem_multiple_material(self):
         cert = Certificate.from_pem(
             self.sample_cert.certificate_pem(),
             self.sample_cert.private_key_pem(),
         )
-        self.assertEqual(
-            self.sample_cert.certificate_pem(), cert.certificate_pem()
-        )
-        self.assertEqual(
-            self.sample_cert.private_key_pem(), cert.private_key_pem()
-        )
+        self.assertEqual(self.sample_cert.certificate_pem(), cert.certificate_pem())
+        self.assertEqual(self.sample_cert.private_key_pem(), cert.private_key_pem())
 
     def test_from_pem_multiple_material_adds_newlines(self):
         # material entries are joined with a newline since each PEM material
@@ -102,12 +85,8 @@ class TestCertificate(MAASTestCase):
             self.sample_cert.certificate_pem().strip(),
             self.sample_cert.private_key_pem().strip(),
         )
-        self.assertEqual(
-            self.sample_cert.certificate_pem(), cert.certificate_pem()
-        )
-        self.assertEqual(
-            self.sample_cert.private_key_pem(), cert.private_key_pem()
-        )
+        self.assertEqual(self.sample_cert.certificate_pem(), cert.certificate_pem())
+        self.assertEqual(self.sample_cert.private_key_pem(), cert.private_key_pem())
 
     def test_from_pem_invalid_material(self):
         error = self.assertRaises(
@@ -157,18 +136,14 @@ class TestCertificate(MAASTestCase):
             ca_certs_material=other_cert_pem,
         )
         self.assertEqual(cert.ca_certificates_pem(), other_cert_pem)
-        self.assertEqual(
-            cert.fullchain_pem(), cert.certificate_pem() + other_cert_pem
-        )
+        self.assertEqual(cert.fullchain_pem(), cert.certificate_pem() + other_cert_pem)
 
     def test_tempfiles(self):
         cert_file, key_file = self.sample_cert.tempfiles()
         self.assertEqual(
             Path(cert_file).read_text(), self.sample_cert.certificate_pem()
         )
-        self.assertEqual(
-            Path(key_file).read_text(), self.sample_cert.private_key_pem()
-        )
+        self.assertEqual(Path(key_file).read_text(), self.sample_cert.private_key_pem())
 
     def test_generate_certificate_defaults(self):
         cert = Certificate.generate("maas")
@@ -206,9 +181,7 @@ class TestCertificate(MAASTestCase):
             organizational_unit_name="myunit",
         )
         self.assertEqual(cert.cert.get_issuer().organizationName, "myorg")
-        self.assertEqual(
-            cert.cert.get_issuer().organizationalUnitName, "myunit"
-        )
+        self.assertEqual(cert.cert.get_issuer().organizationalUnitName, "myunit")
 
     def test_generate_truncate_fields(self):
         cn = factory.make_string(size=65)
@@ -260,12 +233,8 @@ class TestCertificate(MAASTestCase):
         )
 
         x509certificate = cert.cert
-        self.assertEqual(
-            x509certificate.get_issuer(), x509certificate.get_subject()
-        )
-        self.assertEqual(
-            x509certificate.get_version(), crypto.x509.Version.v3.value
-        )
+        self.assertEqual(x509certificate.get_issuer(), x509certificate.get_subject())
+        self.assertEqual(x509certificate.get_version(), crypto.x509.Version.v3.value)
         self.assertEqual(x509certificate.get_extension_count(), 1)
 
         # Extensions are kept in order
@@ -309,9 +278,7 @@ class TestCertificate(MAASTestCase):
             certificate_request.csr.get_extensions()[0].get_short_name(),
             signed_certificate.cert.get_extension(0).get_short_name(),
         )
-        self.assertEqual(
-            signed_certificate.cert.get_issuer(), ca.cert.get_subject()
-        )
+        self.assertEqual(signed_certificate.cert.get_issuer(), ca.cert.get_subject())
 
         # check that the signed certificate is valid
         store = crypto.X509Store()
@@ -354,9 +321,7 @@ class TestClusterCertificates(MAASTestCase):
         certs_dir = self.tempdir / "certificates"
         certs_dir.mkdir(parents=True)
         self.useFixture(EnvironmentVariable("MAAS_ROOT", str(self.tempdir)))
-        store_maas_cluster_cert_tuple(
-            b"private_key", b"certificate", b"cacerts"
-        )
+        store_maas_cluster_cert_tuple(b"private_key", b"certificate", b"cacerts")
         (
             certificate_path,
             private_key_path,

@@ -28,15 +28,13 @@ class TestSecretManager:
     def assert_secrets(self, vault_client, secrets):
         if vault_client:
             assert vault_client.store == secrets
-            assert set(
-                VaultSecret.objects.values_list("path", flat=True)
-            ) == set(secrets)
+            assert set(VaultSecret.objects.values_list("path", flat=True)) == set(
+                secrets
+            )
         else:
             assert dict(Secret.objects.values_list("path", "value")) == secrets
 
-    def assert_secrets_with_deleted(
-        self, vault_client, all_secrets, deleted_secrets
-    ):
+    def assert_secrets_with_deleted(self, vault_client, all_secrets, deleted_secrets):
         known_secrets = {}
         vault_secrets = {}
         for path, value in all_secrets.items():
@@ -51,15 +49,10 @@ class TestSecretManager:
                 == vault_secrets
             )
         else:
-            assert (
-                dict(Secret.objects.values_list("path", "value"))
-                == known_secrets
-            )
+            assert dict(Secret.objects.values_list("path", "value")) == known_secrets
             assert not VaultSecret.objects.exists()
 
-    def test_uses_provided_client_instead_of_making_new(
-        self, vault_client, mocker
-    ):
+    def test_uses_provided_client_instead_of_making_new(self, vault_client, mocker):
         get_vault_mock = mocker.patch.object(vault, "get_region_vault_client")
         get_vault_mock.return_value = vault_client
 
@@ -74,9 +67,7 @@ class TestSecretManager:
         node = factory.make_Node()
         self.set_secret(vault_client, f"node/{node.id}/deploy-metadata", value)
         manager = SecretManager(vault_client=vault_client)
-        assert (
-            manager.get_composite_secret("deploy-metadata", obj=node) == value
-        )
+        assert manager.get_composite_secret("deploy-metadata", obj=node) == value
 
     def test_get_composite_secret_with_model_not_found(self, vault_client):
         node = factory.make_Node()
@@ -84,15 +75,11 @@ class TestSecretManager:
         with pytest.raises(SecretNotFound):
             manager.get_composite_secret("deploy-metadata", obj=node)
 
-    def test_get_composite_secret_with_model_not_found_default(
-        self, vault_client
-    ):
+    def test_get_composite_secret_with_model_not_found_default(self, vault_client):
         node = factory.make_Node()
         manager = SecretManager(vault_client=vault_client)
         assert (
-            manager.get_composite_secret(
-                "deploy-metadata", obj=node, default="default"
-            )
+            manager.get_composite_secret("deploy-metadata", obj=node, default="default")
             == "default"
         )
 
@@ -109,9 +96,7 @@ class TestSecretManager:
 
     def test_get_composite_secret_global_not_found_default(self, vault_client):
         manager = SecretManager(vault_client=vault_client)
-        assert (
-            manager.get_composite_secret("tls", default="default") == "default"
-        )
+        assert manager.get_composite_secret("tls", default="default") == "default"
 
     def test_get_composite_secret_global_unknown(self, vault_client):
         manager = SecretManager(vault_client)
@@ -132,15 +117,11 @@ class TestSecretManager:
         with pytest.raises(SecretNotFound):
             manager.get_simple_secret("deploy-metadata", obj=node)
 
-    def test_get_simple_secret_with_model_not_found_default(
-        self, vault_client
-    ):
+    def test_get_simple_secret_with_model_not_found_default(self, vault_client):
         node = factory.make_Node()
         manager = SecretManager(vault_client=vault_client)
         assert (
-            manager.get_simple_secret(
-                "deploy-metadata", obj=node, default="bar"
-            )
+            manager.get_simple_secret("deploy-metadata", obj=node, default="bar")
             == "bar"
         )
 
@@ -168,9 +149,7 @@ class TestSecretManager:
         manager = SecretManager(vault_client=vault_client)
         value = {"bar": "baz"}
         manager.set_composite_secret("deploy-metadata", value, obj=node)
-        self.assert_secrets(
-            vault_client, {f"node/{node.id}/deploy-metadata": value}
-        )
+        self.assert_secrets(vault_client, {f"node/{node.id}/deploy-metadata": value})
 
     def test_set_composite_secret_global(self, vault_client):
         manager = SecretManager(vault_client=vault_client)
@@ -197,9 +176,7 @@ class TestSecretManager:
     def test_set_simple_secret_global(self, vault_client):
         manager = SecretManager(vault_client=vault_client)
         manager.set_simple_secret("omapi-key", "foo")
-        self.assert_secrets(
-            vault_client, {"global/omapi-key": {"secret": "foo"}}
-        )
+        self.assert_secrets(vault_client, {"global/omapi-key": {"secret": "foo"}})
 
     def test_set_simple_secret_global_unknown(self, vault_client):
         manager = SecretManager(vault_client=vault_client)
@@ -255,9 +232,7 @@ class TestSecretManager:
         node = factory.make_Node()
         manager = SecretManager(vault_client=vault_client)
         manager.set_simple_secret("deploy-metadata", "foo", obj=node)
-        self.set_secret(
-            vault_client, f"node/{node.id}/unknown", {"foo": "bar"}
-        )
+        self.set_secret(vault_client, f"node/{node.id}/unknown", {"foo": "bar"})
         manager.delete_all_object_secrets(node)
         self.assert_secrets_with_deleted(
             vault_client,

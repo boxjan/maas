@@ -153,28 +153,20 @@ class TestGeneralHandler(MAASServerTestCase):
             )
             for release in osystem_releases
         ]
-        self.patch(general, "list_osystem_choices").return_value = [
-            (osystem, osystem)
-        ]
+        self.patch(general, "list_osystem_choices").return_value = [(osystem, osystem)]
         self.patch(general, "list_release_choices").return_value = releases
         expected_osinfo = {
             "osystems": [(osystem, osystem)],
             "releases": releases,
-            "kernels": {
-                "ubuntu": {"jammy": [("hwe-22.04", "jammy (hwe-22.04)")]}
-            },
+            "kernels": {"ubuntu": {"jammy": [("hwe-22.04", "jammy (hwe-22.04)")]}},
             "default_osystem": Config.objects.get_config("default_osystem"),
-            "default_release": Config.objects.get_config(
-                "default_distro_series"
-            ),
+            "default_release": Config.objects.get_config("default_distro_series"),
         }
         self.assertEqual(expected_osinfo, handler.osinfo({}))
 
     def test_machine_actions_for_admin(self):
         handler = GeneralHandler(factory.make_admin(), {}, None)
-        actions_expected = self.dehydrate_actions(
-            ACTIONS_DICT, NODE_TYPE.MACHINE
-        )
+        actions_expected = self.dehydrate_actions(ACTIONS_DICT, NODE_TYPE.MACHINE)
         self.assertCountEqual(actions_expected, handler.machine_actions({}))
 
     def test_machine_actions_for_non_admin(self):
@@ -211,10 +203,7 @@ class TestGeneralHandler(MAASServerTestCase):
         handler = GeneralHandler(factory.make_admin(), {}, None)
         self.assertCountEqual(
             {"set-zone", "delete"},
-            [
-                action["name"]
-                for action in handler.region_controller_actions({})
-            ],
+            [action["name"] for action in handler.region_controller_actions({})],
         )
 
     def test_region_controller_actions_for_non_admin(self):
@@ -348,9 +337,7 @@ class TestGeneralHandler(MAASServerTestCase):
                 {
                     "name": boot_method.name,
                     "bios_boot_method": boot_method.bios_boot_method,
-                    "bootloader_arches": "/".join(
-                        boot_method.bootloader_arches
-                    ),
+                    "bootloader_arches": "/".join(boot_method.bootloader_arches),
                     "arch_octet": boot_method.arch_octet,
                     "protocol": (
                         "http"
@@ -367,18 +354,14 @@ class TestGeneralHandler(MAASServerTestCase):
     def test_generate_certificate_no_name(self):
         Config.objects.set_config("maas_name", "mymaas")
         handler = GeneralHandler(factory.make_User(), {}, None)
-        mock_generate_certificate = self.patch_autospec(
-            general, "generate_certificate"
-        )
+        mock_generate_certificate = self.patch_autospec(general, "generate_certificate")
         handler.generate_client_certificate({})
         mock_generate_certificate.assert_called_once_with("mymaas")
 
     def test_generate_certificate_with_name(self):
         Config.objects.set_config("maas_name", "mymaas")
         handler = GeneralHandler(factory.make_User(), {}, None)
-        mock_generate_certificate = self.patch_autospec(
-            general, "generate_certificate"
-        )
+        mock_generate_certificate = self.patch_autospec(general, "generate_certificate")
         handler.generate_client_certificate({"object_name": "mypod"})
         mock_generate_certificate.assert_called_once_with("mypod@mymaas")
 
@@ -406,9 +389,7 @@ class TestGeneralHandler(MAASServerTestCase):
 
         self.assertEqual(cert.cn(), result["CN"])
         self.assertEqual(cert.certificate_pem(), result["certificate"])
-        self.assertEqual(
-            dehydrate_datetime(cert.expiration()), result["expiration"]
-        )
+        self.assertEqual(dehydrate_datetime(cert.expiration()), result["expiration"])
         self.assertEqual(cert.cert_hash(), result["fingerprint"])
 
         # ensure we don't leak anything else

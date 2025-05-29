@@ -33,9 +33,7 @@ def split_string_list(string):
     return (part for part in re.split(r"[,\s]+", string) if len(part) != 0)
 
 
-def make_gecos_field(
-    fullname=None, room=None, worktel=None, hometel=None, other=None
-):
+def make_gecos_field(fullname=None, room=None, worktel=None, hometel=None, other=None):
     """Construct a GECOS field.
 
     Based on a reading of chfn(1).

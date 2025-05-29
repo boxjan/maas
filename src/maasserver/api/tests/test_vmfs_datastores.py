@@ -87,27 +87,20 @@ class TestVMFSDatastoresAPI(APITestCase.ForUser):
 
     def test_POST_creates_with_block_devices_and_partitions(self):
         self.become_admin()
-        node = factory.make_Machine(
-            status=NODE_STATUS.READY, with_boot_disk=False
-        )
+        node = factory.make_Machine(status=NODE_STATUS.READY, with_boot_disk=False)
         node.boot_disk = factory.make_PhysicalBlockDevice(
             node=node, size=LARGE_BLOCK_DEVICE
         )
         layout = VMFS6StorageLayout(node)
         layout.configure()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         block_device = factory.make_PhysicalBlockDevice(
             node=node,
             size=MIN_PARTITION_SIZE * 3 + PARTITION_TABLE_EXTRA_SPACE,
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = [
-            partition_table.add_partition(size=MIN_PARTITION_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_PARTITION_SIZE) for _ in range(2)
         ]
         name = factory.make_name("name")
         vmfs_uuid = uuid.uuid4()
@@ -146,8 +139,7 @@ class TestVMFSDatastoreAPI(APITestCase.ForUser):
         node = factory.make_Machine()
         vmfs = factory.make_VMFS(node=node)
         self.assertEqual(
-            "/MAAS/api/2.0/nodes/%s/vmfs-datastore/%s/"
-            % (node.system_id, vmfs.id),
+            "/MAAS/api/2.0/nodes/%s/vmfs-datastore/%s/" % (node.system_id, vmfs.id),
             self.get_vmfs_uri(vmfs),
         )
 
@@ -161,9 +153,7 @@ class TestVMFSDatastoreAPI(APITestCase.ForUser):
         parsed_result = json_load_bytes(response.content)
 
         self.assertEqual(parsed_result.get("id"), vmfs.id)
-        self.assertEqual(
-            parsed_result.get("system_id"), vmfs.get_node().system_id
-        )
+        self.assertEqual(parsed_result.get("system_id"), vmfs.get_node().system_id)
         self.assertEqual(parsed_result.get("uuid"), vmfs.uuid)
         self.assertEqual(parsed_result.get("name"), vmfs.name)
         self.assertEqual(parsed_result.get("size"), vmfs.get_size())
@@ -176,9 +166,7 @@ class TestVMFSDatastoreAPI(APITestCase.ForUser):
             {"fstype": "vmfs6", "mount_point": f"/vmfs/volumes/{name}"},
         )
 
-        self.assertEqual(
-            vmfs.filesystems.count(), len(parsed_result["devices"])
-        )
+        self.assertEqual(vmfs.filesystems.count(), len(parsed_result["devices"]))
 
     def test_GET_404_when_not_vmfs(self):
         not_vmfs = factory.make_FilesystemGroup(

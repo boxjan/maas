@@ -35,9 +35,7 @@ class TestGenerateUserData(MAASServerTestCase):
             'text/x-shellscript; charset="utf-8"',
             user_data_script["Content-Type"],
         )
-        self.assertEqual(
-            "base64", user_data_script["Content-Transfer-Encoding"]
-        )
+        self.assertEqual("base64", user_data_script["Content-Transfer-Encoding"])
         self.assertEqual(
             'attachment; filename="user_data.sh"',
             user_data_script["Content-Disposition"],
@@ -65,9 +63,7 @@ class TestGenerateUserData(MAASServerTestCase):
             'text/x-shellscript; charset="utf-8"',
             user_data_script["Content-Type"],
         )
-        self.assertEqual(
-            "base64", user_data_script["Content-Transfer-Encoding"]
-        )
+        self.assertEqual("base64", user_data_script["Content-Transfer-Encoding"])
         self.assertEqual(
             'attachment; filename="user_data.sh"',
             user_data_script["Content-Disposition"],
@@ -82,9 +78,7 @@ class TestGenerateUserData(MAASServerTestCase):
 
     def test_generate_user_data_produces_testing_script(self):
         node = factory.make_Node()
-        user_data = generate_user_data_for_status(
-            node, status=NODE_STATUS.TESTING
-        )
+        user_data = generate_user_data_for_status(node, status=NODE_STATUS.TESTING)
         parsed_data = email.message_from_string(user_data.decode("utf-8"))
         self.assertTrue(parsed_data.is_multipart())
 
@@ -93,9 +87,7 @@ class TestGenerateUserData(MAASServerTestCase):
             'text/x-shellscript; charset="utf-8"',
             user_data_script["Content-Type"],
         )
-        self.assertEqual(
-            "base64", user_data_script["Content-Transfer-Encoding"]
-        )
+        self.assertEqual("base64", user_data_script["Content-Transfer-Encoding"])
         self.assertEqual(
             'attachment; filename="user_data.sh"',
             user_data_script["Content-Disposition"],
@@ -111,9 +103,7 @@ class TestGenerateUserData(MAASServerTestCase):
 
     def test_generate_user_data_produces_rescue_mode_script(self):
         node = factory.make_Node()
-        user_data = generate_user_data_for_status(
-            node, status=NODE_STATUS.RESCUE_MODE
-        )
+        user_data = generate_user_data_for_status(node, status=NODE_STATUS.RESCUE_MODE)
         parsed_data = email.message_from_string(user_data.decode("utf-8"))
         self.assertTrue(parsed_data.is_multipart())
 
@@ -122,9 +112,7 @@ class TestGenerateUserData(MAASServerTestCase):
             'text/x-shellscript; charset="utf-8"',
             user_data_script["Content-Type"],
         )
-        self.assertEqual(
-            "base64", user_data_script["Content-Transfer-Encoding"]
-        )
+        self.assertEqual("base64", user_data_script["Content-Transfer-Encoding"])
         self.assertEqual(
             'attachment; filename="user_data.sh"',
             user_data_script["Content-Disposition"],
@@ -149,9 +137,7 @@ class TestGenerateUserData(MAASServerTestCase):
             'text/x-shellscript; charset="utf-8"',
             user_data_script["Content-Type"],
         )
-        self.assertEqual(
-            "base64", user_data_script["Content-Transfer-Encoding"]
-        )
+        self.assertEqual("base64", user_data_script["Content-Transfer-Encoding"])
         self.assertEqual(
             'attachment; filename="user_data.sh"',
             user_data_script["Content-Disposition"],
@@ -207,9 +193,7 @@ class TestDiskErasingUserData(MAASServerTestCase):
             'text/x-shellscript; charset="utf-8"',
             user_data_script["Content-Type"],
         )
-        self.assertEqual(
-            "base64", user_data_script["Content-Transfer-Encoding"]
-        )
+        self.assertEqual("base64", user_data_script["Content-Transfer-Encoding"])
         self.assertEqual(
             'attachment; filename="user_data.sh"',
             user_data_script["Content-Disposition"],

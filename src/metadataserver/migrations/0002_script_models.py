@@ -102,9 +102,7 @@ class Migration(migrations.Migration):
                 ("exit_status", models.IntegerField(blank=True, null=True)),
                 (
                     "script_name",
-                    models.CharField(
-                        max_length=255, null=True, editable=False
-                    ),
+                    models.CharField(max_length=255, null=True, editable=False),
                 ),
                 (
                     "stdout",
@@ -168,9 +166,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "node",
-                    models.ForeignKey(
-                        to="maasserver.Node", on_delete=models.CASCADE
-                    ),
+                    models.ForeignKey(to="maasserver.Node", on_delete=models.CASCADE),
                 ),
             ],
             bases=(maasserver.models.cleansave.CleanSave, models.Model),

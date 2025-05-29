@@ -1006,9 +1006,7 @@ def parse_item_operation(specifier):
     return specifier, op
 
 
-def parse_item_specifier_type(
-    specifier, spec_types: Container = None, separator=":"
-):
+def parse_item_specifier_type(specifier, spec_types: Container = None, separator=":"):
     """
     Returns a tuple that splits the string int a specifier, and its specifier
     type.
@@ -1088,17 +1086,13 @@ class MAASQueriesMixin:
         if isinstance(specifiers, int):
             return [str(specifiers)]
         elif isinstance(specifiers, str):
-            return [
-                "&" + specifier.strip() for specifier in specifiers.split(",")
-            ]
+            return ["&" + specifier.strip() for specifier in specifiers.split(",")]
         elif isinstance(specifiers, dict):
             return specifiers
         else:
             return list(flatten(specifiers))
 
-    def get_filter_function(
-        self, specifier_type, spec_types, item, separator=":"
-    ):
+    def get_filter_function(self, specifier_type, spec_types, item, separator=":"):
         """Returns a function that must return a Q() based on some pervious
         Q(), an operation function (which will manipulate it), and the data
         that will be used as an argument to the filter operation function.
@@ -1130,9 +1124,9 @@ class MAASQueriesMixin:
                 # we're querying back to the object that we care about, and
                 # manager_object is a Django Manager instance.
                 (manager_object, filter_from_object) = query
-                sub_ids = manager_object.filter_by_specifiers(
-                    item
-                ).values_list(filter_from_object + "__id", flat=True)
+                sub_ids = manager_object.filter_by_specifiers(item).values_list(
+                    filter_from_object + "__id", flat=True
+                )
                 # Return a function to filter the current object based on
                 # its IDs (as gathered from the query above to the related
                 # object).
@@ -1186,14 +1180,10 @@ class MAASQueriesMixin:
             # each value is a list of values (which must be OR'd together).
             for key, constraint_list in specifiers.items():
                 assert isinstance(constraint_list, list)
-                constraints = [
-                    key + separator + value for value in constraint_list
-                ]
+                constraints = [key + separator + value for value in constraint_list]
                 # Leave off specifier_types here because this recursion
                 # will go back to the subclass to get the types filled in.
-                current_q &= self.get_specifiers_q(
-                    constraints, separator=separator
-                )
+                current_q &= self.get_specifiers_q(constraints, separator=separator)
         else:
             for item in specifiers:
                 item, op = parse_item_operation(item)
@@ -1217,9 +1207,7 @@ class MAASQueriesMixin:
         :return:QuerySet
         """
         specifiers = self.format_specifiers(specifiers)
-        query = self.get_specifiers_q(
-            specifiers, separator=separator, **kwargs
-        )
+        query = self.get_specifiers_q(specifiers, separator=separator, **kwargs)
         return self.filter(query)
 
     def exclude_by_specifiers(self, specifiers, **kwargs):

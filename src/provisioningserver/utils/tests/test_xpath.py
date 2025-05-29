@@ -41,18 +41,14 @@ class TestTryMatchXPathScenarios(MAASTestCase):
     scenarios_inputs = (
         scenario("expression matches", "/foo", "<foo/>", True),
         scenario("expression does not match", "/foo", "<bar/>", False),
-        scenario(
-            "text expression matches", "/foo/text()", "<foo>bar</foo>", True
-        ),
+        scenario("text expression matches", "/foo/text()", "<foo>bar</foo>", True),
         scenario(
             "text expression does not match",
             "/foo/text()",
             "<foo></foo>",
             False,
         ),
-        scenario(
-            "string expression matches", "string()", "<foo>bar</foo>", True
-        ),
+        scenario("string expression matches", "string()", "<foo>bar</foo>", True),
         scenario(
             "string expression does not match",
             "string()",

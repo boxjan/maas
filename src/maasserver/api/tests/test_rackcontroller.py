@@ -84,9 +84,7 @@ class TestRackControllerAPI(APITransactionTestCase.ForUser):
             extra={"subarches": "hwe-p,hwe-t,hwe-16.04,hwe-16.10"},
         )
         self.become_admin()
-        response = self.client.get(
-            self.get_rack_uri(rack), {"op": "list_boot_images"}
-        )
+        response = self.client.get(self.get_rack_uri(rack), {"op": "list_boot_images"})
         self.assertEqual(
             http.client.OK,
             response.status_code,
@@ -124,9 +122,7 @@ class TestRackControllerAPI(APITransactionTestCase.ForUser):
                 image_filetype=BOOT_RESOURCE_FILE_TYPE.ARCHIVE_TAR_XZ,
             )
         self.become_admin()
-        response = self.client.get(
-            self.get_rack_uri(rack), {"op": "list_boot_images"}
-        )
+        response = self.client.get(self.get_rack_uri(rack), {"op": "list_boot_images"})
         self.assertEqual(
             http.client.OK,
             response.status_code,
@@ -140,9 +136,7 @@ class TestRackControllerAPI(APITransactionTestCase.ForUser):
 
     def test_GET_list_boot_images_denied_if_not_admin(self):
         rack = factory.make_RackController(owner=factory.make_User())
-        response = self.client.get(
-            self.get_rack_uri(rack), {"op": "list_boot_images"}
-        )
+        response = self.client.get(self.get_rack_uri(rack), {"op": "list_boot_images"})
         self.assertEqual(
             http.client.FORBIDDEN,
             response.status_code,
@@ -304,9 +298,7 @@ class TestRackControllersAPI(APITestCase.ForUser):
     def test_POST_import_boot_images_import_to_rack_controllers(self):
         self.become_admin()
         factory.make_RackController(owner=factory.make_User())
-        response = self.client.post(
-            self.get_rack_uri(), {"op": "import_boot_images"}
-        )
+        response = self.client.post(self.get_rack_uri(), {"op": "import_boot_images"})
         self.assertEqual(
             http.client.ACCEPTED,
             response.status_code,
@@ -315,9 +307,7 @@ class TestRackControllersAPI(APITestCase.ForUser):
 
     def test_POST_import_boot_images_denied_if_not_admin(self):
         factory.make_RackController(owner=factory.make_User())
-        response = self.client.post(
-            self.get_rack_uri(), {"op": "import_boot_images"}
-        )
+        response = self.client.post(self.get_rack_uri(), {"op": "import_boot_images"})
         self.assertEqual(
             http.client.FORBIDDEN,
             response.status_code,
@@ -325,13 +315,9 @@ class TestRackControllersAPI(APITestCase.ForUser):
         )
 
     def test_GET_describe_power_types(self):
-        get_all_power_types = self.patch(
-            rackcontrollers, "get_all_power_types"
-        )
+        get_all_power_types = self.patch(rackcontrollers, "get_all_power_types")
         self.become_admin()
-        response = self.client.get(
-            self.get_rack_uri(), {"op": "describe_power_types"}
-        )
+        response = self.client.get(self.get_rack_uri(), {"op": "describe_power_types"})
         self.assertEqual(
             http.client.OK,
             response.status_code,
@@ -340,12 +326,8 @@ class TestRackControllersAPI(APITestCase.ForUser):
         get_all_power_types.assert_called_once_with()
 
     def test_GET_describe_power_types_denied_if_not_admin(self):
-        get_all_power_types = self.patch(
-            rackcontrollers, "get_all_power_types"
-        )
-        response = self.client.get(
-            self.get_rack_uri(), {"op": "describe_power_types"}
-        )
+        get_all_power_types = self.patch(rackcontrollers, "get_all_power_types")
+        response = self.client.get(self.get_rack_uri(), {"op": "describe_power_types"})
         self.assertEqual(
             http.client.FORBIDDEN,
             response.status_code,

@@ -12,9 +12,7 @@ def scriptresult_fix_script_link(apps, schema_editor):
         ScriptResult.objects.filter(script__isnull=True)
         .annotate(
             new_script_id=Subquery(
-                Script.objects.filter(name=OuterRef("script_name")).values(
-                    "id"
-                )[:1]
+                Script.objects.filter(name=OuterRef("script_name")).values("id")[:1]
             )
         )
         .update(script_id=F("new_script_id"))

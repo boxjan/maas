@@ -31,22 +31,16 @@ from provisioningserver.rpc.testing import MockLiveClusterToRegionRPCFixture
 
 
 class TestLeaseSocketService(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_socket_path(self):
         path = self.make_dir()
         socket_path = os.path.join(path, "dhcpd.sock")
-        self.patch(
-            lease_socket_service, "get_socket_path"
-        ).return_value = socket_path
+        self.patch(lease_socket_service, "get_socket_path").return_value = socket_path
         return socket_path
 
     def patch_rpc_UpdateLeases(self):
@@ -178,9 +172,7 @@ class TestLeaseSocketService(MAASTestCase):
             "updates": [packet],
         }
         yield service.processNotification(payload, clock=reactor)
-        protocol.UpdateLeases.assert_called_once_with(
-            protocol, updates=[packet]
-        )
+        protocol.UpdateLeases.assert_called_once_with(protocol, updates=[packet])
 
     @defer.inlineCallbacks
     def test_processNotifications_region_not_being_called_with_no_updates(

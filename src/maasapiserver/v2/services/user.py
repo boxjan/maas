@@ -48,8 +48,6 @@ class UserService(Service):
             salt="django.contrib.sessions.SessionStore",
             algorithm="sha256",
         )
-        details = signer.unsign_object(
-            session_data, serializer=signing.JSONSerializer
-        )
+        details = signer.unsign_object(session_data, serializer=signing.JSONSerializer)
         user_id = details.get("_auth_user_id")
         return None if user_id is None else int(user_id)

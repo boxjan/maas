@@ -100,9 +100,7 @@ class _Power(amp.Command):
         exceptions.UnknownPowerType: b"UnknownPowerType",
         NotImplementedError: b"NotImplementedError",
         exceptions.PowerActionFail: b"PowerActionFail",
-        exceptions.PowerActionAlreadyInProgress: (
-            b"PowerActionAlreadyInProgress"
-        ),
+        exceptions.PowerActionAlreadyInProgress: (b"PowerActionAlreadyInProgress"),
     }
 
 
@@ -233,9 +231,7 @@ class _ConfigureDHCP(amp.Command):
                                                         ),
                                                         (
                                                             b"description",
-                                                            amp.Unicode(
-                                                                optional=True
-                                                            ),
+                                                            amp.Unicode(optional=True),
                                                         ),
                                                         (
                                                             b"value",
@@ -515,23 +511,17 @@ class ComposeMachine(amp.Command):
         (b"context", StructureAsJSON()),
         (
             b"request",
-            AttrsClassArgument(
-                "provisioningserver.drivers.pod.RequestedMachine"
-            ),
+            AttrsClassArgument("provisioningserver.drivers.pod.RequestedMachine"),
         ),
     ]
     response = [
         (
             b"machine",
-            AttrsClassArgument(
-                "provisioningserver.drivers.pod.DiscoveredMachine"
-            ),
+            AttrsClassArgument("provisioningserver.drivers.pod.DiscoveredMachine"),
         ),
         (
             b"hints",
-            AttrsClassArgument(
-                "provisioningserver.drivers.pod.DiscoveredPodHints"
-            ),
+            AttrsClassArgument("provisioningserver.drivers.pod.DiscoveredPodHints"),
         ),
     ]
     errors = {
@@ -559,9 +549,7 @@ class DecomposeMachine(amp.Command):
     response = [
         (
             b"hints",
-            AttrsClassArgument(
-                "provisioningserver.drivers.pod.DiscoveredPodHints"
-            ),
+            AttrsClassArgument("provisioningserver.drivers.pod.DiscoveredPodHints"),
         )
     ]
     errors = {
@@ -608,9 +596,7 @@ class ScanNetworks(amp.Command):
         (b"interface", amp.Unicode(optional=True)),
     ]
     errors = {
-        exceptions.ScanNetworksAlreadyInProgress: (
-            b"ScanNetworksAlreadyInProgress"
-        )
+        exceptions.ScanNetworksAlreadyInProgress: (b"ScanNetworksAlreadyInProgress")
     }
 
 
@@ -622,9 +608,7 @@ class DisableAndShutoffRackd(amp.Command):
 
     arguments = []
     errors = {
-        exceptions.CannotDisableAndShutoffRackd: (
-            b"CannotDisableAndShutoffRackd"
-        )
+        exceptions.CannotDisableAndShutoffRackd: (b"CannotDisableAndShutoffRackd")
     }
 
 

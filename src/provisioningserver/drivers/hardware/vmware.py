@@ -166,9 +166,7 @@ class VMwareAPI(metaclass=ABCMeta):
 
 class VMwarePyvmomiAPI(VMwareAPI):
     def __init__(self, host, username, password, port=None, protocol=None):
-        super().__init__(
-            host, username, password, port=port, protocol=protocol
-        )
+        super().__init__(host, username, password, port=port, protocol=protocol)
         self.service_instance = None
 
     def connect(self):
@@ -203,9 +201,7 @@ class VMwarePyvmomiAPI(VMwareAPI):
             host=self.host, user=self.username, pwd=self.password, **extra_args
         )
         if not self.service_instance:
-            raise VMwareAPIConnectionFailed(
-                "Could not connect to VMware service API"
-            )
+            raise VMwareAPIConnectionFailed("Could not connect to VMware service API")
         return self.service_instance is not None
 
     def is_folder(self, obj):
@@ -251,10 +247,7 @@ class VMwarePyvmomiAPI(VMwareAPI):
             and vm.summary.config.instanceUuid is not None
         ):
             return vm.summary.config.instanceUuid
-        elif (
-            hasattr(vm.summary.config, "uuid")
-            and vm.summary.config.uuid is not None
-        ):
+        elif hasattr(vm.summary.config, "uuid") and vm.summary.config.uuid is not None:
             return vm.summary.config.uuid
         return None
 
@@ -380,9 +373,7 @@ class VMwarePyvmomiAPI(VMwareAPI):
 def _get_vmware_api(host, username, password, port=None, protocol=None):
     if try_pyvmomi_import():
         # Attempt to detect the best available VMware API
-        return VMwarePyvmomiAPI(
-            host, username, password, port=port, protocol=protocol
-        )
+        return VMwarePyvmomiAPI(host, username, password, port=port, protocol=protocol)
     else:
         raise VMwareClientNotFound(
             "Could not find a suitable VMware API (install python3-pyvmomi)"
@@ -391,9 +382,7 @@ def _get_vmware_api(host, username, password, port=None, protocol=None):
 
 def get_vmware_servers(host, username, password, port=None, protocol=None):
     servers = {}
-    api = _get_vmware_api(
-        host, username, password, port=port, protocol=protocol
-    )
+    api = _get_vmware_api(host, username, password, port=port, protocol=protocol)
 
     if api.connect():
         try:
@@ -419,9 +408,7 @@ def probe_vmware_and_enlist(
     if prefix_filter is None:
         prefix_filter = ""
 
-    api = _get_vmware_api(
-        host, username, password, port=port, protocol=protocol
-    )
+    api = _get_vmware_api(host, username, password, port=port, protocol=protocol)
 
     if api.connect():
         try:
@@ -524,9 +511,7 @@ def power_control_vmware(
     port=None,
     protocol=None,
 ):
-    api = _get_vmware_api(
-        host, username, password, port=port, protocol=protocol
-    )
+    api = _get_vmware_api(host, username, password, port=port, protocol=protocol)
 
     if api.connect():
         try:
@@ -560,9 +545,7 @@ def power_query_vmware(
 ):
     """Return the power state for the VM with the specified UUID,
     using the VMware API."""
-    api = _get_vmware_api(
-        host, username, password, port=port, protocol=protocol
-    )
+    api = _get_vmware_api(host, username, password, port=port, protocol=protocol)
 
     if api.connect():
         try:

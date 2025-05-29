@@ -31,9 +31,7 @@ class TestBytes(MAASTestCase):
 
 class TestChoice(MAASTestCase):
     def test_round_trip(self):
-        choices = {
-            factory.make_name("name"): factory.make_bytes() for _ in range(10)
-        }
+        choices = {factory.make_name("name"): factory.make_bytes() for _ in range(10)}
         argument = arguments.Choice(choices)
         choice = random.choice(list(choices))
         encoded = argument.toString(choice)
@@ -50,9 +48,7 @@ class TestChoice(MAASTestCase):
             arguments.Choice([])
 
     def test_error_when_choices_values_are_not_byte_strings(self):
-        with self.assertRaisesRegex(
-            TypeError, "^Not byte strings: 'foo', 12345"
-        ):
+        with self.assertRaisesRegex(TypeError, "^Not byte strings: 'foo', 12345"):
             arguments.Choice({object(): 12345, object(): "foo"})
 
 

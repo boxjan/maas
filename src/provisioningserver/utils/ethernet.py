@@ -17,9 +17,7 @@ ETHERNET_PACKET = "!6s6s2s"
 # 6 byte source MAC + 6 byte destination MAC + 2 byte Ethertype
 ETHERNET_HEADER_LEN = 14
 
-EthernetPacket = namedtuple(
-    "EthernetPacket", ("dst_mac", "src_mac", "ethertype")
-)
+EthernetPacket = namedtuple("EthernetPacket", ("dst_mac", "src_mac", "ethertype"))
 
 VLAN_HEADER = "!2s2s"
 VLAN_HEADER_LEN = 4

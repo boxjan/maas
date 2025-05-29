@@ -80,9 +80,7 @@ CURTIN_INSTALL_LOG = "/tmp/install.log"
 CURTIN_ERROR_TARFILE = "/tmp/curtin-logs.tar"
 
 
-NetworkYAMLSettings = namedtuple(
-    "NetworkYAMLSettings", ("version", "source_routing")
-)
+NetworkYAMLSettings = namedtuple("NetworkYAMLSettings", ("version", "source_routing"))
 
 
 def get_enlist_preseed(request, rack_controller=None):
@@ -102,9 +100,7 @@ def curtin_maas_reporter(request, node, events_support=True):
     rack_controller = node.get_boot_rack_controller()
     if events_support:
         route = reverse("metadata-status", args=[node.system_id])
-        reporter_url = build_metadata_url(
-            request, route, rack_controller, node=node
-        )
+        reporter_url = build_metadata_url(request, route, rack_controller, node=node)
         return {
             "reporting": {
                 "maas": {
@@ -145,9 +141,7 @@ def compose_curtin_maas_reporter(request, node):
     This enables the ability for curtin to talk back to MAAS through a backend
     that matches what the locally installed Curtin uses.
     """
-    reporter = curtin_maas_reporter(
-        request, node, curtin_supports_webhook_events()
-    )
+    reporter = curtin_maas_reporter(request, node, curtin_supports_webhook_events())
     return [yaml.safe_dump(reporter)]
 
 
@@ -157,9 +151,7 @@ def get_curtin_cloud_config(request, node):
     token = NodeKey.objects.get_token_for_node(node)
     rack_controller = node.get_boot_rack_controller()
     route = reverse("metadata")
-    metadata_url = build_metadata_url(
-        request, route, rack_controller, node=node
-    )
+    metadata_url = build_metadata_url(request, route, rack_controller, node=node)
 
     datasource = {
         "datasource": {
@@ -271,9 +263,7 @@ def compose_curtin_verbose_preseed():
         return []
 
 
-NETWORK_YAML_DEFAULT_SETTINGS = NetworkYAMLSettings(
-    version=1, source_routing=False
-)
+NETWORK_YAML_DEFAULT_SETTINGS = NetworkYAMLSettings(version=1, source_routing=False)
 
 
 def get_network_yaml_settings(osystem, release):
@@ -510,9 +500,7 @@ def get_curtin_installer_url(node):
         pass
     # As a last resort, search for an image using the machine platform
     if image is None:
-        image, xinstall_type = get_curtin_image(
-            arch, platform, os_name, series
-        )
+        image, xinstall_type = get_curtin_image(arch, platform, os_name, series)
 
     if image.filetype == "squashfs":
         if precise:
@@ -560,9 +548,7 @@ def get_curtin_config(request, node, base_osystem=None, base_series=None):
     context = get_preseed_context(
         request, base_osystem, base_series, rack_controller=rack_controller
     )
-    context.update(
-        get_node_preseed_context(request, node, base_osystem, base_series)
-    )
+    context.update(get_node_preseed_context(request, node, base_osystem, base_series))
     context.update(get_curtin_context(request, node))
     deprecated_context_variables = [
         "main_archive_hostname",
@@ -632,9 +618,7 @@ def get_curtin_config(request, node, base_osystem=None, base_series=None):
             }
         )
 
-    custom_validation = get_custom_image_dependency_validation(
-        node, base_osystem
-    )
+    custom_validation = get_custom_image_dependency_validation(node, base_osystem)
     if custom_validation is not None:
         config["late_commands"].update(custom_validation)
 
@@ -685,11 +669,7 @@ def get_curtin_context(request, node):
     :rtype: dict.
     """
     token = NodeKey.objects.get_token_for_node(node)
-    return {
-        "curtin_preseed": compose_debconf_cloud_init_preseed(
-            request, node, token
-        )
-    }
+    return {"curtin_preseed": compose_debconf_cloud_init_preseed(request, node, token)}
 
 
 def get_preseed_type_for(node):
@@ -737,18 +717,14 @@ def get_preseed(request, node) -> bytes:
             node,
             get_preseed_type_for(node),
             osystem=node.get_osystem(config["commissioning_osystem"]),
-            release=node.get_distro_series(
-                config["commissioning_distro_series"]
-            ),
+            release=node.get_distro_series(config["commissioning_distro_series"]),
         )
 
 
 UBUNTU_NAME = UbuntuOS().name
 
 
-def get_preseed_filenames(
-    node, prefix="", osystem="", release="", default=False
-):
+def get_preseed_filenames(node, prefix="", osystem="", release="", default=False):
     """List possible preseed template filenames for the given node.
 
     :param node: The node to return template preseed filenames for.
@@ -817,9 +793,7 @@ def get_preseed_filenames(
             )
             if should_emit:
                 cutoff = 1 if has_prefix else 0
-                yield compose_filename(
-                    elements[:cutoff] + elements[cutoff + 1 :]
-                )
+                yield compose_filename(elements[:cutoff] + elements[cutoff + 1 :])
         elements.pop()
     if default:
         yield GENERIC_FILENAME
@@ -896,17 +870,13 @@ def load_preseed_template(node, prefix, osystem="", release=""):
         It is defined to preserve the context (node, name, release, default)
         since this will be called (by Tempita) called out of scope.
         """
-        filenames = list(
-            get_preseed_filenames(node, name, osystem, release, default)
-        )
+        filenames = list(get_preseed_filenames(node, name, osystem, release, default))
         filepath, content = get_preseed_template(filenames)
         if filepath is None:
             raise TemplateNotFoundError(name)
         # This is where the closure happens: pass `get_template` when
         # instanciating PreseedTemplate.
-        return PreseedTemplate(
-            content, name=filepath, get_template=get_template
-        )
+        return PreseedTemplate(content, name=filepath, get_template=get_template)
 
     return get_template(prefix, None, default=True)
 
@@ -978,9 +948,7 @@ def get_node_preseed_context(request, node, osystem="", release=""):
         "driver": driver,
         "driver_package": driver.get("package", ""),
         "node": node,
-        "preseed_data": compose_preseed(
-            request, get_preseed_type_for(node), node
-        ),
+        "preseed_data": compose_preseed(request, get_preseed_type_for(node), node),
         "node_disable_pxe_url": node_disable_pxe_url,
         "node_disable_pxe_data": node_disable_pxe_data,
         "license_key": node.get_effective_license_key(),

@@ -72,12 +72,8 @@ class TestConfigVaultConfigurateCommand:
         with pytest.raises(type(unexpected)):
             handler.handle(**kwargs)
 
-    def test_will_not_prompt_with_no_existing_config(
-        self, mocker, configure_mock
-    ):
-        get_client_mock = mocker.patch.object(
-            config_vault, "get_region_vault_client"
-        )
+    def test_will_not_prompt_with_no_existing_config(self, mocker, configure_mock):
+        get_client_mock = mocker.patch.object(config_vault, "get_region_vault_client")
         get_client_mock.return_value = None
         prompt_mock = mocker.patch.object(config_vault, "prompt_yes_no")
 
@@ -85,21 +81,15 @@ class TestConfigVaultConfigurateCommand:
         prompt_mock.assert_not_called()
 
     def test_will_prompt_with_existing_config(self, mocker, configure_mock):
-        get_client_mock = mocker.patch.object(
-            config_vault, "get_region_vault_client"
-        )
+        get_client_mock = mocker.patch.object(config_vault, "get_region_vault_client")
         get_client_mock.return_value = "Not None"
         prompt_mock = mocker.patch.object(config_vault, "prompt_yes_no")
 
         Command().handle(**self._configure_kwargs(yes=False))
         prompt_mock.assert_called_once()
 
-    def test_will_not_prompt_with_ignore_existing(
-        self, mocker, configure_mock
-    ):
-        get_client_mock = mocker.patch.object(
-            config_vault, "get_region_vault_client"
-        )
+    def test_will_not_prompt_with_ignore_existing(self, mocker, configure_mock):
+        get_client_mock = mocker.patch.object(config_vault, "get_region_vault_client")
         get_client_mock.return_value = "Not None"
         prompt_mock = mocker.patch.object(config_vault, "prompt_yes_no")
 
@@ -108,9 +98,7 @@ class TestConfigVaultConfigurateCommand:
 
     def test_handle_will_remove_trailing_slashes(self, mocker):
         handler = Command()
-        handler_configure_mock = mocker.patch.object(
-            handler, "_configure_vault"
-        )
+        handler_configure_mock = mocker.patch.object(handler, "_configure_vault")
         expected = "trailing/slash/test"
         kwargs = self._configure_kwargs(
             secrets_path=f"{expected}/////", mount=f"{expected}/"
@@ -154,18 +142,12 @@ class TestSetVaultConfiguredDbCommand:
 class TestConfigVaultMigrateCommand:
     def test_raises_when_vault_already_enabled(self):
         Config.objects.set_config("vault_enabled", True)
-        with pytest.raises(
-            CommandError, match="Secrets are already migrated to Vault"
-        ):
+        with pytest.raises(CommandError, match="Secrets are already migrated to Vault"):
             Command().handle(command=Command.MIGRATE_COMMAND)
 
     def test_raises_when_vault_not_configured_locally(self, mocker):
-        mocker.patch.object(
-            config_vault, "get_region_vault_client"
-        ).return_value = None
-        get_client_mock = mocker.patch.object(
-            config_vault, "get_region_vault_client"
-        )
+        mocker.patch.object(config_vault, "get_region_vault_client").return_value = None
+        get_client_mock = mocker.patch.object(config_vault, "get_region_vault_client")
         get_client_mock.return_value = None
         with pytest.raises(
             CommandError,
@@ -222,18 +204,14 @@ class TestMigrateSecrets:
         assert not Secret.objects.exists()
 
     def test_handle_migrate_stops_when_vault_is_enabled(self, mocker):
-        get_vault_mock = mocker.patch.object(
-            config_vault, "get_region_vault_client"
-        )
+        get_vault_mock = mocker.patch.object(config_vault, "get_region_vault_client")
         Config.objects.set_config("vault_enabled", True)
         with pytest.raises(CommandError, match="already migrated"):
             Command()._handle_migrate({})
         get_vault_mock.assert_not_called()
 
     def test_handle_migrate_stops_when_no_client(self, mocker):
-        mocker.patch.object(
-            config_vault, "get_region_vault_client"
-        ).return_value = None
+        mocker.patch.object(config_vault, "get_region_vault_client").return_value = None
         with pytest.raises(
             CommandError, match="Vault is not configured for the current"
         ):
@@ -247,9 +225,7 @@ class TestMigrateSecrets:
         region_two = factory.make_RegionController()
         ControllerInfo(node=region_one, vault_configured=True).save()
         ControllerInfo(node=region_two, vault_configured=False).save()
-        with pytest.raises(
-            CommandError, match="Vault is not configured for regions"
-        ):
+        with pytest.raises(CommandError, match="Vault is not configured for regions"):
             Command()._handle_migrate({})
 
     def test_handle_migrate_success(self, mocker):
@@ -293,9 +269,7 @@ class TestMigrateSecrets:
 
     def test_restart_regions_wont_retry_with_no_active_regions(self, mocker):
         target = Command()
-        online_regions_mock = mocker.patch.object(
-            target, "_get_online_regions"
-        )
+        online_regions_mock = mocker.patch.object(target, "_get_online_regions")
         online_regions_mock.return_value = []
         notify_mock = mocker.patch.object(config_vault, "notify")
         sleep_mock = mocker.patch.object(config_vault.time, "sleep")
@@ -306,9 +280,7 @@ class TestMigrateSecrets:
 
     def test_restart_regions_will_notify_once(self, mocker):
         target = Command()
-        online_regions_mock = mocker.patch.object(
-            target, "_get_online_regions"
-        )
+        online_regions_mock = mocker.patch.object(target, "_get_online_regions")
         online_regions_mock.side_effect = [
             ["test"],
             ["test"],
@@ -318,15 +290,11 @@ class TestMigrateSecrets:
         sleep_mock = mocker.patch.object(config_vault.time, "sleep")
         target._restart_regions()
         notify_mock.assert_called_once()
-        assert (
-            sleep_mock.call_count == 3
-        )  # One sleep at the start, two in the loop
+        assert sleep_mock.call_count == 3  # One sleep at the start, two in the loop
 
     def test_restart_regions_will_raise_when_attempts_exhausted(self, mocker):
         target = Command()
-        online_regions_mock = mocker.patch.object(
-            target, "_get_online_regions"
-        )
+        online_regions_mock = mocker.patch.object(target, "_get_online_regions")
         online_regions_mock.return_value = {"test": True}
         notify_mock = mocker.patch.object(config_vault, "notify")
         mocker.patch.object(config_vault.time, "sleep")

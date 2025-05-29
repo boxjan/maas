@@ -41,9 +41,7 @@ class TestSSHKeyHandler(MAASServerTestCase):
         user = factory.make_User()
         handler = SSHKeyHandler(user, {}, None)
         sshkey = factory.make_SSHKey(user)
-        self.assertEqual(
-            self.dehydrate_sshkey(sshkey), handler.get({"id": sshkey.id})
-        )
+        self.assertEqual(self.dehydrate_sshkey(sshkey), handler.get({"id": sshkey.id}))
 
     def test_get_doesnt_work_if_not_owned(self):
         user = factory.make_User()

@@ -33,10 +33,7 @@ class DHCPSnippetQueriesMixin(MAASQueriesMixin):
             "name": "__name",
         }
         return super().get_specifiers_q(
-            specifiers,
-            specifier_types=specifier_types,
-            separator=separator,
-            **kwargs
+            specifiers, specifier_types=specifier_types, separator=separator, **kwargs
         )
 
 
@@ -108,10 +105,7 @@ class DHCPSnippet(CleanSave, TimestampedModel):
                 "A DHCP snippet cannot be enabled on an iprange without"
                 "a parent subnet"
             )
-        elif (
-            self.iprange is not None
-            and self.iprange.subnet_id != self.subnet.id
-        ):
+        elif self.iprange is not None and self.iprange.subnet_id != self.subnet.id:
             raise ValidationError(
                 "A DHCP snippet's IP Range must be within the" "parent subnet"
             )

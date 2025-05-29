@@ -44,9 +44,7 @@ def locate_template(*path: Tuple[str]):
 @lru_cache(maxsize=256)
 def load_template(*path: Tuple[str]):
     """Load the template."""
-    return tempita.Template.from_filename(
-        locate_template(*path), encoding="UTF-8"
-    )
+    return tempita.Template.from_filename(locate_template(*path), encoding="UTF-8")
 
 
 def dict_depth(d, depth=0):

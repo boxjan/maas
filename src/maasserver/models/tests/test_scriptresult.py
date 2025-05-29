@@ -105,23 +105,17 @@ class TestScriptResult(MAASServerTestCase):
         self.assertEqual(exit_status, script_result.exit_status)
 
     def test_store_result_sets_status_to_install_failed_when_install(self):
-        script_result = factory.make_ScriptResult(
-            status=SCRIPT_STATUS.INSTALLING
-        )
+        script_result = factory.make_ScriptResult(status=SCRIPT_STATUS.INSTALLING)
         exit_status = random.randint(1, 255)
         script_result.store_result(exit_status)
         self.assertEqual(SCRIPT_STATUS.FAILED_INSTALLING, script_result.status)
         self.assertEqual(exit_status, script_result.exit_status)
 
     def test_store_result_sets_status_to_netconf_failed_when_netconf(self):
-        script_result = factory.make_ScriptResult(
-            status=SCRIPT_STATUS.APPLYING_NETCONF
-        )
+        script_result = factory.make_ScriptResult(status=SCRIPT_STATUS.APPLYING_NETCONF)
         exit_status = random.randint(1, 255)
         script_result.store_result(exit_status)
-        self.assertEqual(
-            SCRIPT_STATUS.FAILED_APPLYING_NETCONF, script_result.status
-        )
+        self.assertEqual(SCRIPT_STATUS.FAILED_APPLYING_NETCONF, script_result.status)
         self.assertEqual(exit_status, script_result.exit_status)
 
     def test_store_result_stores_output(self):
@@ -159,14 +153,11 @@ class TestScriptResult(MAASServerTestCase):
         exit_status = random.randint(0, 255)
         result = {
             "results": {
-                factory.make_name("key"): factory.make_name("value")
-                for _ in range(3)
+                factory.make_name("key"): factory.make_name("value") for _ in range(3)
             }
         }
 
-        script_result.store_result(
-            exit_status, result=yaml.safe_dump(result).encode()
-        )
+        script_result.store_result(exit_status, result=yaml.safe_dump(result).encode())
 
         self.assertEqual(exit_status, script_result.exit_status)
         self.assertDictEqual(result, script_result.read_results())
@@ -186,9 +177,7 @@ class TestScriptResult(MAASServerTestCase):
                 script_result.script_set.node.system_id,
             )
         )
-        event_type = EventType.objects.get(
-            name=EVENT_TYPES.SCRIPT_RESULT_ERROR
-        )
+        event_type = EventType.objects.get(name=EVENT_TYPES.SCRIPT_RESULT_ERROR)
         event = Event.objects.get(
             node=script_result.script_set.node, type_id=event_type.id
         )
@@ -221,9 +210,7 @@ class TestScriptResult(MAASServerTestCase):
     def test_store_result_yaml_can_set_interface_link_connected(self):
         node = factory.make_Node_with_Interface_on_Subnet()
         script_set = factory.make_ScriptSet(node=node)
-        script = factory.make_Script(
-            parameters={"interface": {"type": "interface"}}
-        )
+        script = factory.make_Script(parameters={"interface": {"type": "interface"}})
         script_result = factory.make_ScriptResult(
             status=SCRIPT_STATUS.RUNNING,
             script=script,
@@ -247,9 +234,7 @@ class TestScriptResult(MAASServerTestCase):
         )
         exit_status = random.randint(0, 255)
 
-        script_result.store_result(
-            exit_status, script_version_id=old_version.id
-        )
+        script_result.store_result(exit_status, script_version_id=old_version.id)
 
         self.assertEqual(exit_status, script_result.exit_status)
         self.assertEqual(old_version, script_result.script_version)
@@ -283,9 +268,7 @@ class TestScriptResult(MAASServerTestCase):
                 script_result.script.id,
             )
         )
-        event_type = EventType.objects.get(
-            name=EVENT_TYPES.SCRIPT_RESULT_ERROR
-        )
+        event_type = EventType.objects.get(name=EVENT_TYPES.SCRIPT_RESULT_ERROR)
         event = Event.objects.get(
             node=script_result.script_set.node, type_id=event_type.id
         )
@@ -293,21 +276,15 @@ class TestScriptResult(MAASServerTestCase):
         mock_logger.assert_called_once_with(expected_msg)
 
     def test_store_result_runs_builtin_commissioning_hooks(self):
-        script_set = factory.make_ScriptSet(
-            result_type=RESULT_TYPE.COMMISSIONING
-        )
+        script_set = factory.make_ScriptSet(result_type=RESULT_TYPE.COMMISSIONING)
         script_result = factory.make_ScriptResult(
             script_set=script_set, status=SCRIPT_STATUS.RUNNING
         )
         exit_status = random.randint(0, 255)
         stdout = factory.make_name("stdout").encode()
         mock_hook = MagicMock()
-        scriptresult_module.NODE_INFO_SCRIPTS[script_result.name] = {
-            "hook": mock_hook
-        }
-        self.addCleanup(
-            scriptresult_module.NODE_INFO_SCRIPTS.pop, script_result.name
-        )
+        scriptresult_module.NODE_INFO_SCRIPTS[script_result.name] = {"hook": mock_hook}
+        self.addCleanup(scriptresult_module.NODE_INFO_SCRIPTS.pop, script_result.name)
 
         script_result.store_result(exit_status, stdout=stdout)
 
@@ -316,9 +293,7 @@ class TestScriptResult(MAASServerTestCase):
         )
 
     def test_store_result_logs_event_upon_hook_failure(self):
-        script_set = factory.make_ScriptSet(
-            result_type=RESULT_TYPE.COMMISSIONING
-        )
+        script_set = factory.make_ScriptSet(result_type=RESULT_TYPE.COMMISSIONING)
         script_result = factory.make_ScriptResult(
             script_set=script_set, status=SCRIPT_STATUS.RUNNING
         )
@@ -326,25 +301,15 @@ class TestScriptResult(MAASServerTestCase):
         def _raise():
             raise Exception()
 
-        scriptresult_module.NODE_INFO_SCRIPTS[script_result.name] = {
-            "hook": _raise
-        }
-        self.addCleanup(
-            scriptresult_module.NODE_INFO_SCRIPTS.pop, script_result.name
-        )
+        scriptresult_module.NODE_INFO_SCRIPTS[script_result.name] = {"hook": _raise}
+        self.addCleanup(scriptresult_module.NODE_INFO_SCRIPTS.pop, script_result.name)
         script_result.store_result(0, stdout=b"")
         expected_event = Event.objects.first()
-        self.assertIn(
-            "failed during post-processing.", expected_event.description
-        )
-        self.assertEqual(
-            reload_object(script_result).status, SCRIPT_STATUS.FAILED
-        )
+        self.assertIn("failed during post-processing.", expected_event.description)
+        self.assertEqual(reload_object(script_result).status, SCRIPT_STATUS.FAILED)
 
     def test_store_result_on_recommission_script_resets_builtin_commiss(self):
-        script_set = factory.make_ScriptSet(
-            result_type=RESULT_TYPE.COMMISSIONING
-        )
+        script_set = factory.make_ScriptSet(result_type=RESULT_TYPE.COMMISSIONING)
         for script_name in NODE_INFO_SCRIPTS.keys():
             factory.make_ScriptResult(
                 script_name=script_name,
@@ -369,9 +334,7 @@ class TestScriptResult(MAASServerTestCase):
                 self.assertEqual(SCRIPT_STATUS.PASSED, script_result.status)
 
     def test_store_result_on_recommission_script_failure_does_nothing(self):
-        script_set = factory.make_ScriptSet(
-            result_type=RESULT_TYPE.COMMISSIONING
-        )
+        script_set = factory.make_ScriptSet(result_type=RESULT_TYPE.COMMISSIONING)
         for script_name in NODE_INFO_SCRIPTS.keys():
             factory.make_ScriptResult(
                 script_name=script_name,
@@ -470,9 +433,7 @@ class TestScriptResult(MAASServerTestCase):
                 }
             },
         )
-        self.assertEqual(
-            physical_blockdevice, script_result.physical_blockdevice
-        )
+        self.assertEqual(physical_blockdevice, script_result.physical_blockdevice)
         self.assertDictEqual(
             {
                 "storage": {
@@ -530,9 +491,7 @@ class TestScriptResult(MAASServerTestCase):
     def test_save_purges_orphaned_script_results_storage(self):
         node = factory.make_Machine()
         physical_blockdevice = node.physicalblockdevice_set.first()
-        script = factory.make_Script(
-            parameters={"storage": {"type": "storage"}}
-        )
+        script = factory.make_Script(parameters={"storage": {"type": "storage"}})
         old_script_set = factory.make_ScriptSet(node=node)
         old_script_result = factory.make_ScriptResult(
             script=script,
@@ -560,9 +519,7 @@ class TestScriptResult(MAASServerTestCase):
     def test_save_purges_orphaned_script_results_interface(self):
         node = factory.make_Machine_with_Interface_on_Subnet()
         iface = node.current_config.interface_set.first()
-        script = factory.make_Script(
-            parameters={"interface": {"type": "interface"}}
-        )
+        script = factory.make_Script(parameters={"interface": {"type": "interface"}})
         old_script_set = factory.make_ScriptSet(node=node)
         old_script_result = factory.make_ScriptResult(
             script=script,
@@ -634,9 +591,7 @@ class TestScriptResult(MAASServerTestCase):
             started=now,
             ended=(now + factory.make_timedelta()),
         )
-        self.assertEqual(
-            script_result.runtime, script_result.estimated_runtime
-        )
+        self.assertEqual(script_result.runtime, script_result.estimated_runtime)
 
     def test_estimated_runtime_returns_average_of_previous(self):
         script = factory.make_Script()
@@ -664,8 +619,7 @@ class TestScriptResult(MAASServerTestCase):
             script_set=script_set,
         )
         expected = str(
-            average_runtime
-            - timedelta(microseconds=average_runtime.microseconds)
+            average_runtime - timedelta(microseconds=average_runtime.microseconds)
         )
         self.assertEqual(expected, script_result.estimated_runtime)
 
@@ -752,9 +706,7 @@ class TestScriptResult(MAASServerTestCase):
         script_result = factory.make_ScriptResult(
             result=factory.make_name("invalid").encode()
         )
-        with self.assertRaisesRegex(
-            ValidationError, "YAML must be a dictionary."
-        ):
+        with self.assertRaisesRegex(ValidationError, "YAML must be a dictionary."):
             script_result.read_results()
 
     def test_read_results_errors_with_invalid_status(self):
@@ -784,9 +736,7 @@ class TestScriptResult(MAASServerTestCase):
     def test_read_results_errors_with_link_connected_non_boolean(self):
         node = factory.make_Node_with_Interface_on_Subnet()
         script_set = factory.make_ScriptSet(node=node)
-        script = factory.make_Script(
-            parameters={"interface": {"type": "interface"}}
-        )
+        script = factory.make_Script(parameters={"interface": {"type": "interface"}})
         result = {"link_connected": factory.make_name("link_connected")}
         script_result = factory.make_ScriptResult(
             script=script,
@@ -800,9 +750,7 @@ class TestScriptResult(MAASServerTestCase):
             script_result.read_results()
 
     def test_read_results_errors_when_dict_keys_not_str(self):
-        result = {
-            "results": {random.randint(0, 1000): factory.make_name("value")}
-        }
+        result = {"results": {random.randint(0, 1000): factory.make_name("value")}}
         script_result = factory.make_ScriptResult(
             result=yaml.safe_dump(result).encode()
         )
@@ -829,9 +777,7 @@ class TestScriptResult(MAASServerTestCase):
         script_result = factory.make_ScriptResult(
             result=yaml.safe_dump(result).encode()
         )
-        with self.assertRaisesRegex(
-            ValidationError, "results must be a dictionary."
-        ):
+        with self.assertRaisesRegex(ValidationError, "results must be a dictionary."):
             script_result.read_results()
 
     def test_history_with_script(self):
@@ -850,9 +796,7 @@ class TestScriptResult(MAASServerTestCase):
         script_name = factory.make_name("script_name")
         script_set = factory.make_ScriptSet()
         script_results = [
-            factory.make_ScriptResult(
-                script_name=script_name, script_set=script_set
-            )
+            factory.make_ScriptResult(script_name=script_name, script_set=script_set)
             for _ in range(10)
         ]
         # Script result from another node
@@ -864,9 +808,7 @@ class TestScriptResult(MAASServerTestCase):
         script_name = factory.make_name("script_name")
         script_set = factory.make_ScriptSet()
         script_results = [
-            factory.make_ScriptResult(
-                script_name=script_name, script_set=script_set
-            )
+            factory.make_ScriptResult(script_name=script_name, script_set=script_set)
             for _ in range(10)
         ]
         queries_one = CountQueries()

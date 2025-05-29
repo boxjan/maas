@@ -20,14 +20,10 @@ def clear_arch_cache():
 class TestGetArchitecture:
     def test_get_architecture_from_deb(self, mocker):
         arch = random.choice(["i386", "amd64", "arm64", "ppc64el"])
-        mocker.patch(
-            "apt_pkg.get_architectures", return_value=[arch, "otherarch"]
-        )
+        mocker.patch("apt_pkg.get_architectures", return_value=[arch, "otherarch"])
         assert get_architecture() == arch
 
-    def test_get_architecture_from_snap_env(
-        self, mocker, monkeypatch, factory
-    ):
+    def test_get_architecture_from_snap_env(self, mocker, monkeypatch, factory):
         arch = factory.make_name("arch")
         mock_get_architectures = mocker.patch("apt_pkg.get_architectures")
         monkeypatch.setenv("SNAP_ARCH", arch)

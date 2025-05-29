@@ -48,9 +48,7 @@ class TestResourcePool(MAASServerTestCase):
         self.assertEqual(pool.description, description)
 
     def test_is_default_true(self):
-        self.assertTrue(
-            ResourcePool.objects.get_default_resource_pool().is_default()
-        )
+        self.assertTrue(ResourcePool.objects.get_default_resource_pool().is_default())
 
     def test_is_default_false(self):
         self.assertFalse(factory.make_ResourcePool().is_default())
@@ -138,9 +136,7 @@ class TestResourcePoolManagerGetResourcePools(MAASServerTestCase):
         factory.make_ResourcePool()
         self.rbac_store.add_pool(pool)
         self.rbac_store.allow(user.username, pool, "view")
-        self.assertCountEqual(
-            [pool], ResourcePool.objects.get_resource_pools(user)
-        )
+        self.assertCountEqual([pool], ResourcePool.objects.get_resource_pools(user))
 
     def test_user_rbac_returns_view_all(self):
         self.enable_rbac()
@@ -149,6 +145,4 @@ class TestResourcePoolManagerGetResourcePools(MAASServerTestCase):
         factory.make_ResourcePool()
         self.rbac_store.add_pool(pool)
         self.rbac_store.allow(user.username, pool, "view-all")
-        self.assertCountEqual(
-            [pool], ResourcePool.objects.get_resource_pools(user)
-        )
+        self.assertCountEqual([pool], ResourcePool.objects.get_resource_pools(user))

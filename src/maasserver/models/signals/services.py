@@ -37,13 +37,9 @@ def update_all_rackd_status(sender, instance, **kwargs):
         rack_controller.update_rackd_status()
 
 
-signals.watch(
-    post_save, update_all_rackd_status, sender=RegionControllerProcess
-)
+signals.watch(post_save, update_all_rackd_status, sender=RegionControllerProcess)
 
-signals.watch(
-    post_delete, update_all_rackd_status, sender=RegionControllerProcess
-)
+signals.watch(post_delete, update_all_rackd_status, sender=RegionControllerProcess)
 
 # Enable all signals by default.
 signals.enable()

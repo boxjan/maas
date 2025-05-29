@@ -58,9 +58,7 @@ class TestHMCZPowerDriver(MAASTestCase):
 
     def test_detect_missing_packages_missing(self):
         hmcz_module.no_zhmcclient = True
-        self.assertEqual(
-            ["python3-zhmcclient"], self.hmcz.detect_missing_packages()
-        )
+        self.assertEqual(["python3-zhmcclient"], self.hmcz.detect_missing_packages())
 
     def test_get_partition(self):
         power_partition_name = factory.make_name("power_partition_name")
@@ -139,9 +137,7 @@ class TestHMCZPowerDriver(MAASTestCase):
     @inlineCallbacks
     def test_power_on_stops_in_a_terminated_state(self):
         mock_get_partition = self.patch(self.hmcz, "_get_partition")
-        mock_get_partition.return_value.get_property.return_value = (
-            "terminated"
-        )
+        mock_get_partition.return_value.get_property.return_value = "terminated"
         yield self.hmcz.power_on(None, self.make_context())
         mock_get_partition.return_value.stop.assert_called_once_with(
             wait_for_completion=True
@@ -166,8 +162,8 @@ class TestHMCZPowerDriver(MAASTestCase):
     def test_power_on_times_out_waiting_for_stopping_state(self):
         mock_get_partition = self.patch(self.hmcz, "_get_partition")
         mock_get_partition.return_value.get_property.return_value = "stopping"
-        mock_get_partition.return_value.wait_for_status.side_effect = (
-            StatusTimeout(None, None, None, None)
+        mock_get_partition.return_value.wait_for_status.side_effect = StatusTimeout(
+            None, None, None, None
         )
         with pytest.raises(PowerError):
             yield self.hmcz.power_on(None, self.make_context())
@@ -196,8 +192,8 @@ class TestHMCZPowerDriver(MAASTestCase):
     def test_power_off_timesout_waiting_for_stopping_state(self):
         mock_get_partition = self.patch(self.hmcz, "_get_partition")
         mock_get_partition.return_value.get_property.return_value = "starting"
-        mock_get_partition.return_value.wait_for_status.side_effect = (
-            StatusTimeout(None, None, None, None)
+        mock_get_partition.return_value.wait_for_status.side_effect = StatusTimeout(
+            None, None, None, None
         )
         with pytest.raises(PowerError):
             yield self.hmcz.power_off(None, self.make_context())
@@ -410,17 +406,12 @@ class TestHMCZPowerDriver(MAASTestCase):
                 }
             ]
             + [
-                {
-                    factory.make_name("key"): factory.make_name("value")
-                    for _ in range(5)
-                }
+                {factory.make_name("key"): factory.make_name("value") for _ in range(5)}
                 for _ in range(5)
             ],
         )
 
-        self.assertEqual(
-            "network-adapter", partition.properties["boot-device"]
-        )
+        self.assertEqual("network-adapter", partition.properties["boot-device"])
         self.assertEqual(nic.uri, partition.properties["boot-network-device"])
 
     @inlineCallbacks
@@ -449,10 +440,7 @@ class TestHMCZPowerDriver(MAASTestCase):
                 }
             ]
             + [
-                {
-                    factory.make_name("key"): factory.make_name("value")
-                    for _ in range(5)
-                }
+                {factory.make_name("key"): factory.make_name("value") for _ in range(5)}
                 for _ in range(5)
             ],
         )
@@ -567,9 +555,7 @@ class TestProbeHMCZAndEnlist(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
         self.user = factory.make_name("user")
         self.hostname = factory.make_ip_address()
         self.username = factory.make_name("username")
@@ -637,8 +623,7 @@ class TestProbeHMCZAndEnlist(MAASTestCase):
             [node] = [
                 node
                 for node in rpc.nodes.values()
-                if node.power_parameters["power_partition_name"]
-                == partition_name
+                if node.power_parameters["power_partition_name"] == partition_name
             ]
             self.assertCountEqual(macs, node.mac_addresses)
             self.assertEqual(node.status, status)

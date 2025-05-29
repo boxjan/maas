@@ -31,9 +31,7 @@ class TestDescribe(APITestCase.ForAnonymousAndUserAndAdmin):
     def test_describe(self):
         response = self.client.get(reverse("describe"))
         description = json_load_bytes(response.content)
-        self.assertSetEqual(
-            {"doc", "handlers", "resources", "hash"}, set(description)
-        )
+        self.assertSetEqual({"doc", "handlers", "resources", "hash"}, set(description))
         self.assertIsInstance(description["handlers"], list)
 
     def test_describe_hash_is_the_api_hash(self):

@@ -46,6 +46,4 @@ def set_form_error(form, field_name, error_value):
     method will override any previously-registered error for 'field_name'.
     """
     # Hey Django devs, this is a crap API to set errors.
-    form.errors.setdefault(field_name, []).extend(
-        form.error_class([error_value])
-    )
+    form.errors.setdefault(field_name, []).extend(form.error_class([error_value]))

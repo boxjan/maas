@@ -4,9 +4,7 @@ import maasserver.models.cleansave
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0052_add_codename_title_eol_to_bootresourcecache")
-    ]
+    dependencies = [("maasserver", "0052_add_codename_title_eol_to_bootresourcecache")]
 
     operations = [
         migrations.CreateModel(
@@ -25,9 +23,7 @@ class Migration(migrations.Migration):
                 ("value", models.TextField()),
                 (
                     "node",
-                    models.ForeignKey(
-                        to="maasserver.Node", on_delete=models.CASCADE
-                    ),
+                    models.ForeignKey(to="maasserver.Node", on_delete=models.CASCADE),
                 ),
             ],
             bases=(maasserver.models.cleansave.CleanSave, models.Model),

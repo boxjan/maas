@@ -62,9 +62,7 @@ class TestScanNetworkCommand(MAASTestCase):
     def test_interprets_long_arguments(self):
         self.run_command("--ping", "--threads", "37", "--slow")
         self.scan_networks_mock.assert_called_once_with(
-            Namespace(
-                threads=37, slow=True, ping=True, interface=None, cidr=[]
-            ),
+            Namespace(threads=37, slow=True, ping=True, interface=None, cidr=[]),
             ANY,
             ANY,
             ANY,
@@ -73,9 +71,7 @@ class TestScanNetworkCommand(MAASTestCase):
     def test_default_arguments(self):
         self.run_command()
         self.scan_networks_mock.assert_called_once_with(
-            Namespace(
-                threads=None, slow=False, ping=False, interface=None, cidr=[]
-            ),
+            Namespace(threads=None, slow=False, ping=False, interface=None, cidr=[]),
             ANY,
             ANY,
             ANY,
@@ -215,9 +211,7 @@ class TestScanNetworkCommandEndToEnd(MAASTestCase):
         if slow is True:
             args.append("--slow")
         self.run_command(*args)
-        expected_params = NmapParameters(
-            interface="eth0", cidr=cidr, slow=slow
-        )
+        expected_params = NmapParameters(interface="eth0", cidr=cidr, slow=slow)
         self.popen.assert_called_once_with(
             get_nmap_arguments(expected_params),
             stderr=subprocess.DEVNULL,
@@ -237,9 +231,7 @@ class TestScanNetworkCommandEndToEnd(MAASTestCase):
         if slow is True:
             args.append("--slow")
         self.run_command(*args)
-        expected_params = NmapParameters(
-            interface="eth0", cidr=cidr, slow=slow
-        )
+        expected_params = NmapParameters(interface="eth0", cidr=cidr, slow=slow)
         self.popen.assert_called_once_with(
             get_nmap_arguments(expected_params),
             stderr=subprocess.DEVNULL,
@@ -339,21 +331,15 @@ class TestYieldNmapParameters(MAASTestCase):
         self.assertEqual(
             set(params),
             {
-                NmapParameters(
-                    interface="eth0", cidr="192.168.0.0/24", slow=slow
-                ),
-                NmapParameters(
-                    interface="eth0", cidr="192.168.1.0/24", slow=slow
-                ),
+                NmapParameters(interface="eth0", cidr="192.168.0.0/24", slow=slow),
+                NmapParameters(interface="eth0", cidr="192.168.1.0/24", slow=slow),
             },
         )
 
 
 class TestYieldPingParameters(MAASTestCase):
     def test_ping__yields_ipv4_ips(self):
-        params = yield_ping_parameters(
-            {"eth0": ["2001:db8::/64", "192.168.0.1/30"]}
-        )
+        params = yield_ping_parameters({"eth0": ["2001:db8::/64", "192.168.0.1/30"]})
         self.assertEqual(
             set(params),
             {

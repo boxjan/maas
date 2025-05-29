@@ -28,9 +28,7 @@ from provisioningserver.utils.service_monitor import (
 
 
 class TestServiceMonitorService(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
@@ -38,9 +36,7 @@ class TestServiceMonitorService(MAASTestCase):
         for service in service_monitor._services.values():
             if isinstance(service, ToggleableService):
                 service.off()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def pick_service(self):
         return random.choice(list(service_monitor._services.values()))
@@ -58,18 +54,14 @@ class TestServiceMonitorService(MAASTestCase):
             monitor_service.call, (monitor_service.monitorServices, (), {})
         )
         self.assertEqual(monitor_service.step, 30)
-        self.assertEqual(
-            monitor_service.client_service, sentinel.client_service
-        )
+        self.assertEqual(monitor_service.client_service, sentinel.client_service)
         self.assertEqual(monitor_service.clock, sentinel.clock)
 
     def test_monitorServices_does_not_do_anything_in_dev_environment(self):
         # Belt-n-braces make sure we're in a development environment.
         self.assertTrue(sms.is_dev_environment())
 
-        monitor_service = sms.ServiceMonitorService(
-            sentinel.client_service, Clock()
-        )
+        monitor_service = sms.ServiceMonitorService(sentinel.client_service, Clock())
         mock_ensureServices = self.patch(service_monitor, "ensureServices")
         with TwistedLoggerFixture() as logger:
             monitor_service.monitorServices()
@@ -83,9 +75,7 @@ class TestServiceMonitorService(MAASTestCase):
         # Pretend we're in a production environment.
         self.patch(sms, "is_dev_environment").return_value = False
 
-        monitor_service = sms.ServiceMonitorService(
-            sentinel.client_service, Clock()
-        )
+        monitor_service = sms.ServiceMonitorService(sentinel.client_service, Clock())
         mock_client = Mock()
         self.patch(monitor_service, "_getConnection").return_value = succeed(
             mock_client
@@ -98,16 +88,12 @@ class TestServiceMonitorService(MAASTestCase):
         # Pretend we're in a production environment.
         self.patch(sms, "is_dev_environment").return_value = False
 
-        monitor_service = sms.ServiceMonitorService(
-            sentinel.client_service, Clock()
-        )
+        monitor_service = sms.ServiceMonitorService(sentinel.client_service, Clock())
         mock_ensureServices = self.patch(monitor_service, "_getConnection")
         mock_ensureServices.return_value = fail(factory.make_exception())
         with TwistedLoggerFixture() as logger:
             monitor_service.monitorServices()
-        self.assertIn(
-            "Failed to monitor services and update region.", logger.messages
-        )
+        self.assertIn("Failed to monitor services and update region.", logger.messages)
 
     @inlineCallbacks
     def test_reports_services_to_region_on_start(self):
@@ -118,9 +104,7 @@ class TestServiceMonitorService(MAASTestCase):
         self.addCleanup((yield connecting))
 
         class ExampleService(AlwaysOnService):
-            name = service_name = snap_service_name = factory.make_name(
-                "service"
-            )
+            name = service_name = snap_service_name = factory.make_name("service")
 
         service = ExampleService()
         # Inveigle this new service into the service monitor.
@@ -157,9 +141,7 @@ class TestServiceMonitorService(MAASTestCase):
         self.addCleanup((yield connecting))
 
         class ExampleService(AlwaysOnService):
-            name = service_name = snap_service_name = factory.make_name(
-                "service"
-            )
+            name = service_name = snap_service_name = factory.make_name("service")
 
         service = ExampleService()
         # Inveigle this new service into the service monitor.
@@ -190,24 +172,16 @@ class TestServiceMonitorService(MAASTestCase):
 
     @inlineCallbacks
     def test_buildServices_includes_always_running_services(self):
-        monitor_service = sms.ServiceMonitorService(
-            sentinel.client_service, Clock()
-        )
+        monitor_service = sms.ServiceMonitorService(sentinel.client_service, Clock())
         observed_services = yield monitor_service._buildServices({})
-        self.assertEqual(
-            monitor_service.ALWAYS_RUNNING_SERVICES, observed_services
-        )
+        self.assertEqual(monitor_service.ALWAYS_RUNNING_SERVICES, observed_services)
 
     @inlineCallbacks
     def test_buildServices_adds_services_to_always_running_services(self):
-        monitor_service = sms.ServiceMonitorService(
-            sentinel.client_service, Clock()
-        )
+        monitor_service = sms.ServiceMonitorService(sentinel.client_service, Clock())
         service = self.pick_service()
         state = ServiceState(SERVICE_STATE.ON, "running")
-        observed_services = yield monitor_service._buildServices(
-            {service.name: state}
-        )
+        observed_services = yield monitor_service._buildServices({service.name: state})
         expected_services = list(monitor_service.ALWAYS_RUNNING_SERVICES)
         expected_services.append(
             {"name": service.name, "status": "running", "status_info": ""}

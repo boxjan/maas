@@ -38,9 +38,7 @@ def configure(servers, peers, offset):
     """
     ntp_maas_conf = _render_ntp_maas_conf(servers, peers, offset)
     ntp_maas_conf_path = get_data_path("etc", _NTP_MAAS_CONF_NAME)
-    sudo_write_file(
-        ntp_maas_conf_path, ntp_maas_conf.encode("utf-8"), mode=0o644
-    )
+    sudo_write_file(ntp_maas_conf_path, ntp_maas_conf.encode("utf-8"), mode=0o644)
     ntp_conf = _render_ntp_conf(ntp_maas_conf_path)
     ntp_conf_path = get_data_path("etc", _NTP_CONF_NAME)
     sudo_write_file(ntp_conf_path, ntp_conf.encode("utf-8"), mode=0o644)

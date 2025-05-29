@@ -25,7 +25,5 @@ class Migration(migrations.Migration):
     dependencies = [("maasserver", "0056_zone_serial_ownership")]
 
     operations = [
-        migrations.RunPython(
-            create_initial_publication, remove_initial_publication
-        )
+        migrations.RunPython(create_initial_publication, remove_initial_publication)
     ]

@@ -339,8 +339,7 @@ class TestMakeSettingField(MAASTestCase):
         label = factory.make_name("label")
         field_type = random.choice(["string", "mac_address", "choice"])
         choices = [
-            [factory.make_name("key"), factory.make_name("value")]
-            for _ in range(3)
+            [factory.make_name("key"), factory.make_name("value")] for _ in range(3)
         ]
         default = factory.make_name("default")
         setting = make_setting_field(
@@ -376,9 +375,7 @@ class TestRegistries(MAASTestCase):
     def test_architecture_registry(self):
         self.assertEqual([], list(ArchitectureRegistry))
         ArchitectureRegistry.register_item("resource", sentinel.resource)
-        self.assertIn(
-            sentinel.resource, (item for name, item in ArchitectureRegistry)
-        )
+        self.assertIn(sentinel.resource, (item for name, item in ArchitectureRegistry))
 
     def test_get_by_pxealias_returns_valid_arch(self):
         arch1 = Architecture(
@@ -391,9 +388,7 @@ class TestRegistries(MAASTestCase):
         )
         ArchitectureRegistry.register_item("arch1", arch1)
         ArchitectureRegistry.register_item("arch2", arch2)
-        self.assertEqual(
-            arch1, ArchitectureRegistry.get_by_pxealias("archibald")
-        )
+        self.assertEqual(arch1, ArchitectureRegistry.get_by_pxealias("archibald"))
 
     def test_get_by_pxealias_returns_None_if_none_matching(self):
         arch1 = Architecture(

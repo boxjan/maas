@@ -184,12 +184,8 @@ class TestCredentials(MAASTestCase):
             int(oauth_arguments.get("oauth_timestamp", 0)), now, delta=3
         )
         self.assertEqual(oauth_arguments.get("oauth_version"), "1.0")
-        self.assertEqual(
-            oauth_arguments.get("oauth_signature_method"), "PLAINTEXT"
-        )
-        self.assertEqual(
-            oauth_arguments.get("oauth_consumer_key"), consumer_key
-        )
+        self.assertEqual(oauth_arguments.get("oauth_signature_method"), "PLAINTEXT")
+        self.assertEqual(oauth_arguments.get("oauth_consumer_key"), consumer_key)
         self.assertEqual(oauth_arguments.get("oauth_token"), token_key)
         self.assertEqual(
             oauth_arguments.get("oauth_signature"),
@@ -222,17 +218,13 @@ class MAASMockHTTPHandler(urllib.request.HTTPHandler):
 class TestGetBase(MAASTestCase):
     def test_get_base_url(self):
         self.assertEqual(
-            maas_api_helper.get_base_url(
-                "http://example.com:1234/some/path?and=query"
-            ),
+            maas_api_helper.get_base_url("http://example.com:1234/some/path?and=query"),
             "http://example.com:1234",
         )
 
     def test_get_base_url_no_port(self):
         self.assertEqual(
-            maas_api_helper.get_base_url(
-                "http://example.com/some/path?and=query"
-            ),
+            maas_api_helper.get_base_url("http://example.com/some/path?and=query"),
             "http://example.com",
         )
 
@@ -418,9 +410,7 @@ class TestSignal(MAASTestCase):
         script_result_id = random.randint(1, 1000)
 
         # None used for url and creds as we're not actually sending data.
-        maas_api_helper.signal(
-            None, None, status, script_result_id=script_result_id
-        )
+        maas_api_helper.signal(None, None, status, script_result_id=script_result_id)
 
         mock_encode_multipart_data.assert_called_with(
             {
@@ -501,9 +491,7 @@ class TestSignal(MAASTestCase):
         script_version_id = random.randint(1, 1000)
 
         # None used for url and creds as we're not actually sending data.
-        maas_api_helper.signal(
-            None, None, status, script_version_id=script_version_id
-        )
+        maas_api_helper.signal(None, None, status, script_version_id=script_version_id)
 
         mock_encode_multipart_data.assert_called_with(
             {
@@ -979,6 +967,4 @@ class TestCaptureScriptOutput(MAASTestCase):
             60 * 6,
         )
         proc = Popen('echo "test"', stdout=PIPE, stderr=PIPE, shell=True)
-        self.assertRaises(
-            TimeoutExpired, self.capture, proc, random.randint(1, 5)
-        )
+        self.assertRaises(TimeoutExpired, self.capture, proc, random.randint(1, 5))

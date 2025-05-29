@@ -27,9 +27,7 @@ class TestAddPartitionForm(MAASServerTestCase):
         block_device = factory.make_PhysicalBlockDevice()
         data = {"size": MIN_BLOCK_DEVICE_SIZE - 1}
         form = AddPartitionForm(block_device, data=data)
-        self.assertFalse(
-            form.is_valid(), "Should be invalid because size below zero."
-        )
+        self.assertFalse(form.is_valid(), "Should be invalid because size below zero.")
         self.assertEqual(
             {
                 "size": [
@@ -44,9 +42,7 @@ class TestAddPartitionForm(MAASServerTestCase):
         block_device = factory.make_PhysicalBlockDevice()
         data = {"size": block_device.size + 1}
         form = AddPartitionForm(block_device, data=data)
-        self.assertFalse(
-            form.is_valid(), "Should be invalid because size is to large."
-        )
+        self.assertFalse(form.is_valid(), "Should be invalid because size is to large.")
         self.assertEqual(
             {
                 "size": [
@@ -101,9 +97,7 @@ class TestAddPartitionForm(MAASServerTestCase):
 
     def test_max_possible_size_if_not_specified(self):
         block_device = factory.make_PhysicalBlockDevice()
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         first_partition = factory.make_Partition(
             partition_table=partition_table, size=10 * 1024 * 1024
         )
@@ -158,9 +152,7 @@ class TestFormatPartitionForm(MAASServerTestCase):
 
     def test_is_not_valid_if_vmfs_partition(self):
         node = factory.make_Node(with_boot_disk=False)
-        bd = factory.make_PhysicalBlockDevice(
-            node=node, size=LARGE_BLOCK_DEVICE
-        )
+        bd = factory.make_PhysicalBlockDevice(node=node, size=LARGE_BLOCK_DEVICE)
         layout = VMFS6StorageLayout(node)
         layout.configure()
         pt = bd.get_partitiontable()

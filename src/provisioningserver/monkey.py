@@ -158,9 +158,7 @@ def get_patched_URI():
             except ValueError:
                 port = defaultPort
 
-            return cls(
-                scheme, netloc, host, port, path, params, query, fragment
-            )
+            return cls(scheme, netloc, host, port, path, params, query, fragment)
 
     return PatchedURI
 

@@ -160,9 +160,7 @@ class VLAN(CleanSave, TimestampedModel):
 
     vid = IntegerField(editable=True)
 
-    fabric = ForeignKey(
-        "Fabric", blank=False, editable=True, on_delete=CASCADE
-    )
+    fabric = ForeignKey("Fabric", blank=False, editable=True, on_delete=CASCADE)
 
     mtu = IntegerField(default=DEFAULT_MTU)
 
@@ -213,9 +211,7 @@ class VLAN(CleanSave, TimestampedModel):
     def clean_mtu(self):
         # Linux doesn't allow lower than 552 for the MTU.
         if self.mtu < 552 or self.mtu > 65535:
-            raise ValidationError(
-                {"mtu": ["MTU must be between 552 and 65535."]}
-            )
+            raise ValidationError({"mtu": ["MTU must be between 552 and 65535."]})
 
     def clean(self):
         self.clean_vid()
@@ -263,8 +259,7 @@ class VLAN(CleanSave, TimestampedModel):
     def delete(self):
         if self.is_fabric_default():
             raise ValidationError(
-                "This VLAN is the default VLAN in the fabric, "
-                "it cannot be deleted."
+                "This VLAN is the default VLAN in the fabric, " "it cannot be deleted."
             )
         self.manage_connected_interfaces()
         self.manage_connected_subnets()
@@ -273,9 +268,7 @@ class VLAN(CleanSave, TimestampedModel):
     def save(self, *args, **kwargs):
         # Bug 1555759: Raise a Notification if there are no VLANs with DHCP
         # enabled.  Clear it when one gets enabled.
-        notifications = Notification.objects.filter(
-            ident="dhcp_disabled_all_vlans"
-        )
+        notifications = Notification.objects.filter(ident="dhcp_disabled_all_vlans")
         if self.dhcp_on:
             # No longer true.  Delete the notification.
             notifications.delete()
@@ -294,9 +287,7 @@ class VLAN(CleanSave, TimestampedModel):
         from maasserver.models import Fabric
 
         # Delete any now-empty fabrics.
-        fabrics_with_vlan_count = Fabric.objects.annotate(
-            vlan_count=Count("vlan")
-        )
+        fabrics_with_vlan_count = Fabric.objects.annotate(vlan_count=Count("vlan"))
         fabrics_with_vlan_count.filter(vlan_count=0).delete()
 
     def connected_rack_controllers(self, exclude_racks=None):

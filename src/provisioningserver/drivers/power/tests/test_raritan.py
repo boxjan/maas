@@ -140,6 +140,4 @@ class TestRaritanPowerDriver(MAASTestCase):
         context = self.make_context()
         mock_run_process = self.patch(driver, "run_process")
         mock_run_process.return_value = "Error"
-        self.assertRaises(
-            PowerActionError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_query, system_id, context)

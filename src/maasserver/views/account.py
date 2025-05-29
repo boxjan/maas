@@ -42,8 +42,7 @@ def login(request):
                 request,
                 None,
                 description=(
-                    "Logged in %s."
-                    % ("admin" if request.user.is_superuser else "user")
+                    "Logged in %s." % ("admin" if request.user.is_superuser else "user")
                 ),
             )
             return HttpResponse(status=204)

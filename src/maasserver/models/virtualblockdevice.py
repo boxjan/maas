@@ -33,9 +33,7 @@ class VirtualBlockDeviceManager(BlockDeviceManager):
         if filesystem_group.is_lvm():
             return None
         else:
-            block_device = get_one(
-                self.filter(filesystem_group=filesystem_group)
-            )
+            block_device = get_one(self.filter(filesystem_group=filesystem_group))
             if block_device is None:
                 block_device = VirtualBlockDevice(
                     node_config=filesystem_group.get_node().current_config,

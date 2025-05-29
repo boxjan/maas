@@ -75,16 +75,12 @@ def generate_power_types_doc():
         line("")
         for field in driver.settings:
             field_description = []
-            field_description.append(
-                "* {} ({}).".format(field["name"], field["label"])
-            )
+            field_description.append("* {} ({}).".format(field["name"], field["label"]))
             choices = field.get("choices", [])
             if len(choices) > 0:
                 field_description.append(
                     " Choices: %s"
-                    % ", ".join(
-                        f"'{choice[0]}' ({choice[1]})" for choice in choices
-                    )
+                    % ", ".join(f"'{choice[0]}' ({choice[1]})" for choice in choices)
                 )
             default = field.get("default", "")
             if default != "":
@@ -122,16 +118,12 @@ def generate_pod_types_doc():
         line("")
         for field in driver.settings:
             field_description = []
-            field_description.append(
-                "* {} ({}).".format(field["name"], field["label"])
-            )
+            field_description.append("* {} ({}).".format(field["name"], field["label"]))
             choices = field.get("choices", [])
             if len(choices) > 0:
                 field_description.append(
                     " Choices: %s"
-                    % ", ".join(
-                        f"'{choice[0]}' ({choice[1]})" for choice in choices
-                    )
+                    % ", ".join(f"'{choice[0]}' ({choice[1]})" for choice in choices)
                 )
             default = field.get("default", "")
             if default != "":
@@ -159,9 +151,7 @@ def generate_api_docs(resources):
     for resource in sorted(resources, key=resource_key):
         handler = type(resource.handler)
         if getattr(handler, "resource_uri", sentinel) is sentinel:
-            raise AssertionError(
-                "Missing resource_uri in %s" % handler.__name__
-            )
+            raise AssertionError("Missing resource_uri in %s" % handler.__name__)
         yield generate_doc(handler)
 
 
@@ -189,9 +179,7 @@ def _accumulate_api_resources(resolver, accumulator):
             ):
                 accumulator.add(pattern.callback)
         else:
-            raise AssertionError(
-                f"Not a recognised pattern or resolver: {pattern!r}"
-            )
+            raise AssertionError(f"Not a recognised pattern or resolver: {pattern!r}")
 
 
 def _merge(*iterables):
@@ -355,10 +343,7 @@ def _describe_api():
     from maasserver import urls_api as urlconf
 
     resources = sorted(
-        (
-            _describe_resource(resource)
-            for resource in find_api_resources(urlconf)
-        ),
+        (_describe_resource(resource) for resource in find_api_resources(urlconf)),
         key=itemgetter("name"),
     )
     # This is the core of it:
@@ -370,14 +355,10 @@ def _describe_api():
     # not-None anon and auth handlers in "resources".
     description["handlers"] = []
     description["handlers"].extend(
-        resource["anon"]
-        for resource in resources
-        if resource["anon"] is not None
+        resource["anon"] for resource in resources if resource["anon"] is not None
     )
     description["handlers"].extend(
-        resource["auth"]
-        for resource in resources
-        if resource["auth"] is not None
+        resource["auth"] for resource in resources if resource["auth"] is not None
     )
 
     return description
@@ -485,9 +466,7 @@ def _key_canonical(value):
     elif isinstance(value, tuple):
         return KeyCanonicalTuple(tuple(_key_canonical(v) for v in value))
     else:
-        raise TypeError(
-            f"Cannot compare {value!r} ({type(value).__qualname__})"
-        )
+        raise TypeError(f"Cannot compare {value!r} ({type(value).__qualname__})")
 
 
 def _describe_canonical(description):
@@ -536,9 +515,7 @@ def _describe_canonical(description):
             )
         )
     else:
-        raise TypeError(
-            f"Cannot produce canonical representation for {description!r}."
-        )
+        raise TypeError(f"Cannot produce canonical representation for {description!r}.")
 
 
 def _hash_canonical(description):

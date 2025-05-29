@@ -122,9 +122,7 @@ class VmClusterHandler(OperationsHandler):
         cluster = VMCluster.objects.get_cluster_or_404(
             kwargs["id"], request.user, VMClusterPermission.edit
         )
-        form = UpdateVMClusterForm(
-            data=request.data, instance=cluster, request=request
-        )
+        form = UpdateVMClusterForm(data=request.data, instance=cluster, request=request)
         if not form.is_valid():
             raise MAASAPIValidationError(form.errors)
         cluster = form.save()

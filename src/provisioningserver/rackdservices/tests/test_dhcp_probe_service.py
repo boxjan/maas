@@ -23,21 +23,15 @@ from provisioningserver.rpc.testing import MockLiveClusterToRegionRPCFixture
 
 
 class TestDHCPProbeService(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_rpc_methods(self):
         fixture = self.useFixture(MockLiveClusterToRegionRPCFixture())
-        protocol, connecting = fixture.makeEventLoop(
-            region.ReportForeignDHCPServer
-        )
+        protocol, connecting = fixture.makeEventLoop(region.ReportForeignDHCPServer)
         return protocol, connecting
 
     def test_is_called_every_interval(self):
@@ -86,14 +80,10 @@ class TestDHCPProbeService(MAASTestCase):
         protocol, connecting = self.patch_rpc_methods()
         self.addCleanup((yield connecting))
 
-        del protocol._commandDispatch[
-            region.ReportForeignDHCPServer.commandName
-        ]
+        del protocol._commandDispatch[region.ReportForeignDHCPServer.commandName]
 
         rpc_service = Mock()
-        rpc_service.getClientNow.return_value = defer.succeed(
-            getRegionClient()
-        )
+        rpc_service.getClientNow.return_value = defer.succeed(getRegionClient())
         service = DHCPProbeService(rpc_service, clock)
         yield service.startService()
         yield service.stopService()
@@ -121,9 +111,7 @@ class TestDHCPProbeService(MAASTestCase):
         mock_interfaces.return_value = interfaces
         service = DHCPProbeService(sentinel.service, clock)
         error_message = factory.make_string()
-        self.patch(service, "probe_dhcp").side_effect = Exception(
-            error_message
-        )
+        self.patch(service, "probe_dhcp").side_effect = Exception(error_message)
         with TwistedLoggerFixture() as logger:
             service.startService()
         maaslog.error.assert_called_once_with(

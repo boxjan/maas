@@ -59,9 +59,7 @@ class TestSnapChannel(MAASTestCase):
         self.assertEqual(str(SnapChannel(track="latest")), "latest/stable")
 
     def test_str_no_branch(self):
-        self.assertEqual(
-            str(SnapChannel(track="2.0", risk="beta")), "2.0/beta"
-        )
+        self.assertEqual(str(SnapChannel(track="2.0", risk="beta")), "2.0/beta")
 
     def test_str_with_branch(self):
         self.assertEqual(
@@ -82,26 +80,16 @@ class TestSnapChannel(MAASTestCase):
         )
 
     def test_is_release_branch(self):
+        self.assertFalse(SnapChannel.from_string("2.0/beta").is_release_branch())
+        self.assertFalse(SnapChannel.from_string("2.0/beta/branch").is_release_branch())
         self.assertFalse(
-            SnapChannel.from_string("2.0/beta").is_release_branch()
+            SnapChannel.from_string("2.0/beta/ubuntu-20.04.4").is_release_branch()
         )
         self.assertFalse(
-            SnapChannel.from_string("2.0/beta/branch").is_release_branch()
-        )
-        self.assertFalse(
-            SnapChannel.from_string(
-                "2.0/beta/ubuntu-20.04.4"
-            ).is_release_branch()
-        )
-        self.assertFalse(
-            SnapChannel.from_string(
-                "2.0/beta/myubuntu-20.04"
-            ).is_release_branch()
+            SnapChannel.from_string("2.0/beta/myubuntu-20.04").is_release_branch()
         )
         self.assertTrue(
-            SnapChannel.from_string(
-                "2.0/beta/ubuntu-20.04"
-            ).is_release_branch()
+            SnapChannel.from_string("2.0/beta/ubuntu-20.04").is_release_branch()
         )
 
     def test_equal(self):
@@ -195,9 +183,7 @@ class TestGetSnapMode(MAASTestCase):
         snap_mode_path = snap_common_path.joinpath("snap_mode")
         if mode is not None:
             snap_mode_path.write_text(mode, "utf-8")
-        self.useFixture(
-            EnvironmentVariable("SNAP_COMMON", str(snap_common_path))
-        )
+        self.useFixture(EnvironmentVariable("SNAP_COMMON", str(snap_common_path)))
 
     def test_get_snap_mode_no_mode(self):
         self._write_snap_mode(None)
@@ -227,16 +213,12 @@ class TestSnapVersionsInfo(MAASTestCase):
         )
         self.assertEqual(
             info.current,
-            SnapVersion(
-                revision="1234", version="3.0.0~alpha1-111-g.deadbeef"
-            ),
+            SnapVersion(revision="1234", version="3.0.0~alpha1-111-g.deadbeef"),
         )
         self.assertEqual(info.channel, SnapChannel(track="3.0"))
         self.assertEqual(
             info.update,
-            SnapVersion(
-                revision="5678", version="3.0.0~alpha2-222-g.cafecafe"
-            ),
+            SnapVersion(revision="5678", version="3.0.0~alpha2-222-g.cafecafe"),
         )
 
 
@@ -295,9 +277,7 @@ class TestGetSnapVersionsInfo(MAASTestCase):
                 current=SnapVersion(
                     revision="1234", version="3.0.0~alpha1-111-g.deadbeef"
                 ),
-                channel=SnapChannel(
-                    track="3.0", risk="edge", branch="fix-9991"
-                ),
+                channel=SnapChannel(track="3.0", risk="edge", branch="fix-9991"),
                 update=SnapVersion(
                     revision="5678", version="3.0.0~alpha2-222-g.cafecafe"
                 ),
@@ -324,9 +304,7 @@ class TestGetSnapVersionsInfo(MAASTestCase):
                 current=SnapVersion(
                     revision="1234", version="3.0.0~alpha1-111-g.deadbeef"
                 ),
-                channel=SnapChannel(
-                    track="3.0", risk="edge", branch="fix-9991"
-                ),
+                channel=SnapChannel(track="3.0", risk="edge", branch="fix-9991"),
                 update=None,
                 cohort="",
             ),

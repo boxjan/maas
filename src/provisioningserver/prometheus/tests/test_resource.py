@@ -14,12 +14,8 @@ class TestPrometheusMetricsResource(MAASTestCase):
     def setUp(self):
         super().setUp()
         self.metrics_definitions = [
-            MetricDefinition(
-                "Histogram", "sample_histogram", "Sample histogram", []
-            ),
-            MetricDefinition(
-                "Counter", "sample_counter", "Sample counter", []
-            ),
+            MetricDefinition("Histogram", "sample_histogram", "Sample histogram", []),
+            MetricDefinition("Counter", "sample_counter", "Sample counter", []),
         ]
 
     def test_metrics(self):

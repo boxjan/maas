@@ -164,8 +164,7 @@ class ScriptForm(ModelForm):
                     set_form_error(
                         self,
                         "results",
-                        "Each result in a result dictionary must be a "
-                        "dictionary.",
+                        "Each result in a result dictionary must be a " "dictionary.",
                     )
                 elif "title" not in result:
                     set_form_error(
@@ -185,8 +184,7 @@ class ScriptForm(ModelForm):
             set_form_error(
                 self,
                 "results",
-                "results must be a list of strings or a dictionary of "
-                "dictionaries.",
+                "results must be a list of strings or a dictionary of " "dictionaries.",
             )
             valid = False
         return valid
@@ -199,11 +197,7 @@ class ScriptForm(ModelForm):
 
         # Tags must be a comma seperated string for the form.
         tags = parsed_yaml.pop("tags", None)
-        if (
-            tags is not None
-            and self.instance.id is None
-            and "tags" not in self.data
-        ):
+        if tags is not None and self.instance.id is None and "tags" not in self.data:
             tags_valid = True
             if isinstance(tags, str):
                 self.data["tags"] = tags
@@ -251,9 +245,9 @@ class ScriptForm(ModelForm):
                     # the default type to testing. If the YAML matches the
                     # type allow it.
                     try:
-                        if translate_script_type(
-                            value
-                        ) != translate_script_type(self.data[key]):
+                        if translate_script_type(value) != translate_script_type(
+                            self.data[key]
+                        ):
                             error = True
                     except ValidationError:
                         error = True
@@ -293,9 +287,7 @@ class ScriptForm(ModelForm):
             script = self.data["script"]
 
         script_splitlines = script.splitlines()
-        if len(script_splitlines) >= 1 and not script_splitlines[0].startswith(
-            "#!/"
-        ):
+        if len(script_splitlines) >= 1 and not script_splitlines[0].startswith("#!/"):
             set_form_error(self, "script", "Must start with shebang.")
 
         for line in script_splitlines[1:]:
@@ -436,9 +428,7 @@ class ScriptForm(ModelForm):
             cleaned_data["script_type"] = self.instance.script_type
         else:
             try:
-                cleaned_data["script_type"] = translate_script_type(
-                    script_type
-                )
+                cleaned_data["script_type"] = translate_script_type(script_type)
             except ValidationError as e:
                 set_form_error(self, "script_type", e)
 
@@ -447,9 +437,7 @@ class ScriptForm(ModelForm):
             cleaned_data["hardware_type"] = self.instance.hardware_type
         else:
             try:
-                cleaned_data["hardware_type"] = translate_hardware_type(
-                    hardware_type
-                )
+                cleaned_data["hardware_type"] = translate_hardware_type(hardware_type)
             except ValidationError as e:
                 set_form_error(self, "hardware_type", e)
 
@@ -507,8 +495,7 @@ class ScriptForm(ModelForm):
             set_form_error(
                 self,
                 "comment",
-                '"comment" may only be used when specifying a "script" '
-                "as well.",
+                '"comment" may only be used when specifying a "script" ' "as well.",
             )
             valid = False
 
@@ -576,9 +563,7 @@ class CommissioningScriptForm(Form):
             # If the form isn't valid due to the name it may be because the
             # embedded YAML doesn't define a name. Try again defining it.
             if not form.is_valid() and "name" in form.errors:
-                form = ScriptForm(
-                    data={"name": script_name, "script": script_content}
-                )
+                form = ScriptForm(data={"name": script_name, "script": script_content})
         else:
             form = ScriptForm(data={"script": script_content}, instance=script)
 
@@ -642,9 +627,7 @@ class TestingScriptForm(Form):
             # If the form isn't valid due to the name it may be because the
             # embedded YAML doesn't define a name. Try again defining it.
             if not form.is_valid() and "name" in form.errors:
-                form = ScriptForm(
-                    data={"name": script_name, "script": script_content}
-                )
+                form = ScriptForm(data={"name": script_name, "script": script_content})
         else:
             form = ScriptForm(data={"script": script_content}, instance=script)
 

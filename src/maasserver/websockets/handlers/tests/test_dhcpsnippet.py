@@ -24,9 +24,7 @@ from provisioningserver.events import AUDIT
 class TestDHCPSnippetHandler(MAASServerTestCase):
     def setUp(self):
         super().setUp()
-        self.patch(
-            forms_dhcpsnippet_module, "validate_dhcp_config"
-        ).return_value = []
+        self.patch(forms_dhcpsnippet_module, "validate_dhcp_config").return_value = []
 
     def dehydrate_dhcp_snippet(self, dhcp_snippet):
         node_system_id = None
@@ -92,8 +90,7 @@ class TestDHCPSnippetHandler(MAASServerTestCase):
         user = factory.make_User()
         handler = DHCPSnippetHandler(user, {}, None)
         expected_dhcp_snippets = [
-            self.dehydrate_dhcp_snippet(factory.make_DHCPSnippet())
-            for _ in range(3)
+            self.dehydrate_dhcp_snippet(factory.make_DHCPSnippet()) for _ in range(3)
         ]
         self.assertCountEqual(expected_dhcp_snippets, handler.list({}))
 
@@ -106,9 +103,7 @@ class TestDHCPSnippetHandler(MAASServerTestCase):
         user = factory.make_admin()
         handler = DHCPSnippetHandler(user, {}, None)
         dhcp_snippet_name = factory.make_name("dhcp_snippet_name")
-        handler.create(
-            {"name": dhcp_snippet_name, "value": factory.make_string()}
-        )
+        handler.create({"name": dhcp_snippet_name, "value": factory.make_string()})
         self.assertIsNotNone(DHCPSnippet.objects.get(name=dhcp_snippet_name))
         event = Event.objects.get(type__level=AUDIT)
         self.assertIsNotNone(event)
@@ -162,9 +157,7 @@ class TestDHCPSnippetHandler(MAASServerTestCase):
         dhcp_snippet = factory.make_DHCPSnippet()
         textfile_ids = [dhcp_snippet.value.id]
         for _ in range(10):
-            dhcp_snippet.value = dhcp_snippet.value.update(
-                factory.make_string()
-            )
+            dhcp_snippet.value = dhcp_snippet.value.update(factory.make_string())
             dhcp_snippet.save()
             textfile_ids.append(dhcp_snippet.value.id)
         revert_to = random.randint(-10, -1)

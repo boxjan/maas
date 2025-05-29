@@ -212,9 +212,7 @@ class BINDServerResources(fixtures.Fixture):
             self.zonedir = self.useFixture(TempDirectory()).path
         if self.log_file is None:
             self.log_file = os.path.join(self.homedir, "named.log")
-        self.named_file = os.path.join(
-            self.homedir, os.path.basename(self.NAMED_PATH)
-        )
+        self.named_file = os.path.join(self.homedir, os.path.basename(self.NAMED_PATH))
         self.conf_file = os.path.join(self.homedir, "named.conf")
         self.rndcconf_file = os.path.join(self.homedir, "rndc.conf")
 
@@ -351,12 +349,8 @@ if __name__ == "__main__":
             "server needs (configuration files and executable)"
         ),
     )
-    parser.add_argument(
-        "--log-file", help="The log file allocated for the server"
-    )
-    parser.add_argument(
-        "--port", type=int, help="The port that will be used by BIND"
-    )
+    parser.add_argument("--log-file", help="The log file allocated for the server")
+    parser.add_argument("--port", type=int, help="The port that will be used by BIND")
     parser.add_argument(
         "--rndc-port", type=int, help="The rndc port that will be used by BIND"
     )

@@ -18,9 +18,7 @@ def post_delete_dhcp_snippet_clean_values(sender, instance, **kwargs):
         value.delete()
 
 
-signals.watch(
-    post_delete, post_delete_dhcp_snippet_clean_values, sender=DHCPSnippet
-)
+signals.watch(post_delete, post_delete_dhcp_snippet_clean_values, sender=DHCPSnippet)
 
 # Enable all signals by default.
 signals.enable()

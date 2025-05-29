@@ -44,9 +44,7 @@ def main():
     options = parser.parse_args()
 
     # Configure logging. This is the main entry-point.
-    provisioningserver.logger.configure(
-        verbosity=options.verbosity, mode=options.mode
-    )
+    provisioningserver.logger.configure(verbosity=options.verbosity, mode=options.mode)
 
     if options.set_verbosity is not None:
         provisioningserver.logger.set_verbosity(options.set_verbosity)

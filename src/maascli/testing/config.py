@@ -23,9 +23,7 @@ def make_handler():
         "name": factory.make_name("handler"),
         "doc": "Short\n\nLong",
         "params": [],
-        "actions": [
-            {"name": factory.make_name("action"), "doc": "Doc\n\nstring"}
-        ],
+        "actions": [{"name": factory.make_name("action"), "doc": "Doc\n\nstring"}],
     }
 
 

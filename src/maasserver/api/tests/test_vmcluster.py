@@ -23,9 +23,7 @@ class VMClusterTestMixin:
 
 class TestVMClusters(APITestCase.ForUser):
     def test_handler_path(self):
-        self.assertEqual(
-            "/MAAS/api/2.0/vm-clusters/", reverse("vm_clusters_handler")
-        )
+        self.assertEqual("/MAAS/api/2.0/vm-clusters/", reverse("vm_clusters_handler"))
 
     def test_read_lists_clusters(self):
         clusters = [factory.make_VMCluster() for _ in range(3)]
@@ -54,27 +52,21 @@ class TestVMCluster(APITestCase.ForUser, VMClusterTestMixin):
         self.assertEqual(cluster.name, parsed_result["name"])
         self.assertEqual(cluster.project, parsed_result["project"])
         resources = cluster.total_resources()
-        self.assertEqual(
-            resources.cores.total, parsed_result["total"]["cores"]
-        )
+        self.assertEqual(resources.cores.total, parsed_result["total"]["cores"])
         self.assertEqual(
             resources.memory.general.total, parsed_result["total"]["memory"]
         )
         self.assertEqual(
             resources.storage.total, parsed_result["total"]["local_storage"]
         )
-        self.assertEqual(
-            resources.cores.free, parsed_result["available"]["cores"]
-        )
+        self.assertEqual(resources.cores.free, parsed_result["available"]["cores"])
         self.assertEqual(
             resources.memory.general.free, parsed_result["available"]["memory"]
         )
         self.assertEqual(
             resources.storage.free, parsed_result["available"]["local_storage"]
         )
-        self.assertEqual(
-            resources.cores.allocated, parsed_result["used"]["cores"]
-        )
+        self.assertEqual(resources.cores.allocated, parsed_result["used"]["cores"])
         self.assertEqual(
             resources.memory.general.allocated, parsed_result["used"]["memory"]
         )
@@ -90,20 +82,14 @@ class TestVMCluster(APITestCase.ForUser, VMClusterTestMixin):
             self.assertEqual(pool.path, parsed_pool["path"])
             self.assertEqual(pool.free, parsed_pool["free"])
             self.assertEqual(pool.total, parsed_pool["total"])
-            self.assertEqual(
-                pool.allocated_tracked, parsed_pool["allocated_tracked"]
-            )
-            self.assertEqual(
-                pool.allocated_other, parsed_pool["allocated_other"]
-            )
+            self.assertEqual(pool.allocated_tracked, parsed_pool["allocated_tracked"])
+            self.assertEqual(pool.allocated_other, parsed_pool["allocated_other"])
 
     def test_DELETE_calls_async_delete(self):
         cluster = factory.make_VMCluster()
 
         response = self.client.delete(self.get_cluster_uri(cluster))
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_PUT_calls_async_update(self):
         cluster = factory.make_VMCluster()
@@ -112,9 +98,7 @@ class TestVMCluster(APITestCase.ForUser, VMClusterTestMixin):
             self.get_cluster_uri(cluster),
             {"name": "new_name"},
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
 
 class TestVMClusterAdmin(APITestCase.ForAdmin, VMClusterTestMixin):
@@ -125,9 +109,7 @@ class TestVMClusterAdmin(APITestCase.ForAdmin, VMClusterTestMixin):
         mock_async_delete.return_value = mock_eventual
 
         response = self.client.delete(self.get_cluster_uri(cluster))
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         mock_eventual.wait.assert_called_once_with(60)
 
     def test_UPDATE_calls_async_update(self):
@@ -137,8 +119,6 @@ class TestVMClusterAdmin(APITestCase.ForAdmin, VMClusterTestMixin):
             self.get_cluster_uri(cluster),
             {"name": new_name},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_output = json_load_bytes(response.content)
         self.assertEqual(new_name, parsed_output["name"])

@@ -69,8 +69,7 @@ def _gen_cluster_nodes_power_parameters(nodes, limit):
         nodes.exclude(status=NODE_STATUS.BROKEN)
         .filter(bmc__power_type__in=queryable_power_types)
         .filter(
-            Q(power_state_queried=None)
-            | Q(power_state_queried__lte=five_minutes_ago)
+            Q(power_state_queried=None) | Q(power_state_queried__lte=five_minutes_ago)
         )
         .order_by(F("power_state_queried").asc(nulls_first=True), "system_id")
         .distinct()
@@ -145,9 +144,7 @@ def list_cluster_nodes_power_parameters(system_id, limit=10):
     # rack controller does not update them at the same time. This operation
     # is done on all nodes at the same time in one query.
     system_ids = [detail["system_id"] for detail in details]
-    Node.objects.filter(system_id__in=system_ids).update(
-        power_state_queried=now()
-    )
+    Node.objects.filter(system_id__in=system_ids).update(power_state_queried=now())
 
     return details
 

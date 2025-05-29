@@ -37,9 +37,7 @@ def deprecated_for(new_option):
         def __call__(self, parser, namespace, values, option_string=None):
             action = parser._option_string_actions.get(self._new_option)
             assert action, f'unknown option "{self._new_option}"'
-            assert (
-                option_string
-            ), '"deprecate_for" must be used with optional arguments'
+            assert option_string, '"deprecate_for" must be used with optional arguments'
             print(
                 self._deprecation_message.format(
                     option_string=option_string, new_option=self._new_option
@@ -47,9 +45,7 @@ def deprecated_for(new_option):
                 file=sys.stderr,
             )
             option_string = self._new_option
-            return action(
-                parser, namespace, values, option_string=option_string
-            )
+            return action(parser, namespace, values, option_string=option_string)
 
     return DeprecatedAction
 
@@ -112,9 +108,7 @@ def add_create_admin_options(parser, suppress_help=False):
         "--admin-username",
         default=None,
         metavar="USERNAME",
-        help=argparse.SUPPRESS
-        if suppress_help
-        else "Username for the admin account.",
+        help=argparse.SUPPRESS if suppress_help else "Username for the admin account.",
     )
     parser.add_argument(
         "--admin-password",
@@ -130,9 +124,7 @@ def add_create_admin_options(parser, suppress_help=False):
         "--admin-email",
         default=None,
         metavar="EMAIL",
-        help=argparse.SUPPRESS
-        if suppress_help
-        else "Email address for the admin.",
+        help=argparse.SUPPRESS if suppress_help else "Email address for the admin.",
     )
     parser.add_argument(
         "--admin-ssh-import",
@@ -176,9 +168,7 @@ def create_account_external_auth(auth_config, maas_config, bakery_client=None):
 
     failed_msg = ""
     try:
-        resp = bakery_client.request(
-            "GET", f"{maas_url}/accounts/discharge-request/"
-        )
+        resp = bakery_client.request("GET", f"{maas_url}/accounts/discharge-request/")
         if resp.status_code != 200:
             failed_msg = f"request failed with code {resp.status_code}"
     except Exception as e:
@@ -186,8 +176,7 @@ def create_account_external_auth(auth_config, maas_config, bakery_client=None):
 
     if failed_msg:
         print_msg(
-            "An error occurred while waiting for the first user creation: "
-            + failed_msg
+            "An error occurred while waiting for the first user creation: " + failed_msg
         )
         return
 

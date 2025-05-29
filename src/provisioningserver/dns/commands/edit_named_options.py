@@ -109,8 +109,7 @@ def back_up_existing_file(config_path):
         shutil.copyfile(config_path, backup_destination)
     except OSError as e:
         raise ValueError(
-            "Failed to make a backup of %s, exiting: %s"
-            % (config_path, str(e))
+            "Failed to make a backup of %s, exiting: %s" % (config_path, str(e))
         ) from e
     return backup_destination
 

@@ -12,9 +12,7 @@ def map_enum(enum_class):
     # enum mechanism, this function will act as a marker for pieces of
     # code that should be updated.
     return {
-        key: value
-        for key, value in vars(enum_class).items()
-        if not key.startswith("_")
+        key: value for key, value in vars(enum_class).items() if not key.startswith("_")
     }
 
 
@@ -42,7 +40,5 @@ def map_enum_reverse(enum_class, ignore=None):
     if ignore is None:
         ignore = []
     return {
-        value: key
-        for key, value in map_enum(enum_class).items()
-        if key not in ignore
+        value: key for key, value in map_enum(enum_class).items() if key not in ignore
     }

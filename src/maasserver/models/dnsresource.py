@@ -203,9 +203,7 @@ class DNSResourceManager(Manager, DNSResourceQueriesMixin):
         """
         assert sip.ip is not None
         assert sip.alloc_type == IPADDRESS_TYPE.DISCOVERED
-        resources = self.filter(
-            domain=get_default_domain(), ip_addresses__in=[sip]
-        )
+        resources = self.filter(domain=get_default_domain(), ip_addresses__in=[sip])
         if but_not_for is not None:
             resources = resources.exclude(name=but_not_for)
         for dnsrr in resources:
@@ -247,9 +245,7 @@ class DNSResource(CleanSave, TimestampedModel):
     # There can be more than one name=None entry, so unique needs to be False.
     # We detect and reject duplicates in clean()
     # This could be as many as 3 dot-separated labels, because of SRV records.
-    name = CharField(
-        max_length=191, editable=True, null=True, blank=True, unique=False
-    )
+    name = CharField(max_length=191, editable=True, null=True, blank=True, unique=False)
 
     # Different resource types can have different TTL values, though all of the
     # records of a given RRType for a given FQDN "must" have the same TTL.
@@ -266,9 +262,7 @@ class DNSResource(CleanSave, TimestampedModel):
         Domain, default=get_default_domain, editable=True, on_delete=PROTECT
     )
 
-    ip_addresses = ManyToManyField(
-        "StaticIPAddress", editable=True, blank=True
-    )
+    ip_addresses = ManyToManyField("StaticIPAddress", editable=True, blank=True)
 
     # DNSData model has non-ipaddress entries.
 
@@ -290,16 +284,12 @@ class DNSResource(CleanSave, TimestampedModel):
             return f"{self.name}.{self.domain.name}"
 
     def has_static_ip(self):
-        return self.ip_addresses.exclude(
-            alloc_type=IPADDRESS_TYPE.DISCOVERED
-        ).exists()
+        return self.ip_addresses.exclude(alloc_type=IPADDRESS_TYPE.DISCOVERED).exists()
 
     def get_addresses(self):
         """Return all addresses associated with this FQDN."""
         # Since Node.hostname is unique, this will be at most 1 node.
-        node = Node.objects.filter(
-            hostname=self.name, domain_id=self.domain_id
-        )
+        node = Node.objects.filter(hostname=self.name, domain_id=self.domain_id)
         ips = [ip.get_ip() for ip in self.ip_addresses.all()]
         if node.exists():
             ips += node[0].static_ip_addresses()
@@ -318,13 +308,9 @@ class DNSResource(CleanSave, TimestampedModel):
             self.domain = Domain.objects.get_default_domain()
         # if we have a name, make sure that it is unique in our dns zone.
         if self.id is None and self.name is not None and self.name != "":
-            rrset = DNSResource.objects.filter(
-                name=self.name, domain=self.domain
-            )
+            rrset = DNSResource.objects.filter(name=self.name, domain=self.domain)
             if rrset.exists():
-                raise ValidationError(
-                    "Labels must be unique within their zone."
-                )
+                raise ValidationError("Labels must be unique within their zone.")
         # If we have an ip addresses, then we need to have a valid name.
         # TXT records don't require that we have much at all.
         if self.id is not None and self.ip_addresses.exists():

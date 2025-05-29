@@ -206,18 +206,15 @@ class TestPrometheus(MAASServerTestCase):
         update_prometheus_stats(metrics)
         output = metrics.generate_latest().decode("ascii")
         self.assertIn(
-            "maas_net_subnet_ip_count"
-            '{cidr="1.2.0.0/16",status="available"} 65500.0',
+            "maas_net_subnet_ip_count" '{cidr="1.2.0.0/16",status="available"} 65500.0',
             output,
         )
         self.assertIn(
-            "maas_net_subnet_ip_count"
-            '{cidr="1.2.0.0/16",status="unavailable"} 34.0',
+            "maas_net_subnet_ip_count" '{cidr="1.2.0.0/16",status="unavailable"} 34.0',
             output,
         )
         self.assertIn(
-            "maas_net_subnet_ip_dynamic"
-            '{cidr="1.2.0.0/16",status="available"} 9.0',
+            "maas_net_subnet_ip_dynamic" '{cidr="1.2.0.0/16",status="available"} 9.0',
             output,
         )
         self.assertIn(
@@ -225,17 +222,14 @@ class TestPrometheus(MAASServerTestCase):
             output,
         )
         self.assertIn(
-            "maas_net_subnet_ip_reserved"
-            '{cidr="1.2.0.0/16",status="available"} 18.0',
+            "maas_net_subnet_ip_reserved" '{cidr="1.2.0.0/16",status="available"} 18.0',
             output,
         )
         self.assertIn(
             'maas_net_subnet_ip_reserved{cidr="1.2.0.0/16",status="used"} 2.0',
             output,
         )
-        self.assertIn(
-            'maas_net_subnet_ip_static{cidr="1.2.0.0/16"} 3.0', output
-        )
+        self.assertIn('maas_net_subnet_ip_static{cidr="1.2.0.0/16"} 3.0', output)
 
 
 class TestPrometheusService(MAASTestCase):
@@ -251,9 +245,7 @@ class TestPrometheusService(MAASTestCase):
 
     def test_calls__maybe_make_stats_request(self):
         service = stats.PrometheusService()
-        self.assertEqual(
-            (service.maybe_push_prometheus_stats, (), {}), service.call
-        )
+        self.assertEqual((service.maybe_push_prometheus_stats, (), {}), service.call)
 
     def test_maybe_make_stats_request_does_not_error(self):
         service = stats.PrometheusService()
@@ -272,14 +264,10 @@ class TestPrometheusServiceAsync(MAASTransactionServerTestCase):
 
         with transaction.atomic():
             Config.objects.set_config("prometheus_enabled", True)
-            Config.objects.set_config(
-                "prometheus_push_gateway", "192.168.1.1:8081"
-            )
+            Config.objects.set_config("prometheus_push_gateway", "192.168.1.1:8081")
 
         service = stats.PrometheusService()
-        maybe_push_prometheus_stats = asynchronous(
-            service.maybe_push_prometheus_stats
-        )
+        maybe_push_prometheus_stats = asynchronous(service.maybe_push_prometheus_stats)
         maybe_push_prometheus_stats().wait(TIMEOUT)
 
         mock_call.assert_called_once()
@@ -291,8 +279,6 @@ class TestPrometheusServiceAsync(MAASTransactionServerTestCase):
             Config.objects.set_config("enable_analytics", False)
 
         service = stats.PrometheusService()
-        maybe_push_prometheus_stats = asynchronous(
-            service.maybe_push_prometheus_stats
-        )
+        maybe_push_prometheus_stats = asynchronous(service.maybe_push_prometheus_stats)
         maybe_push_prometheus_stats().wait(TIMEOUT)
         mock_prometheus_client.push_stats_to_prometheus.assert_not_called()

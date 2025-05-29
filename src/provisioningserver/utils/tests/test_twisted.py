@@ -715,9 +715,7 @@ class TestCallInReactor(MAASTestCase):
     @inlineCallbacks
     def test_with_arguments_in_thread(self):
         func = Mock(side_effect=self.returnThreadIdent)
-        result = yield deferToNewThread(
-            callInReactor, func, sentinel.a, b=sentinel.b
-        )
+        result = yield deferToNewThread(callInReactor, func, sentinel.a, b=sentinel.b)
         self.assertEqual(threading.get_ident(), result)
         func.assert_called_once_with(sentinel.a, b=sentinel.b)
 
@@ -756,9 +754,7 @@ class TestCallInReactorWithTimeout(MAASTestCase):
     def test_without_arguments_from_reactor(self):
         result = callInReactorWithTimeout(sentinel.timeout, sentinel.func)
         self.assertEqual(threading.get_ident(), result)
-        self.deferWithTimeout.assert_called_once_with(
-            sentinel.timeout, sentinel.func
-        )
+        self.deferWithTimeout.assert_called_once_with(sentinel.timeout, sentinel.func)
 
     @inlineCallbacks
     def test_without_arguments_from_thread(self):
@@ -766,9 +762,7 @@ class TestCallInReactorWithTimeout(MAASTestCase):
             callInReactorWithTimeout, sentinel.timeout, sentinel.func
         )
         self.assertEqual(threading.get_ident(), result)
-        self.deferWithTimeout.assert_called_once_with(
-            sentinel.timeout, sentinel.func
-        )
+        self.deferWithTimeout.assert_called_once_with(sentinel.timeout, sentinel.func)
 
     def test_with_arguments_in_reactor(self):
         result = callInReactorWithTimeout(
@@ -1080,9 +1074,7 @@ class TestRPCFetcher(MAASTestCase):
         d = fetcher(client, self.fake_command, test=sentinel.kwarg_test)
 
         self.assertIsInstance(d, Deferred)
-        client.assert_called_once_with(
-            self.fake_command, test=sentinel.kwarg_test
-        )
+        client.assert_called_once_with(self.fake_command, test=sentinel.kwarg_test)
 
     def test_deferred_fires_when_client_completes(self):
         client = Mock()
@@ -1216,9 +1208,7 @@ class TestDeferToNewThread(MAASTestCase):
         def check_context_in_thread():
             self.assertEqual(value, context.get(name))
 
-        return context.call(
-            {name: value}, deferToNewThread, check_context_in_thread
-        )
+        return context.call({name: value}, deferToNewThread, check_context_in_thread)
 
     def test_propagates_context_into_callback_from_thread(self):
         name = factory.make_name("name")
@@ -1600,9 +1590,7 @@ class TestThreadPoolCommonBehaviour(MAASTestCase):
 
         # The context was active when the function was called both times, and
         # wasn't exited and re-entered in-between.
-        self.assertEqual(
-            ["__enter__", "function", "function", "__exit__"], steps
-        )
+        self.assertEqual(["__enter__", "function", "function", "__exit__"], steps)
         # All steps happened in the same thread.
         self.assertEqual(len(set(threads)), 1)
         # That thread was not this thread.
@@ -1860,13 +1848,9 @@ class TestTerminateProcess(MAASTestCase):
         super().setUp()
         # Allow spying on calls to os.kill and os.killpg by terminateProcess.
         self.assertIs(twisted_module._os_kill, os.kill)
-        self.patch(
-            twisted_module, "_os_kill", Mock(wraps=twisted_module._os_kill)
-        )
+        self.patch(twisted_module, "_os_kill", Mock(wraps=twisted_module._os_kill))
         self.assertIs(twisted_module._os_killpg, os.killpg)
-        self.patch(
-            twisted_module, "_os_killpg", Mock(wraps=twisted_module._os_killpg)
-        )
+        self.patch(twisted_module, "_os_killpg", Mock(wraps=twisted_module._os_killpg))
 
     def startSignalPrinter(self, protocol, *, pgrp=False):
         script_filename = self.make_file(
@@ -1891,9 +1875,7 @@ class TestTerminateProcess(MAASTestCase):
     def terminateSignalPrinter(self, process, protocol):
         # Terminate with some short timings; no point waiting long in a test,
         # and we need to do it before the subprocess finishes sleeping.
-        terminateProcess(
-            process.pid, protocol.done, quit_after=0.1, kill_after=0.2
-        )
+        terminateProcess(process.pid, protocol.done, quit_after=0.1, kill_after=0.2)
 
     @inlineCallbacks
     def test_terminates_process_with_TERM_QUIT_then_KILL(self):
@@ -2041,9 +2023,7 @@ class TestReducedWebLogFormatter(MAASTestCase):
     def test_renders_full_request(self):
         request = requesthelper.DummyRequest("foo/bar")
         request.method = self.prep(self.method)
-        request.client = address.IPv4Address(
-            "TCP", self.prep(self.client), 12345
-        )
+        request.client = address.IPv4Address("TCP", self.prep(self.client), 12345)
         referer = self.prep(self.referrer)
         if referer is not None:
             request.requestHeaders.addRawHeader("referer", referer)

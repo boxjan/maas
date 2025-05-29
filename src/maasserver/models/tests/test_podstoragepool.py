@@ -29,9 +29,7 @@ class TestPodStoragePool(MAASServerTestCase):
         pool = factory.make_PodStoragePool(pod=pod)
 
         node = factory.make_Node(with_boot_disk=False)
-        other_node_config = factory.make_NodeConfig(
-            node=node, name="deployment"
-        )
+        other_node_config = factory.make_NodeConfig(node=node, name="deployment")
         disk = factory.make_PhysicalBlockDevice(node=node)
         disk_other_config = factory.make_PhysicalBlockDevice(
             node_config=other_node_config

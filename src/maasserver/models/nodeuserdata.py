@@ -52,9 +52,7 @@ class NodeUserDataManager(Manager):
         """
         self.filter(node__in=nodes).delete()
         if data is not None:
-            self.bulk_create(
-                self.model(node=node, data=Bin(data)) for node in nodes
-            )
+            self.bulk_create(self.model(node=node, data=Bin(data)) for node in nodes)
 
 
 class NodeUserData(CleanSave, Model):

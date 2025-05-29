@@ -31,9 +31,7 @@ class TestFileStorage(MAASServerTestCase):
         filename = factory.make_string()
         content = self.make_data()
         user = factory.make_User()
-        storage = FileStorage.objects.save_file(
-            filename, BytesIO(content), user
-        )
+        storage = FileStorage.objects.save_file(filename, BytesIO(content), user)
         self.assertEqual(
             (filename, content, user),
             (storage.filename, storage.content, storage.owner),
@@ -44,9 +42,7 @@ class TestFileStorage(MAASServerTestCase):
         content = self.make_data()
         factory.make_FileStorage(filename=filename, content=content)
         storage = FileStorage.objects.get(filename=filename)
-        self.assertEqual(
-            (filename, content), (storage.filename, storage.content)
-        )
+        self.assertEqual((filename, content), (storage.filename, storage.content))
 
     def test_stores_binary_data(self):
         storage = factory.make_FileStorage(content=sample_binary_data)
@@ -61,13 +57,9 @@ class TestFileStorage(MAASServerTestCase):
             filename=filename, content=self.make_data("old data")
         )
         new_data = self.make_data("new-data")
-        new_storage = factory.make_FileStorage(
-            filename=filename, content=new_data
-        )
+        new_storage = factory.make_FileStorage(filename=filename, content=new_data)
         self.assertEqual(old_storage.filename, new_storage.filename)
-        self.assertEqual(
-            new_data, FileStorage.objects.get(filename=filename).content
-        )
+        self.assertEqual(new_data, FileStorage.objects.get(filename=filename).content)
 
     def test_key_gets_generated(self):
         # The generated system_id looks good.

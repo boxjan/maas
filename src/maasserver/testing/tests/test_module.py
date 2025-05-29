@@ -25,9 +25,7 @@ class TestHelpers(MAASServerTestCase):
         url_path = factory.make_string()
         self.assertEqual(
             f"/{url_path}",
-            extract_redirect(
-                HttpResponseRedirect(f"http://example.com/{url_path}")
-            ),
+            extract_redirect(HttpResponseRedirect(f"http://example.com/{url_path}")),
         )
 
     def test_extract_redirect_errors_out_helpfully_if_not_a_redirect(self):

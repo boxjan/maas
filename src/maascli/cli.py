@@ -87,9 +87,7 @@ class cmd_login(Command):
 
     def __call__(self, options):
         if options.insecure and options.cacerts:
-            raise SystemExit(
-                "You cannot use both cacerts and insecure arguments."
-            )
+            raise SystemExit("You cannot use both cacerts and insecure arguments.")
 
         cacerts = None
         # temporary cacerts file, used to check for bogus credentials
@@ -98,9 +96,7 @@ class cmd_login(Command):
         if options.cacerts is not None:
             cacerts = options.cacerts.read()
             try:
-                crypto.load_certificate(
-                    crypto.FILETYPE_PEM, cacerts.encode("utf-8")
-                )
+                crypto.load_certificate(crypto.FILETYPE_PEM, cacerts.encode("utf-8"))
             except crypto.Error:
                 raise CommandError("Invalid PEM material")
 
@@ -133,9 +129,7 @@ class cmd_login(Command):
                 if not valid_apikey:
                     raise SystemExit("The MAAS server rejected your API key.")
         # Get description of remote API.
-        description = fetch_api_description(
-            options.url, cacerts_path, options.insecure
-        )
+        description = fetch_api_description(options.url, cacerts_path, options.insecure)
         # Save the config.
         profile_name = options.profile_name
         with ProfileConfig.open(create=True) as config:

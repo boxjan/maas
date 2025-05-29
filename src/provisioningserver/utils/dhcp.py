@@ -85,8 +85,7 @@ class DHCP:
         option_bytes = pkt_bytes[SIZEOF_DHCP_PACKET:]
         try:
             self.options = {
-                option: value
-                for option, value in self._parse_options(option_bytes)
+                option: value for option, value in self._parse_options(option_bytes)
             }
         except InvalidDHCPPacket as exception:
             self.valid = False
@@ -117,9 +116,7 @@ class DHCP:
             # bytes are expected to follow.
             length_bytes = stream.read(1)
             if len(length_bytes) != 1:
-                raise InvalidDHCPPacket(
-                    "Truncated length field in DHCP option."
-                )
+                raise InvalidDHCPPacket("Truncated length field in DHCP option.")
             option_length = length_bytes[0]
             option_value = stream.read(option_length)
             if len(option_value) != option_length:

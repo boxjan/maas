@@ -126,9 +126,7 @@ class BootImageHelperMixin:
             boot_type = "uefi"
             image_type = BOOT_RESOURCE_FILE_TYPE.ARCHIVE_TAR_XZ
         else:
-            os_drv = OperatingSystemRegistry.get_item(
-                osystem
-            ).get_image_filetypes()
+            os_drv = OperatingSystemRegistry.get_item(osystem).get_image_filetypes()
             image_type = image_type or next(iter(os_drv))
             boot_type = None
 
@@ -195,11 +193,7 @@ class TestGetPreseedFilenames(MAASServerTestCase):
                 prefix,
                 "generic",
             ],
-            list(
-                get_preseed_filenames(
-                    node, prefix, osystem, release, default=True
-                )
-            ),
+            list(get_preseed_filenames(node, prefix, osystem, release, default=True)),
         )
 
     def test_returns_limited_filenames_if_node_is_None(self):
@@ -242,9 +236,7 @@ class TestGetPreseedFilenames(MAASServerTestCase):
         node = factory.make_Node(hostname=hostname)
         self.assertSequenceEqual(
             "generic",
-            list(get_preseed_filenames(node, prefix, release, default=True))[
-                -1
-            ],
+            list(get_preseed_filenames(node, prefix, release, default=True))[-1],
         )
 
     def test_returns_list_with_default(self):
@@ -257,9 +249,7 @@ class TestGetPreseedFilenames(MAASServerTestCase):
         node = factory.make_Node(hostname=hostname)
         self.assertSequenceEqual(
             prefix,
-            list(get_preseed_filenames(node, prefix, release, default=False))[
-                -1
-            ],
+            list(get_preseed_filenames(node, prefix, release, default=False))[-1],
         )
 
     def test_returns_backward_compatible_name_for_ubuntu_without_prefix(self):
@@ -329,9 +319,7 @@ class TestGetPreseedTemplate(MAASServerTestCase):
         self.patch(settings, "PRESEED_TEMPLATE_LOCATIONS", [])
         self.assertEqual(
             (None, None),
-            get_preseed_template(
-                (factory.make_string(), factory.make_string())
-            ),
+            get_preseed_template((factory.make_string(), factory.make_string())),
         )
 
     def test_get_preseed_template_returns_None_when_no_filenames(self):
@@ -574,9 +562,7 @@ class TestLoadPreseedTemplate(MAASServerTestCase):
         master_template_name = factory.make_string()
         preseed_content = '{{inherit "%s"}}' % master_template_name
         self.create_template(self.location, prefix, preseed_content)
-        master_content = self.create_template(
-            self.location, master_template_name
-        )
+        master_content = self.create_template(self.location, master_template_name)
         node = factory.make_Node()
         template = load_preseed_template(node, prefix)
         self.assertEqual(master_content, template.substitute())
@@ -634,9 +620,7 @@ class TestPreseedContext(MAASServerTestCase):
         syslog_port = factory.pick_port()
         Config.objects.set_config("maas_syslog_port", syslog_port)
         context = get_preseed_context(make_HttpRequest())
-        self.assertTrue(
-            context["syslog_host_port"].endswith(":%d" % syslog_port)
-        )
+        self.assertTrue(context["syslog_host_port"].endswith(":%d" % syslog_port))
 
 
 class TestNodeDeprecatedPreseedContext(
@@ -697,9 +681,7 @@ class TestNodePreseedContext(BootImageHelperMixin, MAASServerTestCase):
             "enable_third_party_drivers", enable_third_party_drivers
         )
         context = get_node_preseed_context(make_HttpRequest(), node, release)
-        self.assertEqual(
-            enable_third_party_drivers, context["third_party_drivers"]
-        )
+        self.assertEqual(enable_third_party_drivers, context["third_party_drivers"])
 
 
 class TestPreseedTemplate(MAASTestCase):
@@ -748,9 +730,7 @@ class TestRenderPreseed(BootImageHelperMixin, MAASServerTestCase):
             primary_rack=self.rack_controller
         )
         self.make_boot_image_for_node(node, "install")
-        preseed = render_preseed(
-            make_HttpRequest(), node, self.preseed, "precise"
-        )
+        preseed = render_preseed(make_HttpRequest(), node, self.preseed, "precise")
         # The test really is that the preseed is rendered without an
         # error.
         self.assertIsInstance(preseed, bytes)
@@ -765,12 +745,8 @@ class TestRenderPreseed(BootImageHelperMixin, MAASServerTestCase):
         self.make_boot_image_for_node(node, "install")
         self.useFixture(RegionConfigurationFixture(maas_url=maas_url))
         request = make_HttpRequest()
-        preseed = render_preseed(
-            request, node, self.preseed, "precise"
-        ).decode("utf-8")
-        rack_url = (
-            f"{request.scheme}://{node.get_boot_rack_controller().fqdn}:5248/"
-        )
+        preseed = render_preseed(request, node, self.preseed, "precise").decode("utf-8")
+        rack_url = f"{request.scheme}://{node.get_boot_rack_controller().fqdn}:5248/"
         self.assertIn(rack_url, preseed)
         self.assertNotIn(maas_url, preseed)
 
@@ -787,17 +763,13 @@ class TestRenderEnlistmentPreseed(MAASServerTestCase):
     ]
 
     def test_render_enlistment_preseed(self):
-        preseed = render_enlistment_preseed(
-            make_HttpRequest(), self.preseed, "precise"
-        )
+        preseed = render_enlistment_preseed(make_HttpRequest(), self.preseed, "precise")
         # The test really is that the preseed is rendered without an
         # error.
         self.assertIsInstance(preseed, bytes)
 
     def test_render_enlistment_preseed_valid_yaml(self):
-        preseed = render_enlistment_preseed(
-            make_HttpRequest(), self.preseed, "precise"
-        )
+        preseed = render_enlistment_preseed(make_HttpRequest(), self.preseed, "precise")
         self.assertTrue(yaml.safe_load(preseed))
 
     def test_get_preseed_uses_request_url(self):
@@ -860,9 +832,7 @@ class TestComposeCurtinMAASReporter(MAASServerTestCase):
             token.consumer.key, reporter["reporting"]["maas"]["consumer_key"]
         )
         self.assertEqual(token.key, reporter["reporting"]["maas"]["token_key"])
-        self.assertEqual(
-            token.secret, reporter["reporting"]["maas"]["token_secret"]
-        )
+        self.assertEqual(token.secret, reporter["reporting"]["maas"]["token_secret"])
         self.assertEqual(
             preseed_module.CURTIN_INSTALL_LOG, reporter["install"]["log_file"]
         )
@@ -892,9 +862,7 @@ class TestComposeCurtinMAASReporter(MAASServerTestCase):
             token.consumer.key, reporter["reporter"]["maas"]["consumer_key"]
         )
         self.assertEqual(token.key, reporter["reporter"]["maas"]["token_key"])
-        self.assertEqual(
-            token.secret, reporter["reporter"]["maas"]["token_secret"]
-        )
+        self.assertEqual(token.secret, reporter["reporter"]["maas"]["token_secret"])
 
     def test_returns_list_of_yaml_strings_matching_curtin(self):
         preseeds = compose_curtin_maas_reporter(
@@ -1017,9 +985,7 @@ class TestComposeCurtinCloudConfig(MAASServerTestCase):
             config["cloudconfig"]["maas-cloud-config"]["content"],
         )
         self.assertEqual(
-            yaml.safe_load(
-                config["cloudconfig"]["maas-cloud-config"]["content"]
-            ),
+            yaml.safe_load(config["cloudconfig"]["maas-cloud-config"]["content"]),
             ds_config,
         )
         self.assertIn(
@@ -1028,9 +994,7 @@ class TestComposeCurtinCloudConfig(MAASServerTestCase):
         )
         self.assertEqual(
             snap_config,
-            yaml.safe_load(
-                config["cloudconfig"]["maas-ubuntu-sso"]["content"]
-            ),
+            yaml.safe_load(config["cloudconfig"]["maas-ubuntu-sso"]["content"]),
         )
         self.assertIn(
             "#cloud-config",
@@ -1075,9 +1039,7 @@ class TestComposeCurtinCloudConfig(MAASServerTestCase):
         cloud_config = yaml.safe_load(
             config["cloudconfig"]["maas-cloud-config"]["content"]
         )
-        metadata_url = urlparse(
-            cloud_config["datasource"]["MAAS"]["metadata_url"]
-        )
+        metadata_url = urlparse(cloud_config["datasource"]["MAAS"]["metadata_url"])
         self.assertEqual(metadata_url.hostname, str(machine.boot_cluster_ip))
         self.assertEqual(metadata_url.port, 5248)
 
@@ -1100,26 +1062,18 @@ class TestComposeCurtinSwapSpace(MAASServerTestCase):
     def test_suppresses_swap_file_when_swap_on_block_device(self):
         node = factory.make_Node()
         block_device = factory.make_BlockDevice(node=node)
-        factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.SWAP, block_device=block_device
-        )
+        factory.make_Filesystem(fstype=FILESYSTEM_TYPE.SWAP, block_device=block_device)
         node.swap_size = None
         swap_preseed = compose_curtin_swap_preseed(node)
-        self.assertEqual(
-            swap_preseed, [yaml.safe_dump({"swap": {"size": "0B"}})]
-        )
+        self.assertEqual(swap_preseed, [yaml.safe_dump({"swap": {"size": "0B"}})])
 
     def test_suppresses_swap_file_when_swap_on_partition(self):
         node = factory.make_Node()
         partition = factory.make_Partition(node=node)
-        factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.SWAP, partition=partition
-        )
+        factory.make_Filesystem(fstype=FILESYSTEM_TYPE.SWAP, partition=partition)
         node.swap_size = None
         swap_preseed = compose_curtin_swap_preseed(node)
-        self.assertEqual(
-            swap_preseed, [yaml.safe_dump({"swap": {"size": "0B"}})]
-        )
+        self.assertEqual(swap_preseed, [yaml.safe_dump({"swap": {"size": "0B"}})])
 
 
 class TestComposeCurtinKernel(MAASServerTestCase):
@@ -1196,9 +1150,7 @@ class TestGetCurtinMergedConfig(MAASServerTestCase):
             yaml.safe_dump({"maas": {"test": "data"}, "override": "data"}),
             yaml.safe_dump({"maas2": {"test": "data2"}, "override": "data2"}),
         ]
-        mock_yaml_config = self.patch_autospec(
-            preseed_module, "get_curtin_yaml_config"
-        )
+        mock_yaml_config = self.patch_autospec(preseed_module, "get_curtin_yaml_config")
         mock_yaml_config.return_value = configs
         self.assertEqual(
             {
@@ -1208,9 +1160,7 @@ class TestGetCurtinMergedConfig(MAASServerTestCase):
             },
             get_curtin_merged_config(sentinel.request, sentinel.node),
         )
-        mock_yaml_config.assert_called_once_with(
-            sentinel.request, sentinel.node
-        )
+        mock_yaml_config.assert_called_once_with(sentinel.request, sentinel.node)
 
 
 class TestGetCurtinUserData(BootImageHelperMixin, MAASServerTestCase):
@@ -1224,9 +1174,7 @@ class TestGetCurtinUserData(BootImageHelperMixin, MAASServerTestCase):
         factory.make_PackageRepository(
             url=main_url, default=True, arches=["i386", "amd64"]
         )
-        self.patch(
-            preseed_module, "curtin_supports_custom_storage"
-        ).return_value = True
+        self.patch(preseed_module, "curtin_supports_custom_storage").return_value = True
         self.make_boot_image_for_node(node, "xinstall")
         mock_compose_storage = self.patch(
             preseed_module, "compose_curtin_storage_config"
@@ -1249,9 +1197,7 @@ class TestGetCurtinUserData(BootImageHelperMixin, MAASServerTestCase):
             primary_rack=self.rack_controller,
             osystem=random.choice(["windows", "ubuntu-core", "esxi"]),
         )
-        self.patch(
-            preseed_module, "curtin_supports_custom_storage"
-        ).return_value = True
+        self.patch(preseed_module, "curtin_supports_custom_storage").return_value = True
         self.patch(
             preseed_module, "curtin_supports_custom_storage_for_dd"
         ).return_value = True
@@ -1317,9 +1263,7 @@ class TestGetCurtinUserData(BootImageHelperMixin, MAASServerTestCase):
             osystem=factory.make_name("osystem"),
         )
         self.make_boot_image_for_node(node, "xinstall")
-        self.patch(
-            preseed_module, "curtin_supports_custom_storage"
-        ).return_value = True
+        self.patch(preseed_module, "curtin_supports_custom_storage").return_value = True
         self.patch(
             preseed_module, "curtin_supports_centos_curthook"
         ).return_value = True
@@ -1336,9 +1280,7 @@ class TestGetCurtinUserData(BootImageHelperMixin, MAASServerTestCase):
             osystem=factory.make_name("osystem"),
         )
         self.make_boot_image_for_node(node, "xinstall")
-        self.patch(
-            preseed_module, "curtin_supports_custom_storage"
-        ).return_value = True
+        self.patch(preseed_module, "curtin_supports_custom_storage").return_value = True
         self.patch(
             preseed_module, "curtin_supports_centos_curthook"
         ).return_value = False
@@ -1369,9 +1311,7 @@ class TestRenderCurtinUserdataWithThirdPartyDrivers(
         )
         Config.objects.set_config("enable_third_party_drivers", True)
         self.make_boot_image_for_node(node, "xinstall")
-        get_third_party_driver = self.patch(
-            preseed_module, "get_third_party_driver"
-        )
+        get_third_party_driver = self.patch(preseed_module, "get_third_party_driver")
         get_third_party_driver.return_value = self.driver
         curtin_config_text = get_curtin_config(make_HttpRequest(), node)
         config = yaml.safe_load(curtin_config_text)
@@ -1393,9 +1333,7 @@ class TestGetCurtinUserDataOS(BootImageHelperMixin, MAASServerTestCase):
     """Tests for `get_curtin_userdata` using os specific scenarios."""
 
     # Create a scenario for each possible os specific preseed.
-    scenarios = [
-        (name, {"os_name": name}) for name in ["centos", "suse", "windows"]
-    ]
+    scenarios = [(name, {"os_name": name}) for name in ["centos", "suse", "windows"]]
 
     def test_get_curtin_userdata(self):
         node = factory.make_Node_with_Interface_on_Subnet(
@@ -1431,14 +1369,10 @@ class TestCurtinUtilities(BootImageHelperMixin, MAASServerTestCase):
         for pocket in archive.POCKETS_TO_DISABLE:
             if archive.disabled_pockets and pocket in archive.disabled_pockets:
                 continue
-            sources_list += (
-                f"deb {archive.url} $RELEASE-{pocket} {components}\n"
-            )
+            sources_list += f"deb {archive.url} $RELEASE-{pocket} {components}\n"
             if archive.disable_sources:
                 sources_list += "# "
-            sources_list += (
-                f"deb-src {archive.url} $RELEASE-{pocket} {components}\n"
-            )
+            sources_list += f"deb-src {archive.url} $RELEASE-{pocket} {components}\n"
 
         apt_config = config.get("apt")
         self.assertFalse(apt_config.get("preserve_sources_list"))
@@ -1463,9 +1397,7 @@ class TestCurtinUtilities(BootImageHelperMixin, MAASServerTestCase):
         request = make_HttpRequest()
         config = yaml.safe_load(get_curtin_config(request, node))
         self.assertIn("debconf_selections", config)
-        self.assertIn(
-            "cloud-init/datasources", config["debconf_selections"]["maas"]
-        )
+        self.assertIn("cloud-init/datasources", config["debconf_selections"]["maas"])
         self.assertIn(
             "cloud-init-base/datasources", config["debconf_selections"]["maas"]
         )
@@ -1570,9 +1502,7 @@ class TestCurtinUtilities(BootImageHelperMixin, MAASServerTestCase):
         node.save()
         self.make_boot_image_for_node(node, "xinstall")
         config = get_curtin_config(make_HttpRequest(), node)
-        self.assertIn(
-            "maas_00: chreipl node /dev/" + node.get_boot_disk().name, config
-        )
+        self.assertIn("maas_00: chreipl node /dev/" + node.get_boot_disk().name, config)
 
     def test_get_curtin_config_has_yum_proxy_late_command(self):
         node = factory.make_Node_with_Interface_on_Subnet(
@@ -1734,12 +1664,8 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
         self.make_boot_image_for_node(node, "xinstall")
         # compose_curtin_archive_config returns a list.
         userdata = get_archive_config(make_HttpRequest(), node)
-        archive = PackageRepository.objects.get_default_archive(
-            node.split_arch()[0]
-        )
-        self.assertEqual(
-            userdata["apt"]["sources"]["archive_key"]["key"], archive.key
-        )
+        archive = PackageRepository.objects.get_default_archive(node.split_arch()[0])
+        self.assertEqual(userdata["apt"]["sources"]["archive_key"]["key"], archive.key)
 
     def test_compose_curtin_archive_config_disables_pockets(self):
         PackageRepository.objects.all().delete()
@@ -1756,9 +1682,7 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
         # compose_curtin_archive_config returns a list.
         userdata = compose_curtin_archive_config(make_HttpRequest(), node)
         preseed = yaml.safe_load(userdata[0])
-        archive = PackageRepository.objects.get_default_archive(
-            node.split_arch()[0]
-        )
+        archive = PackageRepository.objects.get_default_archive(node.split_arch()[0])
         self.assertAptConfig(preseed, archive)
 
     def test_compose_curtin_archive_config_with_disabled_pockets(self):
@@ -1799,9 +1723,7 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
         # compose_curtin_archive_config returns a list.
         userdata = compose_curtin_archive_config(make_HttpRequest(), node)
         preseed = yaml.safe_load(userdata[0])
-        archive = PackageRepository.objects.get_default_archive(
-            node.split_arch()[0]
-        )
+        archive = PackageRepository.objects.get_default_archive(node.split_arch()[0])
         self.assertAptConfig(preseed, archive)
 
     def test_compose_curtin_archive_config_has_ppa(self):
@@ -1982,9 +1904,7 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
         self.make_boot_image_for_node(node, "xinstall")
         # compose_curtin_archive_config returns a list.
         userdata = compose_curtin_archive_config(make_HttpRequest(), node)
-        archive = PackageRepository.objects.get_default_archive(
-            node.split_arch()[0]
-        )
+        archive = PackageRepository.objects.get_default_archive(node.split_arch()[0])
         self.assertAptConfig(yaml.safe_load(userdata[0]), archive)
 
     def test_compose_curtin_archive_config_main_archive_for_custom_os(self):
@@ -2067,9 +1987,7 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
         arch, subarch = architecture.split("/")
         image_type = BOOT_RESOURCE_FILE_TYPE.ROOT_TGZ
         res = self.make_boot_image_for_node(node, image_type=image_type)
-        image = [
-            f for f in res.sets.first().files.all() if f.filetype == image_type
-        ][0]
+        image = [f for f in res.sets.first().files.all() if f.filetype == image_type][0]
         installer_url = get_curtin_installer_url(node)
         self.assertEqual(
             (
@@ -2097,9 +2015,7 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
         arch, _ = architecture.split("/")
         image_type = BOOT_RESOURCE_FILE_TYPE.SQUASHFS_IMAGE
         res = self.make_boot_image_for_node(node, image_type=image_type)
-        image = [
-            f for f in res.sets.first().files.all() if f.filetype == image_type
-        ][0]
+        image = [f for f in res.sets.first().files.all() if f.filetype == image_type][0]
         installer_url = get_curtin_installer_url(node)
         self.assertEqual(
             (
@@ -2139,13 +2055,9 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
             distro_series=series,
         )
         # Make boot image that is not xinstall
-        self.make_boot_image_for_node(
-            node, purpose=BOOT_IMAGE_PURPOSE.BOOTLOADER
-        )
+        self.make_boot_image_for_node(node, purpose=BOOT_IMAGE_PURPOSE.BOOTLOADER)
 
-        error = self.assertRaises(
-            MissingBootImage, get_curtin_installer_url, node
-        )
+        error = self.assertRaises(MissingBootImage, get_curtin_installer_url, node)
         arch, subarch = architecture.split("/")
         msg = (
             "No image could be found for the given selection: "
@@ -2156,15 +2068,11 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
 
     def test_get_preseed_type_for_commissioning(self):
         node = factory.make_Node(status=NODE_STATUS.COMMISSIONING)
-        self.assertEqual(
-            PRESEED_TYPE.COMMISSIONING, get_preseed_type_for(node)
-        )
+        self.assertEqual(PRESEED_TYPE.COMMISSIONING, get_preseed_type_for(node))
 
     def test_get_preseed_type_for_disk_erasing(self):
         node = factory.make_Node(status=NODE_STATUS.DISK_ERASING)
-        self.assertEqual(
-            PRESEED_TYPE.COMMISSIONING, get_preseed_type_for(node)
-        )
+        self.assertEqual(PRESEED_TYPE.COMMISSIONING, get_preseed_type_for(node))
 
     def test_get_preseed_type_for_curtin(self):
         node = factory.make_Node(status=NODE_STATUS.DEPLOYING)
@@ -2176,9 +2084,7 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
         # will get a 'commissioning' preseed in order to be powered
         # down.
         node = factory.make_Node(status=NODE_STATUS.READY)
-        self.assertEqual(
-            PRESEED_TYPE.COMMISSIONING, get_preseed_type_for(node)
-        )
+        self.assertEqual(PRESEED_TYPE.COMMISSIONING, get_preseed_type_for(node))
 
     def test_get_preseed_type_for_ephemeral_deployment(self):
         # A diskless node is one that it is ephemerally deployed.
@@ -2187,9 +2093,7 @@ XJzKwRUEuJlIkVEZ72OtuoUMoBrjuADRlJQUW0ZbcmpOxjK1c6w08nhSvA==
             with_boot_disk=False,
             ephemeral_deploy=True,
         )
-        self.assertEqual(
-            PRESEED_TYPE.COMMISSIONING, get_preseed_type_for(node)
-        )
+        self.assertEqual(PRESEED_TYPE.COMMISSIONING, get_preseed_type_for(node))
 
 
 class TestPreseedMethods(BootImageHelperMixin, MAASTransactionServerTestCase):
@@ -2207,12 +2111,8 @@ class TestPreseedMethods(BootImageHelperMixin, MAASTransactionServerTestCase):
                     {
                         "arches": ["i386", "amd64"],
                         "search": {
-                            "primary": [
-                                PackageRepository.get_main_archive().url
-                            ],
-                            "security": [
-                                PackageRepository.get_main_archive().url
-                            ],
+                            "primary": [PackageRepository.get_main_archive().url],
+                            "security": [PackageRepository.get_main_archive().url],
                         },
                         "failsafe": {
                             "primary": "http://archive.ubuntu.com/ubuntu",
@@ -2222,12 +2122,8 @@ class TestPreseedMethods(BootImageHelperMixin, MAASTransactionServerTestCase):
                     {
                         "arches": ["default"],
                         "search": {
-                            "primary": [
-                                PackageRepository.get_ports_archive().url
-                            ],
-                            "security": [
-                                PackageRepository.get_ports_archive().url
-                            ],
+                            "primary": [PackageRepository.get_ports_archive().url],
+                            "security": [PackageRepository.get_ports_archive().url],
                         },
                         "failsafe": {
                             "primary": "http://ports.ubuntu.com/ubuntu-ports",
@@ -2335,9 +2231,9 @@ class TestPreseedURLs(BootImageHelperMixin, MAASServerTestCase):
         rack_controller = factory.make_RackController(url=maas_url)
 
         self.assertTrue(
-            compose_enlistment_preseed_url(
-                rack_controller=rack_controller
-            ).startswith(maas_url),
+            compose_enlistment_preseed_url(rack_controller=rack_controller).startswith(
+                maas_url
+            ),
         )
 
     def test_compose_preseed_url_links_to_preseed_for_node(self):

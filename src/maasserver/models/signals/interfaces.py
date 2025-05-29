@@ -84,9 +84,7 @@ def interface_enabled_or_disabled(instance, old_values, **kwargs):
         for rel in instance.children_relationships.all():
             if not rel.child.is_enabled():
                 for ip_address in rel.child.ip_addresses.all():
-                    rel.child.unlink_ip_address(
-                        ip_address, clearing_config=True
-                    )
+                    rel.child.unlink_ip_address(ip_address, clearing_config=True)
 
 
 for klass in INTERFACE_CLASSES:
@@ -162,9 +160,7 @@ def interface_mtu_params_update(instance, old_values, **kwargs):
 
 
 for klass in INTERFACE_CLASSES:
-    signals.watch_fields(
-        interface_mtu_params_update, klass, ["params"], delete=False
-    )
+    signals.watch_fields(interface_mtu_params_update, klass, ["params"], delete=False)
 
 
 def interface_vlan_update(instance, old_values, **kwargs):
@@ -232,9 +228,7 @@ def interface_vlan_update(instance, old_values, **kwargs):
     else:
         # Interface VLAN was changed on a machine or device. Remove all its
         # links except the DISCOVERED ones.
-        instance.ip_addresses.exclude(
-            alloc_type=IPADDRESS_TYPE.DISCOVERED
-        ).delete()
+        instance.ip_addresses.exclude(alloc_type=IPADDRESS_TYPE.DISCOVERED).delete()
         if old_vlan_id is not None:
             # Don't bother logging if the VLAN was previously NULL, since there
             # shouldn't be any IP addresses on the interface, anyway. (But keep
@@ -257,9 +251,7 @@ def interface_vlan_update(instance, old_values, **kwargs):
 
 
 for klass in INTERFACE_CLASSES:
-    signals.watch_fields(
-        interface_vlan_update, klass, ["vlan_id"], delete=False
-    )
+    signals.watch_fields(interface_vlan_update, klass, ["vlan_id"], delete=False)
 
 
 def delete_children_interface_handler(sender, instance, **kwargs):
@@ -292,9 +284,7 @@ def delete_related_ip_addresses(sender, instance, **kwargs):
         return
 
     # Delete all linked IP addresses that only have one link
-    StaticIPAddress.objects.annotate(
-        interface_count=Count("interface")
-    ).filter(
+    StaticIPAddress.objects.annotate(interface_count=Count("interface")).filter(
         id__in=instance.ip_addresses.all().values("id"), interface_count__lte=1
     ).delete()
 

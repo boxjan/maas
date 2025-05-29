@@ -28,7 +28,5 @@ class TestSwitchBootOrderHandler(APITestCase.ForUser):
 
         uri = get_switch_boot_order_uri(machine.system_id)
         response = self.client.put(uri, {"network_boot": False})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         machine.set_boot_order.assert_called_once_with(network_boot=False)

@@ -41,8 +41,7 @@ def parse_args() -> Namespace:
     parser.add_argument(
         "--tag-prefix",
         help=(
-            "Prefix for tag names. If none is specified, a random one "
-            "is generated"
+            "Prefix for tag names. If none is specified, a random one " "is generated"
         ),
         default="",
     )
@@ -86,9 +85,7 @@ def setup_django(
 
     settings_module = import_module(f"maasserver.djangosettings.{setting}")
     config = {
-        key: value
-        for key, value in settings_module.__dict__.items()
-        if key.isupper()
+        key: value for key, value in settings_module.__dict__.items() if key.isupper()
     }
     # ensure logging is enabled
     log_config = config["LOGGING"]
@@ -140,9 +137,7 @@ def _set_triggers(state):
     with connection.cursor() as cursor:
         for table in TRIGGERS:
             for trigger in TRIGGERS[table]:
-                cursor.execute(
-                    f'ALTER TABLE "{table}" {state} TRIGGER "{trigger}"'
-                )
+                cursor.execute(f'ALTER TABLE "{table}" {state} TRIGGER "{trigger}"')
 
 
 @transaction.atomic
@@ -173,6 +168,4 @@ def main():
     )
     enable_triggers()
     end_time = time.monotonic()
-    LOGGER.info(
-        f"sampledata generated in {timedelta(seconds=end_time - start_time)}"
-    )
+    LOGGER.info(f"sampledata generated in {timedelta(seconds=end_time - start_time)}")

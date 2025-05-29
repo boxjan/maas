@@ -23,9 +23,7 @@ class IPRangeForm(MAASModelForm):
         model = IPRange
         fields = ("subnet", "type", "start_ip", "end_ip", "user", "comment")
 
-    def __init__(
-        self, data=None, instance=None, request=None, *args, **kwargs
-    ):
+    def __init__(self, data=None, instance=None, request=None, *args, **kwargs):
         if data is None:
             data = {}
         else:

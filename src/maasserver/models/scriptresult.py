@@ -74,17 +74,13 @@ class ScriptResult(CleanSave, TimestampedModel):
         on_delete=SET_NULL,
     )
 
-    status = IntegerField(
-        choices=SCRIPT_STATUS_CHOICES, default=SCRIPT_STATUS.PENDING
-    )
+    status = IntegerField(choices=SCRIPT_STATUS_CHOICES, default=SCRIPT_STATUS.PENDING)
 
     exit_status = IntegerField(blank=True, null=True)
 
     # Used by the builtin commissioning scripts and installation result. Also
     # stores the Script name incase the Script is deleted but the result isn't.
-    script_name = CharField(
-        max_length=255, unique=False, editable=False, null=True
-    )
+    script_name = CharField(max_length=255, unique=False, editable=False, null=True)
 
     output = BinaryField(max_length=1024 * 1024, blank=True, default=b"")
 
@@ -294,13 +290,10 @@ class ScriptResult(CleanSave, TimestampedModel):
             try:
                 parsed_yaml = self.read_results()
             except ValidationError as err:
-                err_msg = (
-                    "%s(%s) sent a script result with invalid YAML: %s"
-                    % (
-                        self.script_set.node.fqdn,
-                        self.script_set.node.system_id,
-                        err.message,
-                    )
+                err_msg = "%s(%s) sent a script result with invalid YAML: %s" % (
+                    self.script_set.node.fqdn,
+                    self.script_set.node.system_id,
+                    err.message,
                 )
                 logger.error(err_msg)
                 Event.objects.create_node_event(
@@ -405,9 +398,7 @@ class ScriptResult(CleanSave, TimestampedModel):
 
     @property
     def history(self):
-        qs = ScriptResult.objects.filter(
-            script_set__node_id=self.script_set.node_id
-        )
+        qs = ScriptResult.objects.filter(script_set__node_id=self.script_set.node_id)
         if self.script is not None:
             qs = qs.filter(script=self.script)
         else:

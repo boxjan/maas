@@ -78,9 +78,7 @@ UNDEFINED = object()
 
 class TestBMC(MAASServerTestCase):
     def get_machine_ip_address(self, machine):
-        return machine.current_config.interface_set.all()[
-            0
-        ].ip_addresses.all()[0]
+        return machine.current_config.interface_set.all()[0].ip_addresses.all()[0]
 
     def make_machine_and_bmc_with_shared_ip(self):
         machine = factory.make_Node(interface=False)
@@ -176,9 +174,7 @@ class TestBMC(MAASServerTestCase):
             "power_address": "protocol://%s:8080/path/to/thing#tag"
             % (factory.ip_to_url_format(sticky_ip.ip))
         }
-        bmc = factory.make_BMC(
-            power_type="virsh", power_parameters=power_parameters
-        )
+        bmc = factory.make_BMC(power_type="virsh", power_parameters=power_parameters)
         self.assertEqual(sticky_ip.ip, bmc.ip_address.ip)
         self.assertEqual(subnet, bmc.ip_address.subnet)
 
@@ -188,9 +184,7 @@ class TestBMC(MAASServerTestCase):
             alloc_type=IPADDRESS_TYPE.STICKY, subnet=subnet
         )
         power_parameters = {"power_address": "%s" % sticky_ip.ip}
-        bmc = factory.make_BMC(
-            power_type="ipmi", power_parameters=power_parameters
-        )
+        bmc = factory.make_BMC(power_type="ipmi", power_parameters=power_parameters)
         self.assertEqual(sticky_ip.ip, bmc.ip_address.ip)
         self.assertEqual(subnet, bmc.ip_address.subnet)
 
@@ -200,9 +194,7 @@ class TestBMC(MAASServerTestCase):
             alloc_type=IPADDRESS_TYPE.STICKY, subnet=subnet
         )
         power_parameters = {"power_address": "[%s]" % sticky_ip.ip}
-        bmc = factory.make_BMC(
-            power_type="ipmi", power_parameters=power_parameters
-        )
+        bmc = factory.make_BMC(power_type="ipmi", power_parameters=power_parameters)
         self.assertEqual(sticky_ip.ip, bmc.ip_address.ip)
         self.assertEqual(subnet, bmc.ip_address.subnet)
 
@@ -212,9 +204,7 @@ class TestBMC(MAASServerTestCase):
             "power_address": "protocol://%s:8080/path#tag"
             % factory.ip_to_url_format(ip)
         }
-        bmc = factory.make_BMC(
-            power_type="virsh", power_parameters=power_parameters
-        )
+        bmc = factory.make_BMC(power_type="virsh", power_parameters=power_parameters)
         self.assertEqual(ip, bmc.ip_address.ip)
         self.assertIsNone(bmc.ip_address.subnet)
 
@@ -240,9 +230,7 @@ class TestBMC(MAASServerTestCase):
         with self.assertRaisesRegex(
             ValueError, "does not support netmasks or subnet prefixes!"
         ):
-            factory.make_BMC(
-                power_type="ipmi", power_parameters=power_parameters
-            )
+            factory.make_BMC(power_type="ipmi", power_parameters=power_parameters)
 
     def test_deleting_machine_ip_when_shared_with_bmc(self):
         machine, bmc, machine_ip = self.make_machine_and_bmc_with_shared_ip()
@@ -340,9 +328,7 @@ class TestBMC(MAASServerTestCase):
         ip = factory.make_StaticIPAddress(ip="10.10.10.10")
         bmc = factory.make_BMC(
             power_type="virsh",
-            power_parameters={
-                "power_address": f"virsh://{ip.ip}/path/to/thing#tag"
-            },
+            power_parameters={"power_address": f"virsh://{ip.ip}/path/to/thing#tag"},
         )
         self.assertEqual(bmc.ip_address.id, ip.id)
 
@@ -378,23 +364,17 @@ class TestBMC(MAASServerTestCase):
     def test_delete_deletes_bmc_secrets(self):
         bmc = factory.make_BMC()
         secret_manager = SecretManager()
-        secret_manager.set_composite_secret(
-            "power-parameters", {"foo": "bar"}, obj=bmc
-        )
+        secret_manager.set_composite_secret("power-parameters", {"foo": "bar"}, obj=bmc)
 
         bmc.delete()
         self.assertIsNone(
-            secret_manager.get_simple_secret(
-                "power-parameters", obj=bmc, default=None
-            )
+            secret_manager.get_simple_secret("power-parameters", obj=bmc, default=None)
         )
 
     def test_delete_bmc_spares_non_orphaned_ip_address(self):
         machine, bmc, machine_ip = self.make_machine_and_bmc_with_shared_ip()
         bmc.delete()
-        self.assertEqual(
-            1, StaticIPAddress.objects.filter(id=machine_ip.id).count()
-        )
+        self.assertEqual(1, StaticIPAddress.objects.filter(id=machine_ip.id).count())
 
     def test_scope_power_parameters(self):
         bmc_parameters = dict(
@@ -424,9 +404,7 @@ class TestBMC(MAASServerTestCase):
 
     def test_bmc_extract_ip_address_whole_value(self):
         power_parameters = {"power_address": "192.168.1.1"}
-        self.assertEqual(
-            "192.168.1.1", BMC.extract_ip_address("hmc", power_parameters)
-        )
+        self.assertEqual("192.168.1.1", BMC.extract_ip_address("hmc", power_parameters))
 
     def test_bmc_extract_ip_address_empty_power_type_gives_none(self):
         power_parameters = {"power_address": "192.168.1.1"}
@@ -448,14 +426,10 @@ class TestBMC(MAASServerTestCase):
         self.assertIsNone(BMC.extract_ip_address("virsh", {}))
 
         power_parameters = {"power_address": ""}
-        self.assertEqual(
-            None, BMC.extract_ip_address("virsh", power_parameters)
-        )
+        self.assertEqual(None, BMC.extract_ip_address("virsh", power_parameters))
 
         power_parameters = {"power_address": None}
-        self.assertEqual(
-            None, BMC.extract_ip_address("virsh", power_parameters)
-        )
+        self.assertEqual(None, BMC.extract_ip_address("virsh", power_parameters))
 
     def test_bmc_extract_ip_address_from_url_empty_host(self):
         power_parameters = {"power_address": "http://:8080/foo/#baz"}
@@ -463,9 +437,7 @@ class TestBMC(MAASServerTestCase):
 
     def test_bmc_extract_ip_address_with_fqdn_returns_none(self):
         self.assertIsNone(
-            BMC.extract_ip_address(
-                "webhook", {"power_address": factory.make_url()}
-            )
+            BMC.extract_ip_address("webhook", {"power_address": factory.make_url()})
         )
 
     def test_get_usable_rack_controllers_returns_empty_when_none(self):
@@ -521,9 +493,7 @@ class TestBMC(MAASServerTestCase):
         sip.save()
         bmc = factory.make_BMC(
             power_type="virsh",
-            power_parameters={
-                "power_address": "qemu+ssh://user@%s/system" % ip
-            },
+            power_parameters={"power_address": "qemu+ssh://user@%s/system" % ip},
             ip_address=sip,
         )
         bmc.get_usable_rack_controllers()
@@ -532,14 +502,10 @@ class TestBMC(MAASServerTestCase):
     def test_get_usable_rack_controllers_updates_handles_unknown_subnet(self):
         network = factory.make_ipv4_network()
         ip = factory.pick_ip_in_network(network)
-        sip = StaticIPAddress.objects.create(
-            alloc_type=IPADDRESS_TYPE.STICKY, ip=ip
-        )
+        sip = StaticIPAddress.objects.create(alloc_type=IPADDRESS_TYPE.STICKY, ip=ip)
         bmc = factory.make_BMC(
             power_type="virsh",
-            power_parameters={
-                "power_address": "qemu+ssh://user@%s/system" % ip
-            },
+            power_parameters={"power_address": "qemu+ssh://user@%s/system" % ip},
             ip_address=sip,
         )
         bmc.get_usable_rack_controllers()
@@ -556,9 +522,7 @@ class TestBMC(MAASServerTestCase):
     def test_get_client_identifiers_returns_rack_controller_system_ids(self):
         rack_controllers = [factory.make_RackController() for _ in range(3)]
         bmc = factory.make_BMC()
-        self.patch(
-            bmc, "get_usable_rack_controllers"
-        ).return_value = rack_controllers
+        self.patch(bmc, "get_usable_rack_controllers").return_value = rack_controllers
         expected_system_ids = [rack.system_id for rack in rack_controllers]
         self.assertEqual(expected_system_ids, bmc.get_client_identifiers())
 
@@ -568,18 +532,14 @@ class TestBMC(MAASServerTestCase):
             bmc, "get_usable_rack_controllers"
         )
         bmc.is_accessible()
-        mock_get_usable_rack_controllers.assert_called_once_with(
-            with_connection=True
-        )
+        mock_get_usable_rack_controllers.assert_called_once_with(with_connection=True)
 
     def test_is_accessible_returns_true(self):
         bmc = factory.make_BMC()
         mock_get_usable_rack_controllers = self.patch(
             bmc, "get_usable_rack_controllers"
         )
-        mock_get_usable_rack_controllers.return_value = [
-            factory.make_RackController()
-        ]
+        mock_get_usable_rack_controllers.return_value = [factory.make_RackController()]
         self.assertTrue(bmc.is_accessible())
 
     def test_is_accessible_returns_false(self):
@@ -632,9 +592,7 @@ class TestBMC(MAASServerTestCase):
     def test_get_power_params(self):
         bmc = factory.make_BMC()
         secret_manager = SecretManager()
-        secret_manager.set_composite_secret(
-            "power-parameters", {"foo": "bar"}, obj=bmc
-        )
+        secret_manager.set_composite_secret("power-parameters", {"foo": "bar"}, obj=bmc)
 
         self.assertEqual({"foo": "bar"}, bmc.get_power_parameters())
 
@@ -647,9 +605,7 @@ class TestPodManager(MAASServerTestCase):
     def test_get_pods_no_rbac_always_all(self):
         pods = [factory.make_Pod() for _ in range(3)]
         for perm in PodPermission:
-            self.assertCountEqual(
-                pods, Pod.objects.get_pods(factory.make_User(), perm)
-            )
+            self.assertCountEqual(pods, Pod.objects.get_pods(factory.make_User(), perm))
 
     def test_get_pods_view_rbac_returns_view_rights(self):
         self.enable_rbac()
@@ -869,9 +825,7 @@ class PodTestMixin:
                 for _ in range(3)
             ]
         if storage_pools is None:
-            storage_pools = [
-                self.make_discovered_storage_pool() for _ in range(3)
-            ]
+            storage_pools = [self.make_discovered_storage_pool() for _ in range(3)]
         if mac_addresses is None:
             mac_addresses = []
         return DiscoveredPod(
@@ -947,9 +901,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
     def test_create_with_no_pool(self):
         pod = Pod(power_type="virsh", power_parameters={})
         pod.save()
-        self.assertEqual(
-            ResourcePool.objects.get_default_resource_pool(), pod.pool
-        )
+        self.assertEqual(ResourcePool.objects.get_default_resource_pool(), pod.pool)
 
     def test_save_with_no_pool(self):
         pod = Pod(power_type="virsh", power_parameters={})
@@ -973,9 +925,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         )
         pod.save()
         self.assertEqual(cpu_over_commit_ratio, pod.cpu_over_commit_ratio)
-        self.assertEqual(
-            memory_over_commit_ratio, pod.memory_over_commit_ratio
-        )
+        self.assertEqual(memory_over_commit_ratio, pod.memory_over_commit_ratio)
 
     def test_create_with_no_over_commit_ratios(self):
         pod = Pod(power_type="virsh", power_parameters={})
@@ -1056,8 +1006,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         pod = factory.make_Pod()
         pod.sync(discovered, factory.make_User())
         machine_macs = [
-            machine.interfaces[0].mac_address
-            for machine in discovered.machines
+            machine.interfaces[0].mac_address for machine in discovered.machines
         ]
         created_machines = Machine.objects.filter(
             current_config__interface__mac_address__in=machine_macs
@@ -1070,12 +1019,8 @@ class TestPod(MAASServerTestCase, PodTestMixin):
                 created_machine.architecture, discovered_machine.architecture
             )
             self.assertEqual(created_machine.bmc, pod)
-            self.assertEqual(
-                created_machine.cpu_count, discovered_machine.cores
-            )
-            self.assertEqual(
-                created_machine.cpu_speed, discovered_machine.cpu_speed
-            )
+            self.assertEqual(created_machine.cpu_count, discovered_machine.cores)
+            self.assertEqual(created_machine.cpu_speed, discovered_machine.cpu_speed)
             self.assertEqual(created_machine.memory, discovered_machine.memory)
             self.assertEqual(
                 created_machine.power_state, discovered_machine.power_state
@@ -1098,28 +1043,20 @@ class TestPod(MAASServerTestCase, PodTestMixin):
                     created_device.name,
                     BlockDevice._get_block_name_from_idx(idx),
                 )
-                self.assertEqual(
-                    created_device.id_path, discovered_device.id_path
-                )
+                self.assertEqual(created_device.id_path, discovered_device.id_path)
                 self.assertEqual(created_device.model, discovered_device.model)
-                self.assertEqual(
-                    created_device.serial, discovered_device.serial
-                )
+                self.assertEqual(created_device.serial, discovered_device.serial)
                 self.assertEqual(created_device.size, discovered_device.size)
                 self.assertEqual(
                     created_device.block_size, discovered_device.block_size
                 )
-                self.assertCountEqual(
-                    created_device.tags, discovered_device.tags
-                )
+                self.assertCountEqual(created_device.tags, discovered_device.tags)
             for created_if, (idx, discovered_if) in zip(
                 created_machine.current_config.interface_set.all(),
                 enumerate(discovered_machine.interfaces),
             ):
                 self.assertEqual(created_if.name, f"eth{idx}")
-                self.assertEqual(
-                    created_if.mac_address, discovered_if.mac_address
-                )
+                self.assertEqual(created_if.mac_address, discovered_if.mac_address)
                 self.assertEqual(
                     created_if.vlan,
                     default_vlan if discovered_if.boot else None,
@@ -1140,9 +1077,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             self.make_discovered_machine(project=project2),
         ]
         discovered_pod = self.make_discovered_pod(machines=discovered_machines)
-        pod = factory.make_Pod(
-            pod_type="lxd", parameters={"project": project1}
-        )
+        pod = factory.make_Pod(pod_type="lxd", parameters={"project": project1})
         self.patch(Machine, "start_commissioning")
         pod.sync(discovered_pod, factory.make_User())
         discovered_vms = {
@@ -1152,13 +1087,9 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         vms = VirtualMachine.objects.all()
         for vm in vms:
             discovered_vm = discovered_vms.pop(vm.identifier)
-            self.assertEqual(
-                vm.project, discovered_vm.power_parameters["project"]
-            )
+            self.assertEqual(vm.project, discovered_vm.power_parameters["project"])
             self.assertEqual(vm.memory, discovered_vm.memory)
-            self.assertEqual(
-                vm.hugepages_backed, discovered_vm.hugepages_backed
-            )
+            self.assertEqual(vm.hugepages_backed, discovered_vm.hugepages_backed)
             self.assertEqual(vm.pinned_cores, discovered_vm.pinned_cores)
             self.assertEqual(vm.unpinned_cores, discovered_vm.cores)
         self.assertEqual(discovered_vms, {}, "Found extra vms not discovered")
@@ -1170,9 +1101,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         project1 = factory.make_string()
         project2 = factory.make_string()
         discovered_pod = self.make_discovered_pod(machines=[])
-        pod = factory.make_Pod(
-            pod_type="lxd", parameters={"project": project1}
-        )
+        pod = factory.make_Pod(pod_type="lxd", parameters={"project": project1})
         factory.make_VirtualMachine(project=project1, bmc=pod)
         factory.make_VirtualMachine(project=project2, bmc=pod)
         self.patch(Machine, "start_commissioning")
@@ -1191,9 +1120,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
     def test_sync_pod_links_existing_vm(self):
         project = factory.make_string()
         discovered_machine = self.make_discovered_machine(project=project)
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         instance_name = discovered_machine.power_parameters["instance_name"]
         pod = factory.make_Pod(pod_type="lxd", parameters={"project": project})
         virtual_machine = factory.make_VirtualMachine(
@@ -1209,9 +1136,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
     def test_sync_pod_links_different_vm_different_project(self):
         project = factory.make_string()
         discovered_machine = self.make_discovered_machine(project=project)
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         instance_name = discovered_machine.power_parameters["instance_name"]
         pod = factory.make_Pod(pod_type="lxd", parameters={"project": project})
         other_vm = factory.make_VirtualMachine(
@@ -1228,9 +1153,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         project = factory.make_string()
         discovered_machine = self.make_discovered_machine(project=project)
         instance_name = discovered_machine.power_parameters["instance_name"]
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod = factory.make_Pod(pod_type="lxd", parameters={"project": project})
         machine1 = factory.make_Machine(bmc=pod)
         # a VM linked to a machine that's been removed on the VM host
@@ -1256,9 +1179,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             parameters={"default_storage_pool": discovered_default.name}
         )
         pod.sync(discovered, factory.make_User())
-        self.assertEqual(
-            discovered_default.name, pod.default_storage_pool.name
-        )
+        self.assertEqual(discovered_default.name, pod.default_storage_pool.name)
         self.assertEqual({}, pod.get_power_parameters())
 
     def test_sync_pod_sets_default_numanode(self):
@@ -1267,9 +1188,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             block_devices=[discovered_bdev], interfaces=[discovered_iface]
         )
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         self.patch(Machine, "start_commissioning")
         pod = factory.make_Pod()
         pod.sync(discovered_pod, factory.make_User())
@@ -1283,16 +1202,12 @@ class TestPod(MAASServerTestCase, PodTestMixin):
     def test_sync_pod_ignores_unknown_values(self):
         pod = factory.make_Pod()
         # Fill Pod with data, factory doesn't do this.
-        discovered_pod = self.make_discovered_pod(
-            machines=[], storage_pools=[]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[], storage_pools=[])
         user = factory.make_User()
         pod.sync(discovered_pod, user)
         # Simulate sending unknown data. LXD does this as data
         # is sent in the form of a commissioning script.
-        pod.sync(
-            DiscoveredPod(architectures=discovered_pod.architectures), user
-        )
+        pod.sync(DiscoveredPod(architectures=discovered_pod.architectures), user)
         self.assertNotEqual(-1, pod.cores)
         self.assertNotEqual(-1, pod.cpu_speed)
         self.assertNotEqual(-1, pod.memory)
@@ -1306,9 +1221,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         pod = factory.make_Pod()
         cluster = factory.make_VMCluster(pods=0)
 
-        discovered_pod = self.make_discovered_pod(
-            machines=[], storage_pools=[]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[], storage_pools=[])
         user = factory.make_User()
         pod.sync(discovered_pod, user, cluster=cluster)
 
@@ -1545,9 +1458,9 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         self.assertEqual(
             ["maas0", "maas1", "maas2"],
             list(
-                machine.current_config.interface_set.order_by(
-                    "id"
-                ).values_list("name", flat=True)
+                machine.current_config.interface_set.order_by("id").values_list(
+                    "name", flat=True
+                )
             ),
         )
 
@@ -1661,19 +1574,13 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             ),
             requested_machine=requested_machine,
         )
-        sip = StaticIPAddress.objects.filter(
-            interface__name=rmi.ifname
-        ).first()
+        sip = StaticIPAddress.objects.filter(interface__name=rmi.ifname).first()
         self.assertEqual(sip.get_interface().node_config.node, machine)
         self.assertIsNone(sip.ip)
-        sip2 = StaticIPAddress.objects.filter(
-            interface__name=rmi2.ifname
-        ).first()
+        sip2 = StaticIPAddress.objects.filter(interface__name=rmi2.ifname).first()
         self.assertEqual(sip2.get_interface().node_config.node, machine)
         self.assertIsNone(sip2.ip)
-        sip3 = StaticIPAddress.objects.filter(
-            interface__name=rmi3.ifname
-        ).first()
+        sip3 = StaticIPAddress.objects.filter(interface__name=rmi3.ifname).first()
         self.assertEqual(sip3.get_interface().node_config.node, machine)
         self.assertIsNone(sip3.ip)
 
@@ -1684,15 +1591,9 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         self.patch(Machine, "start_commissioning")
         fabric = factory.make_Fabric()
         controller = factory.make_RackController()
-        vlan = factory.make_VLAN(
-            fabric=fabric, dhcp_on=True, primary_rack=controller
-        )
-        vlan2 = factory.make_VLAN(
-            fabric=fabric, dhcp_on=False, primary_rack=controller
-        )
-        vlan3 = factory.make_VLAN(
-            fabric=fabric, dhcp_on=False, primary_rack=controller
-        )
+        vlan = factory.make_VLAN(fabric=fabric, dhcp_on=True, primary_rack=controller)
+        vlan2 = factory.make_VLAN(fabric=fabric, dhcp_on=False, primary_rack=controller)
+        vlan3 = factory.make_VLAN(fabric=fabric, dhcp_on=False, primary_rack=controller)
         # Create subnets, so we can test to ensure they get linked up.
         subnet = factory.make_Subnet(vlan=vlan)
         factory.make_Subnet(vlan=vlan2)
@@ -1707,17 +1608,11 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             parents=[eth0],
         )
         ip = factory.make_StaticIPAddress(subnet=subnet, interface=br0)
-        discovered_machine.interfaces[
-            0
-        ].attach_type = InterfaceAttachType.BRIDGE
+        discovered_machine.interfaces[0].attach_type = InterfaceAttachType.BRIDGE
         discovered_machine.interfaces[0].attach_name = br0.name
-        discovered_machine.interfaces[
-            1
-        ].attach_type = InterfaceAttachType.MACVLAN
+        discovered_machine.interfaces[1].attach_type = InterfaceAttachType.MACVLAN
         discovered_machine.interfaces[1].attach_name = eth1.name
-        discovered_machine.interfaces[
-            2
-        ].attach_type = InterfaceAttachType.MACVLAN
+        discovered_machine.interfaces[2].attach_type = InterfaceAttachType.MACVLAN
         discovered_machine.interfaces[2].attach_name = eth2.name
         pod = factory.make_Pod(ip_address=ip)
         # Skip commissioning on creation so that we can test that VLANs
@@ -1727,8 +1622,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             factory.make_User(),
             # Use numeric names to mimic what Juju will do.
             interfaces=LabeledConstraintMap(
-                "0:vlan=id:%d;1:vlan=id:%d;2:vlan=id:%d"
-                % (vlan.id, vlan2.id, vlan3.id)
+                "0:vlan=id:%d;1:vlan=id:%d;2:vlan=id:%d" % (vlan.id, vlan2.id, vlan3.id)
             ),
         )
         interfaces = {
@@ -1749,18 +1643,12 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         self.patch(Machine, "start_commissioning")
         fabric = factory.make_Fabric()
         controller = factory.make_RackController()
-        vlan1 = factory.make_VLAN(
-            fabric=fabric, dhcp_on=True, primary_rack=controller
-        )
-        vlan2 = factory.make_VLAN(
-            fabric=fabric, dhcp_on=False, primary_rack=controller
-        )
+        vlan1 = factory.make_VLAN(fabric=fabric, dhcp_on=True, primary_rack=controller)
+        vlan2 = factory.make_VLAN(fabric=fabric, dhcp_on=False, primary_rack=controller)
         factory.make_Subnet(vlan=vlan1)
         subnet1 = factory.make_Subnet(vlan=vlan1)
         subnet2 = factory.make_Subnet(vlan=vlan2)
-        eth0 = factory.make_Interface(
-            node=controller, vlan=vlan1, sriov_max_vf=10
-        )
+        eth0 = factory.make_Interface(node=controller, vlan=vlan1, sriov_max_vf=10)
         factory.make_Interface(
             node=controller,
             vlan=vlan2,
@@ -1850,9 +1738,9 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         self.assertEqual(
             ["eth0", "eth1", "eth2"],
             list(
-                machine.current_config.interface_set.order_by(
-                    "id"
-                ).values_list("name", flat=True)
+                machine.current_config.interface_set.order_by("id").values_list(
+                    "name", flat=True
+                )
             ),
         )
 
@@ -1874,9 +1762,9 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         self.assertEqual(
             ["eth0", "eth1", "eth2"],
             list(
-                machine.current_config.interface_set.order_by(
-                    "id"
-                ).values_list("name", flat=True)
+                machine.current_config.interface_set.order_by("id").values_list(
+                    "name", flat=True
+                )
             ),
         )
 
@@ -1908,9 +1796,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         vmdisk1, vmdisk2 = VirtualMachineDisk.objects.filter(vm=vm).order_by(
             "block_device__id_path"
         )
-        disk1, disk2 = machine.current_config.blockdevice_set.order_by(
-            "id_path"
-        )
+        disk1, disk2 = machine.current_config.blockdevice_set.order_by("id_path")
         pool1 = PodStoragePool.objects.get(pool_id=d_storage_pool1.id)
         pool2 = PodStoragePool.objects.get(pool_id=d_storage_pool2.id)
         self.assertEqual(disk1.vmdisk, vmdisk1)
@@ -1975,8 +1861,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         pod = factory.make_Pod()
         pod.sync(discovered, factory.make_User())
         machine_macs = [
-            machine.interfaces[0].mac_address
-            for machine in discovered.machines
+            machine.interfaces[0].mac_address for machine in discovered.machines
         ]
         created_machines = Machine.objects.filter(
             current_config__interface__mac_address__in=machine_macs
@@ -1988,12 +1873,8 @@ class TestPod(MAASServerTestCase, PodTestMixin):
                 created_machine.architecture, discovered_machine.architecture
             )
             self.assertEqual(created_machine.bmc, pod)
-            self.assertEqual(
-                created_machine.cpu_count, discovered_machine.cores
-            )
-            self.assertEqual(
-                created_machine.cpu_speed, discovered_machine.cpu_speed
-            )
+            self.assertEqual(created_machine.cpu_count, discovered_machine.cores)
+            self.assertEqual(created_machine.cpu_speed, discovered_machine.cpu_speed)
             self.assertEqual(created_machine.memory, discovered_machine.memory)
             self.assertEqual(
                 created_machine.power_state, discovered_machine.power_state
@@ -2016,28 +1897,20 @@ class TestPod(MAASServerTestCase, PodTestMixin):
                     created_device.name,
                     BlockDevice._get_block_name_from_idx(idx),
                 )
-                self.assertEqual(
-                    created_device.id_path, discovered_device.id_path
-                )
+                self.assertEqual(created_device.id_path, discovered_device.id_path)
                 self.assertEqual(created_device.model, discovered_device.model)
-                self.assertEqual(
-                    created_device.serial, discovered_device.serial
-                )
+                self.assertEqual(created_device.serial, discovered_device.serial)
                 self.assertEqual(created_device.size, discovered_device.size)
                 self.assertEqual(
                     created_device.block_size, discovered_device.block_size
                 )
-                self.assertCountEqual(
-                    created_device.tags, discovered_device.tags
-                )
+                self.assertCountEqual(created_device.tags, discovered_device.tags)
             for created_if, (idx, discovered_if) in zip(
                 created_machine.current_config.interface_set.all(),
                 enumerate(discovered_machine.interfaces),
             ):
                 self.assertEqual(created_if.name, f"eth{idx}")
-                self.assertEqual(
-                    created_if.mac_address, discovered_if.mac_address
-                )
+                self.assertEqual(created_if.mac_address, discovered_if.mac_address)
                 self.assertEqual(
                     created_if.vlan,
                     vlan if discovered_if.boot else None,
@@ -2067,9 +1940,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         pod = factory.make_Pod()
         pod.create_machine(machine, factory.make_User())
         created_machine = Machine.objects.get(
-            current_config__interface__mac_address=machine.interfaces[
-                0
-            ].mac_address
+            current_config__interface__mac_address=machine.interfaces[0].mac_address
         )
         self.assertEqual(created_machine.architecture, machine.architecture)
         self.assertEqual(created_machine.bmc, pod)
@@ -2084,9 +1955,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         self.assertCountEqual(
             [tag.name for tag in created_machine.tags.all()], machine.tags
         )
-        self.assertCountEqual(
-            created_machine.physicalblockdevice_set.all(), []
-        )
+        self.assertCountEqual(created_machine.physicalblockdevice_set.all(), [])
 
     def test_create_machine_doesnt_allow_bad_physical_block_device(self):
         block_device = self.make_discovered_block_device()
@@ -2142,9 +2011,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             interfaces=[discovered_interface]
         )
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         self.assertEqual(pod.id, machine.bmc.id)
@@ -2158,9 +2025,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             interfaces=[discovered_interface]
         )
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         controller = reload_object(controller)
         self.assertEqual(NODE_TYPE.RACK_CONTROLLER, controller.node_type)
@@ -2174,9 +2039,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             interfaces=[discovered_interface]
         )
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         self.assertEqual(machine.architecture, discovered_machine.architecture)
@@ -2201,9 +2064,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             interfaces=[discovered_interface]
         )
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         self.assertEqual(machine.cpu_count, discovered_machine.cores)
@@ -2226,9 +2087,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         )
         discovered_machine.hugepages_backed = True
         discovered_machine.pinned_cores = [0, 1, 2]
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         vm = machine.virtualmachine
@@ -2247,9 +2106,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         )
         discovered_machine.hugepages_backed = True
         discovered_machine.pinned_cores = [0, 1, 2]
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         vm = machine.virtualmachine
@@ -2277,9 +2134,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine.pinned_cores = [0, 1, 2]
         discovered_machine.hostname = machine.hostname
         discovered_machine.power_parameters["instance_name"] = machine.hostname
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         vm = reload_object(vm)
         self.assertTrue(vm.hugepages_backed)
@@ -2297,9 +2152,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             interfaces=[discovered_interface]
         )
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         old_bmc = reload_object(old_bmc)
@@ -2331,9 +2184,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             interfaces=[discovered_interface]
         )
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         old_bmc = reload_object(old_bmc)
@@ -2343,9 +2194,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
     def test_sync_updates_existing_machine_block_devices_for_dynamic(self):
         pod = factory.make_Pod()
         machine = factory.make_Node(with_boot_disk=False, dynamic=True)
-        boot_interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine
-        )
+        boot_interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine)
         keep_model_bd = factory.make_PhysicalBlockDevice(node=machine)
         keep_path_bd = factory.make_PhysicalBlockDevice(
             node=machine, id_path=factory.make_name("id_path")
@@ -2357,9 +2206,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         dkeep_model_bd = self.make_discovered_block_device(
             model=keep_model_bd.model, serial=keep_model_bd.serial
         )
-        dkeep_path_bd = self.make_discovered_block_device(
-            id_path=keep_path_bd.id_path
-        )
+        dkeep_path_bd = self.make_discovered_block_device(id_path=keep_path_bd.id_path)
         dnew_model_bd = self.make_discovered_block_device()
         dnew_path_bd = self.make_discovered_block_device(
             id_path=factory.make_name("id_path")
@@ -2372,17 +2219,11 @@ class TestPod(MAASServerTestCase, PodTestMixin):
                 dnew_path_bd,
             ],
             interfaces=[
-                self.make_discovered_interface(
-                    mac_address=boot_interface.mac_address
-                )
+                self.make_discovered_interface(mac_address=boot_interface.mac_address)
             ],
         )
-        discovered_machine.power_parameters[
-            "instance_name"
-        ] = factory.make_string()
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_machine.power_parameters["instance_name"] = factory.make_string()
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         keep_model_bd = reload_object(keep_model_bd)
@@ -2432,9 +2273,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         )
         discovered_machine.cores = 3
         discovered_machine.memory = 4096
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         self.assertEqual(machine.cpu_count, 3)
@@ -2447,9 +2286,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         keep_interface = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL, node=machine, vlan=other_vlan
         )
-        delete_interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine
-        )
+        delete_interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine)
         dkeep_interface = self.make_discovered_interface(
             mac_address=keep_interface.mac_address
         )
@@ -2458,9 +2295,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             interfaces=[dkeep_interface, dnew_interface]
         )
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         keep_interface = reload_object(keep_interface)
@@ -2482,9 +2317,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
     def test_sync_updates_existing_machine_vmdisks(self):
         pod = factory.make_Pod()
         machine = factory.make_Node(with_boot_disk=False, dynamic=True)
-        boot_interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine
-        )
+        boot_interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine)
         disk1 = factory.make_PhysicalBlockDevice(
             node=machine,
             id_path=factory.make_name("id_path"),
@@ -2498,17 +2331,11 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_machine = self.make_discovered_machine(
             block_devices=[d_disk1, d_disk2],
             interfaces=[
-                self.make_discovered_interface(
-                    mac_address=boot_interface.mac_address
-                )
+                self.make_discovered_interface(mac_address=boot_interface.mac_address)
             ],
         )
-        discovered_machine.power_parameters[
-            "instance_name"
-        ] = factory.make_string()
-        discovered_pod = self.make_discovered_pod(
-            machines=[discovered_machine]
-        )
+        discovered_machine.power_parameters["instance_name"] = factory.make_string()
+        discovered_pod = self.make_discovered_pod(machines=[discovered_machine])
         pod.sync(discovered_pod, factory.make_User())
         machine = reload_object(machine)
         vmdisk1 = disk1.vmdisk
@@ -2529,12 +2356,8 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         discovered_pool2 = self.make_discovered_storage_pool()
         discovered_machine = self.make_discovered_machine(
             block_devices=[
-                self.make_discovered_block_device(
-                    storage_pools=[discovered_pool1]
-                ),
-                self.make_discovered_block_device(
-                    storage_pools=[discovered_pool2]
-                ),
+                self.make_discovered_block_device(storage_pools=[discovered_pool1]),
+                self.make_discovered_block_device(storage_pools=[discovered_pool2]),
             ],
         )
         instance_name = factory.make_string()
@@ -2578,9 +2401,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
 
     def test_sync_converts_existing_device(self):
         pod = factory.make_Pod()
-        device = factory.make_Node_with_Interface_on_Subnet(
-            node_type=NODE_TYPE.DEVICE
-        )
+        device = factory.make_Node_with_Interface_on_Subnet(node_type=NODE_TYPE.DEVICE)
         pod.sync(
             DiscoveredPod(
                 architectures=[device.architecture],
@@ -2605,9 +2426,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         mac_addresses = [factory.make_mac_address() for _ in range(3)]
         sync_user = factory.make_User()
         pod.sync(
-            DiscoveredPod(
-                architectures=["amd64/generic"], mac_addresses=mac_addresses
-            ),
+            DiscoveredPod(architectures=["amd64/generic"], mac_addresses=mac_addresses),
             sync_user,
         )
         self.assertEqual(1, pod.hints.nodes.count())
@@ -2698,9 +2517,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             vm=machine.virtualmachine
         )
         self.assertEqual("11:22:33:44:55:66", created_interface.mac_address)
-        self.assertEqual(
-            InterfaceAttachType.BRIDGE, created_interface.attachment_type
-        )
+        self.assertEqual(InterfaceAttachType.BRIDGE, created_interface.attachment_type)
 
     def test_sync_machine_interface_existing(self):
         pod = factory.make_Pod(pod_type="lxd")
@@ -2727,12 +2544,8 @@ class TestPod(MAASServerTestCase, PodTestMixin):
         created_interface = VirtualMachineInterface.objects.get(
             vm=machine.virtualmachine
         )
-        self.assertEqual(
-            "11:22:33:44:55:66", str(created_interface.mac_address)
-        )
-        self.assertEqual(
-            InterfaceAttachType.BRIDGE, created_interface.attachment_type
-        )
+        self.assertEqual("11:22:33:44:55:66", str(created_interface.mac_address))
+        self.assertEqual(InterfaceAttachType.BRIDGE, created_interface.attachment_type)
 
     def test_sync_machine_interface_removed(self):
         pod = factory.make_Pod(pod_type="lxd")
@@ -2775,16 +2588,10 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             attachment_type=InterfaceAttachType.MACVLAN,
         )
         pod._sync_machine(discovered_machine, machine)
-        vm_interface = VirtualMachineInterface.objects.get(
-            vm=machine.virtualmachine
-        )
+        vm_interface = VirtualMachineInterface.objects.get(vm=machine.virtualmachine)
         self.assertEqual("11:22:33:44:55:66", str(vm_interface.mac_address))
-        self.assertEqual(
-            InterfaceAttachType.BRIDGE, vm_interface.attachment_type
-        )
-        vm2_interface = VirtualMachineInterface.objects.get(
-            vm=machine2.virtualmachine
-        )
+        self.assertEqual(InterfaceAttachType.BRIDGE, vm_interface.attachment_type)
+        vm2_interface = VirtualMachineInterface.objects.get(vm=machine2.virtualmachine)
         self.assertEqual("33:44:55:66:77:88", str(vm2_interface.mac_address))
 
     def test_sync_machine_interface_no_mac_address(self):
@@ -2808,13 +2615,9 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             vm=machine.virtualmachine
         ).order_by("id")
         self.assertIsNone(vm_interface1.mac_address)
-        self.assertEqual(
-            InterfaceAttachType.SRIOV, vm_interface1.attachment_type
-        )
+        self.assertEqual(InterfaceAttachType.SRIOV, vm_interface1.attachment_type)
         self.assertIsNone(vm_interface2.mac_address)
-        self.assertEqual(
-            InterfaceAttachType.SRIOV, vm_interface2.attachment_type
-        )
+        self.assertEqual(InterfaceAttachType.SRIOV, vm_interface2.attachment_type)
 
     def test_sync_machine_interface_no_pod_host(self):
         project = factory.make_string()
@@ -2832,18 +2635,14 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             interfaces=[interface],
         )
         pod._sync_machine(discovered_machine, machine)
-        vm_interface = VirtualMachineInterface.objects.get(
-            vm=machine.virtualmachine
-        )
+        vm_interface = VirtualMachineInterface.objects.get(vm=machine.virtualmachine)
         self.assertIsNone(pod.host)
         self.assertIsNone(vm_interface.host_interface)
 
     def test_sync_machine_interface_no_pod_host_interface(self):
         project = factory.make_string()
         pod_host = factory.make_Machine()
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, name="eth0", node=pod_host
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, name="eth0", node=pod_host)
         pod = factory.make_Pod(
             pod_type="lxd",
             parameters={"project": project},
@@ -2860,9 +2659,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             interfaces=[interface],
         )
         pod._sync_machine(discovered_machine, machine)
-        vm_interface = VirtualMachineInterface.objects.get(
-            vm=machine.virtualmachine
-        )
+        vm_interface = VirtualMachineInterface.objects.get(vm=machine.virtualmachine)
         self.assertIsNone(vm_interface.host_interface)
 
     def test_sync_machine_interface_with_pod_host_interface(self):
@@ -2887,9 +2684,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             interfaces=[interface],
         )
         pod._sync_machine(discovered_machine, machine)
-        vm_interface = VirtualMachineInterface.objects.get(
-            vm=machine.virtualmachine
-        )
+        vm_interface = VirtualMachineInterface.objects.get(vm=machine.virtualmachine)
         self.assertEqual(host_interface, vm_interface.host_interface)
 
     def test_sync_machines_uses_location_to_set_bmc_in_a_cluster(self):
@@ -2920,9 +2715,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             vmhost.sync_machines(discovered_machines, admin)
         new_bmc_ids = [vm.bmc_id for vm in cluster.virtual_machines()]
         self.assertCountEqual(bmc_ids, new_bmc_ids)
-        vm = VirtualMachine.objects.get(
-            identifier=discovered_machines[0].hostname
-        )
+        vm = VirtualMachine.objects.get(identifier=discovered_machines[0].hostname)
         self.assertEqual(vm.memory, discovered_machines[0].memory)
 
     def test_sync_machines_uses_location_to_update_bmc_in_a_cluster(self):
@@ -2952,9 +2745,7 @@ class TestPod(MAASServerTestCase, PodTestMixin):
             vmhost.sync_machines(discovered_machines, admin)
         new_bmc_ids = [vm.bmc_id for vm in cluster.virtual_machines()]
         self.assertNotIn(vmhosts[0].id, new_bmc_ids)
-        vm = VirtualMachine.objects.get(
-            identifier=discovered_machines[0].hostname
-        )
+        vm = VirtualMachine.objects.get(identifier=discovered_machines[0].hostname)
         intended_bmc = Pod.objects.get(
             name=discovered_machines[0].location,
             power_parameters__project=project,
@@ -3027,9 +2818,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
         pod = yield deferToDatabase(factory.make_Pod)
         machine = yield deferToDatabase(factory.make_Machine, bmc=pod)
         client = Mock()
-        self.patch(
-            bmc_module, "getClientFromIdentifiers"
-        ).return_value = client
+        self.patch(bmc_module, "getClientFromIdentifiers").return_value = client
         yield pod.async_delete()
         client.assert_not_called()
         machine = yield deferToDatabase(reload_object, machine)
@@ -3045,9 +2834,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
         machine2 = yield deferToDatabase(factory.make_Machine, bmc=pod)
         client = Mock()
         client.side_effect = lambda *args, **kwargs: succeed({"hints": None})
-        self.patch(
-            bmc_module, "getClientFromIdentifiers"
-        ).return_value = client
+        self.patch(bmc_module, "getClientFromIdentifiers").return_value = client
         yield pod.async_delete(decompose=True)
 
         power_parameters = yield deferToDatabase(pod.get_power_parameters)
@@ -3092,9 +2879,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
         )
         await pod.async_delete(decompose=True)
         pod_node_count = await deferToDatabase(
-            lambda: Node.objects.filter(
-                system_id=dynamically_created_system_id
-            ).count()
+            lambda: Node.objects.filter(system_id=dynamically_created_system_id).count()
         )
         self.assertEqual(0, pod_node_count)
 
@@ -3113,15 +2898,13 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
             lambda: pod.hints.nodes.first().system_id
         )
         await deferToDatabase(
-            lambda: Node.objects.filter(
-                system_id=dynamically_created_system_id
-            ).update(bmc=factory.make_BMC())
+            lambda: Node.objects.filter(system_id=dynamically_created_system_id).update(
+                bmc=factory.make_BMC()
+            )
         )
         await pod.async_delete(decompose=True)
         pod_node_count = await deferToDatabase(
-            lambda: Node.objects.filter(
-                system_id=dynamically_created_system_id
-            ).count()
+            lambda: Node.objects.filter(system_id=dynamically_created_system_id).count()
         )
         self.assertEqual(1, pod_node_count)
 
@@ -3131,9 +2914,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
             lambda: factory.make_Machine_with_Interface_on_Subnet()
         )
         machine_mac = await deferToDatabase(
-            lambda: str(
-                machine.current_config.interface_set.first().mac_address
-            )
+            lambda: str(machine.current_config.interface_set.first().mac_address)
         )
         discovered = self.make_discovered_pod(mac_addresses=[machine_mac])
         # Create a subset of the discovered pod's tags
@@ -3154,9 +2935,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
     async def test_dont_deletes_dynamically_created_controllers(self):
         controller = await deferToDatabase(lambda: factory.make_Controller())
         controller_mac = await deferToDatabase(
-            lambda: str(
-                controller.current_config.interface_set.first().mac_address
-            )
+            lambda: str(controller.current_config.interface_set.first().mac_address)
         )
         self.assertTrue(controller.should_be_dynamically_deleted())
         discovered = self.make_discovered_pod(mac_addresses=[controller_mac])
@@ -3166,9 +2945,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
         await deferToDatabase(pod.sync, discovered, admin)
         await pod.async_delete(decompose=True)
         controller_count = await deferToDatabase(
-            lambda: Controller.objects.filter(
-                system_id=controller.system_id
-            ).count()
+            lambda: Controller.objects.filter(system_id=controller.system_id).count()
         )
         self.assertEqual(1, controller_count)
 
@@ -3194,9 +2971,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
             succeed({"hints": sentinel.hints}),
             fail(PodProblem()),
         ]
-        self.patch(
-            bmc_module, "getClientFromIdentifiers"
-        ).return_value = client
+        self.patch(bmc_module, "getClientFromIdentifiers").return_value = client
         yield pod.async_delete(decompose=True)
         # All the machines should have been deleted.
         decomposable_machine_one = yield deferToDatabase(
@@ -3243,10 +3018,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
     def test_delete_clustered_pod_deletes_cluster(self):
         cluster = yield deferToDatabase(factory.make_VMCluster, pods=0)
         pod_defers = yield DeferredList(
-            [
-                deferToDatabase(factory.make_Pod, cluster=cluster)
-                for _ in range(3)
-            ]
+            [deferToDatabase(factory.make_Pod, cluster=cluster) for _ in range(3)]
         )
         pods = [pod[1] for pod in pod_defers]
         yield pods[0].async_delete()
@@ -3260,17 +3032,12 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
     def test_delete_clustered_pod_deletes_peers(self):
         cluster = yield deferToDatabase(factory.make_VMCluster, pods=0)
         pod_defers = yield DeferredList(
-            [
-                deferToDatabase(factory.make_Pod, cluster=cluster)
-                for _ in range(3)
-            ]
+            [deferToDatabase(factory.make_Pod, cluster=cluster) for _ in range(3)]
         )
         pods = [pod[1] for pod in pod_defers]
         pod_ids = [pod.id for pod in pods]
         yield pods[0].async_delete()
-        not_found_pods = yield deferToDatabase(
-            Pod.objects.filter, id__in=pod_ids
-        )
+        not_found_pods = yield deferToDatabase(Pod.objects.filter, id__in=pod_ids)
         list_not_found_pods = yield deferToDatabase(list, not_found_pods)
         self.assertEqual(list_not_found_pods, [])
 
@@ -3300,9 +3067,7 @@ class TestPodDelete(MAASTransactionServerTestCase, PodTestMixin):
 class TestPodDefaultMACVlanMode(MAASServerTestCase):
     def test_allows_default_macvlan_mode(self):
         pod = factory.make_Pod()
-        default_macvlan_mode = random.choice(
-            ["bridge", "private", "vepa", "passthru"]
-        )
+        default_macvlan_mode = random.choice(["bridge", "private", "vepa", "passthru"])
         pod.default_macvlan_mode = default_macvlan_mode
         pod.save()
         self.assertEqual(default_macvlan_mode, pod.default_macvlan_mode)

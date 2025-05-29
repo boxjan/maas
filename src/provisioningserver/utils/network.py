@@ -184,8 +184,7 @@ def _coalesce_adjacent_purposes(
     for item in ranges:
         if previous_purpose is not None and previous_last is not None:
             adjacent_and_identical = (
-                item.first == (previous_last + 1)
-                and item.purpose == previous_purpose
+                item.first == (previous_last + 1) and item.purpose == previous_purpose
             )
             if adjacent_and_identical:
                 new_ranges.pop()
@@ -375,9 +374,7 @@ class IPRangeStatistics:
             data["suggested_gateway"] = self.suggested_gateway
             suggested_dynamic_range = None
             if self.suggested_dynamic_range is not None:
-                suggested_dynamic_range = (
-                    self.suggested_dynamic_range.render_json()
-                )
+                suggested_dynamic_range = self.suggested_dynamic_range.render_json()
             data["suggested_dynamic_range"] = suggested_dynamic_range
         return data
 
@@ -511,9 +508,7 @@ class MAASIPSet(set):
         return largest
 
     def render_json(self, *args, **kwargs):
-        return [
-            iprange.render_json(*args, **kwargs) for iprange in self.ranges
-        ]
+        return [iprange.render_json(*args, **kwargs) for iprange in self.ranges]
 
     def __getitem__(self, item):
         return self.find(item)
@@ -574,9 +569,7 @@ class MAASIPSet(set):
         # Check if there is a gap between the last used range and the end
         # of the range we're checking against.
         if candidate_end - candidate_start >= 0:
-            unused_ranges.append(
-                make_iprange(candidate_start, candidate_end, purpose)
-            )
+            unused_ranges.append(make_iprange(candidate_start, candidate_end, purpose))
         return MAASIPSet(unused_ranges)
 
     def get_full_range(self, outer_range):
@@ -586,9 +579,12 @@ class MAASIPSet(set):
         # However, in bug #1570606 we observed a situation where there were
         # no resulting ranges. This assert is just in case the fix didn't cover
         # all cases where this could happen.
-        assert len(full_range.ranges) > 0, (
-            "get_full_range(): No ranges for CIDR: %s; "
-            "self=%r, unused_ranges=%r" % (outer_range, self, unused_ranges)
+        assert (
+            len(full_range.ranges) > 0
+        ), "get_full_range(): No ranges for CIDR: %s; " "self=%r, unused_ranges=%r" % (
+            outer_range,
+            self,
+            unused_ranges,
         )
         return full_range
 
@@ -742,9 +738,7 @@ def get_all_addresses_for_interface(interface: str) -> Iterable[str]:
                 # We know the interface name, so we don't care to keep the
                 # interface name on link-local addresses.  Strip those off
                 # here.
-                yield clean_up_netifaces_address(
-                    inet6_address["addr"], interface
-                )
+                yield clean_up_netifaces_address(inet6_address["addr"], interface)
 
 
 def get_all_interface_addresses() -> Iterable[str]:
@@ -753,9 +747,7 @@ def get_all_interface_addresses() -> Iterable[str]:
         yield from get_all_addresses_for_interface(interface)
 
 
-def safe_getaddrinfo(
-    hostname, port, family=AF_INET, proto=IPPROTO_TCP, timeout=10
-):
+def safe_getaddrinfo(hostname, port, family=AF_INET, proto=IPPROTO_TCP, timeout=10):
     if family in (
         AF_INET,
         0,
@@ -764,9 +756,7 @@ def safe_getaddrinfo(
 
     # TODO use getaddrinfo for all versions once fixed in the stdlib
     # see (see python/cpython issue #82082)
-    sock_type = (
-        socket.SOCK_STREAM if proto == IPPROTO_TCP else socket.SOCK_DGRAM
-    )
+    sock_type = socket.SOCK_STREAM if proto == IPPROTO_TCP else socket.SOCK_DGRAM
 
     @asynchronous(timeout=timeout)
     @inlineCallbacks
@@ -809,9 +799,7 @@ def sync_safe_getaddrinfo(*args, **kwargs):
     return safe_getaddrinfo(*args, **kwargs)
 
 
-def resolve_host_to_addrinfo(
-    hostname, ip_version=4, port=0, proto=IPPROTO_TCP
-):
+def resolve_host_to_addrinfo(hostname, ip_version=4, port=0, proto=IPPROTO_TCP):
     """Wrapper around `getaddrinfo`: return address information for `hostname`.
 
     :param hostname: Host name (or IP address).
@@ -947,9 +935,7 @@ def bytes_to_ipaddress(ip_address_bytes):
     if len(ip_address_bytes) == 4:
         return IPAddress(struct.unpack("!L", ip_address_bytes)[0])
     if len(ip_address_bytes) == 16:
-        most_significant, least_significant = struct.unpack(
-            "!QQ", ip_address_bytes
-        )
+        most_significant, least_significant = struct.unpack("!QQ", ip_address_bytes)
         return IPAddress((most_significant << 64) | least_significant)
     else:
         raise ValueError("Invalid IP address size: expected 4 or 16 bytes.")
@@ -1216,9 +1202,7 @@ def get_all_interfaces_definition(
             "mac_address": details["mac"],
             "links": [],
             "enabled": details["enabled"],
-            "parents": [
-                iface for iface in details["parents"] if iface in ipaddr_info
-            ],
+            "parents": [iface for iface in details["parents"] if iface in ipaddr_info],
             "source": "machine-resources",
         }
         if "vid" in details:
@@ -1229,9 +1213,7 @@ def get_all_interfaces_definition(
             if str(IPNetwork(address).ip) == dhcp_address:
                 interface["links"].append({"mode": "dhcp", "address": address})
             else:
-                interface["links"].append(
-                    {"mode": "static", "address": address}
-                )
+                interface["links"].append({"mode": "static", "address": address})
         fix_link_addresses(interface["links"])
         fix_link_gateways(interface["links"], iproute_info)
         interfaces[name] = interface
@@ -1315,11 +1297,7 @@ def enumerate_ipv4_addresses(ifdata):
         `get_all_interfaces_definition()`.
     :return: generator yielding each IPv4 address as a string.
     """
-    return (
-        ip
-        for ip in enumerate_assigned_ips(ifdata)
-        if IPAddress(ip).version == 4
-    )
+    return (ip for ip in enumerate_assigned_ips(ifdata) if IPAddress(ip).version == 4)
 
 
 def has_ipv4_address(interface: dict) -> bool:
@@ -1350,9 +1328,7 @@ def is_loopback_address(hostname):
         ip = IPAddress(hostname)
     except AddrFormatError:
         return hostname.lower() in {"localhost", "localhost."}
-    return ip.is_loopback() or (
-        ip.is_ipv4_mapped() and ip.ipv4().is_loopback()
-    )
+    return ip.is_loopback() or (ip.is_ipv4_mapped() and ip.ipv4().is_loopback())
 
 
 @synchronous
@@ -1372,8 +1348,7 @@ def resolves_to_loopback_address(hostname):
         return hostname.lower() in {"localhost", "localhost."}
     else:
         return any(
-            is_loopback_address(sockaddr[0])
-            for _, _, _, _, sockaddr in addrinfo
+            is_loopback_address(sockaddr[0]) for _, _, _, _, sockaddr in addrinfo
         )
 
 

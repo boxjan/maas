@@ -138,9 +138,7 @@ class TestGetIPAddr(MAASTestCase):
         )
         # all interfaces from binary output are included in result
         self.assertCountEqual(SAMPLE_LXD_NETWORKS, get_ip_addr())
-        patch_call_and_check.assert_called_once_with(
-            ["sudo", "/path/to/amd64"]
-        )
+        patch_call_and_check.assert_called_once_with(["sudo", "/path/to/amd64"])
 
     def test_no_use_sudo_in_snap(self):
         self.patch(

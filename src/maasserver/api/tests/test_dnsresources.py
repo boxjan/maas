@@ -41,12 +41,8 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
         uri = get_dnsresources_uri()
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        expected_ids = [
-            dnsresource.id for dnsresource in DNSResource.objects.all()
-        ]
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        expected_ids = [dnsresource.id for dnsresource in DNSResource.objects.all()]
         result_ids = [
             dnsresource["id"]
             for dnsresource in json.loads(
@@ -63,12 +59,9 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
         uri = get_dnsresources_uri()
         response = self.client.get(uri, {"all": "true"})
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [
-            dnsresource.id
-            for dnsresource in get_dnsresource_queryset(all_records=True)
+            dnsresource.id for dnsresource in get_dnsresource_queryset(all_records=True)
         ]
         result_ids = [
             dnsresource["id"]
@@ -84,9 +77,7 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
         dnsrr = DNSResource.objects.first()
         uri = get_dnsresources_uri()
         response = self.client.get(uri, {"domain": [dnsrr.domain.name]})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [dnsrr.id]
         result_ids = [
             dnsresource["id"]
@@ -102,12 +93,8 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
             factory.make_DNSResource()
         dnsrr = DNSResource.objects.first()
         uri = get_dnsresources_uri()
-        response = self.client.get(
-            uri, {"all": "true", "domain": [dnsrr.domain.name]}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.get(uri, {"all": "true", "domain": [dnsrr.domain.name]})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [-1, dnsrr.id]
         result_ids = [
             dnsresource["id"]
@@ -126,9 +113,7 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
         )
         factory.make_StaticIPAddress(interface=machine.boot_interface)
         response = self.client.get(uri, {"all": "true"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [-1]
         result_ids = [
             dnsresource["id"]
@@ -144,9 +129,7 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
         dnsrr = DNSResource.objects.first()
         uri = get_dnsresources_uri()
         response = self.client.get(uri, {"name": [dnsrr.name]})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [dnsrr.id]
         result_ids = [
             dnsresource["id"]
@@ -162,12 +145,9 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
         rrtype = DNSData.objects.first().rrtype
         uri = get_dnsresources_uri()
         response = self.client.get(uri, {"rrtype": [rrtype]})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [
-            dnsrr.id
-            for dnsrr in DNSResource.objects.filter(dnsdata__rrtype=rrtype)
+            dnsrr.id for dnsrr in DNSResource.objects.filter(dnsdata__rrtype=rrtype)
         ]
         result_ids = [
             dnsresource["id"]
@@ -192,14 +172,10 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
                 "ip_addresses": str(sip.ip),
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             fqdn,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         self.assertEqual(
             sip.ip,
@@ -223,14 +199,10 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
                 "ip_addresses": str(sip.ip),
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             fqdn,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         self.assertEqual(
             sip.ip,
@@ -246,17 +218,11 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
         fqdn = f"{dnsresource_name}.{domain.name}"
         sip = factory.make_StaticIPAddress()
         uri = get_dnsresources_uri()
-        response = self.client.post(
-            uri, {"fqdn": fqdn, "ip_addresses": str(sip.ip)}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.post(uri, {"fqdn": fqdn, "ip_addresses": str(sip.ip)})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             fqdn,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         self.assertEqual(
             sip.ip,
@@ -280,14 +246,10 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
                 "ip_addresses": " ".join([str(ip.ip) for ip in ips]),
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             fqdn,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
             "ip_addresses"
@@ -298,9 +260,7 @@ class TestDNSResourcesAPI(APITestCase.ForUser):
         dnsresource_name = factory.make_name("dnsresource")
         uri = get_dnsresources_uri()
         response = self.client.post(uri, {"name": dnsresource_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_create_requires_name(self):
         self.become_admin()
@@ -325,9 +285,7 @@ class TestDNSResourceAPI(APITestCase.ForUser):
             factory.make_DNSResource()
         uri = get_dnsresource_uri(dnsrr)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_dnsresource = json.loads(
             response.content.decode(settings.DEFAULT_CHARSET)
         )
@@ -337,9 +295,7 @@ class TestDNSResourceAPI(APITestCase.ForUser):
     def test_read_404_when_bad_id(self):
         uri = reverse("dnsresource_handler", args=[random.randint(100, 1000)])
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_update(self):
         self.become_admin()
@@ -347,14 +303,10 @@ class TestDNSResourceAPI(APITestCase.ForUser):
         new_name = factory.make_name("dnsresource")
         uri = get_dnsresource_uri(dnsresource)
         response = self.client.put(uri, {"name": new_name})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             f"{new_name}.{dnsresource.domain.name}",
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         self.assertEqual(new_name, reload_object(dnsresource).name)
 
@@ -363,9 +315,7 @@ class TestDNSResourceAPI(APITestCase.ForUser):
         new_name = factory.make_name("dnsresource")
         uri = get_dnsresource_uri(dnsresource)
         response = self.client.put(uri, {"name": new_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_update_by_name_domain__id(self):
         self.become_admin()
@@ -383,14 +333,10 @@ class TestDNSResourceAPI(APITestCase.ForUser):
                 "ip_addresses": str(sip.ip),
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             fqdn,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         self.assertEqual(
             sip.ip,
@@ -415,14 +361,10 @@ class TestDNSResourceAPI(APITestCase.ForUser):
                 "ip_addresses": str(sip.ip),
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             fqdn,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         self.assertEqual(
             sip.ip,
@@ -439,17 +381,11 @@ class TestDNSResourceAPI(APITestCase.ForUser):
         fqdn = f"{new_name}.{domain.name}"
         sip = factory.make_StaticIPAddress()
         uri = get_dnsresource_uri(dnsresource)
-        response = self.client.put(
-            uri, {"fqdn": fqdn, "ip_addresses": str(sip.ip)}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.put(uri, {"fqdn": fqdn, "ip_addresses": str(sip.ip)})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             fqdn,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         self.assertEqual(
             sip.ip,
@@ -474,14 +410,10 @@ class TestDNSResourceAPI(APITestCase.ForUser):
                 "ip_addresses": " ".join([str(ip.ip) for ip in ips]),
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             fqdn,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "fqdn"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["fqdn"],
         )
         result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
             "ip_addresses"
@@ -493,24 +425,18 @@ class TestDNSResourceAPI(APITestCase.ForUser):
         dnsresource = factory.make_DNSResource()
         uri = get_dnsresource_uri(dnsresource)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(dnsresource))
 
     def test_delete_403_when_not_admin(self):
         dnsresource = factory.make_DNSResource()
         uri = get_dnsresource_uri(dnsresource)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(dnsresource))
 
     def test_delete_404_when_invalid_id(self):
         self.become_admin()
         uri = reverse("dnsresource_handler", args=[random.randint(100, 1000)])
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)

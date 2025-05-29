@@ -32,9 +32,7 @@ class PhysicalBlockDevice(BlockDevice):
         help_text="Firmware version of block device.",
     )
 
-    numa_node = ForeignKey(
-        "NUMANode", related_name="blockdevices", on_delete=CASCADE
-    )
+    numa_node = ForeignKey("NUMANode", related_name="blockdevices", on_delete=CASCADE)
 
     def __init__(self, *args, **kwargs):
         if kwargs:

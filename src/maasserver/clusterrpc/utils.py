@@ -31,9 +31,7 @@ RPCResults = namedtuple(
 )
 
 
-def call_racks_synchronously(
-    command, *, kwargs=None, timeout=10, controllers=None
-):
+def call_racks_synchronously(command, *, kwargs=None, timeout=10, controllers=None):
     """Calls the specified RPC command on each rack controller synchronously.
 
     Collects the results into a list, then returns a `RPCResults` namedtuple
@@ -175,9 +173,7 @@ def call_clusters(
             call = partial(client, command, **kwargs)
             calls[call] = controller
 
-    for call, response in asynchronous.gatherCallResults(
-        calls, timeout=timeout
-    ):
+    for call, response in asynchronous.gatherCallResults(calls, timeout=timeout):
         # When a call returns results, figure out which controller it came from
         # and remove it from the list, so we can report which controllers
         # timed out.
@@ -255,7 +251,6 @@ def get_error_message_for_exception(exception):
     if len(error_message) == 0:
         error_message = (
             "Unexpected exception: %s. See /var/log/maas/regiond.log "
-            "on the region server for more information."
-            % exception.__class__.__name__
+            "on the region server for more information." % exception.__class__.__name__
         )
     return error_message

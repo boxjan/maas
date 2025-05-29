@@ -41,9 +41,7 @@ class InvalidCredentialsFormat(Exception):
 
 # This would be a dataclass, but needs to support python3.5
 class Credentials:
-    KEYS = frozenset(
-        ("token_key", "token_secret", "consumer_key", "consumer_secret")
-    )
+    KEYS = frozenset(("token_key", "token_secret", "consumer_key", "consumer_secret"))
 
     _STRING_RE = re.compile(
         r"(?P<consumer_key>[^:]+)"
@@ -58,9 +56,7 @@ class Credentials:
             setattr(self, key, kwargs.get(key) or "")
 
     def __eq__(self, other):
-        return all(
-            getattr(self, key) == getattr(other, key) for key in self.KEYS
-        )
+        return all(getattr(self, key) == getattr(other, key) for key in self.KEYS)
 
     def __bool__(self):
         return any(getattr(self, key) for key in self.KEYS)
@@ -171,14 +167,10 @@ def warn(msg):
 def get_base_url(url):
     """Return the base URL (no path) for the specified URL."""
     parsed = urllib.parse.urlparse(url)
-    return urllib.parse.urlunparse(
-        (parsed.scheme, parsed.netloc, "", "", "", "")
-    )
+    return urllib.parse.urlunparse((parsed.scheme, parsed.netloc, "", "", "", ""))
 
 
-def geturl(
-    url, credentials=None, headers=None, data=None, post_data=None, retry=True
-):
+def geturl(url, credentials=None, headers=None, data=None, post_data=None, retry=True):
     # This would be a dataclass, but needs to support python3.5
     class ExecuteState:
         def __init__(self, headers=None):
@@ -188,9 +180,7 @@ def geturl(
     def execute(url, data, post_data, state):
         state.headers.update(credentials.oauth_headers(url, state.clockskew))
         try:
-            req = urllib.request.Request(
-                url=url, data=data, headers=state.headers
-            )
+            req = urllib.request.Request(url=url, data=data, headers=state.headers)
             return urllib.request.urlopen(req, data=post_data)
         except urllib.error.HTTPError as exc:
             if "date" not in exc.headers:
@@ -221,10 +211,7 @@ def geturl(
                 return execute(url, data, post_data, state)
             except Exception as e:
                 error = e
-                warn(
-                    "request to %s failed. sleeping %d.: %s"
-                    % (url, naptime, error)
-                )
+                warn("request to %s failed. sleeping %d.: %s" % (url, naptime, error))
                 time.sleep(naptime)
         if error:
             raise error
@@ -266,8 +253,7 @@ def _encode_file(name, file, boundary):
 
 def _random_string(length):
     return b"".join(
-        random.choice(string.ascii_letters).encode("ascii")
-        for ii in range(length + 1)
+        random.choice(string.ascii_letters).encode("ascii") for ii in range(length + 1)
     )
 
 
@@ -298,9 +284,7 @@ def encode_multipart_data(data, files=None):
     body = b"\r\n".join(lines)
 
     headers = {
-        "Content-Type": (
-            "multipart/form-data; boundary=" + boundary.decode("ascii")
-        ),
+        "Content-Type": ("multipart/form-data; boundary=" + boundary.decode("ascii")),
         "Content-Length": str(len(body)),
     }
 
@@ -353,9 +337,7 @@ def signal(
         # have been converted into commissioning scripts.
         if not isinstance(power_params, dict):
             if power_type == "moonshot":
-                user, power_pass, power_address, driver = power_params.split(
-                    ","
-                )
+                user, power_pass, power_address, driver = power_params.split(",")
             else:
                 (
                     user,
@@ -455,16 +437,12 @@ def capture_script_output(
                 selector.register(proc.stderr, selectors.EVENT_READ, err)
                 while selector.get_map() and proc.poll() is None:
                     # Select with a short timeout so that we don't tight loop.
-                    _select_script_output(
-                        selector, combined, 0.1, proc, console_output
-                    )
+                    _select_script_output(selector, combined, 0.1, proc, console_output)
                     if timeout is not None and time.monotonic() > timeout:
                         break
                 # Process has finished or has closed stdout and stderr.
                 # Process anything still sitting in the latter's buffers.
-                _select_script_output(
-                    selector, combined, 0.0, proc, console_output
-                )
+                _select_script_output(selector, combined, 0.0, proc, console_output)
 
     now = time.monotonic()
     # Wait for the process to finish.
@@ -502,11 +480,7 @@ def _select_script_output(selector, combined, timeout, proc, console_output):
             else:
                 # Output to console if specified
                 if chunk != b"" and console_output:
-                    fd = (
-                        sys.stdout
-                        if key.fileobj == proc.stdout
-                        else sys.stderr
-                    )
+                    fd = sys.stdout if key.fileobj == proc.stdout else sys.stderr
                     fd.write(chunk.decode())
                     fd.flush()
 

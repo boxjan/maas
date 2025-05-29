@@ -19,9 +19,7 @@ from provisioningserver.monkey import (
 class TestAugmentDeferToThreadPool(MAASTestCase):
     """Tests for `augment_twisted_deferToThreadPool`."""
 
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
@@ -29,9 +27,7 @@ class TestAugmentDeferToThreadPool(MAASTestCase):
 
     @inlineCallbacks
     def test_functions_returning_Deferreds_from_threads_crash(self):
-        with self.assertRaisesRegex(
-            TypeError, "Synchronous call returned a Deferred:"
-        ):
+        with self.assertRaisesRegex(TypeError, "Synchronous call returned a Deferred:"):
             yield deferToThread(Deferred)
 
     @inlineCallbacks
@@ -44,9 +40,7 @@ class TestPatchedURI(MAASTestCase):
     def test_parses_URL_with_hostname(self):
         hostname = factory.make_name("host")
         path = factory.make_name("path")
-        uri = get_patched_URI().fromBytes(
-            f"http://{hostname}/{path}".encode("utf-8")
-        )
+        uri = get_patched_URI().fromBytes(f"http://{hostname}/{path}".encode("utf-8"))
         self.assertEqual(uri.host, hostname.encode("utf-8"))
         self.assertEqual(uri.path, f"/{path}".encode("utf-8"))
         self.assertEqual(uri.port, 80)
@@ -65,9 +59,7 @@ class TestPatchedURI(MAASTestCase):
     def test_parses_URL_with_IPv4_address(self):
         ip = factory.make_ipv4_address()
         path = factory.make_name("path").encode("ascii")
-        uri = get_patched_URI().fromBytes(
-            f"http://{ip}/{path}".encode("utf-8")
-        )
+        uri = get_patched_URI().fromBytes(f"http://{ip}/{path}".encode("utf-8"))
         self.assertEqual(uri.host, ip.encode("utf-8"))
         self.assertEqual(uri.path, f"/{path}".encode("utf-8"))
         self.assertEqual(uri.port, 80)
@@ -76,9 +68,7 @@ class TestPatchedURI(MAASTestCase):
         ip = factory.make_ipv4_address()
         port = factory.pick_port()
         path = factory.make_name("path")
-        uri = get_patched_URI().fromBytes(
-            f"http://{ip}:{port}/{path}".encode("utf-8")
-        )
+        uri = get_patched_URI().fromBytes(f"http://{ip}:{port}/{path}".encode("utf-8"))
         self.assertEqual(uri.host, ip.encode("utf-8"))
         self.assertEqual(uri.path, f"/{path}".encode("utf-8"))
         self.assertEqual(uri.port, port)
@@ -95,9 +85,7 @@ class TestPatchedURI(MAASTestCase):
         ip = factory.make_ipv6_address()
         port = factory.pick_port()
         path = factory.make_name("path")
-        uri = get_patched_URI().fromBytes(
-            f"http://[{ip}]:{port}/{path}".encode()
-        )
+        uri = get_patched_URI().fromBytes(f"http://[{ip}]:{port}/{path}".encode())
         self.assertEqual(uri.host, ip.encode("utf-8"))
         self.assertEqual(uri.path, f"/{path}".encode("utf-8"))
         self.assertEqual(uri.port, port)

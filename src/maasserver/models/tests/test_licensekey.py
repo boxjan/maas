@@ -21,9 +21,7 @@ class TestLicenseKeyManager(MAASServerTestCase):
 
     def test_get_license_key(self):
         key = factory.make_LicenseKey()
-        license_key = LicenseKey.objects.get_license_key(
-            key.osystem, key.distro_series
-        )
+        license_key = LicenseKey.objects.get_license_key(key.osystem, key.distro_series)
         self.assertEqual(key.license_key, license_key)
 
     def test_has_license_key_True(self):

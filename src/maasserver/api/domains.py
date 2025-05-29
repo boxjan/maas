@@ -92,15 +92,10 @@ class DomainsHandler(OperationsHandler):
         except KeyError:
             raise MAASAPIValidationError({"serial": "Missing parameter"})
         except ValueError:
-            raise MAASAPIValidationError(
-                {"serial": "Expected a serial number"}
-            )
+            raise MAASAPIValidationError({"serial": "Expected a serial number"})
         if serial == 0 or serial > INT_MAX:
             raise MAASAPIValidationError(
-                {
-                    "serial": "Expected a serial number between 1 and %d"
-                    % INT_MAX
-                }
+                {"serial": "Expected a serial number between 1 and %d" % INT_MAX}
             )
         zone_serial.set_value(serial)
         dns_force_reload()
@@ -161,9 +156,7 @@ class DomainHandler(OperationsHandler):
         @error-example "not-found"
             No Domain matches the given query.
         """
-        return Domain.objects.get_domain_or_404(
-            id, request.user, NodePermission.view
-        )
+        return Domain.objects.get_domain_or_404(id, request.user, NodePermission.view)
 
     def update(self, request, id):
         """@description-title Update a domain

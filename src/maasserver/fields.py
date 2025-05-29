@@ -66,9 +66,7 @@ def normalise_macaddress(mac: str) -> str:
         case 1:  # no separator
             tokens = re.findall("..", tokens[0])
         case 3:  # each token is two bytes
-            tokens = chain(
-                *(re.findall("..", token.zfill(4)) for token in tokens)
-            )
+            tokens = chain(*(re.findall("..", token.zfill(4)) for token in tokens))
         case _:  # single-byte tokens
             tokens = (token.zfill(2) for token in tokens)
     return ":".join(tokens)
@@ -136,18 +134,14 @@ class LargeObjectFile:
         """
         self._lobject.write(data)
 
-    def open(
-        self, mode="rwb", new_file=None, using="default", connection=None
-    ):
+    def open(self, mode="rwb", new_file=None, using="default", connection=None):
         """Opens the internal large object instance."""
         if "b" not in mode:
             raise ValueError("Large objects must be opened in binary mode.")
         if connection is None:
             connection = connections[using]
         validate_in_transaction(connection)
-        self._lobject = connection.connection.lobject(
-            self.oid, mode, 0, new_file
-        )
+        self._lobject = connection.connection.lobject(self.oid, mode, 0, new_file)
         self.oid = self._lobject.oid
         return self
 
@@ -223,9 +217,7 @@ class LargeObjectField(IntegerField):
         if isinstance(value, LargeObjectFile):
             if value.oid > 0:
                 return value.oid
-            raise AssertionError(
-                "LargeObjectFile's oid must be greater than 0."
-            )
+            raise AssertionError("LargeObjectFile's oid must be greater than 0.")
         raise AssertionError(
             "Invalid LargeObjectField value (expected LargeObjectFile): '%s'"
             % repr(value)
@@ -240,8 +232,7 @@ class LargeObjectField(IntegerField):
         elif isinstance(value, int):
             return LargeObjectFile(value, self, self.model, self.block_size)
         raise AssertionError(
-            "Invalid LargeObjectField value (expected integer): '%s'"
-            % repr(value)
+            "Invalid LargeObjectField value (expected integer): '%s'" % repr(value)
         )
 
 
@@ -343,19 +334,13 @@ class IPPortListFormField(IPListFormField):
             return None
         else:
             ip_ports = re.split(self.separators, value)
-            ip_ports = [
-                ip_port.strip() for ip_port in ip_ports if ip_ports != ""
-            ]
+            ip_ports = [ip_port.strip() for ip_port in ip_ports if ip_ports != ""]
             result = []
             for ip_port in ip_ports:
                 if "." in ip_port or ("[" == ip_port[0] and "]:" in ip_port):
                     sock_addr = urllib.parse.urlsplit("//" + ip_port)
                     ip = sock_addr.hostname
-                    port = (
-                        int(sock_addr.port)
-                        if sock_addr.port
-                        else self._default_port
-                    )
+                    port = int(sock_addr.port) if sock_addr.port else self._default_port
                 else:
                     ip = ip_port
                     port = self._default_port
@@ -437,9 +422,7 @@ class SubnetListFormField(forms.CharField):
     pt_ipv4 = r"(?: \d{1,3} [.] \d{1,3} [.] \d{1,3} [.] \d{1,3} )"
     pt_ipv6 = r"(?: (|[0-9A-Fa-f]{1,4}) [:] (|[0-9A-Fa-f]{1,4}) [:] (.*))"
     pt_ip = re.compile(rf"^ (?: {pt_ipv4} | {pt_ipv6} ) $", re.VERBOSE)
-    pt_subnet = re.compile(
-        rf"^ (?: {pt_ipv4} | {pt_ipv6} ) \/\d+$", re.VERBOSE
-    )
+    pt_subnet = re.compile(rf"^ (?: {pt_ipv4} | {pt_ipv6} ) \/\d+$", re.VERBOSE)
 
     def clean(self, value):
         if value is None:
@@ -625,9 +608,7 @@ class VersionedTextFileField(forms.ModelChoiceField):
 class URLOrPPAValidator(URLValidator):
     message = "Enter a valid repository URL or PPA location."
 
-    ppa_re = (
-        r"ppa:" + URLValidator.hostname_re + r"/" + URLValidator.hostname_re
-    )
+    ppa_re = r"ppa:" + URLValidator.hostname_re + r"/" + URLValidator.hostname_re
 
     def __call__(self, value):
         match = re.search(URLOrPPAValidator.ppa_re, force_str(value))

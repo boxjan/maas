@@ -109,9 +109,7 @@ class TestRegionEventLoop(MAASTestCase):
 
         @asynchronous
         def tryPopulate(*args, **kwargs):
-            self.assertRaises(
-                ValueError, an_eventloop.populateService, *args, **kwargs
-            )
+            self.assertRaises(ValueError, an_eventloop.populateService, *args, **kwargs)
 
         tryPopulate("web", master=True).wait(TIMEOUT)
 
@@ -121,9 +119,7 @@ class TestRegionEventLoop(MAASTestCase):
 
         @asynchronous
         def tryPopulate(*args, **kwargs):
-            self.assertRaises(
-                ValueError, an_eventloop.populateService, *args, **kwargs
-            )
+            self.assertRaises(ValueError, an_eventloop.populateService, *args, **kwargs)
 
         tryPopulate("workers", master=False).wait(TIMEOUT)
 
@@ -133,9 +129,7 @@ class TestRegionEventLoop(MAASTestCase):
 
         @asynchronous
         def tryPopulate(*args, **kwargs):
-            self.assertRaises(
-                ValueError, an_eventloop.populateService, *args, **kwargs
-            )
+            self.assertRaises(ValueError, an_eventloop.populateService, *args, **kwargs)
 
         tryPopulate("workers", master=True, all_in_one=True).wait(TIMEOUT)
 
@@ -143,9 +137,7 @@ class TestRegionEventLoop(MAASTestCase):
         self.patch(eventloop.services, "getServiceNamed")
         an_eventloop = eventloop.RegionEventLoop()
         # At first there are no services.
-        self.assertEqual(
-            set(), {service.name for service in an_eventloop.services}
-        )
+        self.assertEqual(set(), {service.name for service in an_eventloop.services})
         # populate() creates a service with each factory.
         an_eventloop.populate(master=False).wait(TIMEOUT)
         self.assertEqual(
@@ -172,9 +164,7 @@ class TestRegionEventLoop(MAASTestCase):
         self.patch(eventloop.services, "getServiceNamed")
         an_eventloop = eventloop.RegionEventLoop()
         # At first there are no services.
-        self.assertEqual(
-            set(), {service.name for service in an_eventloop.services}
-        )
+        self.assertEqual(set(), {service.name for service in an_eventloop.services})
         # populate() creates a service with each factory.
         an_eventloop.populate(master=False, import_services=True).wait(TIMEOUT)
         self.assertEqual(
@@ -199,9 +189,7 @@ class TestRegionEventLoop(MAASTestCase):
         self.patch(eventloop.services, "getServiceNamed")
         an_eventloop = eventloop.RegionEventLoop()
         # At first there are no services.
-        self.assertEqual(
-            set(), {service.name for service in an_eventloop.services}
-        )
+        self.assertEqual(set(), {service.name for service in an_eventloop.services})
         # populate() creates a service with each factory.
         an_eventloop.populate(master=True).wait(TIMEOUT)
         self.assertEqual(
@@ -226,13 +214,11 @@ class TestRegionEventLoop(MAASTestCase):
         self.patch(eventloop.services, "getServiceNamed")
         an_eventloop = eventloop.RegionEventLoop()
         # At first there are no services.
-        self.assertEqual(
-            set(), {service.name for service in an_eventloop.services}
-        )
+        self.assertEqual(set(), {service.name for service in an_eventloop.services})
         # populate() creates a service with each factory.
-        an_eventloop.populate(
-            master=True, all_in_one=True, import_services=True
-        ).wait(TIMEOUT)
+        an_eventloop.populate(master=True, all_in_one=True, import_services=True).wait(
+            TIMEOUT
+        )
         self.assertEqual(
             {
                 name
@@ -262,9 +248,7 @@ class TestRegionEventLoop(MAASTestCase):
         self.assertFalse(eventloop.loop.running)
         self.assertEqual(set(eventloop.loop.services), set())
         # Patch prepare so it's not actually run.
-        self.patch(eventloop.loop, "prepare").return_value = defer.succeed(
-            None
-        )
+        self.patch(eventloop.loop, "prepare").return_value = defer.succeed(None)
         # After starting the loop, the services list is populated, and
         # the services are started too.
         eventloop.loop.start().wait(TIMEOUT)
@@ -299,9 +283,7 @@ class TestRegionEventLoop(MAASTestCase):
         # that the services list is empty.
         self.useFixture(RegionEventLoopFixture())
         # Patch prepare so it's not actually run.
-        self.patch(eventloop.loop, "prepare").return_value = defer.succeed(
-            None
-        )
+        self.patch(eventloop.loop, "prepare").return_value = defer.succeed(None)
         eventloop.loop.start().wait(TIMEOUT)
         eventloop.loop.reset().wait(TIMEOUT)
         # After stopping the loop, the services list is also emptied.
@@ -315,9 +297,7 @@ class TestRegionEventLoop(MAASTestCase):
         eventloop.loop.factories = ((factory.make_name("service"), None),)
         eventloop.loop.reset().wait(TIMEOUT)
         # The loop's factories are also reset.
-        self.assertEqual(
-            eventloop.loop.__class__.factories, eventloop.loop.factories
-        )
+        self.assertEqual(eventloop.loop.__class__.factories, eventloop.loop.factories)
 
     def test_restart(self):
         # Replace the factories in RegionEventLoop with non-functional
@@ -327,9 +307,7 @@ class TestRegionEventLoop(MAASTestCase):
         # Stop and reset eventloop afterwards
         self.addCleanup(lambda: eventloop.loop.reset().wait(TIMEOUT))
         # Patch prepare so it's not actually run.
-        self.patch(eventloop.loop, "prepare").return_value = defer.succeed(
-            None
-        )
+        self.patch(eventloop.loop, "prepare").return_value = defer.succeed(None)
         reset_mock = self.patch(eventloop.loop, "reset")
         reset_mock.return_value = defer.succeed(None)
 
@@ -363,9 +341,7 @@ class TestFactories(MAASServerTestCase):
             eventloop.make_DatabaseTaskService,
             eventloop.loop.factories["database-tasks"]["factory"],
         )
-        self.assertFalse(
-            eventloop.loop.factories["database-tasks"]["only_on_master"]
-        )
+        self.assertFalse(eventloop.loop.factories["database-tasks"]["only_on_master"])
 
     def test_make_MasterDatabaseTaskService(self):
         service = eventloop.make_DatabaseTaskService()
@@ -383,17 +359,13 @@ class TestFactories(MAASServerTestCase):
         service = eventloop.make_RegionControllerService(
             sentinel.postgresListener, sentinel.dbtasks
         )
-        self.assertIsInstance(
-            service, region_controller.RegionControllerService
-        )
+        self.assertIsInstance(service, region_controller.RegionControllerService)
         # It is registered as a factory in RegionEventLoop.
         self.assertIs(
             eventloop.make_RegionControllerService,
             eventloop.loop.factories["region-controller"]["factory"],
         )
-        self.assertTrue(
-            eventloop.loop.factories["region-controller"]["only_on_master"]
-        )
+        self.assertTrue(eventloop.loop.factories["region-controller"]["only_on_master"])
 
     def test_make_RegionService(self):
         service = eventloop.make_RegionService(sentinel.ipcWorker)
@@ -404,9 +376,7 @@ class TestFactories(MAASServerTestCase):
             eventloop.loop.factories["rpc"]["factory"],
         )
         self.assertFalse(eventloop.loop.factories["rpc"]["only_on_master"])
-        self.assertEqual(
-            ["ipc-worker"], eventloop.loop.factories["rpc"]["requires"]
-        )
+        self.assertEqual(["ipc-worker"], eventloop.loop.factories["rpc"]["requires"])
 
     def test_make_NonceCleanupService(self):
         service = eventloop.make_NonceCleanupService()
@@ -416,9 +386,7 @@ class TestFactories(MAASServerTestCase):
             eventloop.make_NonceCleanupService,
             eventloop.loop.factories["nonce-cleanup"]["factory"],
         )
-        self.assertTrue(
-            eventloop.loop.factories["nonce-cleanup"]["only_on_master"]
-        )
+        self.assertTrue(eventloop.loop.factories["nonce-cleanup"]["only_on_master"])
 
     def test_make_StatusMonitorService(self):
         service = eventloop.make_StatusMonitorService()
@@ -428,9 +396,7 @@ class TestFactories(MAASServerTestCase):
             eventloop.make_StatusMonitorService,
             eventloop.loop.factories["status-monitor"]["factory"],
         )
-        self.assertTrue(
-            eventloop.loop.factories["status-monitor"]["only_on_master"]
-        )
+        self.assertTrue(eventloop.loop.factories["status-monitor"]["only_on_master"])
 
     def test_make_StatsService(self):
         service = eventloop.make_StatsService()
@@ -450,9 +416,7 @@ class TestFactories(MAASServerTestCase):
             eventloop.make_PrometheusService,
             eventloop.loop.factories["prometheus"]["factory"],
         )
-        self.assertTrue(
-            eventloop.loop.factories["prometheus"]["only_on_master"]
-        )
+        self.assertTrue(eventloop.loop.factories["prometheus"]["only_on_master"])
 
     def test_make_ImportResourcesService(self):
         service = eventloop.make_ImportResourcesService()
@@ -462,30 +426,20 @@ class TestFactories(MAASServerTestCase):
             eventloop.make_ImportResourcesService,
             eventloop.loop.factories["import-resources"]["factory"],
         )
-        self.assertFalse(
-            eventloop.loop.factories["import-resources"]["only_on_master"]
-        )
-        self.assertTrue(
-            eventloop.loop.factories["import-resources"]["import_service"]
-        )
+        self.assertFalse(eventloop.loop.factories["import-resources"]["only_on_master"])
+        self.assertTrue(eventloop.loop.factories["import-resources"]["import_service"])
 
     def test_make_ImportResourcesProgressService(self):
         service = eventloop.make_ImportResourcesProgressService()
-        self.assertIsInstance(
-            service, bootresources.ImportResourcesProgressService
-        )
+        self.assertIsInstance(service, bootresources.ImportResourcesProgressService)
         # It is registered as a factory in RegionEventLoop.
         factories = eventloop.loop.factories
         self.assertIs(
             eventloop.make_ImportResourcesProgressService,
             factories["import-resources-progress"]["factory"],
         )
-        self.assertFalse(
-            factories["import-resources-progress"]["only_on_master"]
-        )
-        self.assertTrue(
-            factories["import-resources-progress"]["import_service"]
-        )
+        self.assertFalse(factories["import-resources-progress"]["only_on_master"])
+        self.assertTrue(factories["import-resources-progress"]["import_service"])
 
     def test_make_WebApplicationService(self):
         service = eventloop.make_WebApplicationService(
@@ -527,26 +481,18 @@ class TestFactories(MAASServerTestCase):
             ["ipc-worker", "postgres-listener-worker"],
             eventloop.loop.factories["rack-controller"]["requires"],
         )
-        self.assertFalse(
-            eventloop.loop.factories["rack-controller"]["only_on_master"]
-        )
+        self.assertFalse(eventloop.loop.factories["rack-controller"]["only_on_master"])
 
     def test_make_ServiceMonitorService(self):
         service = eventloop.make_ServiceMonitorService()
-        self.assertIsInstance(
-            service, service_monitor_service.ServiceMonitorService
-        )
+        self.assertIsInstance(service, service_monitor_service.ServiceMonitorService)
         # It is registered as a factory in RegionEventLoop.
         self.assertIs(
             eventloop.make_ServiceMonitorService,
             eventloop.loop.factories["service-monitor"]["factory"],
         )
-        self.assertEqual(
-            [], eventloop.loop.factories["service-monitor"]["requires"]
-        )
-        self.assertTrue(
-            eventloop.loop.factories["service-monitor"]["only_on_master"]
-        )
+        self.assertEqual([], eventloop.loop.factories["service-monitor"]["requires"])
+        self.assertTrue(eventloop.loop.factories["service-monitor"]["only_on_master"])
 
     def test_make_StatusWorkerService(self):
         service = eventloop.make_StatusWorkerService(sentinel.dbtasks)
@@ -561,9 +507,7 @@ class TestFactories(MAASServerTestCase):
             ["database-tasks"],
             eventloop.loop.factories["status-worker"]["requires"],
         )
-        self.assertFalse(
-            eventloop.loop.factories["status-worker"]["only_on_master"]
-        )
+        self.assertFalse(eventloop.loop.factories["status-worker"]["only_on_master"])
 
     def test_make_NetworkTimeProtocolService(self):
         service = eventloop.make_NetworkTimeProtocolService()
@@ -611,16 +555,12 @@ class TestFactories(MAASServerTestCase):
             eventloop.loop.factories["ipc-master"]["factory"],
         )
         # Has a no dependencies.
-        self.assertEqual(
-            [], eventloop.loop.factories["ipc-master"]["requires"]
-        )
+        self.assertEqual([], eventloop.loop.factories["ipc-master"]["requires"])
         # Has an optional dependency on workers.
         self.assertEqual(
             ["workers"], eventloop.loop.factories["ipc-master"]["optional"]
         )
-        self.assertTrue(
-            eventloop.loop.factories["ipc-master"]["only_on_master"]
-        )
+        self.assertTrue(eventloop.loop.factories["ipc-master"]["only_on_master"])
 
     def test_make_IPCWorkerService(self):
         service = eventloop.make_IPCWorkerService()
@@ -631,12 +571,8 @@ class TestFactories(MAASServerTestCase):
             eventloop.loop.factories["ipc-worker"]["factory"],
         )
         # Has a no dependencies.
-        self.assertEqual(
-            [], eventloop.loop.factories["ipc-worker"]["requires"]
-        )
-        self.assertFalse(
-            eventloop.loop.factories["ipc-worker"]["only_on_master"]
-        )
+        self.assertEqual([], eventloop.loop.factories["ipc-worker"]["requires"])
+        self.assertFalse(eventloop.loop.factories["ipc-worker"]["only_on_master"])
 
     def test_make_PrometheusExporterService(self):
         service = eventloop.make_PrometheusExporterService()
@@ -655,9 +591,7 @@ class TestFactories(MAASServerTestCase):
         service = eventloop.make_CertificateExpirationCheckService()
         self.assertIsInstance(service, CertificateExpirationCheckService)
         self.assertIs(
-            eventloop.loop.factories["certificate-expiration-check"][
-                "factory"
-            ],
+            eventloop.loop.factories["certificate-expiration-check"]["factory"],
             eventloop.make_CertificateExpirationCheckService,
         )
 

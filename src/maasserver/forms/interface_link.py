@@ -63,17 +63,13 @@ class InterfaceLinkForm(forms.Form):
             choices=mode_choices,
             required=True,
             error_messages={
-                "invalid_choice": compose_invalid_choice_text(
-                    "mode", mode_choices
-                )
+                "invalid_choice": compose_invalid_choice_text("mode", mode_choices)
             },
         )
         if self.instance.vlan is None or self.force is True:
             self.fields["subnet"].queryset = Subnet.objects.all()
         else:
-            self.fields[
-                "subnet"
-            ].queryset = self.instance.vlan.subnet_set.all()
+            self.fields["subnet"].queryset = self.instance.vlan.subnet_set.all()
 
     def clean(self):
         for interface in self.instance.children.all():
@@ -120,9 +116,7 @@ class InterfaceLinkForm(forms.Form):
                     % (dhcp_address.subnet),
                 )
             else:
-                set_form_error(
-                    self, "mode", "Interface is already set to DHCP."
-                )
+                set_form_error(self, "mode", "Interface is already set to DHCP.")
 
     def _clean_mode_static(self, cleaned_data):
         subnet = cleaned_data.get("subnet", None)
@@ -172,9 +166,7 @@ class InterfaceLinkForm(forms.Form):
         if not default_gateway:
             return
         if mode not in GATEWAY_OPTION_MODES:
-            set_form_error(
-                self, "default_gateway", "Cannot use in mode '%s'." % mode
-            )
+            set_form_error(self, "default_gateway", "Cannot use in mode '%s'." % mode)
         else:
             if subnet is None:
                 set_form_error(
@@ -205,17 +197,13 @@ class InterfaceLinkForm(forms.Form):
         # out the VLAN so that link_subnet() will reset the interface's subnet
         # to be correct.
         should_clear_vlan = (
-            self.force is True
-            and subnet is not None
-            and self.instance.vlan is not None
+            self.force is True and subnet is not None and self.instance.vlan is not None
         )
         if should_clear_vlan:
             self.instance.vlan = None
         if not ip_address:
             ip_address = None
-        link_ip = self.instance.link_subnet(
-            mode, subnet, ip_address=ip_address
-        )
+        link_ip = self.instance.link_subnet(mode, subnet, ip_address=ip_address)
         if default_gateway:
             node = self.instance.get_node()
             network = subnet.get_ipnetwork()
@@ -224,9 +212,7 @@ class InterfaceLinkForm(forms.Form):
             elif network.version == IPADDRESS_FAMILY.IPv6:
                 node.gateway_link_ipv6 = link_ip
             else:
-                raise ValueError(
-                    "Unknown subnet IP version: %s" % network.version
-                )
+                raise ValueError("Unknown subnet IP version: %s" % network.version)
             node.save()
         return Interface.objects.get(id=self.instance.id)
 
@@ -240,9 +226,7 @@ class InterfaceUnlinkForm(forms.Form):
         self.set_up_id_field()
 
     def set_up_id_field(self):
-        link_ids = self.instance.ip_addresses.all().values_list(
-            "id", flat=True
-        )
+        link_ids = self.instance.ip_addresses.all().values_list("id", flat=True)
         link_choices = [(link_id, link_id) for link_id in link_ids]
         invalid_choice = compose_invalid_choice_text("id", link_choices)
         self.fields["id"] = forms.ChoiceField(
@@ -303,9 +287,7 @@ class InterfaceSetDefaultGatwayForm(forms.Form):
             IPAddress(gateway).version for gateway in unique_gateways
         )
         too_many = sorted(
-            ip_family
-            for ip_family, count in gateway_versions.items()
-            if count > 1
+            ip_family for ip_family, count in gateway_versions.items() if count > 1
         )
         if len(too_many) > 0:
             set_form_error(
@@ -344,9 +326,7 @@ class InterfaceSetDefaultGatwayForm(forms.Form):
             elif network.version == IPADDRESS_FAMILY.IPv6:
                 node.gateway_link_ipv6 = link
             else:
-                raise ValueError(
-                    "Unknown subnet IP version: %s" % network.version
-                )
+                raise ValueError("Unknown subnet IP version: %s" % network.version)
             node.save()
         else:
             ipv4_link = self.get_first_link_by_ip_family(IPADDRESS_FAMILY.IPv4)

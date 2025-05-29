@@ -174,8 +174,7 @@ class TestS390XBootMethodRenderConfig(MAASTestCase):
         output_before = method.get_reader(**options).read(10000)
         # Sprinkle some magic in.
         options.update(
-            (factory.make_name("name"), factory.make_name("value"))
-            for _ in range(10)
+            (factory.make_name("name"), factory.make_name("value")) for _ in range(10)
         )
         # Capture the output after sprinking in some random options.
         output_after = method.get_reader(**options).read(10000)
@@ -187,9 +186,7 @@ class TestS390XBootMethodRenderConfig(MAASTestCase):
         method = S390XBootMethod()
         options = {
             "backend": None,
-            "kernel_params": make_kernel_parameters(
-                arch="amd64", purpose="local"
-            ),
+            "kernel_params": make_kernel_parameters(arch="amd64", purpose="local"),
         }
         output = method.get_reader(**options).read(10000).decode("utf-8")
         self.assertIn("", output)

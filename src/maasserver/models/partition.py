@@ -98,9 +98,7 @@ class PartitionManager(Manager):
                 )
             tags = list(tags)
         tags_where, tags_params = psql_array(tags, sql_type="text")
-        where_contains = (
-            '"maasserver_partition"."tags"::text[] @> %s' % tags_where
-        )
+        where_contains = '"maasserver_partition"."tags"::text[] @> %s' % tags_where
         return self.extra(where=[where_contains], params=tags_params)
 
 
@@ -158,9 +156,7 @@ class Partition(CleanSave, TimestampedModel):
 
     def get_name(self):
         """Return the name of the partition."""
-        return (
-            f"{self.partition_table.block_device.get_name()}-part{self.index}"
-        )
+        return f"{self.partition_table.block_device.get_name()}-part{self.index}"
 
     def get_node(self):
         """`Node` this partition belongs to."""
@@ -204,9 +200,7 @@ class Partition(CleanSave, TimestampedModel):
             bios_boot_method = node.get_bios_boot_method()
             block_device = self.partition_table.block_device
 
-            need_prep_partition = (
-                arch == "ppc64el" and block_device.id == boot_disk.id
-            )
+            need_prep_partition = arch == "ppc64el" and block_device.id == boot_disk.id
             need_bios_grub = (
                 arch == "amd64"
                 and bios_boot_method != "uefi"
@@ -262,8 +256,7 @@ class Partition(CleanSave, TimestampedModel):
                             {
                                 "size": [
                                     "Partition %s cannot be resized to fit on the "
-                                    "block device; not enough free space."
-                                    % (self.id)
+                                    "block device; not enough free space." % (self.id)
                                 ]
                             }
                         )

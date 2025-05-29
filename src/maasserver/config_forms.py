@@ -61,9 +61,7 @@ class DictCharField(forms.MultiValueField):
         # be used to skip the validation of the fields and accept arbitrary
         # data.
         if skip_check:
-            self.field_dict[SKIP_CHECK_NAME] = forms.BooleanField(
-                required=False
-            )
+            self.field_dict[SKIP_CHECK_NAME] = forms.BooleanField(required=False)
         self.names = [name for name in self.field_dict]
         # Create the DictCharWidget with init values from the list of fields.
         self.fields = list(self.field_dict.values())
@@ -120,9 +118,9 @@ class DictCharField(forms.MultiValueField):
         .. _MultiValueField: http://code.djangoproject.com/
             svn/django/tags/releases/1.3.1/django/forms/fields.py
         """
-        skip_check = self.skip_check and self.widget.widgets[
-            -1
-        ].value_from_datadict(value, files=None, name=SKIP_CHECK_NAME)
+        skip_check = self.skip_check and self.widget.widgets[-1].value_from_datadict(
+            value, files=None, name=SKIP_CHECK_NAME
+        )
         # Remove the 'skip_check' value from the list of values.
         try:
             value.pop(SKIP_CHECK_NAME)
@@ -156,9 +154,7 @@ class DictCharField(forms.MultiValueField):
             # value is considered empty if it is in
             # validators.EMPTY_VALUES, or if each of the subvalues is
             # None.
-            is_empty = value in validators.EMPTY_VALUES or all(
-                v is None for v in value
-            )
+            is_empty = value in validators.EMPTY_VALUES or all(v is None for v in value)
             if is_empty:
                 if self.required:
                     raise ValidationError(self.error_messages["required"])
@@ -189,9 +185,7 @@ class DictCharField(forms.MultiValueField):
             # 'required' field to allow subfields to be required or not.
             if field.required and field_value in validators.EMPTY_VALUES:
                 errors.append(
-                    "{}: {}".format(
-                        field.label, self.error_messages["required"]
-                    )
+                    "{}: {}".format(field.label, self.error_messages["required"])
                 )
                 continue
             try:
@@ -200,9 +194,7 @@ class DictCharField(forms.MultiValueField):
                 # Collect all validation errors in a single list, which we'll
                 # raise at the end of clean(), rather than raising a single
                 # exception for the first error we encounter.
-                errors.extend(
-                    f"{field.label}: {message}" for message in e.messages
-                )
+                errors.extend(f"{field.label}: {message}" for message in e.messages)
         if errors:
             raise ValidationError(errors)
 
@@ -298,9 +290,7 @@ class DictCharWidget(forms.widgets.MultiWidget):
                 except IndexError:
                     widget_value = None
             if id_:
-                final_attrs = dict(
-                    final_attrs, id=f"{id_}_{self.names[index]}"
-                )
+                final_attrs = dict(final_attrs, id=f"{id_}_{self.names[index]}")
             # Add label to each sub-field.
             if id_:
                 label_for = ' for="%s"' % final_attrs["id"]

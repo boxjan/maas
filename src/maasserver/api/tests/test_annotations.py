@@ -147,67 +147,49 @@ class TestAPIAnnotations(APITestCase.ForUser):
         p = params[0]
         self.assertEqual(p["type"], "String")
         self.assertEqual(p["name"], "param_name")
-        self.assertEqual(
-            " ".join(p["description"].split()), "param description"
-        )
+        self.assertEqual(" ".join(p["description"].split()), "param description")
         self.assertEqual(" ".join(p["example"].split()), "param-ex")
 
         p = params[1]
         self.assertEqual(p["type"], "Int")
         self.assertEqual(p["name"], "param_name2")
-        self.assertEqual(
-            " ".join(p["description"].split()), "param2 description"
-        )
+        self.assertEqual(" ".join(p["description"].split()), "param2 description")
         self.assertEqual(" ".join(p["example"].split()), "param2-ex")
 
         p = params[2]
         self.assertEqual(p["type"], "URL String")
         self.assertEqual(p["name"], "param_name3")
-        self.assertEqual(
-            " ".join(p["description"].split()), "param3 description"
-        )
+        self.assertEqual(" ".join(p["description"].split()), "param3 description")
         self.assertEqual(" ".join(p["example"].split()), "param3-ex")
 
         p = params[3]
         self.assertEqual(p["type"], "JSON")
         self.assertEqual(p["name"], "param_name4")
-        self.assertEqual(
-            " ".join(p["description"].split()), "param4 description"
-        )
-        self.assertEqual(
-            " ".join(p["example"].split()), '{ "id": 1, "foo": "bar" }'
-        )
+        self.assertEqual(" ".join(p["description"].split()), "param4 description")
+        self.assertEqual(" ".join(p["example"].split()), '{ "id": 1, "foo": "bar" }')
 
         p = params[4]
         self.assertEqual(p["type"], "Boolean")
         self.assertEqual(p["name"], "param_name5")
-        self.assertEqual(
-            " ".join(p["description"].split()), "param5 description"
-        )
+        self.assertEqual(" ".join(p["description"].split()), "param5 description")
         self.assertEqual(" ".join(p["example"].split()), "True")
 
         p = params[5]
         self.assertEqual(p["type"], "Float")
         self.assertEqual(p["name"], "param_name6")
-        self.assertEqual(
-            " ".join(p["description"].split()), "param6 description"
-        )
+        self.assertEqual(" ".join(p["description"].split()), "param6 description")
         self.assertEqual(" ".join(p["example"].split()), "1.5")
 
         s = successes[0]
         self.assertEqual(s["type"], "Content")
         self.assertEqual(s["name"], "success_name")
-        self.assertEqual(
-            " ".join(s["description"].split()), "success description"
-        )
+        self.assertEqual(" ".join(s["description"].split()), "success description")
         self.assertEqual(" ".join(s["example"].split()), "success content")
 
         e = errors[0]
         self.assertEqual(e["type"], "HTTP Status Code")
         self.assertEqual(e["name"], "error_name")
-        self.assertEqual(
-            " ".join(e["description"].split()), "error description"
-        )
+        self.assertEqual(" ".join(e["description"].split()), "error description")
         self.assertEqual(" ".join(e["example"].split()), "error content")
 
     def test_annotations_present(self):
@@ -347,9 +329,7 @@ class TestAPIAnnotations(APITestCase.ForUser):
         ds_empty_name = ds_orig.replace(
             '@param (string) "param_name"', '@param (string) ""'
         )
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_empty_name)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_empty_name))
 
     def test_param_required_type_has_correct_value(self):
         """'required' option should only allow true and false.
@@ -362,24 +342,16 @@ class TestAPIAnnotations(APITestCase.ForUser):
         api_docstring_parser = APIDocstringParser()
 
         ds_req = ds_orig.replace("required=true", "required=false")
-        self.assert_has_no_api_warning(
-            self.do_parse(api_docstring_parser, ds_req)
-        )
+        self.assert_has_no_api_warning(self.do_parse(api_docstring_parser, ds_req))
 
         ds_req = ds_orig.replace("required=true", "required=True")
-        self.assert_has_no_api_warning(
-            self.do_parse(api_docstring_parser, ds_req)
-        )
+        self.assert_has_no_api_warning(self.do_parse(api_docstring_parser, ds_req))
 
         ds_req = ds_orig.replace("required=true", "required=False")
-        self.assert_has_no_api_warning(
-            self.do_parse(api_docstring_parser, ds_req)
-        )
+        self.assert_has_no_api_warning(self.do_parse(api_docstring_parser, ds_req))
 
         ds_req = ds_orig.replace("required=true", "required=yes")
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_req)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_req))
 
     def test_param_formatting_type_has_correct_value(self):
         """'formatting' option should only allow true and false.
@@ -392,24 +364,16 @@ class TestAPIAnnotations(APITestCase.ForUser):
         api_docstring_parser = APIDocstringParser()
 
         ds_req = ds_orig.replace("formatting=true", "formatting=false")
-        self.assert_has_no_api_warning(
-            self.do_parse(api_docstring_parser, ds_req)
-        )
+        self.assert_has_no_api_warning(self.do_parse(api_docstring_parser, ds_req))
 
         ds_req = ds_orig.replace("formatting=true", "formatting=True")
-        self.assert_has_no_api_warning(
-            self.do_parse(api_docstring_parser, ds_req)
-        )
+        self.assert_has_no_api_warning(self.do_parse(api_docstring_parser, ds_req))
 
         ds_req = ds_orig.replace("formatting=true", "formatting=False")
-        self.assert_has_no_api_warning(
-            self.do_parse(api_docstring_parser, ds_req)
-        )
+        self.assert_has_no_api_warning(self.do_parse(api_docstring_parser, ds_req))
 
         ds_req = ds_orig.replace("formatting=true", "formatting=yes")
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_req)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_req))
 
     def test_valid_types(self):
         """Ensure that non-valid types raise warnings."""
@@ -418,9 +382,7 @@ class TestAPIAnnotations(APITestCase.ForUser):
 
         ds_bad_type = ds_orig.replace("(int)", "(badtype)")
 
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_bad_type)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_bad_type))
 
     def test_missing_param_example_annotation_pieces(self):
         """Test for missing pieces of param-example tag.
@@ -451,9 +413,7 @@ class TestAPIAnnotations(APITestCase.ForUser):
         ds_empty_name = ds_orig.replace(
             '@param-example "param_name"', '@param-example ""'
         )
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_empty_name)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_empty_name))
 
     def test_missing_success_annotation_pieces(self):
         """Test for missing pieces of success tag.
@@ -489,9 +449,7 @@ class TestAPIAnnotations(APITestCase.ForUser):
         ds_empty_name = ds_orig.replace(
             '@success (content) "success_name"', '@success (content) ""'
         )
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_empty_name)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_empty_name))
 
     def test_missing_success_example_annotation_pieces(self):
         """Test for missing pieces of success-example tag.
@@ -523,9 +481,7 @@ class TestAPIAnnotations(APITestCase.ForUser):
         ds_empty_name = ds_orig.replace(
             '@success-example "success_name"', '@success-example ""'
         )
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_empty_name)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_empty_name))
 
     def test_missing_error_annotation_pieces(self):
         """Test for missing pieces of error tag.
@@ -538,9 +494,7 @@ class TestAPIAnnotations(APITestCase.ForUser):
 
         # All of these should issue warnings
         # @error (http-status-code) "error_name" error description
-        ds_missing_type = ds_orig.replace(
-            "@error (http-status-code)", "@error"
-        )
+        ds_missing_type = ds_orig.replace("@error (http-status-code)", "@error")
         self.assert_has_api_warning(
             self.do_parse(api_docstring_parser, ds_missing_type)
         )
@@ -565,9 +519,7 @@ class TestAPIAnnotations(APITestCase.ForUser):
             '@error (http-status-code) "error_name"',
             '@error (http-status-code) ""',
         )
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_empty_name)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_empty_name))
 
     def test_missing_error_example_annotation_pieces(self):
         """Test for missing pieces of error-example tag.
@@ -599,15 +551,11 @@ class TestAPIAnnotations(APITestCase.ForUser):
         ds_empty_name = ds_orig.replace(
             '@error-example "error_name"', '@error-example ""'
         )
-        self.assert_has_api_warning(
-            self.do_parse(api_docstring_parser, ds_empty_name)
-        )
+        self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_empty_name))
 
     def test_empty_description1(self):
         """Test for empty description field in description-title tag."""
-        ds_md = self.sample_api_annotated_docstring.replace(
-            "Docstring title", ""
-        )
+        ds_md = self.sample_api_annotated_docstring.replace("Docstring title", "")
         api_docstring_parser = APIDocstringParser()
 
         self.assert_has_api_warning(self.do_parse(api_docstring_parser, ds_md))

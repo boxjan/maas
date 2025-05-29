@@ -23,9 +23,7 @@ class TestEvent(MAASTestCase):
         event = Event()
         event.registerHandler(event.registerHandler)
         event.fire(sentinel.otherHandler)
-        self.assertEqual(
-            {event.registerHandler, sentinel.otherHandler}, event.handlers
-        )
+        self.assertEqual({event.registerHandler, sentinel.otherHandler}, event.handlers)
 
     def test_unregisterHandler(self):
         event = Event()
@@ -47,8 +45,7 @@ class TestEvent(MAASTestCase):
         event.registerHandler(handler_two)
         args = [factory.make_name("arg") for _ in range(3)]
         kwargs = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         event.fire(*args, **kwargs)
         handler_one.mock_called_once_with(*args, **kwargs)

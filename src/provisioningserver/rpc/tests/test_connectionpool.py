@@ -86,9 +86,7 @@ class TestConnectionPool(MAASTestCase):
         cp._reap_extra_connection(eventloop, connection)
         self.assertIn(eventloop, clock.calls[0].args)
         self.assertIn(connection, clock.calls[0].args)
-        self.assertEqual(
-            "_reap_extra_connection", clock.calls[0].func.__name__
-        )
+        self.assertEqual("_reap_extra_connection", clock.calls[0].func.__name__)
         self.assertEqual(cp._keepalive, clock.calls[0].time)
 
     def test_is_staged(self):
@@ -249,9 +247,7 @@ class TestConnectionPool(MAASTestCase):
             eventloops[2]: [_create_conn(True)],
         }
 
-        self.assertRaises(
-            exceptions.AllConnectionsBusy, cp.get_random_free_connection
-        )
+        self.assertRaises(exceptions.AllConnectionsBusy, cp.get_random_free_connection)
 
     def test_get_all_connections(self):
         cp = ConnectionPool(Clock(), Mock())

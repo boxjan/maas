@@ -37,14 +37,10 @@ class TestActiveDiscoveryService(MAASTransactionServerTestCase):
         self.assertEqual(service.call, (run, (), {}))
         self.assertEqual(service.step, active_discovery.CHECK_INTERVAL)
         self.assertEqual(service.clock, clock)
-        register.assert_called_once_with(
-            "config", service.refreshDiscoveryConfig
-        )
+        register.assert_called_once_with("config", service.refreshDiscoveryConfig)
         unregister.assert_not_called()
         service.stopService()
-        unregister.assert_called_once_with(
-            "config", service.refreshDiscoveryConfig
-        )
+        unregister.assert_called_once_with("config", service.refreshDiscoveryConfig)
 
     def test_run_calls_refreshDiscoveryConfig(self):
         clock = Clock()
@@ -156,9 +152,7 @@ class TestRefreshDiscoveryConfig(MAASTransactionServerTestCase):
 class TestGetActiveDiscoveryConfig(MAASTransactionServerTestCase):
     def test_returns_expected_interval(self):
         expected_interval = random.randint(1, 1000)
-        Config.objects.set_config(
-            "active_discovery_interval", expected_interval
-        )
+        Config.objects.set_config("active_discovery_interval", expected_interval)
         service = ActiveDiscoveryService(Clock())
         enabled, interval, last_scan = service.get_active_discovery_config()
         self.assertEqual(expected_interval, interval)
@@ -167,9 +161,7 @@ class TestGetActiveDiscoveryConfig(MAASTransactionServerTestCase):
 
     def test_returns_expected_last_scan(self):
         expected_last_scan = random.randint(1, 1000)
-        Config.objects.set_config(
-            "active_discovery_last_scan", expected_last_scan
-        )
+        Config.objects.set_config("active_discovery_last_scan", expected_last_scan)
         service = ActiveDiscoveryService(Clock())
         enabled, interval, last_scan = service.get_active_discovery_config()
         self.assertEqual(expected_last_scan, last_scan)
@@ -177,12 +169,8 @@ class TestGetActiveDiscoveryConfig(MAASTransactionServerTestCase):
     def test_returns_disabled_if_interval_is_zero(self):
         expected_interval = 0
         expected_last_scan = 0
-        Config.objects.set_config(
-            "active_discovery_last_scan", expected_last_scan
-        )
-        Config.objects.set_config(
-            "active_discovery_interval", expected_interval
-        )
+        Config.objects.set_config("active_discovery_last_scan", expected_last_scan)
+        Config.objects.set_config("active_discovery_interval", expected_interval)
         service = ActiveDiscoveryService(Clock())
         enabled, interval, last_scan = service.get_active_discovery_config()
         self.assertFalse(enabled)
@@ -190,12 +178,8 @@ class TestGetActiveDiscoveryConfig(MAASTransactionServerTestCase):
     def test_returns_disabled_if_interval_is_invalid(self):
         expected_interval = factory.make_name()
         expected_last_scan = factory.make_name()
-        Config.objects.set_config(
-            "active_discovery_last_scan", expected_last_scan
-        )
-        Config.objects.set_config(
-            "active_discovery_interval", expected_interval
-        )
+        Config.objects.set_config("active_discovery_last_scan", expected_last_scan)
+        Config.objects.set_config("active_discovery_interval", expected_interval)
         service = ActiveDiscoveryService(Clock())
         enabled, interval, last_scan = service.get_active_discovery_config()
         self.assertFalse(enabled)
@@ -212,9 +196,7 @@ class TestTryLockAndScan(MAASTransactionServerTestCase):
         self.get_active_discovery_config = self.patch(
             self.service, "get_active_discovery_config"
         )
-        self.getCurrentTimestamp = self.patch(
-            self.service, "getCurrentTimestamp"
-        )
+        self.getCurrentTimestamp = self.patch(self.service, "getCurrentTimestamp")
         self.get_network_discovery_config = self.patch(
             active_discovery.Config.objects, "get_network_discovery_config"
         )
@@ -223,9 +205,7 @@ class TestTryLockAndScan(MAASTransactionServerTestCase):
             "get_cidr_list_for_periodic_active_scan",
         )
         self.mock_discovery_config = Mock()
-        self.get_network_discovery_config.return_value = (
-            self.mock_discovery_config
-        )
+        self.get_network_discovery_config.return_value = self.mock_discovery_config
 
     def test_aborts_if_passive_discovery_is_disabled(self):
         self.mock_discovery_config.passive = False
@@ -262,9 +242,7 @@ class TestTryLockAndScan(MAASTransactionServerTestCase):
         self.getCurrentTimestamp.return_value = 100
         cidrs = [IPNetwork(factory.make_ipv4_network())]
         self.get_cidr_list.return_value = cidrs
-        scan_all_rack_networks = self.patch(
-            active_discovery, "scan_all_rack_networks"
-        )
+        scan_all_rack_networks = self.patch(active_discovery, "scan_all_rack_networks")
         rpc_results = Mock()
         rpc_results.available = ["rack1"]
         scan_all_rack_networks.return_value = rpc_results

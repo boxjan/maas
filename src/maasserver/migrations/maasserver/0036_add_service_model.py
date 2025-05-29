@@ -4,9 +4,7 @@ import maasserver.models.cleansave
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0035_convert_ether_wake_to_manual_power_type")
-    ]
+    dependencies = [("maasserver", "0035_convert_ether_wake_to_manual_power_type")]
 
     operations = [
         migrations.CreateModel(
@@ -48,9 +46,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "status_info",
-                    models.CharField(
-                        blank=True, editable=False, max_length=255
-                    ),
+                    models.CharField(blank=True, editable=False, max_length=255),
                 ),
                 (
                     "node",

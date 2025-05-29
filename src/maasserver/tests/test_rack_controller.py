@@ -41,9 +41,7 @@ class TestRackControllerService(
         self.assertIs(service.postgresListener, sentinel.listener)
 
     def test_startService_sets_starting_to_result_of_processId_get(self):
-        ipcWorker = create_autospec(
-            IPCWorkerService(sentinel.reactor), spec_set=True
-        )
+        ipcWorker = create_autospec(IPCWorkerService(sentinel.reactor), spec_set=True)
         service = RackControllerService(ipcWorker, sentinel.listener)
         observed = service.startService()
         processId = ipcWorker.processId
@@ -135,14 +133,11 @@ class TestRackControllerService(
         def create_process_and_racks():
             process = factory.make_RegionControllerProcess()
             rack_controllers = [
-                factory.make_RackController(managing_process=process)
-                for _ in range(3)
+                factory.make_RackController(managing_process=process) for _ in range(3)
             ]
             return process, rack_controllers
 
-        process, rack_controllers = yield deferToDatabase(
-            create_process_and_racks
-        )
+        process, rack_controllers = yield deferToDatabase(create_process_and_racks)
 
         ipcWorker = IPCWorkerService(sentinel.reactor)
         ipcWorker.processId.set(process.id)
@@ -362,13 +357,9 @@ class TestRackControllerService(
     @wait_for_reactor
     @inlineCallbacks
     def test_processDHCP_calls_configure_dhcp(self):
-        rack = yield deferToDatabase(
-            transactional(factory.make_RackController)
-        )
+        rack = yield deferToDatabase(transactional(factory.make_RackController))
         service = RackControllerService(sentinel.ipcWorker, sentinel.listener)
-        mock_configure_dhcp = self.patch(
-            rack_controller.dhcp, "configure_dhcp"
-        )
+        mock_configure_dhcp = self.patch(rack_controller.dhcp, "configure_dhcp")
         mock_configure_dhcp.return_value = succeed(None)
         yield service.processDHCP(rack.id)
         mock_configure_dhcp.assert_called_once_with(rack)
@@ -404,14 +395,10 @@ class TestRackControllerService(
     @wait_for_reactor
     @inlineCallbacks
     def test_processDHCP_unwatch_errback_ignores_other_exceptions(self):
-        rack = yield deferToDatabase(
-            transactional(factory.make_RackController)
-        )
+        rack = yield deferToDatabase(transactional(factory.make_RackController))
         service = RackControllerService(sentinel.ipcWorker, sentinel.listener)
         service.running = True
-        mock_configure_dhcp = self.patch(
-            rack_controller.dhcp, "configure_dhcp"
-        )
+        mock_configure_dhcp = self.patch(rack_controller.dhcp, "configure_dhcp")
         exc = factory.make_exception()
         mock_configure_dhcp.return_value = fail(exc)
         try:

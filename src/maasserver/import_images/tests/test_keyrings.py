@@ -31,9 +31,7 @@ class TestCalculateKeyringName(MAASTestCase):
     def test_creates_name_from_url(self):
         path = "/".join(self.getUniqueString() for _ in range(1, 5))
         source_url = f"http://example.com/{path}"
-        expected_keyring_name = hashlib.md5(
-            source_url.encode("utf8")
-        ).hexdigest()
+        expected_keyring_name = hashlib.md5(source_url.encode("utf8")).hexdigest()
         self.assertEqual(
             expected_keyring_name, keyrings.calculate_keyring_name(source_url)
         )
@@ -82,9 +80,7 @@ class TestWriteAllKeyrings(MAASTestCase):
         keyring_path = self.make_dir()
 
         expected_values = [
-            os.path.join(
-                keyring_path, keyrings.calculate_keyring_name(source["url"])
-            )
+            os.path.join(keyring_path, keyrings.calculate_keyring_name(source["url"]))
             for source in sources
         ]
 

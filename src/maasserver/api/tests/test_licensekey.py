@@ -166,26 +166,20 @@ class TestLicenseKey(APITestCase.ForUser):
 
 class TestLicenseKeysAPI(APITestCase.ForUser):
     def test_handler_path(self):
-        self.assertEqual(
-            "/MAAS/api/2.0/license-keys/", reverse("license_keys_handler")
-        )
+        self.assertEqual("/MAAS/api/2.0/license-keys/", reverse("license_keys_handler"))
 
     def test_GET_returns_license_keys(self):
         self.become_admin()
         orig_license_key = factory.make_LicenseKey()
 
         response = self.client.get(reverse("license_keys_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(1, len(parsed_result))
         [returned_network] = parsed_result
         fields = {"osystem", "distro_series", "license_key"}
-        self.assertEqual(
-            fields.union({"resource_uri"}), returned_network.keys()
-        )
+        self.assertEqual(fields.union({"resource_uri"}), returned_network.keys())
         expected_values = {
             field: getattr(orig_license_key, field)
             for field in fields
@@ -205,9 +199,7 @@ class TestLicenseKeysAPI(APITestCase.ForUser):
     def test_GET_returns_empty_if_no_networks(self):
         self.become_admin()
         response = self.client.get(reverse("license_keys_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual([], json_load_bytes(response.content))
 
     def test_POST_creates_license_key(self):
@@ -221,9 +213,7 @@ class TestLicenseKeysAPI(APITestCase.ForUser):
         }
         response = self.client.post(reverse("license_keys_handler"), params)
         self.assertEqual(http.client.OK, response.status_code)
-        license_key = LicenseKey.objects.get(
-            osystem=osystem, distro_series=release
-        )
+        license_key = LicenseKey.objects.get(osystem=osystem, distro_series=release)
         self.assertEqual(license_key.osystem, osystem)
         self.assertEqual(license_key.distro_series, release)
         self.assertEqual(license_key.license_key, params["license_key"])
@@ -240,9 +230,7 @@ class TestLicenseKeysAPI(APITestCase.ForUser):
         }
         response = self.client.post(reverse("license_keys_handler"), params)
         self.assertEqual(http.client.OK, response.status_code)
-        license_key = LicenseKey.objects.get(
-            osystem=osystem, distro_series=release
-        )
+        license_key = LicenseKey.objects.get(osystem=osystem, distro_series=release)
         self.assertEqual(license_key.osystem, osystem)
         self.assertEqual(license_key.distro_series, release)
         self.assertEqual(license_key.license_key, params["license_key"])
@@ -269,9 +257,5 @@ class TestLicenseKeysAPI(APITestCase.ForUser):
         )
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
         self.assertIsNone(
-            get_one(
-                LicenseKey.objects.filter(
-                    osystem=osystem, distro_series=series
-                )
-            )
+            get_one(LicenseKey.objects.filter(osystem=osystem, distro_series=series))
         )

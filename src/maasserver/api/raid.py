@@ -171,9 +171,7 @@ class RaidHandler(OperationsHandler):
         """Return the devices that make up this RAID."""
         return [
             filesystem.get_device()
-            for filesystem in raid.filesystems.filter(
-                fstype=FILESYSTEM_TYPE.RAID
-            )
+            for filesystem in raid.filesystems.filter(fstype=FILESYSTEM_TYPE.RAID)
         ]
 
     @classmethod
@@ -181,9 +179,7 @@ class RaidHandler(OperationsHandler):
         """Return the spare devices in this RAID."""
         return [
             filesystem.get_device()
-            for filesystem in raid.filesystems.filter(
-                fstype=FILESYSTEM_TYPE.RAID_SPARE
-            )
+            for filesystem in raid.filesystems.filter(fstype=FILESYSTEM_TYPE.RAID_SPARE)
         ]
 
     def read(self, request, system_id, id):

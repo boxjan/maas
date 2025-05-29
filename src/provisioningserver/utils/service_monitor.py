@@ -97,9 +97,7 @@ def _running_under_pebble():
     return os.environ.get("PEBBLE") is not None
 
 
-ServiceStateBase = namedtuple(
-    "ServiceStateBase", ["active_state", "process_state"]
-)
+ServiceStateBase = namedtuple("ServiceStateBase", ["active_state", "process_state"])
 
 
 class ServiceState(ServiceStateBase):
@@ -321,8 +319,7 @@ class ServiceMonitor:
             # ServiceActionError is already logged.
             if failure.check(ServiceActionError) is None:
                 maaslog.error(
-                    "While monitoring service '%s' an error was "
-                    "encountered: %s",
+                    "While monitoring service '%s' an error was " "encountered: %s",
                     service_name,
                     failure.value,
                 )
@@ -519,11 +516,7 @@ class ServiceMonitor:
         def cb_reschedule_if_not_done(body):
             if "result" in body:
                 result = body["result"]
-                if (
-                    "status" in result
-                    and "ready" in result
-                    and result["ready"]
-                ):
+                if "status" in result and "ready" in result and result["ready"]:
                     # Reference: https://github.com/canonical/pebble/blob/6276eaa533f414d091997f2ba9d7c83ca0e36038/internals/overlord/state/change.go#L73
                     status = result["status"]
                     msg = None
@@ -604,9 +597,7 @@ class ServiceMonitor:
         output = None
 
         try:
-            response = yield self._pebble_request(
-                method, endpoint, payload=payload
-            )
+            response = yield self._pebble_request(method, endpoint, payload=payload)
             if action == "services":
                 result = response.get("result", None)
                 if not result:
@@ -621,9 +612,9 @@ class ServiceMonitor:
                         raise ValueError(
                             "Expected to have change id in async request response"
                         )
-                    yield self._pebble_wait_on_change(
-                        response["change"]
-                    ).addTimeout(async_change_timeout, reactor)
+                    yield self._pebble_wait_on_change(response["change"]).addTimeout(
+                        async_change_timeout, reactor
+                    )
             return 0, output, None
         except Exception as e:
             return 1, output, str(e)
@@ -641,22 +632,16 @@ class ServiceMonitor:
         )
 
     @inlineCallbacks
-    def _pebble_request(
-        self, method: str, endpoint: str, payload: Dict = None
-    ):
+    def _pebble_request(self, method: str, endpoint: str, payload: Dict = None):
         """Makes a request to pebble via unix socket"""
         if not endpoint.startswith("/"):
-            raise ValueError(
-                f"Pebble endpoint does not start with '/': {endpoint}"
-            )
+            raise ValueError(f"Pebble endpoint does not start with '/': {endpoint}")
 
         headers = None
         body = None
         if payload:
             headers = Headers({"Content-Type": ["application/json"]})
-            body = FileBodyProducer(
-                BytesIO(json.dumps(payload).encode("utf-8"))
-            )
+            body = FileBodyProducer(BytesIO(json.dumps(payload).encode("utf-8")))
 
         response = yield self._agent.request(
             method.encode("ascii"),
@@ -666,9 +651,7 @@ class ServiceMonitor:
         )
 
         if not (200 <= response.code <= 299):
-            raise ValueError(
-                f"Unexpected pebble response code: {response.code}"
-            )
+            raise ValueError(f"Unexpected pebble response code: {response.code}")
         body_bytes = yield readBody(response)
         return json.loads(body_bytes.decode("utf-8"))
 

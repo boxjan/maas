@@ -68,9 +68,7 @@ def get_vendor_data(node, proxy):
 
 
 def get_node_maas_url(node):
-    maas_hostname = get_maas_facing_server_host(
-        node.get_boot_rack_controller()
-    )
+    maas_hostname = get_maas_facing_server_host(node.get_boot_rack_controller())
     return f"http://{maas_hostname}:5240/MAAS"
 
 
@@ -89,9 +87,7 @@ def generate_system_info(node):
         username = node.default_user
         fullname = node.owner.get_full_name()
         gecos = make_gecos_field(fullname)
-        yield "system_info", {
-            "default_user": {"name": username, "gecos": gecos}
-        }
+        yield "system_info", {"default_user": {"name": username, "gecos": gecos}}
 
 
 def generate_snap_configuration(node, proxy):
@@ -310,9 +306,7 @@ def generate_kvm_pod_configuration(node):
     secret_manager = SecretManager()
     node = node.as_node()
     if deploy_secrets:
-        secret_manager.set_composite_secret(
-            "deploy-metadata", deploy_secrets, obj=node
-        )
+        secret_manager.set_composite_secret("deploy-metadata", deploy_secrets, obj=node)
     else:
         secret_manager.delete_secret("deploy-metadata", obj=node)
 
@@ -411,9 +405,7 @@ def generate_hardware_sync_systemd_configuration(node):
         return
 
     token = NodeKey.objects.get_token_for_node(node)
-    hardware_sync_interval = Config.objects.get_config(
-        "hardware_sync_interval"
-    )
+    hardware_sync_interval = Config.objects.get_config("hardware_sync_interval")
     hardware_sync_timer_tmpl = tempita.Template(
         _get_metadataserver_template(HARDWARE_SYNC_TIMER_TEMPLATE)
     )
@@ -424,9 +416,7 @@ def generate_hardware_sync_systemd_configuration(node):
     maas_url = get_node_rack_url(node)
 
     hardware_sync_timer = hardware_sync_timer_tmpl.substitute(
-        hardware_sync_interval=systemd_interval_to_calendar(
-            hardware_sync_interval
-        )
+        hardware_sync_interval=systemd_interval_to_calendar(hardware_sync_interval)
     )
 
     hardware_sync_service = hardware_sync_service_tmpl.substitute(

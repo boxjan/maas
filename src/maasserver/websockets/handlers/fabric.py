@@ -41,7 +41,5 @@ class FabricHandler(TimestampedModelHandler):
     def delete(self, parameters):
         """Delete this Domain."""
         domain = self.get_object(parameters)
-        assert self.user.has_perm(
-            NodePermission.admin, domain
-        ), "Permission denied."
+        assert self.user.has_perm(NodePermission.admin, domain), "Permission denied."
         domain.delete()

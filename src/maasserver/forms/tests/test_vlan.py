@@ -170,9 +170,7 @@ class TestVLANForm(MAASServerTestCase):
         vlan.primary_rack = primary_rack
         vlan.secondary_rack = secondary_rack
         vlan.save()
-        form = VLANForm(
-            instance=reload_object(vlan), data={"primary_rack": ""}
-        )
+        form = VLANForm(instance=reload_object(vlan), data={"primary_rack": ""})
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
         vlan = reload_object(vlan)
@@ -228,9 +226,7 @@ class TestVLANForm(MAASServerTestCase):
         service.status = SERVICE_STATUS.DEAD
         service.save()
         second_rack = factory.make_RackController(vlan=vlan)
-        form = VLANForm(
-            instance=vlan, data={"secondary_rack": second_rack.system_id}
-        )
+        form = VLANForm(instance=vlan, data={"secondary_rack": second_rack.system_id})
         self.assertFalse(form.is_valid())
 
     def test_update_setting_secondary_allowed_when_primary_on(self):
@@ -242,9 +238,7 @@ class TestVLANForm(MAASServerTestCase):
         service.status = SERVICE_STATUS.RUNNING
         service.save()
         second_rack = factory.make_RackController(vlan=vlan)
-        form = VLANForm(
-            instance=vlan, data={"secondary_rack": second_rack.system_id}
-        )
+        form = VLANForm(instance=vlan, data={"secondary_rack": second_rack.system_id})
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
         vlan = reload_object(vlan)

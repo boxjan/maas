@@ -183,9 +183,7 @@ class BcacheCacheSetHandler(OperationsHandler):
                 "Cannot delete cache set because the machine is not Ready."
             )
         if cache_set.filesystemgroup_set.exists():
-            raise MAASAPIBadRequest(
-                "Cannot delete cache set; it's currently in use."
-            )
+            raise MAASAPIBadRequest("Cannot delete cache set; it's currently in use.")
         else:
             cache_set.delete()
             create_audit_event(

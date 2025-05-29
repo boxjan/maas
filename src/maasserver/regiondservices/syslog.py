@@ -75,9 +75,7 @@ class RegionSyslogService(TimerService):
         port = Config.objects.get_config("maas_syslog_port")
         promtail_enabled = Config.objects.get_config("promtail_enabled")
         promtail_port = (
-            Config.objects.get_config("promtail_port")
-            if promtail_enabled
-            else None
+            Config.objects.get_config("promtail_port") if promtail_enabled else None
         )
         return _Configuration(port, peers, promtail_port)
 

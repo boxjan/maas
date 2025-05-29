@@ -53,9 +53,7 @@ class EventManager(Manager):
             node = system_id
         else:
             node = (
-                Node.objects.get(system_id=system_id)
-                if system_id is not None
-                else None
+                Node.objects.get(system_id=system_id) if system_id is not None else None
             )
         if node is not None:
             node_hostname = node.hostname
@@ -69,9 +67,7 @@ class EventManager(Manager):
         else:
             user_id = None
             username = ""
-        event_type = EventType.objects.register(
-            type_name, type_description, type_level
-        )
+        event_type = EventType.objects.register(type_name, type_description, type_level)
         return Event.objects.create(
             type=event_type,
             node=node,
@@ -132,16 +128,12 @@ class Event(CleanSave, TimestampedModel):
     :ivar description: A free-form description of the event.
     """
 
-    type = ForeignKey(
-        "EventType", null=False, editable=False, on_delete=PROTECT
-    )
+    type = ForeignKey("EventType", null=False, editable=False, on_delete=PROTECT)
 
     # This gets set to None if the node gets deleted from the pre_delete signal
     node = ForeignKey("Node", null=True, editable=False, on_delete=DO_NOTHING)
 
-    node_system_id = CharField(
-        max_length=41, blank=True, null=True, editable=False
-    )
+    node_system_id = CharField(max_length=41, blank=True, null=True, editable=False)
 
     # Set on node deletion.
     node_hostname = CharField(

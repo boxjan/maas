@@ -52,9 +52,7 @@ class CertificateRequest(NamedTuple):
         if organization_name:
             csr.get_subject().organizationName = organization_name[:64]
         if organizational_unit_name:
-            csr.get_subject().organizationalUnitName = (
-                organizational_unit_name[:64]
-            )
+            csr.get_subject().organizationalUnitName = organizational_unit_name[:64]
         csr.set_pubkey(key)
 
         if subject_alternative_name:
@@ -77,9 +75,7 @@ class Certificate(NamedTuple):
     ca_certs: Tuple[crypto.X509]
 
     @classmethod
-    def from_pem(
-        cls, *materials: str, ca_certs_material: str = ""
-    ) -> "Certificate":
+    def from_pem(cls, *materials: str, ca_certs_material: str = "") -> "Certificate":
         """Return a Certificate from PEM encoded material.
 
         The `materials` items are concatened and they are expected to contain a
@@ -141,16 +137,12 @@ class Certificate(NamedTuple):
         key = crypto.PKey()
         key.generate_key(crypto.TYPE_RSA, key_bits)
 
-        cert = cls._build_base_certificate(
-            key, crypto.x509.Version.v1, validity
-        )
+        cert = cls._build_base_certificate(key, crypto.x509.Version.v1, validity)
         cert.get_subject().CN = cn[:64]
         if organization_name:
             cert.get_issuer().organizationName = organization_name[:64]
         if organizational_unit_name:
-            cert.get_issuer().organizationalUnitName = (
-                organizational_unit_name[:64]
-            )
+            cert.get_issuer().organizationalUnitName = organizational_unit_name[:64]
 
         cert.sign(key, "sha512")
         return cls(key, cert, ())
@@ -172,16 +164,12 @@ class Certificate(NamedTuple):
         key = crypto.PKey()
         key.generate_key(crypto.TYPE_RSA, key_bits)
 
-        cert = cls._build_base_certificate(
-            key, crypto.x509.Version.v3, validity
-        )
+        cert = cls._build_base_certificate(key, crypto.x509.Version.v3, validity)
         cert.get_subject().CN = cn[:64]
         if organization_name:
             cert.get_issuer().organizationName = organization_name[:64]
         if organizational_unit_name:
-            cert.get_issuer().organizationalUnitName = (
-                organizational_unit_name[:64]
-            )
+            cert.get_issuer().organizationalUnitName = organizational_unit_name[:64]
         cert.set_issuer(cert.get_subject())
 
         # This is a must for self-signed certificates.
@@ -247,21 +235,15 @@ class Certificate(NamedTuple):
 
     def public_key_pem(self) -> str:
         """Return PEM-encoded public key."""
-        return crypto.dump_publickey(crypto.FILETYPE_PEM, self.key).decode(
-            "ascii"
-        )
+        return crypto.dump_publickey(crypto.FILETYPE_PEM, self.key).decode("ascii")
 
     def private_key_pem(self) -> str:
         """Return PEM-encoded private key."""
-        return crypto.dump_privatekey(crypto.FILETYPE_PEM, self.key).decode(
-            "ascii"
-        )
+        return crypto.dump_privatekey(crypto.FILETYPE_PEM, self.key).decode("ascii")
 
     def certificate_pem(self) -> str:
         """Return PEM-encoded certificate."""
-        return crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert).decode(
-            "ascii"
-        )
+        return crypto.dump_certificate(crypto.FILETYPE_PEM, self.cert).decode("ascii")
 
     def ca_certificates_pem(self) -> str:
         """Return PEM-encoded CA certificates chain"""
@@ -321,11 +303,7 @@ def get_maas_cluster_cert_paths() -> tuple[str, str, str] | None:
     private_key = cert_dir / "cluster.key"
     certificate = cert_dir / "cluster.pem"
     cacerts = cert_dir / "cacerts.pem"
-    if (
-        not private_key.exists()
-        or not certificate.exists()
-        or not cacerts.exists()
-    ):
+    if not private_key.exists() or not certificate.exists() or not cacerts.exists():
         return None
     return str(certificate), str(private_key), str(cacerts)
 

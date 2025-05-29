@@ -79,12 +79,9 @@ class StorageLayoutBase(Form):
     def setup_root_device_field(self):
         """Setup the possible root devices."""
         choices = [
-            (block_device.id, block_device.id)
-            for block_device in self.block_devices
+            (block_device.id, block_device.id) for block_device in self.block_devices
         ]
-        invalid_choice_message = compose_invalid_choice_text(
-            "root_device", choices
-        )
+        invalid_choice_message = compose_invalid_choice_text("root_device", choices)
         self.fields["root_device"] = forms.ChoiceField(
             choices=choices,
             required=False,
@@ -102,13 +99,9 @@ class StorageLayoutBase(Form):
                 self.boot_disk.size - EFI_PARTITION_SIZE, size
             )
         if min_size is not None and size < min_size:
-            raise ValidationError(
-                "Size is too small. Minimum size is %s." % min_size
-            )
+            raise ValidationError("Size is too small. Minimum size is %s." % min_size)
         if max_size is not None and size > max_size:
-            raise ValidationError(
-                "Size is too large. Maximum size is %s." % max_size
-            )
+            raise ValidationError("Size is too large. Maximum size is %s." % max_size)
         return size
 
     def clean_boot_size(self):
@@ -117,11 +110,7 @@ class StorageLayoutBase(Form):
             return self._clean_size(
                 "boot_size",
                 MIN_BOOT_PARTITION_SIZE,
-                (
-                    self.boot_disk.size
-                    - EFI_PARTITION_SIZE
-                    - MIN_ROOT_PARTITION_SIZE
-                ),
+                (self.boot_disk.size - EFI_PARTITION_SIZE - MIN_ROOT_PARTITION_SIZE),
             )
         else:
             return None
@@ -132,11 +121,7 @@ class StorageLayoutBase(Form):
             return self._clean_size(
                 "root_size",
                 MIN_ROOT_PARTITION_SIZE,
-                (
-                    self.boot_disk.size
-                    - EFI_PARTITION_SIZE
-                    - MIN_BOOT_PARTITION_SIZE
-                ),
+                (self.boot_disk.size - EFI_PARTITION_SIZE - MIN_BOOT_PARTITION_SIZE),
             )
         else:
             return None
@@ -222,11 +207,7 @@ class StorageLayoutBase(Form):
                 label="efi",
                 mount_point="/boot/efi",
             )
-        elif (
-            bios_boot_method != "uefi"
-            and node_arch == "arm64"
-            and boot_size is None
-        ):
+        elif bios_boot_method != "uefi" and node_arch == "arm64" and boot_size is None:
             # Add boot partition only if booting an arm64 architecture and
             # not UEFI and boot_size is None.
             boot_partition = boot_partition_table.add_partition(
@@ -258,9 +239,7 @@ class StorageLayoutBase(Form):
             partition_table = boot_partition_table
             root_device = self.boot_disk
         else:
-            partition_table = PartitionTable.objects.create(
-                block_device=root_device
-            )
+            partition_table = PartitionTable.objects.create(block_device=root_device)
 
         # Fix the maximum root_size for MBR.
         max_mbr_size = get_max_mbr_partition_size()
@@ -444,9 +423,7 @@ class LVMStorageLayout(StorageLayoutBase):
             root_size = self.get_root_size()
             if root_size is None:
                 root_size = (
-                    self.boot_disk.size
-                    - EFI_PARTITION_SIZE
-                    - self.get_boot_size()
+                    self.boot_disk.size - EFI_PARTITION_SIZE - self.get_boot_size()
                 )
             if is_percentage(lv_size):
                 lv_size = calculate_size_from_percentage(root_size, lv_size)
@@ -454,8 +431,7 @@ class LVMStorageLayout(StorageLayoutBase):
                 set_form_error(
                     self,
                     "lv_size",
-                    "Size is too small. Minimum size is %s."
-                    % MIN_ROOT_PARTITION_SIZE,
+                    "Size is too small. Minimum size is %s." % MIN_ROOT_PARTITION_SIZE,
                 )
             if lv_size > root_size:
                 set_form_error(
@@ -558,9 +534,7 @@ class BcacheStorageLayout(FlatStorageLayout):
 
     DEFAULT_CACHE_MODE = CACHE_MODE_TYPE.WRITETHROUGH
 
-    cache_mode = forms.ChoiceField(
-        choices=CACHE_MODE_TYPE_CHOICES, required=False
-    )
+    cache_mode = forms.ChoiceField(choices=CACHE_MODE_TYPE_CHOICES, required=False)
     cache_size = BytesOrPercentageField(required=False)
     cache_no_part = forms.BooleanField(required=False)
 
@@ -577,9 +551,7 @@ class BcacheStorageLayout(FlatStorageLayout):
             for block_device in self.block_devices
             if block_device != self.boot_disk
         ]
-        invalid_choice_message = compose_invalid_choice_text(
-            "cache_device", choices
-        )
+        invalid_choice_message = compose_invalid_choice_text("cache_device", choices)
         self.fields["cache_device"] = forms.ChoiceField(
             choices=choices,
             required=False,
@@ -663,9 +635,7 @@ class BcacheStorageLayout(FlatStorageLayout):
         cache_size = self.get_cache_size()
         cache_no_part = self.get_cache_no_part()
         if cache_size is not None and cache_no_part:
-            error_msg = (
-                "Cannot use cache_size and cache_no_part at the same time."
-            )
+            error_msg = "Cannot use cache_size and cache_no_part at the same time."
             set_form_error(self, "cache_size", error_msg)
             set_form_error(self, "cache_no_part", error_msg)
         elif cache_device is not None and cache_size is not None:
@@ -677,15 +647,13 @@ class BcacheStorageLayout(FlatStorageLayout):
                 set_form_error(
                     self,
                     "cache_size",
-                    "Size is too small. Minimum size is %s."
-                    % MIN_BLOCK_DEVICE_SIZE,
+                    "Size is too small. Minimum size is %s." % MIN_BLOCK_DEVICE_SIZE,
                 )
             if cache_size > cache_device.size:
                 set_form_error(
                     self,
                     "cache_size",
-                    "Size is too large. Maximum size is %s."
-                    % (cache_device.size),
+                    "Size is too large. Maximum size is %s." % (cache_device.size),
                 )
             cleaned_data["cache_size"] = cache_size
         return cleaned_data
@@ -703,8 +671,7 @@ class BcacheStorageLayout(FlatStorageLayout):
                 return super().configure_storage(allow_fallback)
             else:
                 raise StorageLayoutError(
-                    "Node doesn't have an available cache device to "
-                    "setup bcache."
+                    "Node doesn't have an available cache device to " "setup bcache."
                 )
 
         boot_size = self.get_boot_size()
@@ -733,9 +700,7 @@ class BcacheStorageLayout(FlatStorageLayout):
             if pt is None:
                 continue
             found_boot = False
-            ordered_partitions = sorted(
-                pt.partitions.all(), key=lambda part: part.id
-            )
+            ordered_partitions = sorted(pt.partitions.all(), key=lambda part: part.id)
             for partition in ordered_partitions:
                 # On UEFI systems the first partition is for the bootloader. If
                 # found check the next partition.
@@ -824,9 +789,7 @@ class VMFS6StorageLayout(StorageLayoutBase):
 
     def _clean_boot_disk(self):
         if self.boot_disk.size < (10 * 1024**3):
-            set_form_error(
-                self, "boot_size", "Boot disk must be at least 10Gb."
-            )
+            set_form_error(self, "boot_size", "Boot disk must be at least 10Gb.")
 
     def clean(self):
         cleaned_data = super().clean()
@@ -889,9 +852,7 @@ class VMFS6StorageLayout(StorageLayoutBase):
                 ):
                     if (i + 1) == len(layout):
                         return bd
-                    if partition.bootable != base_partition.get(
-                        "bootable", False
-                    ):
+                    if partition.bootable != base_partition.get("bootable", False):
                         break
                     # Skip checking the size of the Datastore partition as that
                     # changes based on available disk size/user input.
@@ -962,9 +923,7 @@ class VMFS7StorageLayout(VMFS6StorageLayout):
         device must not be shared between ESXi hosts.
         """
         if self.boot_disk.size < (32 * 1024**3):
-            set_form_error(
-                self, "boot_size", "Boot disk must be at least 32Gb."
-            )
+            set_form_error(self, "boot_size", "Boot disk must be at least 32Gb.")
 
     @property
     def last_base_partition_index(self):
@@ -988,9 +947,7 @@ class CustomStorageLayout(StorageLayoutBase):
 
         data = self.node.get_commissioning_resources()
         if not data or "storage-extra" not in data:
-            raise StorageLayoutError(
-                "No custom storage layout configuration found"
-            )
+            raise StorageLayoutError("No custom storage layout configuration found")
 
         try:
             layout = get_storage_layout(data["storage-extra"])
@@ -1047,9 +1004,7 @@ STORAGE_LAYOUTS = frozenset(
         VMFS7StorageLayout,
     ]
 )
-STORAGE_LAYOUT_CHOICES = [
-    (layout.name, layout.title) for layout in STORAGE_LAYOUTS
-]
+STORAGE_LAYOUT_CHOICES = [(layout.name, layout.title) for layout in STORAGE_LAYOUTS]
 
 
 def get_storage_layout_for_node(name, node, params: dict = None):

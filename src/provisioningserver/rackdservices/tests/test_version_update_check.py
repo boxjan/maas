@@ -44,9 +44,7 @@ class TestVersionUpdateCheckService(MAASTestCase):
     @inlineCallbacks
     def test_process_version_info_not_called_without_versions(self):
         service = SampleVersionUpdateCheckService()
-        self.patch(
-            version_update_check, "get_versions_info"
-        ).return_value = None
+        self.patch(version_update_check, "get_versions_info").return_value = None
         yield service.do_action()
         self.assertEqual(service.calls, [])
 
@@ -67,9 +65,7 @@ class TestRackVersionUpdateCheckService(MAASTestCase):
 
     @inlineCallbacks
     def create_fake_rpc_service(self):
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
         fixture = self.useFixture(MockLiveClusterToRegionRPCFixture())
         protocol, connecting = fixture.makeEventLoop(UpdateControllerState)
         self.addCleanup((yield connecting))
@@ -97,13 +93,9 @@ class TestRackVersionUpdateCheckService(MAASTestCase):
     def test_get_versions_state_in_snap(self):
         service = RackVersionUpdateCheckService(None)
         versions_info = SnapVersionsInfo(
-            current=SnapVersion(
-                revision="1234", version="3.0.0~alpha1-111-g.deadbeef"
-            ),
+            current=SnapVersion(revision="1234", version="3.0.0~alpha1-111-g.deadbeef"),
             channel=SnapChannel(track="3.0"),
-            update=SnapVersion(
-                revision="5678", version="3.0.0~alpha2-222-g.cafecafe"
-            ),
+            update=SnapVersion(revision="5678", version="3.0.0~alpha2-222-g.cafecafe"),
         )
         self.assertEqual(
             service._get_state(versions_info),
@@ -118,13 +110,9 @@ class TestRackVersionUpdateCheckService(MAASTestCase):
         rpc_service = services.getServiceNamed("rpc")
         service = RackVersionUpdateCheckService(rpc_service)
         versions_info = SnapVersionsInfo(
-            current=SnapVersion(
-                revision="1234", version="3.0.0~alpha1-111-g.deadbeef"
-            ),
+            current=SnapVersion(revision="1234", version="3.0.0~alpha1-111-g.deadbeef"),
             channel=SnapChannel(track="3.0"),
-            update=SnapVersion(
-                revision="5678", version="3.0.0~alpha2-222-g.cafecafe"
-            ),
+            update=SnapVersion(revision="5678", version="3.0.0~alpha2-222-g.cafecafe"),
         )
         self.patch(
             version_update_check, "get_versions_info"

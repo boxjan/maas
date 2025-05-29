@@ -26,9 +26,7 @@ def get_bcache_cache_set_uri(cache_set, node=None):
     """Return a bcache cache set URI on the API."""
     if node is None:
         node = cache_set.get_node()
-    return reverse(
-        "bcache_cache_set_handler", args=[node.system_id, cache_set.id]
-    )
+    return reverse("bcache_cache_set_handler", args=[node.system_id, cache_set.id])
 
 
 class TestBcacheCacheSetsAPI(APITestCase.ForUser):
@@ -45,17 +43,14 @@ class TestBcacheCacheSetsAPI(APITestCase.ForUser):
         uri = get_bcache_cache_sets_uri(node)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [cache_set.id for cache_set in cache_sets]
         expected_names = [cache_set.name for cache_set in cache_sets]
         result_ids = [
             cache_set["id"] for cache_set in json_load_bytes(response.content)
         ]
         result_names = [
-            cache_set["name"]
-            for cache_set in json_load_bytes(response.content)
+            cache_set["name"] for cache_set in json_load_bytes(response.content)
         ]
         self.assertCountEqual(expected_ids, result_ids)
         self.assertCountEqual(expected_names, result_names)
@@ -69,9 +64,7 @@ class TestBcacheCacheSetsAPI(APITestCase.ForUser):
         cache_device = factory.make_PhysicalBlockDevice(node=node)
         uri = get_bcache_cache_sets_uri(node)
         response = self.client.post(uri, {"cache_device": cache_device.id})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_device = json_load_bytes(response.content)
         self.assertEqual(cache_device.id, parsed_device["cache_device"]["id"])
         mock_create_audit_event.assert_called_once_with(
@@ -87,9 +80,7 @@ class TestBcacheCacheSetsAPI(APITestCase.ForUser):
         cache_device = factory.make_PhysicalBlockDevice(node=node)
         uri = get_bcache_cache_sets_uri(node)
         response = self.client.post(uri, {"cache_device": cache_device.id})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_create_409_when_not_ready(self):
         self.become_admin()
@@ -97,9 +88,7 @@ class TestBcacheCacheSetsAPI(APITestCase.ForUser):
         cache_device = factory.make_PhysicalBlockDevice(node=node)
         uri = get_bcache_cache_sets_uri(node)
         response = self.client.post(uri, {"cache_device": cache_device.id})
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_create_with_missing_cache_fails(self):
         self.become_admin()
@@ -133,9 +122,7 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
         uri = get_bcache_cache_set_uri(cache_set)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_cache_set = json_load_bytes(response.content)
         self.assertEqual(parsed_cache_set.get("id"), cache_set.id)
         self.assertEqual(parsed_cache_set.get("name"), cache_set.name)
@@ -159,18 +146,14 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
             args=[node.system_id, random.randint(100, 1000)],
         )
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_read_404_when_node_mismatch(self):
         node = factory.make_Node(owner=self.user)
         cache_set = factory.make_CacheSet(node=node)
         uri = get_bcache_cache_set_uri(cache_set, node=factory.make_Node())
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_delete_deletes_cache_set(self):
         mock_create_audit_event = self.patch(
@@ -181,9 +164,7 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
         cache_set = factory.make_CacheSet(node=node)
         uri = get_bcache_cache_set_uri(cache_set)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(cache_set))
         mock_create_audit_event.assert_called_once_with(
             EVENT_TYPES.NODE,
@@ -198,9 +179,7 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
         cache_set = factory.make_CacheSet(node=node)
         uri = get_bcache_cache_set_uri(cache_set)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_delete_404_when_invalid_id(self):
         self.become_admin()
@@ -210,9 +189,7 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
             args=[node.system_id, random.randint(100, 1000)],
         )
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_delete_409_when_not_ready(self):
         self.become_admin()
@@ -220,9 +197,7 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
         cache_set = factory.make_CacheSet(node=node)
         uri = get_bcache_cache_set_uri(cache_set)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_delete_400_when_cache_set_in_use(self):
         self.become_admin()
@@ -253,9 +228,7 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
         new_device = factory.make_PhysicalBlockDevice(node=node)
         uri = get_bcache_cache_set_uri(cache_set)
         response = self.client.put(uri, {"cache_device": new_device.id})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_device = json_load_bytes(response.content)
         self.assertEqual(new_device.id, parsed_device["cache_device"]["id"])
         mock_create_audit_event.assert_called_once_with(
@@ -271,9 +244,7 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
         cache_set = factory.make_CacheSet(node=node)
         uri = get_bcache_cache_set_uri(cache_set)
         response = self.client.put(uri, {})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_update_409_when_not_ready(self):
         self.become_admin()
@@ -281,9 +252,7 @@ class TestBcacheCacheSetAPI(APITestCase.ForUser):
         cache_set = factory.make_CacheSet(node=node)
         uri = get_bcache_cache_set_uri(cache_set)
         response = self.client.put(uri, {})
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_update_400_when_invalid_id(self):
         self.become_admin()

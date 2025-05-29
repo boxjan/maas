@@ -31,16 +31,12 @@ class TestFactory(MAASServerTestCase):
 
         self.assertEqual(
             Enum.FIRST_VALUE,
-            factory.pick_enum(
-                Enum, but_not=(Enum.SECOND_VALUE, Enum.THIRD_VALUE)
-            ),
+            factory.pick_enum(Enum, but_not=(Enum.SECOND_VALUE, Enum.THIRD_VALUE)),
         )
 
     def test_pick_choice_chooses_from_django_options(self):
         options = [(2, "b"), (10, "j")]
-        self.assertIn(
-            factory.pick_choice(options), [option[0] for option in options]
-        )
+        self.assertIn(factory.pick_choice(options), [option[0] for option in options])
 
     def test_pick_choice_can_exclude_choices(self):
         options = [(2, "b"), (10, "j")]

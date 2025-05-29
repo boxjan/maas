@@ -26,9 +26,7 @@ class Migration(migrations.Migration):
                     "name",
                     models.CharField(
                         validators=[
-                            django.core.validators.RegexValidator(
-                                "^\\w[ \\w-]*$"
-                            )
+                            django.core.validators.RegexValidator("^\\w[ \\w-]*$")
                         ],
                         max_length=255,
                         unique=True,

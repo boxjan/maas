@@ -24,15 +24,12 @@ from provisioningserver.utils import shell, snap
 
 AMT_ERRORS = {
     "401 Unauthorized": {
-        "message": (
-            "Incorrect password.  Check BMC configuration and try again."
-        ),
+        "message": ("Incorrect password.  Check BMC configuration and try again."),
         "exception": PowerAuthError,
     },
     "500 Can't connect": {
         "message": (
-            "Could not connect to BMC.  "
-            "Check BMC configuration and try again."
+            "Could not connect to BMC.  " "Check BMC configuration and try again."
         ),
         "exception": PowerConnError,
     },
@@ -151,14 +148,10 @@ class AMTPowerDriver(PowerDriver):
         # Change boot order to PXE and enable boot config request
         for method, (schema_file, schema_uri) in wsman_pxe_options.items():
             with open(schema_file, "rb") as fd:
-                command = self._get_wsman_command(
-                    *wsman_opts, method, schema_uri
-                )
+                command = self._get_wsman_command(*wsman_opts, method, schema_uri)
                 self._run(command, power_pass, stdin=fd.read())
 
-    def _run(
-        self, command: tuple, power_pass: str, stdin: bytes = None
-    ) -> bytes:
+    def _run(self, command: tuple, power_pass: str, stdin: bytes = None) -> bytes:
         """Run a subprocess with stdin."""
         result = shell.run_command(
             *command,
@@ -239,9 +232,7 @@ class AMTPowerDriver(PowerDriver):
         """Ask for node's power state: 'on' or 'off', via amttool."""
         # Retry the state if it fails because it often fails the first time
         for _ in range(10):
-            output = self._issue_amttool_command(
-                "info", ip_address, power_pass
-            )
+            output = self._issue_amttool_command("info", ip_address, power_pass)
             if output:
                 break
             # Wait 1 second between retries.  AMT controllers are generally
@@ -299,9 +290,7 @@ class AMTPowerDriver(PowerDriver):
             elif state in ("6", "8", "12", "13"):
                 return "off"
             else:
-                raise PowerActionError(
-                    "Got unknown power state from node: %s" % state
-                )
+                raise PowerActionError("Got unknown power state from node: %s" % state)
 
     def amttool_restart(self, ip_address, power_pass):
         """Restart the node via amttool."""
@@ -390,12 +379,8 @@ class AMTPowerDriver(PowerDriver):
         if not result.stdout:
             for error, error_info in AMT_ERRORS.items():
                 if error in result.stderr:
-                    raise error_info.get("exception")(
-                        error_info.get("message")
-                    )
-            raise PowerConnError(
-                f"Unable to retrieve AMT version: {result.stderr}"
-            )
+                    raise error_info.get("exception")(error_info.get("message"))
+            raise PowerConnError(f"Unable to retrieve AMT version: {result.stderr}")
         else:
             match = re.search(r"ProductVersion>AMT\s*([0-9]+)", result.stdout)
             if match is None:
@@ -422,9 +407,9 @@ class AMTPowerDriver(PowerDriver):
         """Get the IP address of the AMT BMC."""
         # The user specified power_address overrides any automatically
         # determined ip_address.
-        if is_power_parameter_set(
-            power_address
-        ) and not is_power_parameter_set(ip_address):
+        if is_power_parameter_set(power_address) and not is_power_parameter_set(
+            ip_address
+        ):
             return power_address
         elif is_power_parameter_set(ip_address):
             return ip_address

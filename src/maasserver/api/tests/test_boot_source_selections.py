@@ -44,9 +44,7 @@ class TestBootSourceSelectionAPI(APITestCase.ForUser):
     def test_GET_returns_boot_source(self):
         self.become_admin()
         boot_source_selection = factory.make_BootSourceSelection()
-        response = self.client.get(
-            get_boot_source_selection_uri(boot_source_selection)
-        )
+        response = self.client.get(get_boot_source_selection_uri(boot_source_selection))
         self.assertEqual(http.client.OK, response.status_code)
         returned_boot_source_selection = json_load_bytes(response.content)
         boot_source = boot_source_selection.boot_source
@@ -72,9 +70,7 @@ class TestBootSourceSelectionAPI(APITestCase.ForUser):
 
     def test_GET_requires_admin(self):
         boot_source_selection = factory.make_BootSourceSelection()
-        response = self.client.get(
-            get_boot_source_selection_uri(boot_source_selection)
-        )
+        response = self.client.get(get_boot_source_selection_uri(boot_source_selection))
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_DELETE_deletes_boot_source_selection(self):
@@ -117,9 +113,7 @@ class TestBootSourceSelectionAPI(APITestCase.ForUser):
         response = self.client.put(
             get_boot_source_selection_uri(boot_source_selection), new_values
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         boot_source_selection = reload_object(boot_source_selection)
         self.assertEqual(boot_source_selection.os, new_os)
         self.assertEqual(boot_source_selection.release, new_release)
@@ -131,9 +125,7 @@ class TestBootSourceSelectionAPI(APITestCase.ForUser):
             boot_source_selection.subarches,
             [boot_source_caches[0].subarch, boot_source_caches[1].subarch],
         )
-        self.assertEqual(
-            boot_source_selection.labels, [boot_source_caches[0].label]
-        )
+        self.assertEqual(boot_source_selection.labels, [boot_source_caches[0].label])
 
     def test_PUT_requires_admin(self):
         boot_source_selection = factory.make_BootSourceSelection()
@@ -163,17 +155,14 @@ class TestBootSourceSelectionsAPI(APITestCase.ForUser):
         self.become_admin()
         boot_source = factory.make_BootSource()
         selections = [
-            factory.make_BootSourceSelection(boot_source=boot_source)
-            for _ in range(3)
+            factory.make_BootSourceSelection(boot_source=boot_source) for _ in range(3)
         ]
         # Create boot source selections in another boot source.
         [factory.make_BootSourceSelection() for _ in range(3)]
         response = self.client.get(
             reverse("boot_source_selections_handler", args=[boot_source.id])
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertCountEqual(
             [selection.id for selection in selections],
@@ -210,9 +199,7 @@ class TestBootSourceSelectionsAPI(APITestCase.ForUser):
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
 
-        boot_source_selection = BootSourceSelection.objects.get(
-            id=parsed_result["id"]
-        )
+        boot_source_selection = BootSourceSelection.objects.get(id=parsed_result["id"])
         self.assertEqual(boot_source_selection.release, new_release)
         self.assertEqual(
             boot_source_selection.arches,
@@ -222,9 +209,7 @@ class TestBootSourceSelectionsAPI(APITestCase.ForUser):
             boot_source_selection.subarches,
             [boot_source_caches[0].subarch, boot_source_caches[1].subarch],
         )
-        self.assertEqual(
-            boot_source_selection.labels, [boot_source_caches[0].label]
-        )
+        self.assertEqual(boot_source_selection.labels, [boot_source_caches[0].label])
 
     def test_POST_requires_admin(self):
         boot_source = factory.make_BootSource()

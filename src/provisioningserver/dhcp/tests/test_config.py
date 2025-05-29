@@ -66,9 +66,7 @@ def make_sample_params_only(
         for _ in range(3)
     ]
 
-    shared_networks = fix_shared_networks_failover(
-        shared_networks, failover_peers
-    )
+    shared_networks = fix_shared_networks_failover(shared_networks, failover_peers)
 
     return {
         "omapi_key": b64encode(factory.make_bytes()).decode("ascii"),
@@ -116,9 +114,7 @@ def make_sample_params(test, ipv6=False, with_interface=False):
         otherwise prepare configuration for a DHCPv4 server.
     :return: A dictionary of sample configuration.
     """
-    sample_params = make_sample_params_only(
-        ipv6=ipv6, with_interface=with_interface
-    )
+    sample_params = make_sample_params_only(ipv6=ipv6, with_interface=with_interface)
 
     # So that get_config can resolve the configuration, collect hostnames from
     # the sample params that need to resolve then replace them with names that
@@ -211,9 +207,7 @@ class TestGetConfig(MAASTestCase):
         # Since the branch comes with dhcp templates in etc/maas, we can
         # instantiate those templates without any hackery.
         self.assertIsNotNone(
-            config.get_config(
-                self.template, **make_sample_params(self, ipv6=self.ipv6)
-            )
+            config.get_config(self.template, **make_sample_params(self, ipv6=self.ipv6))
         )
 
     def test_complains_if_too_few_parameters(self):
@@ -231,7 +225,9 @@ class TestGetConfig(MAASTestCase):
             tblines[-1],
             "provisioningserver.dhcp.config.DHCPConfigError: Failed to render DHCP configuration.\n",
         )
-        above_exception = "\nThe above exception was the direct cause of the following exception:\n\n"
+        above_exception = (
+            "\nThe above exception was the direct cause of the following exception:\n\n"
+        )
         self.assertIn(above_exception, tblines)
         idx = tblines.index(above_exception)
         self.assertRegex(
@@ -454,9 +450,9 @@ class TestGetConfigIPv4(MAASTestCase):
         next_server_ip = factory.pick_ip_in_network(
             netaddr.IPNetwork(subnet["subnet_cidr"])
         )
-        self.patch(
-            net_utils, "get_all_addresses_for_interface"
-        ).return_value = [next_server_ip]
+        self.patch(net_utils, "get_all_addresses_for_interface").return_value = [
+            next_server_ip
+        ]
         config_output = config.get_config("dhcpd.conf.template", **params)
         validate_dhcpd_configuration(self, config_output, False)
         self.assertIn("next-server %s;" % next_server_ip, config_output)
@@ -527,9 +523,7 @@ class Test_process_shared_network_v6(MAASTestCase):
                             {
                                 "ip_range_high": "2001:db8:3:1::ffff",
                                 "ip_range_low": "2001:db8:3:1::",
-                                "failover_peer": self.expected[
-                                    "failover_peer"
-                                ],
+                                "failover_peer": self.expected["failover_peer"],
                             }
                         ],
                         "dns_servers": [],
@@ -553,9 +547,7 @@ class Test_process_shared_network_v6(MAASTestCase):
         actual = config._process_network_parameters_v6(
             self.failover_peers, shared_networks
         )
-        self.assertDictEqual(
-            actual[0]["subnets"][0]["pools"][0], self.expected
-        )
+        self.assertDictEqual(actual[0]["subnets"][0]["pools"][0], self.expected)
 
 
 class TestComposeConditionalBootloader(MAASTestCase):
@@ -598,9 +590,7 @@ class TestComposeConditionalBootloader(MAASTestCase):
                     "option dhcp-parameter-request-list = concat(",
                     output,
                 )
-                self.assertIn(
-                    "option dhcp-parameter-request-list,d2);", output
-                )
+                self.assertIn("option dhcp-parameter-request-list,d2);", output)
             if method.http_url:
                 self.assertIn(
                     'option vendor-class-identifier "HTTPClient";',
@@ -643,9 +633,7 @@ class TestComposeConditionalBootloader(MAASTestCase):
                     "option dhcp6.oro = concat(option dhcp6.oro,00d2);", output
                 )
             if method.http_url:
-                self.assertIn(
-                    'option dhcp6.vendor-class 0 10 "HTTPClient";', output
-                )
+                self.assertIn('option dhcp6.vendor-class 0 10 "HTTPClient";', output)
 
     def test_disabled_boot_architecture(self):
         if factory.pick_bool():

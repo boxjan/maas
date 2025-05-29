@@ -26,9 +26,7 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
     @staticmethod
     def get_package_repository_uri(package_repository):
         """Return the Package Repository's URI on the API."""
-        return reverse(
-            "package_repository_handler", args=[package_repository.id]
-        )
+        return reverse("package_repository_handler", args=[package_repository.id])
 
     def test_handler_path(self):
         package_repository = factory.make_PackageRepository()
@@ -39,12 +37,8 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
 
     def test_read_by_id(self):
         package_repository = factory.make_PackageRepository()
-        response = self.client.get(
-            self.get_package_repository_uri(package_repository)
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.get(self.get_package_repository_uri(package_repository))
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_package_repository = json.loads(response.content.decode())
         self.assertEqual(
             parsed_package_repository["resource_uri"],
@@ -58,13 +52,9 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
 
     def test_read_by_name(self):
         package_repository = factory.make_PackageRepository()
-        uri = "/MAAS/api/2.0/package-repositories/%s/" % (
-            package_repository.name
-        )
+        uri = "/MAAS/api/2.0/package-repositories/%s/" % (package_repository.name)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_package_repository = json.loads(response.content.decode())
         self.assertEqual(
             parsed_package_repository["resource_uri"],
@@ -79,13 +69,9 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
     def test_read_404_when_bad_id(self):
         most_recent_repo = PackageRepository.objects.latest("id")
         response = self.client.get(
-            reverse(
-                "package_repository_handler", args=[most_recent_repo.id + 1]
-            )
+            reverse("package_repository_handler", args=[most_recent_repo.id + 1])
         )
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_update_custom_repository(self):
         """Updates a custom repository"""
@@ -106,17 +92,11 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
         response = self.client.put(
             self.get_package_repository_uri(package_repository), new_values
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         package_repository = reload_object(package_repository)
         self.assertEqual(package_repository.url, new_values["url"])
-        self.assertEqual(
-            package_repository.distributions, new_values["distributions"]
-        )
-        self.assertEqual(
-            package_repository.components, new_values["components"]
-        )
+        self.assertEqual(package_repository.distributions, new_values["distributions"])
+        self.assertEqual(package_repository.components, new_values["components"])
         self.assertEqual(package_repository.arches, new_values["arches"])
 
     def test_update_custom_repository_fails_if_disabled_components(self):
@@ -132,9 +112,7 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
                 factory.make_name("distribution%d" % i) for i in range(3)
             ],
             "components": [factory.make_name("comp%d" % i) for i in range(4)],
-            "disabled_components": [
-                factory.make_name("comp%d" % i) for i in range(4)
-            ],
+            "disabled_components": [factory.make_name("comp%d" % i) for i in range(4)],
             "arches": [
                 random.choice(PackageRepository.KNOWN_ARCHES),
                 random.choice(PackageRepository.KNOWN_ARCHES),
@@ -151,9 +129,7 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
         """Updates a Ubuntu mirror"""
         self.become_admin()
         # Create an Ubuntu mirror without components
-        package_repository = factory.make_PackageRepository(
-            default=True, components=[]
-        )
+        package_repository = factory.make_PackageRepository(default=True, components=[])
         new_values = {
             "url": factory.make_url(scheme="http"),
             "distributions": [
@@ -169,14 +145,10 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
         response = self.client.put(
             self.get_package_repository_uri(package_repository), new_values
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         package_repository = reload_object(package_repository)
         self.assertEqual(package_repository.url, new_values["url"])
-        self.assertEqual(
-            package_repository.distributions, new_values["distributions"]
-        )
+        self.assertEqual(package_repository.distributions, new_values["distributions"])
         self.assertEqual(
             package_repository.disabled_pockets, new_values["disabled_pockets"]
         )
@@ -190,9 +162,7 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
         """Test that updating an Ubuntu mirror with invalid pockets fails"""
         self.become_admin()
         # Create an Ubuntu mirror without components
-        package_repository = factory.make_PackageRepository(
-            default=True, components=[]
-        )
+        package_repository = factory.make_PackageRepository(default=True, components=[])
         new_values = {
             "url": factory.make_url(scheme="http"),
             "distributions": [
@@ -215,9 +185,7 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
         """Test that updating an Ubuntu mirror with invalid components fails"""
         self.become_admin()
         # Create an Ubuntu mirror without components
-        package_repository = factory.make_PackageRepository(
-            default=True, components=[]
-        )
+        package_repository = factory.make_PackageRepository(default=True, components=[])
         new_values = {
             "url": factory.make_url(scheme="http"),
             "distributions": [
@@ -242,18 +210,14 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
         an Ubuntu repository"""
         self.become_admin()
         # Create an Ubuntu mirror without components
-        package_repository = factory.make_PackageRepository(
-            default=True, components=[]
-        )
+        package_repository = factory.make_PackageRepository(default=True, components=[])
         new_values = {
             "url": factory.make_url(scheme="http"),
             "distributions": [
                 factory.make_name("distribution%d" % i) for i in range(3)
             ],
             "components": [factory.make_name("comp%d" % i) for i in range(4)],
-            "disabled_components": [
-                factory.make_name("comp%d" % i) for i in range(4)
-            ],
+            "disabled_components": [factory.make_name("comp%d" % i) for i in range(4)],
             "arches": [
                 random.choice(PackageRepository.KNOWN_ARCHES),
                 random.choice(PackageRepository.KNOWN_ARCHES),
@@ -272,9 +236,7 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
             self.get_package_repository_uri(package_repository),
             {"url": factory.make_url(scheme="http")},
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_delete_deletes_package_repository(self):
         self.become_admin()
@@ -282,9 +244,7 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
         response = self.client.delete(
             self.get_package_repository_uri(package_repository)
         )
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(package_repository))
         event = Event.objects.get(type__level=AUDIT)
         self.assertIsNotNone(event)
@@ -298,22 +258,16 @@ class TestPackageRepositoryAPI(APITestCase.ForUser):
         response = self.client.delete(
             self.get_package_repository_uri(package_repository)
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(package_repository))
 
     def test_delete_404_when_invalid_id(self):
         most_recent_repo = PackageRepository.objects.latest("id")
         self.become_admin()
         response = self.client.delete(
-            reverse(
-                "package_repository_handler", args=[most_recent_repo.id + 1]
-            )
+            reverse("package_repository_handler", args=[most_recent_repo.id + 1])
         )
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
 
 class TestPackageRepositoriesAPI(APITestCase.ForUser):
@@ -335,9 +289,7 @@ class TestPackageRepositoriesAPI(APITestCase.ForUser):
             factory.make_PackageRepository()
         response = self.client.get(self.get_package_repositories_uri())
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [
             package_repository.id
             for package_repository in PackageRepository.objects.all()
@@ -354,13 +306,9 @@ class TestPackageRepositoriesAPI(APITestCase.ForUser):
         url = factory.make_url(scheme="http")
         enabled = factory.pick_bool()
         params = {"name": name, "url": url, "enabled": enabled}
-        response = self.client.post(
-            self.get_package_repositories_uri(), params
-        )
+        response = self.client.post(self.get_package_repositories_uri(), params)
         parsed_result = json.loads(response.content.decode())
-        package_repository = PackageRepository.objects.get(
-            id=parsed_result["id"]
-        )
+        package_repository = PackageRepository.objects.get(id=parsed_result["id"])
         self.assertEqual(package_repository.name, params["name"])
         self.assertEqual(package_repository.url, params["url"])
         self.assertEqual(package_repository.enabled, params["enabled"])
@@ -369,6 +317,4 @@ class TestPackageRepositoriesAPI(APITestCase.ForUser):
         response = self.client.post(
             self.get_package_repositories_uri(), {"url": factory.make_string()}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)

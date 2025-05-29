@@ -162,9 +162,7 @@ class TestGetServersFor_Machine(TestGetServersFor_Common):
         vlan.save()
 
         servers = get_servers_for(machine)
-        self.assertEqual(
-            servers, {rack_primary_address.ip, rack_secondary_address.ip}
-        )
+        self.assertEqual(servers, {rack_primary_address.ip, rack_secondary_address.ip})
 
 
 class TestGetServersFor_Device(TestGetServersFor_Common):
@@ -238,9 +236,7 @@ class TestGetServersFor_Selection(MAASServerTestCase):
         populate_node_with_addresses(node, {subnet4, subnet6})
         # ... and a server with an address in every subnet.
         server = self.make_server()
-        populate_node_with_addresses(
-            server, {subnet4, subnet6, subnet4v, subnet6v}
-        )
+        populate_node_with_addresses(server, {subnet4, subnet6, subnet4v, subnet6v})
 
         # The NTP server addresses chosen will be those that are "closest" to
         # the node, and same-subnet wins in this over same-VLAN. No additional
@@ -290,15 +286,11 @@ class TestGetPeersFor_Region_RegionRack(MAASServerTestCase):
         # Create a node with an address in the first two subnets and the first
         # two same-VLAN subnets.
         node1 = self.make_node()
-        populate_node_with_addresses(
-            node1, {subnet4, subnet6, subnet4v1, subnet6v1}
-        )
+        populate_node_with_addresses(node1, {subnet4, subnet6, subnet4v1, subnet6v1})
         # Create a node with an address in the first two subnets and the
         # second two same-VLAN subnets.
         node2 = self.make_node()
-        populate_node_with_addresses(
-            node2, {subnet4, subnet6, subnet4v2, subnet6v2}
-        )
+        populate_node_with_addresses(node2, {subnet4, subnet6, subnet4v2, subnet6v2})
 
         # The NTP server addresses chosen will be those that are "closest" to
         # the node, and same-subnet wins in this over same-VLAN. No additional

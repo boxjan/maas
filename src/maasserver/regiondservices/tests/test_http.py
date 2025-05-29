@@ -23,9 +23,7 @@ from provisioningserver.testing.certificates import (
 wait_for_reactor = wait_for()
 
 
-class TestRegionHTTPService(
-    TransactionalHelpersMixin, MAASTransactionServerTestCase
-):
+class TestRegionHTTPService(TransactionalHelpersMixin, MAASTransactionServerTestCase):
     def create_tls_config(self):
         cert = get_sample_cert_with_cacerts()
 
@@ -71,9 +69,7 @@ class TestRegionHTTPService(
         tempdir = self.make_dir()
         nginx_conf = Path(tempdir) / "regiond.nginx.conf"
         service = http.RegionHTTPService()
-        self.patch(http, "compose_http_config_path").return_value = str(
-            nginx_conf
-        )
+        self.patch(http, "compose_http_config_path").return_value = str(nginx_conf)
 
         mock_create_cert_files = self.patch(service, "_create_cert_files")
         mock_create_cert_files.return_value = ("key_path", "cert_path")
@@ -111,9 +107,7 @@ class TestRegionHTTPService(
         tempdir = self.make_dir()
         nginx_conf = Path(tempdir) / "regiond.nginx.conf"
         service = http.RegionHTTPService()
-        self.patch(http, "compose_http_config_path").return_value = str(
-            nginx_conf
-        )
+        self.patch(http, "compose_http_config_path").return_value = str(nginx_conf)
 
         mock_create_cert_files = self.patch(service, "_create_cert_files")
         mock_create_cert_files.return_value = ("key_path", "cert_path")
@@ -127,9 +121,7 @@ class TestRegionHTTPService(
                 f"server unix:/snap/maas/maas-regiond-webapp.sock.{worker_id};",
                 nginx_config,
             )
-        self.assertIn(
-            "root /snap/maas/5443/usr/share/maas/web/static;", nginx_config
-        )
+        self.assertIn("root /snap/maas/5443/usr/share/maas/web/static;", nginx_config)
         self.assertIn("listen 5443 ssl http2;", nginx_config)
         self.assertIn("ssl_certificate cert_path;", nginx_config)
         self.assertIn("ssl_certificate_key key_path;", nginx_config)
@@ -140,9 +132,7 @@ class TestRegionHTTPService(
         tempdir = self.make_dir()
         nginx_conf = Path(tempdir) / "regiond.nginx.conf"
         service = http.RegionHTTPService()
-        self.patch(http, "compose_http_config_path").return_value = str(
-            nginx_conf
-        )
+        self.patch(http, "compose_http_config_path").return_value = str(nginx_conf)
 
         mock_create_cert_files = self.patch(service, "_create_cert_files")
         mock_create_cert_files.return_value = ("key_path", "cert_path")

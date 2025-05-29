@@ -56,9 +56,7 @@ class ConfigHandler(Handler):
         return self._include_choices(
             [
                 {"name": name, "value": value}
-                for name, value in Config.objects.get_configs(
-                    config_keys
-                ).items()
+                for name, value in Config.objects.get_configs(config_keys).items()
             ]
         )
 

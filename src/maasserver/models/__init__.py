@@ -301,9 +301,7 @@ HandlerDocumentation.get_resource_uri_template = get_resource_uri_template
 
 # Monkey patch the property resource_uri_template: it hold a reference to
 # get_resource_uri_template.
-HandlerDocumentation.resource_uri_template = property(
-    get_resource_uri_template
-)
+HandlerDocumentation.resource_uri_template = property(get_resource_uri_template)
 
 
 # Ensure that all signals modules are loaded.

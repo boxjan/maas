@@ -52,9 +52,7 @@ class TestValidateLicenseKey(MAASServerTestCase):
                 # All clients but the first return False.
                 callRemote.return_value = succeed({"is_valid": False})
 
-        is_valid = validate_license_key(
-            "windows", "win2012", factory.make_name("key")
-        )
+        is_valid = validate_license_key("windows", "win2012", factory.make_name("key"))
         self.assertTrue(is_valid)
 
     def test_returns_True_when_only_one_cluster_returns_True_others_fail(self):
@@ -74,9 +72,7 @@ class TestValidateLicenseKey(MAASServerTestCase):
                 # All clients but the first raise an exception.
                 callRemote.side_effect = ZeroDivisionError()
 
-        is_valid = validate_license_key(
-            "windows", "win2012", factory.make_name("key")
-        )
+        is_valid = validate_license_key("windows", "win2012", factory.make_name("key"))
         self.assertTrue(is_valid)
 
     def test_returns_False_with_one_cluster(self):
@@ -97,7 +93,5 @@ class TestValidateLicenseKey(MAASServerTestCase):
             callRemote = self.patch(client._conn, "callRemote")
             callRemote.side_effect = ZeroDivisionError()
 
-        is_valid = validate_license_key(
-            "windows", "win2012", factory.make_name("key")
-        )
+        is_valid = validate_license_key("windows", "win2012", factory.make_name("key"))
         self.assertFalse(is_valid)

@@ -36,9 +36,7 @@ class UnsupportedDBException(Exception):
     """Unsupported PGSQL server version detected"""
 
     def __init__(self, version: int, *args: object):
-        super().__init__(
-            f"Unsupported postgresql server version ({version}) detected"
-        )
+        super().__init__(f"Unsupported postgresql server version ({version}) detected")
 
 
 class Options(logger.VerbosityOptions):
@@ -263,9 +261,7 @@ class RegionAllInOneServiceMaker(RegionMasterServiceMaker):
         # Populate the region's event-loop with services.
         from maasserver import eventloop
 
-        eventloop.loop.populate(
-            master=True, all_in_one=True, import_services=True
-        )
+        eventloop.loop.populate(master=True, all_in_one=True, import_services=True)
 
         # Return the eventloop's services to twistd, which will then be
         # responsible for starting them all.

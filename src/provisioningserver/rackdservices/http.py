@@ -111,9 +111,7 @@ class RackHTTPService(TimerService):
             # Sort the connections so the same IP is always picked per
             # region controller. This ensures that the HTTP configuration
             # is not reloaded unless its actually required to reload.
-            conn = list(sorted(connections, key=lambda conn: conn.address[0]))[
-                0
-            ]
+            conn = list(sorted(connections, key=lambda conn: conn.address[0]))[0]
             addr = IPAddress(conn.address[0])
             if addr.is_ipv4_mapped():
                 yield str(addr.ipv4())
@@ -347,6 +345,4 @@ class HTTPResource(resource.Resource):
         super().__init__()
         self.putChild(b"boot", HTTPBootResource())
         self.putChild(b"log", HTTPLogResource())
-        self.putChild(
-            b"metrics", PrometheusMetricsResource(PROMETHEUS_METRICS)
-        )
+        self.putChild(b"metrics", PrometheusMetricsResource(PROMETHEUS_METRICS))

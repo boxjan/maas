@@ -75,9 +75,7 @@ class TestBootResourceManager(MAASServerTestCase):
 
     def test_get_synced_resource_returns_resource_when_exists(self):
         resource, args = self.make_synced_boot_resource()
-        self.assertEqual(
-            resource, BootResource.objects.get_synced_resource(*args)
-        )
+        self.assertEqual(resource, BootResource.objects.get_synced_resource(*args))
 
     def test_get_synced_resource_returns_None_when_doesnt_exists(self):
         os = factory.make_name("os")
@@ -86,9 +84,7 @@ class TestBootResourceManager(MAASServerTestCase):
         subarch = factory.make_name("subarch")
         self.assertEqual(
             None,
-            BootResource.objects.get_synced_resource(
-                os, arch, subarch, series
-            ),
+            BootResource.objects.get_synced_resource(os, arch, subarch, series),
         )
 
     def test_has_uploaded_resource_returns_true_when_exists(self):
@@ -105,9 +101,7 @@ class TestBootResourceManager(MAASServerTestCase):
 
     def test_get_uploaded_resource_returns_resource_when_exists(self):
         resource, args = self.make_uploaded_boot_resource()
-        self.assertEqual(
-            resource, BootResource.objects.get_uploaded_resource(*args)
-        )
+        self.assertEqual(resource, BootResource.objects.get_uploaded_resource(*args))
 
     def test_get_uploaded_resource_returns_None_when_doesnt_exists(self):
         name = factory.make_name("name")
@@ -194,12 +188,8 @@ class TestBootResourceManager(MAASServerTestCase):
         os = factory.make_name("os")
         series = factory.make_name("series")
         name = f"{os}/{series}"
-        factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name
-        )
-        commissionables = BootResource.objects.get_commissionable_resource(
-            os, series
-        )
+        factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name)
+        commissionables = BootResource.objects.get_commissionable_resource(os, series)
         self.assertIsInstance(commissionables, Iterable)
 
     def test_get_commissionable_resource_returns_only_commissionable(self):
@@ -216,9 +206,7 @@ class TestBootResourceManager(MAASServerTestCase):
             rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name
         )
         factory.make_BootResourceSet(not_commissionable)
-        commissionables = BootResource.objects.get_commissionable_resource(
-            os, series
-        )
+        commissionables = BootResource.objects.get_commissionable_resource(os, series)
         self.assertEqual([resource], list(commissionables))
 
     def test_get_commissionable_resource_returns_only_for_os_series(self):
@@ -229,9 +217,7 @@ class TestBootResourceManager(MAASServerTestCase):
             rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name
         )
         factory.make_usable_boot_resource()
-        commissionables = BootResource.objects.get_commissionable_resource(
-            os, series
-        )
+        commissionables = BootResource.objects.get_commissionable_resource(os, series)
         self.assertCountEqual([resource], commissionables)
 
     def test_get_commissionable_resource_returns_sorted_by_architecture(self):
@@ -253,12 +239,8 @@ class TestBootResourceManager(MAASServerTestCase):
             name=name,
             architecture="c/generic",
         )
-        commissionables = BootResource.objects.get_commissionable_resource(
-            os, series
-        )
-        self.assertEqual(
-            [resource_a, resource_b, resource_c], list(commissionables)
-        )
+        commissionables = BootResource.objects.get_commissionable_resource(os, series)
+        self.assertEqual([resource_a, resource_b, resource_c], list(commissionables))
 
     def test_get_default_commissioning_resource_returns_i386_first(self):
         os = factory.make_name("os")
@@ -316,8 +298,7 @@ class TestBootResourceManager(MAASServerTestCase):
 
     def test_get_resource_for_returns_matching_resource(self):
         resources = [
-            factory.make_BootResource(rtype=BOOT_RESOURCE_TYPE.SYNCED)
-            for _ in range(3)
+            factory.make_BootResource(rtype=BOOT_RESOURCE_TYPE.SYNCED) for _ in range(3)
         ]
         resource = resources.pop()
         subarches = [factory.make_name("subarch") for _ in range(3)]
@@ -330,9 +311,7 @@ class TestBootResourceManager(MAASServerTestCase):
         arch, _ = resource.split_arch()
         self.assertEqual(
             resource,
-            BootResource.objects.get_resource_for(
-                osystem, arch, subarch, series
-            ),
+            BootResource.objects.get_resource_for(osystem, arch, subarch, series),
         )
 
     def test_get_resource_for_returns_custom_resource(self):
@@ -354,9 +333,7 @@ class TestBootResourceManager(MAASServerTestCase):
         arch, _ = custom.split_arch()
         self.assertEqual(
             custom,
-            BootResource.objects.get_resource_for(
-                osystem, arch, subarch, series
-            ),
+            BootResource.objects.get_resource_for(osystem, arch, subarch, series),
         )
 
 
@@ -371,9 +348,7 @@ class TestGetAvailableCommissioningResources(MAASServerTestCase):
     def test_returns_empty_if_no_cache(self):
         release = factory.make_name("release")
         name = "ubuntu/%s" % release
-        factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name
-        )
+        factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name)
         self.assertEqual(
             [], BootResource.objects.get_available_commissioning_resources()
         )
@@ -382,9 +357,7 @@ class TestGetAvailableCommissioningResources(MAASServerTestCase):
         release = factory.make_name("release")
         name = "ubuntu/%s" % release
         support_eol = factory.make_date().strftime("%Y-%m-%d")
-        factory.make_usable_boot_resource(
-            rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name
-        )
+        factory.make_usable_boot_resource(rtype=BOOT_RESOURCE_TYPE.SYNCED, name=name)
         factory.make_BootSourceCache(
             os="ubuntu",
             release=release,
@@ -533,8 +506,7 @@ class TestGetKernels(MAASServerTestCase):
                 factory.make_incomplete_boot_resource(
                     name=self.name,
                     rtype=BOOT_RESOURCE_TYPE.SYNCED,
-                    architecture="%s/%s"
-                    % (self.arch, factory.make_name("incomplete")),
+                    architecture="%s/%s" % (self.arch, factory.make_name("incomplete")),
                     kflavor=kflavor,
                 )
         else:
@@ -550,8 +522,7 @@ class TestGetKernels(MAASServerTestCase):
         self.assertCountEqual(
             self.kernels,
             BootResource.objects.get_kernels(self.name, self.arch),
-            "%s should return %s as its usable kernel"
-            % (self.name, self.kernels),
+            "%s should return %s as its usable kernel" % (self.name, self.kernels),
         )
         self.assertEqual(
             generic_kernels,
@@ -561,8 +532,7 @@ class TestGetKernels(MAASServerTestCase):
                 platform=None,
                 kflavor="generic",
             ),
-            "%s should return %s as its usable kernel"
-            % (self.name, generic_kernels),
+            "%s should return %s as its usable kernel" % (self.name, generic_kernels),
         )
 
 
@@ -612,9 +582,7 @@ class TestGetKpackageForNode(MAASServerTestCase):
             ],
         ):
             node.hwe_kernel = hwe_kernel
-            self.assertEqual(
-                kpackage, BootResource.objects.get_kpackage_for_node(node)
-            )
+            self.assertEqual(kpackage, BootResource.objects.get_kpackage_for_node(node))
 
     def test_returns_none(self):
         node = factory.make_Node()
@@ -653,9 +621,7 @@ class TestGetKparamsForNode(MAASServerTestCase):
             architecture="amd64/generic",
             hwe_kernel="hwe-t",
         )
-        self.assertEqual(
-            "a=b", BootResource.objects.get_kparams_for_node(node)
-        )
+        self.assertEqual("a=b", BootResource.objects.get_kparams_for_node(node))
 
     def test_returns_none(self):
         node = factory.make_Node()
@@ -683,9 +649,7 @@ class TestBootResource(MAASServerTestCase):
 
     def test_validation_raises_error_on_missing_subarch(self):
         arch = factory.make_name("arch")
-        self.assertRaises(
-            ValidationError, factory.make_BootResource, architecture=arch
-        )
+        self.assertRaises(ValidationError, factory.make_BootResource, architecture=arch)
 
     def test_validation_raises_error_on_invalid_name_for_synced(self):
         name = factory.make_name("name")
@@ -699,9 +663,7 @@ class TestBootResource(MAASServerTestCase):
         self.assertRaises(ValidationError, resource.save)
 
     def test_validation_raises_error_on_invalid_name_for_uploaded(self):
-        name = "{}/{}".format(
-            factory.make_name("os"), factory.make_name("series")
-        )
+        name = "{}/{}".format(factory.make_name("os"), factory.make_name("series"))
         arch = "{}/{}".format(
             factory.make_name("arch"),
             factory.make_name("subarch"),
@@ -736,9 +698,7 @@ class TestBootResource(MAASServerTestCase):
         resource.save()
 
     def test_create_raises_error_on_not_unique(self):
-        name = "{}/{}".format(
-            factory.make_name("os"), factory.make_name("series")
-        )
+        name = "{}/{}".format(factory.make_name("os"), factory.make_name("series"))
         arch = "{}/{}".format(
             factory.make_name("arch"),
             factory.make_name("subarch"),
@@ -793,9 +753,7 @@ class TestBootResource(MAASServerTestCase):
     def test_get_next_version_name_returns_first_revision(self):
         expected_version = "%s.1" % self.configure_now()
         resource = factory.make_BootResource()
-        factory.make_BootResourceSet(
-            resource, version=resource.get_next_version_name()
-        )
+        factory.make_BootResourceSet(resource, version=resource.get_next_version_name())
         self.assertEqual(expected_version, resource.get_next_version_name())
 
     def test_get_next_version_name_returns_later_revision(self):
@@ -820,26 +778,18 @@ class TestBootResource(MAASServerTestCase):
 
     def test_supports_subarch_returns_False_if_subarches_is_missing(self):
         resource = factory.make_BootResource()
-        self.assertFalse(
-            resource.supports_subarch(factory.make_name("subarch"))
-        )
+        self.assertFalse(resource.supports_subarch(factory.make_name("subarch")))
 
     def test_supports_subarch_returns_True_if_subarch_in_subarches(self):
         subarches = [factory.make_name("subarch") for _ in range(3)]
         subarch = random.choice(subarches)
-        resource = factory.make_BootResource(
-            extra={"subarches": ",".join(subarches)}
-        )
+        resource = factory.make_BootResource(extra={"subarches": ",".join(subarches)})
         self.assertTrue(resource.supports_subarch(subarch))
 
     def test_supports_subarch_returns_False_if_subarch_not_in_subarches(self):
         subarches = [factory.make_name("subarch") for _ in range(3)]
-        resource = factory.make_BootResource(
-            extra={"subarches": ",".join(subarches)}
-        )
-        self.assertFalse(
-            resource.supports_subarch(factory.make_name("subarch"))
-        )
+        resource = factory.make_BootResource(extra={"subarches": ",".join(subarches)})
+        self.assertFalse(resource.supports_subarch(factory.make_name("subarch")))
 
     def test_split_base_image_handles_no_base_image(self):
         resource = factory.make_BootResource()
@@ -882,12 +832,8 @@ class TestBootResource(MAASServerTestCase):
         )
 
         last_deployments = get_boot_resources_last_deployments()
-        self.assertEqual(
-            last_deployments[f"{name}/{arch_one}"], event_one.created
-        )
-        self.assertEqual(
-            last_deployments[f"{name}/{arch_two}"], event_two.created
-        )
+        self.assertEqual(last_deployments[f"{name}/{arch_one}"], event_one.created)
+        self.assertEqual(last_deployments[f"{name}/{arch_two}"], event_two.created)
 
     def test_get_boot_resources_last_deployments_many_subarchs(self):
         os = factory.make_name("os")
@@ -926,15 +872,9 @@ class TestBootResource(MAASServerTestCase):
         )
 
         last_deployments = get_boot_resources_last_deployments()
-        self.assertNotEqual(
-            last_deployments[f"{name}/{arch}"], event_one.created
-        )
-        self.assertNotEqual(
-            last_deployments[f"{name}/{arch}"], event_two.created
-        )
-        self.assertEqual(
-            last_deployments[f"{name}/{arch}"], event_three.created
-        )
+        self.assertNotEqual(last_deployments[f"{name}/{arch}"], event_one.created)
+        self.assertNotEqual(last_deployments[f"{name}/{arch}"], event_two.created)
+        self.assertEqual(last_deployments[f"{name}/{arch}"], event_three.created)
 
     def test_get_boot_resources_last_deployments_returns_None_if_no_deployments(
         self,

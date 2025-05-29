@@ -62,9 +62,7 @@ class RegionHTTPService(Service):
     def stopService(self):
         if self.listener is not None:
             with suppress(PostgresListenerUnregistrationError):
-                self.listener.unregister(
-                    "sys_reverse_proxy", self._consume_event
-                )
+                self.listener.unregister("sys_reverse_proxy", self._consume_event)
 
         return super().stopService()
 
@@ -131,9 +129,7 @@ class RegionHTTPService(Service):
     @inlineCallbacks
     def _reload_service(self):
         yield service_monitor.reloadService("reverse_proxy")
-        yield deferToDatabase(
-            certificate_expiration_check.check_tls_certificate
-        )
+        yield deferToDatabase(certificate_expiration_check.check_tls_certificate)
 
     @inlineCallbacks
     def _consume_event(self, channel, message):

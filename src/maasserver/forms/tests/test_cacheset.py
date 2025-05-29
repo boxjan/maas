@@ -36,9 +36,9 @@ class TestCreateCacheSetForm(MAASServerTestCase):
             partition.name for partition in partitions
         ]
         # Get the IDs of the non-partitioned devices.
-        block_devices = [
-            bd.id for bd in bds if bd.get_partitiontable() is None
-        ] + [bd.name for bd in bds if bd.get_partitiontable() is None]
+        block_devices = [bd.id for bd in bds if bd.get_partitiontable() is None] + [
+            bd.name for bd in bds if bd.get_partitiontable() is None
+        ]
         form = CreateCacheSetForm(node=node, data={})
         self.assertCountEqual(
             block_devices,
@@ -52,9 +52,7 @@ class TestCreateCacheSetForm(MAASServerTestCase):
     def test_cache_set_creation_with_block_device(self):
         node = factory.make_Node()
         cache_device = factory.make_PhysicalBlockDevice(node=node)
-        form = CreateCacheSetForm(
-            node=node, data={"cache_device": cache_device.id}
-        )
+        form = CreateCacheSetForm(node=node, data={"cache_device": cache_device.id})
 
         self.assertTrue(form.is_valid(), form.errors)
         cache_set = form.save()
@@ -63,9 +61,7 @@ class TestCreateCacheSetForm(MAASServerTestCase):
     def test_cache_set_creation_with_boot_disk(self):
         node = factory.make_Node(with_boot_disk=False)
         boot_disk = factory.make_PhysicalBlockDevice(node=node, bootable=True)
-        form = CreateCacheSetForm(
-            node=node, data={"cache_device": boot_disk.id}
-        )
+        form = CreateCacheSetForm(node=node, data={"cache_device": boot_disk.id})
 
         self.assertTrue(form.is_valid(), form.errors)
         cache_set = form.save()
@@ -75,13 +71,9 @@ class TestCreateCacheSetForm(MAASServerTestCase):
     def test_cache_set_creation_with_partition(self):
         node = factory.make_Node()
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
-        form = CreateCacheSetForm(
-            node=node, data={"cache_partition": partition.id}
-        )
+        form = CreateCacheSetForm(node=node, data={"cache_partition": partition.id})
 
         self.assertTrue(form.is_valid(), form.errors)
         cache_set = form.save()
@@ -91,9 +83,7 @@ class TestCreateCacheSetForm(MAASServerTestCase):
         node = factory.make_Node()
         cache_device = factory.make_PhysicalBlockDevice(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         form = CreateCacheSetForm(
             node=node,
@@ -123,9 +113,7 @@ class TestUpdateCacheSetForm(MAASServerTestCase):
             factory.make_PartitionTable(block_device=bd).add_partition()
             for bd in bds[5:]
         ]
-        partition_choices = [p.id for p in partitions] + [
-            p.name for p in partitions
-        ]
+        partition_choices = [p.id for p in partitions] + [p.name for p in partitions]
         # Get the chocies of the non-partitioned devices.
         block_device_choices = [
             bd.id for bd in bds if bd.get_partitiontable() is None

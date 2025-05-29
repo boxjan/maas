@@ -14,9 +14,7 @@ from provisioningserver.utils.url import compose_URL, get_domain, splithost
 class TestComposeURL(MAASTestCase):
     def make_path(self):
         """Return an arbitrary URL path part."""
-        return "{}/{}".format(
-            factory.make_name("root"), factory.make_name("sub")
-        )
+        return "{}/{}".format(factory.make_name("root"), factory.make_name("sub"))
 
     def make_network_interface(self):
         return "eth%d" % randint(0, 100)
@@ -24,16 +22,12 @@ class TestComposeURL(MAASTestCase):
     def test_inserts_IPv4(self):
         ip = factory.make_ipv4_address()
         path = self.make_path()
-        self.assertEqual(
-            f"http://{ip}/{path}", compose_URL("http:///%s" % path, ip)
-        )
+        self.assertEqual(f"http://{ip}/{path}", compose_URL("http:///%s" % path, ip))
 
     def test_inserts_IPv6_with_brackets(self):
         ip = factory.make_ipv6_address()
         path = self.make_path()
-        self.assertEqual(
-            f"http://[{ip}]/{path}", compose_URL("http:///%s" % path, ip)
-        )
+        self.assertEqual(f"http://[{ip}]/{path}", compose_URL("http:///%s" % path, ip))
 
     def test_escapes_IPv6_zone_index(self):
         ip = factory.make_ipv6_address()

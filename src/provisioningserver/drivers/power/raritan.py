@@ -31,9 +31,7 @@ class RaritanPowerDriver(PowerDriver):
     can_set_boot_order = False
     description = "Raritan PDU"
     settings = [
-        make_setting_field(
-            "power_address", "IP for Raritan PDU", required=True
-        ),
+        make_setting_field("power_address", "IP for Raritan PDU", required=True),
         make_setting_field(
             "node_outlet",
             "Raritan PDU node outlet number",
@@ -76,9 +74,7 @@ class RaritanPowerDriver(PowerDriver):
         sleep(float(context["power_on_delay"]))
         self.run_process(
             "snmpset",
-            *_get_common_args(
-                context["power_address"], context["node_outlet"]
-            ),
+            *_get_common_args(context["power_address"], context["node_outlet"]),
             "i",
             "1",
         )
@@ -87,9 +83,7 @@ class RaritanPowerDriver(PowerDriver):
         """Power off Raritan outlet."""
         self.run_process(
             "snmpset",
-            *_get_common_args(
-                context["power_address"], context["node_outlet"]
-            ),
+            *_get_common_args(context["power_address"], context["node_outlet"]),
             "i",
             "0",
         )
@@ -98,9 +92,7 @@ class RaritanPowerDriver(PowerDriver):
         """Power query Raritan outlet."""
         power_state = self.run_process(
             "snmpget",
-            *_get_common_args(
-                context["power_address"], context["node_outlet"]
-            ),
+            *_get_common_args(context["power_address"], context["node_outlet"]),
         )
         if power_state == RaritanState.OFF:
             return "off"
@@ -108,8 +100,7 @@ class RaritanPowerDriver(PowerDriver):
             return "on"
         else:
             raise PowerActionError(
-                "Raritan Power Driver retrieved unknown power state: %r"
-                % power_state
+                "Raritan Power Driver retrieved unknown power state: %r" % power_state
             )
 
 

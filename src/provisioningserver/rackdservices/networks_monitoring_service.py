@@ -53,9 +53,7 @@ class RackNetworksMonitoringService(NetworksMonitoringService):
             RequestRackRefresh,
             system_id=client.localIdent,
         )
-        returnValue(
-            (self.clientService.maas_url, client.localIdent, credentials)
-        )
+        returnValue((self.clientService.maas_url, client.localIdent, credentials))
 
     def reportNeighbours(self, neighbours):
         """Report neighbour information to the region."""

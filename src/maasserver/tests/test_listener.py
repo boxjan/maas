@@ -135,9 +135,7 @@ class TestPostgresListenerService(MAASServerTestCase):
         listener = PostgresListenerService()
         start_calls = []
         stop_calls = []
-        listener.events.connected.registerHandler(
-            lambda: start_calls.append(True)
-        )
+        listener.events.connected.registerHandler(lambda: start_calls.append(True))
         listener.events.disconnected.registerHandler(
             lambda reason: stop_calls.append(reason)
         )
@@ -246,9 +244,7 @@ class TestPostgresListenerService(MAASServerTestCase):
         startConnection.side_effect = exception_type(exception_message)
 
         with TwistedLoggerFixture() as logger:
-            with self.assertRaisesRegex(
-                exception_type, escape(exception_message)
-            ):
+            with self.assertRaisesRegex(exception_type, escape(exception_message)):
                 yield listener.tryConnection()
 
         self.assertEqual(len(logger.events), 1)
@@ -311,9 +307,7 @@ class TestPostgresListenerService(MAASServerTestCase):
         yield listener.tryConnection()
         yield listener.channelRegistrarDone
         try:
-            self.assertEqual(
-                [call("channel")], listener.registerChannel.mock_calls
-            )
+            self.assertEqual([call("channel")], listener.registerChannel.mock_calls)
             self.assertEqual({"channel": [handler]}, listener.listeners)
             self.assertEqual({"channel"}, listener.registeredChannels)
         finally:
@@ -662,9 +656,7 @@ class TestPostgresListenerService(MAASServerTestCase):
         listener.unregister = MagicMock()
         channel = factory.make_name("sys", sep="_").lower()
         with listener.listen(channel, sentinel.handler):
-            listener.register.assert_called_once_with(
-                channel, sentinel.handler
-            )
+            listener.register.assert_called_once_with(channel, sentinel.handler)
         listener.unregister.assert_called_once_with(channel, sentinel.handler)
 
     def test_listen_unregisters_channel_when_exception_raised(self):
@@ -675,8 +667,6 @@ class TestPostgresListenerService(MAASServerTestCase):
         exception_text = "Expected exception"
         with self.assertRaisesRegex(Exception, f"^{exception_text}$"):
             with listener.listen(channel, sentinel.handler):
-                listener.register.assert_called_once_with(
-                    channel, sentinel.handler
-                )
+                listener.register.assert_called_once_with(channel, sentinel.handler)
                 raise Exception(exception_text)
         listener.unregister.assert_called_once_with(channel, sentinel.handler)

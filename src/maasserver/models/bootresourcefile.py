@@ -59,17 +59,13 @@ class BootResourceFileManager(Manager):
 
     def calculate_filename_on_disk(self, sha256: str):
         # If a file with the same sha already exists, then we have to use the same filename_on_disk id.
-        matching_resource = BootResourceFile.objects.filter(
-            sha256=sha256
-        ).first()
+        matching_resource = BootResourceFile.objects.filter(sha256=sha256).first()
         if matching_resource:
             return matching_resource.filename_on_disk
 
         collisions = list(
             BootResourceFile.objects.filter(
-                filename_on_disk__startswith=sha256[
-                    :SHORTSHA256_MIN_PREFIX_LEN
-                ]
+                filename_on_disk__startswith=sha256[:SHORTSHA256_MIN_PREFIX_LEN]
             ).values_list("filename_on_disk", flat=True)
         )
         if len(collisions) > 0:
@@ -82,9 +78,7 @@ class BootResourceFileManager(Manager):
             return sha256[:SHORTSHA256_MIN_PREFIX_LEN]
 
     def filestore_remove_files(self, rfile_qs: QuerySet):
-        other_res = self.filter(sha256=OuterRef("sha256")).exclude(
-            id=OuterRef("id")
-        )
+        other_res = self.filter(sha256=OuterRef("sha256")).exclude(id=OuterRef("id"))
         rfiles = rfile_qs.annotate(shared=Exists(other_res)).values(
             "sha256", "filename_on_disk", "shared"
         )
@@ -178,9 +172,9 @@ class BootResourceFile(CleanSave, TimestampedModel):
         if not self.bootresourcefilesync_set.exists():
             return 0.0
         sync_size = (
-            self.bootresourcefilesync_set.all().aggregate(
-                total_size=Sum("size")
-            )["total_size"]
+            self.bootresourcefilesync_set.all().aggregate(total_size=Sum("size"))[
+                "total_size"
+            ]
             or 0
         )
         n_regions = RegionController.objects.count()
@@ -211,9 +205,7 @@ class BootResourceFile(CleanSave, TimestampedModel):
         ]
 
     def local_file(self) -> LocalBootResourceFile:
-        return LocalBootResourceFile(
-            self.sha256, self.filename_on_disk, self.size
-        )
+        return LocalBootResourceFile(self.sha256, self.filename_on_disk, self.size)
 
     def __str__(self):
         return f"<BootResourceFile {self.filename}/{self.filetype}>"

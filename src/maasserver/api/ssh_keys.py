@@ -81,16 +81,13 @@ class SSHKeysHandler(OperationsHandler):
                 )
         elif username is not None and not request.user.is_superuser:
             raise MAASAPIValidationError(
-                "Only administrators can specify a user"
-                " when creating an SSH key."
+                "Only administrators can specify a user" " when creating an SSH key."
             )
 
         form = SSHKeyForm(user=user, data=request.data)
         if form.is_valid():
             sshkey = form.save(ENDPOINT.API, request)
-            emitter = JSONEmitter(
-                sshkey, typemapper, None, DISPLAY_SSHKEY_FIELDS
-            )
+            emitter = JSONEmitter(sshkey, typemapper, None, DISPLAY_SSHKEY_FIELDS)
             stream = emitter.render(request)
             return HttpResponse(
                 stream,
@@ -210,9 +207,7 @@ class SSHKeyHandler(OperationsHandler):
         if key.user != request.user:
             return HttpResponseForbidden(
                 "Can't delete a key you don't own.",
-                content_type=(
-                    "text/plain; charset=%s" % settings.DEFAULT_CHARSET
-                ),
+                content_type=("text/plain; charset=%s" % settings.DEFAULT_CHARSET),
             )
         key.delete()
         create_audit_event(

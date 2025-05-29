@@ -141,9 +141,7 @@ class TestParseSystemdInterval(MAASTestCase):
         )
 
     def test_parses_full_word_durations(self):
-        self._assert_parsed(
-            "1 hour 1 minute 1 second", hours=1, minutes=1, seconds=1
-        )
+        self._assert_parsed("1 hour 1 minute 1 second", hours=1, minutes=1, seconds=1)
 
     def test_parses_abbreviated_durations(self):
         self._assert_parsed("1hr 15min 5sec", hours=1, minutes=15, seconds=5)
@@ -167,36 +165,24 @@ class TestParseSystemdInterval(MAASTestCase):
 class TestSystemdIntervalToCalendar(MAASTestCase):
     def test_every_2_hours(self):
         interval = "2h"
-        self.assertEqual(
-            "*-*-* 00/2:00:00", systemd_interval_to_calendar(interval)
-        )
+        self.assertEqual("*-*-* 00/2:00:00", systemd_interval_to_calendar(interval))
 
     def test_every_hour(self):
         interval = "1h"
-        self.assertEqual(
-            "*-*-* *:00:00", systemd_interval_to_calendar(interval)
-        )
+        self.assertEqual("*-*-* *:00:00", systemd_interval_to_calendar(interval))
 
     def test_every_hour_and_a_half(self):
         interval = "1h 30m"
-        self.assertEqual(
-            "*-*-* *:00/30:00", systemd_interval_to_calendar(interval)
-        )
+        self.assertEqual("*-*-* *:00/30:00", systemd_interval_to_calendar(interval))
 
     def test_every_30_minutes(self):
         interval = "30m"
-        self.assertEqual(
-            "*-*-* *:00/30:00", systemd_interval_to_calendar(interval)
-        )
+        self.assertEqual("*-*-* *:00/30:00", systemd_interval_to_calendar(interval))
 
     def test_every_30_minutes_5_seconds(self):
         interval = "30m 5s"
-        self.assertEqual(
-            "*-*-* *:00/30:00/5", systemd_interval_to_calendar(interval)
-        )
+        self.assertEqual("*-*-* *:00/30:00/5", systemd_interval_to_calendar(interval))
 
     def test_every_15_seconds(self):
         interval = "15s"
-        self.assertEqual(
-            "*-*-* *:*:00/15", systemd_interval_to_calendar(interval)
-        )
+        self.assertEqual("*-*-* *:*:00/15", systemd_interval_to_calendar(interval))

@@ -60,9 +60,7 @@ def run(app_config: Config | None = None):
     if app_config is None:
         app_config = read_config()
 
-    logging.basicConfig(
-        level=logging.DEBUG if app_config.debug else logging.INFO
-    )
+    logging.basicConfig(level=logging.DEBUG if app_config.debug else logging.INFO)
 
     server_config = uvicorn.Config(
         create_app(config=app_config),

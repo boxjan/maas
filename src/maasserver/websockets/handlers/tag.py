@@ -20,9 +20,7 @@ from provisioningserver.events import EVENT_TYPES
 def _annotate_qs_with_counts(qs: QuerySet) -> QuerySet:
     """Helper to add annotations for node type."""
     return qs.annotate(
-        machine_count=Count(
-            "node", filter=Q(node__node_type=NODE_TYPE.MACHINE)
-        ),
+        machine_count=Count("node", filter=Q(node__node_type=NODE_TYPE.MACHINE)),
         device_count=Count("node", filter=Q(node__node_type=NODE_TYPE.DEVICE)),
         controller_count=Count(
             "node",

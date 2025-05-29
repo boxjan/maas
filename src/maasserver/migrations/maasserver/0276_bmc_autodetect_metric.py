@@ -19,8 +19,6 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="bmc",
             name="created_by_commissioning",
-            field=models.BooleanField(
-                default=False, editable=False, null=True
-            ),
+            field=models.BooleanField(default=False, editable=False, null=True),
         ),
     ]

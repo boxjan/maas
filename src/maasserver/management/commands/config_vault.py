@@ -52,9 +52,7 @@ class Command(BaseCommand):
             # one on startup and the flag will be set if Vault
             # is configured.
             return False
-        ControllerInfo.objects.filter(node_id=node.id).update(
-            vault_configured=True
-        )
+        ControllerInfo.objects.filter(node_id=node.id).update(vault_configured=True)
         return True
 
     def _configure_vault(

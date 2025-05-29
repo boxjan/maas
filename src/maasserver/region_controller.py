@@ -123,31 +123,21 @@ class RegionControllerService(Service):
         """Start listening for messages."""
         super().startService()
         self.postgresListener.register("sys_dns", self.markDNSForUpdate)
-        self.postgresListener.register(
-            "sys_dns_updates", self.queueDynamicDNSUpdate
-        )
+        self.postgresListener.register("sys_dns_updates", self.queueDynamicDNSUpdate)
         self.postgresListener.register("sys_proxy", self.markProxyForUpdate)
         self.postgresListener.register("sys_rbac", self.markRBACForUpdate)
-        self.postgresListener.register(
-            "sys_vault_migration", self.restartRegion
-        )
-        self.postgresListener.events.connected.registerHandler(
-            self.markAllForUpdate
-        )
+        self.postgresListener.register("sys_vault_migration", self.restartRegion)
+        self.postgresListener.events.connected.registerHandler(self.markAllForUpdate)
 
     @asynchronous(timeout=FOREVER)
     def stopService(self):
         """Close the controller."""
         super().stopService()
-        self.postgresListener.events.connected.unregisterHandler(
-            self.markAllForUpdate
-        )
+        self.postgresListener.events.connected.unregisterHandler(self.markAllForUpdate)
         self.postgresListener.unregister("sys_dns", self.markDNSForUpdate)
         self.postgresListener.unregister("sys_proxy", self.markProxyForUpdate)
         self.postgresListener.unregister("sys_rbac", self.markRBACForUpdate)
-        self.postgresListener.unregister(
-            "sys_vault_migration", self.restartRegion
-        )
+        self.postgresListener.unregister("sys_vault_migration", self.restartRegion)
         if self.processingDefer is not None:
             self.processingDefer, d = None, self.processingDefer
             self.processing.stop()
@@ -175,9 +165,7 @@ class RegionControllerService(Service):
 
     def restartRegion(self, channel, message):
         """Restarts region eventloop when `sys_vault_migration` message is received."""
-        logging.getLogger(__name__).info(
-            "Received migration restart notification."
-        )
+        logging.getLogger(__name__).info("Received migration restart notification.")
         eventloop.restart()
 
     def queueDynamicDNSUpdate(self, channel, message):
@@ -268,10 +256,7 @@ class RegionControllerService(Service):
         def _set_latest_serial(result):
             if result:
                 (serial, _, _) = result
-                if (
-                    not self._dns_latest_serial
-                    or self._dns_latest_serial < serial
-                ):
+                if not self._dns_latest_serial or self._dns_latest_serial < serial:
                     self._dns_latest_serial = serial
             return result
 
@@ -342,9 +327,7 @@ class RegionControllerService(Service):
 
             for domain in list(not_matching_domains):
                 try:
-                    answers, _, _ = yield self.dnsResolver.lookupAuthority(
-                        domain
-                    )
+                    answers, _, _ = yield self.dnsResolver.lookupAuthority(domain)
                 except (ValueError, TimeoutError):
                     answers = []
                 if len(answers) > 0:
@@ -378,9 +361,7 @@ class RegionControllerService(Service):
 
             def _logReason(reasons):
                 if len(reasons) == 0:
-                    msg = (
-                        "Reloaded DNS configuration; previous failure (retry)"
-                    )
+                    msg = "Reloaded DNS configuration; previous failure (retry)"
                 elif len(reasons) == 1:
                     msg = "Reloaded DNS configuration; %s" % reasons[0]
                 else:
@@ -389,9 +370,7 @@ class RegionControllerService(Service):
                     )
                 log.msg(msg)
 
-            d = deferToDatabase(
-                self._getReloadReasons, self.previousSerial, serial
-            )
+            d = deferToDatabase(self._getReloadReasons, self.previousSerial, serial)
             d.addCallback(_logReason)
             d.addErrback(log.err, "Failed to log reason for DNS reload")
 
@@ -475,9 +454,7 @@ class RegionControllerService(Service):
                 Resource(identifier=rpool.id, name=rpool.name)
                 for rpool in ResourcePool.objects.order_by("id")
             ]
-            new_sync_id = client.update_resources(
-                "resource-pool", updates=resources
-            )
+            new_sync_id = client.update_resources("resource-pool", updates=resources)
         else:
             # Send only the difference of what has been changed.
             updates, removals = self._rbacDifference(changes)

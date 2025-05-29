@@ -41,9 +41,7 @@ def _is_valid_hostname(hostname):
 
 @synchronous
 @transactional
-def update_lease(
-    action, mac, ip_family, ip, timestamp, lease_time=None, hostname=None
-):
+def update_lease(action, mac, ip_family, ip, timestamp, lease_time=None, hostname=None):
     """Update one DHCP leases from a cluster.
 
     :param action: DHCP action taken on the cluster as found in
@@ -101,12 +99,8 @@ def update_lease(
             ip,
             mac,
             created,
-            " (lease time: %ss)" % lease_time
-            if lease_time is not None
-            else "",
-            " (hostname: %s)" % hostname
-            if _is_valid_hostname(hostname)
-            else "",
+            " (lease time: %ss)" % lease_time if lease_time is not None else "",
+            " (hostname: %s)" % hostname if _is_valid_hostname(hostname) else "",
         )
     )
 
@@ -133,9 +127,7 @@ def update_lease(
     sip = None
     # Delete all discovered IP addresses attached to all interfaces of the same
     # IP address family.
-    old_family_addresses = StaticIPAddress.objects.filter_by_ip_family(
-        subnet_family
-    )
+    old_family_addresses = StaticIPAddress.objects.filter_by_ip_family(subnet_family)
     old_family_addresses = old_family_addresses.filter(
         alloc_type=IPADDRESS_TYPE.DISCOVERED, interface__in=interfaces
     )

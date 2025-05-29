@@ -42,9 +42,7 @@ async def insert_app(
 ) -> FastAPI:
     class InsertHandler(Handler):
         @handler(path="/success", methods=["GET"])
-        async def success(
-            self, conn: AsyncConnection = Depends(db_conn)
-        ) -> None:
+        async def success(self, conn: AsyncConnection = Depends(db_conn)) -> None:
             await conn.execute(insert(TestTable).values(id=42, name="default"))
 
         @handler(path="/failure", methods=["GET"])

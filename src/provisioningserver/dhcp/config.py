@@ -331,8 +331,7 @@ def _get_addresses(*hostnames):
                 ipv6.append(addr)
             else:
                 raise AssertionError(
-                    "IP version %r for address %r is not recognised."
-                    % (ipver, addr)
+                    "IP version %r for address %r is not recognised." % (ipver, addr)
                 )
     return ipv4, ipv6
 
@@ -444,9 +443,7 @@ def get_config_v4(
     for shared_network in shared_networks:
         interface = shared_network.get("interface", None)
         for subnet in shared_network["subnets"]:
-            rack_ip = get_rack_ip_for_subnet(
-                4, subnet["subnet_cidr"], interface
-            )
+            rack_ip = get_rack_ip_for_subnet(4, subnet["subnet_cidr"], interface)
             if rack_ip is not None:
                 subnet["next_server"] = rack_ip
                 subnet["bootloader"] = compose_conditional_bootloader(
@@ -469,9 +466,7 @@ def get_config_v4(
             **helpers,
         )
     except (KeyError, NameError) as error:
-        raise DHCPConfigError(
-            "Failed to render DHCP configuration."
-        ) from error
+        raise DHCPConfigError("Failed to render DHCP configuration.") from error
 
 
 def get_config_v6(
@@ -497,9 +492,7 @@ def get_config_v6(
         "running_in_snap": snap.running_in_snap(),
     }
 
-    shared_networks = _process_network_parameters_v6(
-        failover_peers, shared_networks
-    )
+    shared_networks = _process_network_parameters_v6(failover_peers, shared_networks)
 
     try:
         return template.substitute(
@@ -511,9 +504,7 @@ def get_config_v6(
             **helpers,
         )
     except (KeyError, NameError) as error:
-        raise DHCPConfigError(
-            "Failed to render DHCP configuration."
-        ) from error
+        raise DHCPConfigError("Failed to render DHCP configuration.") from error
 
 
 def _process_network_parameters_v6(failover_peers, shared_networks):
@@ -531,9 +522,7 @@ def _process_network_parameters_v6(failover_peers, shared_networks):
     for shared_network in shared_networks:
         interface = shared_network.get("interface", None)
         for subnet in shared_network["subnets"]:
-            rack_ip = get_rack_ip_for_subnet(
-                6, subnet["subnet_cidr"], interface
-            )
+            rack_ip = get_rack_ip_for_subnet(6, subnet["subnet_cidr"], interface)
             if rack_ip is not None:
                 subnet["bootloader"] = compose_conditional_bootloader(
                     True, rack_ip, subnet.get("disabled_boot_architectures")
@@ -545,14 +534,10 @@ def _process_network_parameters_v6(failover_peers, shared_networks):
             for pool in subnet["pools"]:
                 peer = pool.get("failover_peer", None)
                 if peer is not None:
-                    ip_range = IPRange(
-                        pool["ip_range_low"], pool["ip_range_high"]
-                    )
+                    ip_range = IPRange(pool["ip_range_low"], pool["ip_range_high"])
                     if peers[peer]["mode"] == "primary":
                         pool["ip_range_high"] = str(
-                            IPAddress(
-                                ip_range.first + int(ip_range.size / 2) - 1
-                            )
+                            IPAddress(ip_range.first + int(ip_range.size / 2) - 1)
                         )
                     else:
                         pool["ip_range_low"] = str(

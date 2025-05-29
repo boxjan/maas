@@ -63,13 +63,9 @@ def refresh(
         )
 
     if failed_scripts:
-        signal(
-            url, creds, "FAILED", f"Failed refreshing {system_id}", retry=False
-        )
+        signal(url, creds, "FAILED", f"Failed refreshing {system_id}", retry=False)
     else:
-        signal(
-            url, creds, "OK", f"Finished refreshing {system_id}", retry=False
-        )
+        signal(url, creds, "OK", f"Finished refreshing {system_id}", retry=False)
 
 
 SCRIPTS_BASE_PATH = os.path.dirname(__file__)
@@ -77,9 +73,7 @@ SCRIPTS_BASE_PATH = os.path.dirname(__file__)
 
 # XXX: This method should download the scripts from the region, instead
 # of relying on the scripts being available locally.
-def runscripts(
-    scripts, url, creds, tmpdir, post_process_hook=None, retry=True
-):
+def runscripts(scripts, url, creds, tmpdir, post_process_hook=None, retry=True):
     in_snap = running_in_snap()
 
     total_scripts = len(scripts)
@@ -124,9 +118,7 @@ def runscripts(
         timeout = 60
         command = [script_path] if in_snap else ["sudo", "-E", script_path]
         try:
-            proc = Popen(
-                command, stdin=DEVNULL, stdout=PIPE, stderr=PIPE, env=env
-            )
+            proc = Popen(command, stdin=DEVNULL, stdout=PIPE, stderr=PIPE, env=env)
             capture_script_output(
                 proc, combined_path, stdout_path, stderr_path, timeout
             )
@@ -167,9 +159,7 @@ def runscripts(
             failed_scripts.append(script_name)
         else:
             if post_process_hook is not None:
-                post_process_hook(
-                    script_name, combined_path, stdout_path, stderr_path
-                )
+                post_process_hook(script_name, combined_path, stdout_path, stderr_path)
             files = {
                 script_name: open(combined_path, "rb").read(),
                 stdout_name: open(stdout_path, "rb").read(),

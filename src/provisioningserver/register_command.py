@@ -78,10 +78,7 @@ def add_arguments(parser):
         "--url",
         action="append",
         required=False,
-        help=(
-            "URL of the region controller where to connect this "
-            "rack controller."
-        ),
+        help=("URL of the region controller where to connect this " "rack controller."),
     )
     parser.add_argument(
         "--secret",
@@ -135,8 +132,6 @@ def run(args):
         call_and_check(["systemctl", "enable", "maas-rackd"])
         call_and_check(["systemctl", "start", "maas-rackd"])
     except ExternalProcessError as e:
-        print(
-            "Unable to enable and start the maas-rackd service.", file=stderr
-        )
+        print("Unable to enable and start the maas-rackd service.", file=stderr)
         print("Failed with error: %s." % e.output_as_unicode, file=stderr)
         raise SystemExit(1)

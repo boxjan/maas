@@ -131,9 +131,7 @@ class MachineHandler(NodeHandler):
         node_total_storage_query_set = (
             Machine.objects.select_related("current_config")
             .annotate(
-                storage=Sum(
-                    "current_config__blockdevice__physicalblockdevice__size"
-                )
+                storage=Sum("current_config__blockdevice__physicalblockdevice__size")
             )
             .filter(pk=OuterRef("pk"))
         )
@@ -413,9 +411,7 @@ class MachineHandler(NodeHandler):
                 )
                 if script_result.script_set.result_type == RESULT_TYPE.TESTING
             ]
-            data["cpu_test_status"] = self.dehydrate_test_statuses(
-                cpu_script_results
-            )
+            data["cpu_test_status"] = self.dehydrate_test_statuses(cpu_script_results)
 
             memory_script_results = [
                 script_result
@@ -460,30 +456,20 @@ class MachineHandler(NodeHandler):
                     HARDWARE_TYPE.MEMORY, None
                 )
             )
-            data[
-                "network_test_status"
-            ] = self.dehydrate_test_statuses_for_list(
+            data["network_test_status"] = self.dehydrate_test_statuses_for_list(
                 self._script_results_for_list.get(obj.id, {}).get(
                     HARDWARE_TYPE.NETWORK, None
                 )
             )
-            data[
-                "storage_test_status"
-            ] = self.dehydrate_test_statuses_for_list(
-                self._script_results_for_list.get(obj.id, {}).get(
-                    HARDWARE_TYPE.STORAGE
-                )
+            data["storage_test_status"] = self.dehydrate_test_statuses_for_list(
+                self._script_results_for_list.get(obj.id, {}).get(HARDWARE_TYPE.STORAGE)
             )
 
         if not for_list:
             # Add info specific to a machine.
-            data["workload_annotations"] = OwnerData.objects.get_owner_data(
-                obj
-            )
+            data["workload_annotations"] = OwnerData.objects.get_owner_data(obj)
             data["show_os_info"] = self.dehydrate_show_os_info(obj)
-            devices = [
-                self.dehydrate_device(device) for device in obj.children.all()
-            ]
+            devices = [self.dehydrate_device(device) for device in obj.children.all()]
             data["devices"] = sorted(devices, key=itemgetter("fqdn"))
 
             interface_script_results = [
@@ -569,9 +555,7 @@ class MachineHandler(NodeHandler):
 
         # Cleanup any fields that have a None value.
         new_params = {
-            key: value
-            for key, value in new_params.items()
-            if value is not None
+            key: value for key, value in new_params.items() if value is not None
         }
 
         return super().preprocess_form(action, new_params)
@@ -675,9 +659,7 @@ class MachineHandler(NodeHandler):
         mount_options = params.get("mount_options")
 
         if node.status not in [NODE_STATUS.ALLOCATED, NODE_STATUS.READY]:
-            raise HandlerError(
-                "Node must be allocated or ready to edit storage"
-            )
+            raise HandlerError("Node must be allocated or ready to edit storage")
 
         # If this is on a block device, check if the tags need to be updated.
         # (The client sends them in from the same form.)
@@ -796,9 +778,7 @@ class MachineHandler(NodeHandler):
         elif device.type == "virtual":
             form = UpdateVirtualBlockDeviceForm(instance=device, data=params)
         else:
-            raise HandlerError(
-                "Cannot update block device of type %s" % device.type
-            )
+            raise HandlerError("Cannot update block device of type %s" % device.type)
         if not form.is_valid():
             raise HandlerError(form.errors)
         else:
@@ -871,9 +851,7 @@ class MachineHandler(NodeHandler):
             blockdevice = BlockDevice.objects.get(
                 node_config=node.current_config, id=blockdevice_id
             )
-            fs = Filesystem.objects.get(
-                block_device=blockdevice, id=filesystem_id
-            )
+            fs = Filesystem.objects.get(block_device=blockdevice, id=filesystem_id)
         else:
             partition = Partition.objects.get(id=partition_id)
             fs = Filesystem.objects.get(partition=partition, id=filesystem_id)
@@ -1069,9 +1047,7 @@ class MachineHandler(NodeHandler):
             id=params["block_id"], node_config=node.current_config
         ).actual_instance
         if device.type != "physical":
-            raise HandlerError(
-                "Only a physical disk can be set as the boot disk."
-            )
+            raise HandlerError("Only a physical disk can be set as the boot disk.")
         node.boot_disk = device
         node.save()
 
@@ -1088,19 +1064,15 @@ class MachineHandler(NodeHandler):
             node.set_storage_layout(storage_layout)
         except StorageLayoutMissingBootDiskError:
             raise HandlerError(
-                "Machine is missing a boot disk; no storage layout can be "
-                "applied."
+                "Machine is missing a boot disk; no storage layout can be " "applied."
             )
         except StorageLayoutError as e:
             raise HandlerError(
-                "Failed to configure storage layout '%s': %s"
-                % (storage_layout, str(e))
+                "Failed to configure storage layout '%s': %s" % (storage_layout, str(e))
             )
 
     def _action(self, obj, action_name, extra_params):
-        action = get_node_action(
-            obj, action_name, self.user, request=self.request
-        )
+        action = get_node_action(obj, action_name, self.user, request=self.request)
         if action is None:
             raise NodeActionError(
                 f"{action_name} action is not available for this node."
@@ -1109,9 +1081,7 @@ class MachineHandler(NodeHandler):
 
     def _bulk_action(self, filter_params, action_name, extra_params):
         """Find nodes that match the filter, then apply the given action to them."""
-        machines = self._filter(
-            self.get_queryset(for_list=True), None, filter_params
-        )
+        machines = self._filter(self.get_queryset(for_list=True), None, filter_params)
         success_count = 0
         failed_system_ids = []
         failure_details = defaultdict(list)
@@ -1131,16 +1101,12 @@ class MachineHandler(NodeHandler):
 
     def _bulk_clone(self, source, filter_params, extra_params):
         """Bulk clone - special case of bulk_action."""
-        clone_action = get_node_action(
-            source, "clone", self.user, request=self.request
-        )
+        clone_action = get_node_action(source, "clone", self.user, request=self.request)
         destinations = self._filter(
             self.get_queryset(for_list=True), None, filter_params
         )
         destination_ids = [node.system_id for node in destinations]
-        return clone_action.execute(
-            destinations=destination_ids, **extra_params
-        )
+        return clone_action.execute(destinations=destination_ids, **extra_params)
 
     def action(self, params):
         """Perform the action on the object."""

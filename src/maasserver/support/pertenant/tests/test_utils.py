@@ -34,9 +34,7 @@ class TestExtractBootstrapNodeSystemId(MAASServerTestCase):
     def test_parses_valid_provider_state_file(self):
         node = factory.make_Node()
         provider_state_file = make_provider_state_file(node=node)
-        system_id = extract_bootstrap_node_system_id(
-            provider_state_file.content
-        )
+        system_id = extract_bootstrap_node_system_id(provider_state_file.content)
         self.assertEqual(system_id, node.system_id)
 
     def test_returns_None_if_parsing_fails(self):
@@ -47,9 +45,7 @@ class TestExtractBootstrapNodeSystemId(MAASServerTestCase):
             "zookeeper-instances: []",  # no instances listed
         ]
         for invalid_content in invalid_contents:
-            self.assertIsNone(
-                extract_bootstrap_node_system_id(invalid_content)
-            )
+            self.assertIsNone(extract_bootstrap_node_system_id(invalid_content))
 
 
 class TestGetBootstrapNodeOwner(MAASServerTestCase):

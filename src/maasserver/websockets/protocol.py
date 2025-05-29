@@ -192,9 +192,7 @@ class WebSocketProtocol(Protocol):
             return
 
         try:
-            result = yield deferToDatabase(
-                self.get_user_and_session, session_id
-            )
+            result = yield deferToDatabase(self.get_user_and_session, session_id)
         except Exception as error:
             self.loseConnection(
                 STATUSES.PROTOCOL_ERROR, f"Error authenticating user: {error}"
@@ -207,9 +205,7 @@ class WebSocketProtocol(Protocol):
             self.user = self.session = None
 
         if self.user is None or self.user.id is None:
-            self.loseConnection(
-                STATUSES.PROTOCOL_ERROR, "Failed to authenticate user."
-            )
+            self.loseConnection(STATUSES.PROTOCOL_ERROR, "Failed to authenticate user.")
             returnValue(False)
         else:
             returnValue(True)
@@ -247,9 +243,7 @@ class WebSocketProtocol(Protocol):
                 return handledMessages
             if msg_type not in (MSG_TYPE.REQUEST, MSG_TYPE.PING):
                 # Only support request messages from the client.
-                self.loseConnection(
-                    STATUSES.PROTOCOL_ERROR, "Invalid message type."
-                )
+                self.loseConnection(STATUSES.PROTOCOL_ERROR, "Invalid message type.")
                 return handledMessages
             if self.handleRequest(message, msg_type) is None:
                 # Handling of request has failed, stop processing the messages
@@ -282,9 +276,7 @@ class WebSocketProtocol(Protocol):
             handler_name, method = msg_method.split(".", 1)
         except ValueError:
             # Invalid method. Method format is "handler.method".
-            self.loseConnection(
-                STATUSES.PROTOCOL_ERROR, "Invalid method formatting."
-            )
+            self.loseConnection(STATUSES.PROTOCOL_ERROR, "Invalid method formatting.")
             return None
 
         # Create the handler for the call.
@@ -372,9 +364,7 @@ class WebSocketProtocol(Protocol):
         handler_name = handler_class._meta.handler_name
         handler_cache = self.cache.setdefault(handler_name, {})
         session_id = self.session.session_key
-        return handler_class(
-            self.user, handler_cache, self.request, session_id
-        )
+        return handler_class(self.user, handler_cache, self.request, session_id)
 
 
 class WebSocketFactory(Factory):
@@ -424,10 +414,7 @@ class WebSocketFactory(Factory):
             # children classes and should not be exposed over the channel.
             if meta.abstract:
                 continue
-            if (
-                meta.handler_name is not None
-                and meta.handler_name not in self.handlers
-            ):
+            if meta.handler_name is not None and meta.handler_name not in self.handlers:
                 self.handlers[meta.handler_name] = cls
 
     def getHandler(self, name):
@@ -462,20 +449,14 @@ class WebSocketFactory(Factory):
         service."""
         rpc_service = services.getServiceNamed("rpc")
         rpc_service.events.connected.registerHandler(self.updateRackController)
-        rpc_service.events.disconnected.registerHandler(
-            self.updateRackController
-        )
+        rpc_service.events.disconnected.registerHandler(self.updateRackController)
 
     def unregisterRPCEvents(self):
         """Unregister from connected and disconnected events from the RPC
         service."""
         rpc_service = services.getServiceNamed("rpc")
-        rpc_service.events.connected.unregisterHandler(
-            self.updateRackController
-        )
-        rpc_service.events.disconnected.unregisterHandler(
-            self.updateRackController
-        )
+        rpc_service.events.connected.unregisterHandler(self.updateRackController)
+        rpc_service.events.disconnected.unregisterHandler(self.updateRackController)
 
     def updateRackController(self, ident):
         """Called when a rack controller connects or disconnects from this
@@ -496,9 +477,7 @@ class WebSocketFactory(Factory):
         """Send onNotify to the `ControllerHandler` for `system_id`."""
         rack_handler = self.getHandler("controller")
         if rack_handler:
-            return self.onNotify(
-                rack_handler, "controller", "update", system_id
-            )
+            return self.onNotify(rack_handler, "controller", "update", system_id)
         else:
             return fail("Unable to get the 'controller' handler.")
 

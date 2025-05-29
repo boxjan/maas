@@ -111,8 +111,6 @@ def run_7z():
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
-        description="7z Hardware Benchmark Testing."
-    )
+    parser = argparse.ArgumentParser(description="7z Hardware Benchmark Testing.")
     args = parser.parse_args()
     sys.exit(run_7z())

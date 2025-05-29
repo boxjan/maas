@@ -29,9 +29,7 @@ class RBACSyncManager(Manager):
 
     def changes(self, resource_type):
         """Returns the changes that have occurred for `resource_type`."""
-        return list(
-            self.filter(resource_type__in=["", resource_type]).order_by("id")
-        )
+        return list(self.filter(resource_type__in=["", resource_type]).order_by("id"))
 
     def clear(self, resource_type):
         """Deletes all `RBACSync` for `resource_type`."""

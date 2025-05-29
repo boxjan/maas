@@ -29,9 +29,7 @@ class ServiceMonitorService(TimerService):
     # "rackd" should not show in this list as the region controller handles
     # updating the status of "rackd". This is because its status all depends
     # on the connections across the multiple regions.
-    ALWAYS_RUNNING_SERVICES = [
-        {"name": "tftp", "status": "running", "status_info": ""}
-    ]
+    ALWAYS_RUNNING_SERVICES = [{"name": "tftp", "status": "running", "status_info": ""}]
 
     check_interval = timedelta(seconds=30).total_seconds()
 
@@ -54,9 +52,7 @@ class ServiceMonitorService(TimerService):
             d = self._getConnection()
             d.addCallback(self._ensureServices)
             d.addCallback(self._updateRegion)
-            d.addErrback(
-                log.err, "Failed to monitor services and update region."
-            )
+            d.addErrback(log.err, "Failed to monitor services and update region.")
             return d
 
     @inlineCallbacks
@@ -71,8 +67,7 @@ class ServiceMonitorService(TimerService):
                 yield pause(wait, self.clock)
         else:
             maaslog.error(
-                "Can't update service statuses, no RPC "
-                "connection to region."
+                "Can't update service statuses, no RPC " "connection to region."
             )
         return client
 
@@ -89,9 +84,7 @@ class ServiceMonitorService(TimerService):
         client, services = result
         if client:
             services = yield self._buildServices(services)
-            yield client(
-                UpdateServices, system_id=client.localIdent, services=services
-            )
+            yield client(UpdateServices, system_id=client.localIdent, services=services)
 
     @inlineCallbacks
     def _buildServices(self, services):

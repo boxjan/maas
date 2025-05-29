@@ -52,9 +52,7 @@ def write_all_keyrings(directory, sources):
             )
 
         if keyring_data is not None:
-            keyring_file = os.path.join(
-                directory, calculate_keyring_name(source_url)
-            )
+            keyring_file = os.path.join(directory, calculate_keyring_name(source_url))
             write_keyring(keyring_file, keyring_data)
             source["keyring"] = keyring_file
     return sources

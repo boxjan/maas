@@ -21,9 +21,7 @@ class WebClientContextFactory(BrowserLikePolicyForHTTPS):
         if self._verify:
             opts = ClientTLSOptions(
                 hostname.decode("ascii"),
-                OpenSSLCertificateOptions(
-                    trustRoot=platformTrust()
-                ).getContext(),
+                OpenSSLCertificateOptions(trustRoot=platformTrust()).getContext(),
             )
         else:
             opts = ClientTLSOptions(

@@ -27,15 +27,11 @@ from provisioningserver.rpc.testing import MockClusterToRegionRPCFixture
 
 
 class TestNodePowerMonitorService(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def test_init_sets_up_timer_correctly(self):
         service = npms.NodePowerMonitorService()
@@ -51,12 +47,8 @@ class TestNodePowerMonitorService(MAASTestCase):
         service = self.make_monitor_service()
 
         rpc_fixture = self.useFixture(MockClusterToRegionRPCFixture())
-        proto_region, io = rpc_fixture.makeEventLoop(
-            region.ListNodePowerParameters
-        )
-        proto_region.ListNodePowerParameters.return_value = succeed(
-            {"nodes": []}
-        )
+        proto_region, io = rpc_fixture.makeEventLoop(region.ListNodePowerParameters)
+        proto_region.ListNodePowerParameters.return_value = succeed({"nodes": []})
 
         client = getRegionClient()
         d = service.query_nodes(client)
@@ -80,9 +72,7 @@ class TestNodePowerMonitorService(MAASTestCase):
         }
 
         rpc_fixture = self.useFixture(MockClusterToRegionRPCFixture())
-        proto_region, io = rpc_fixture.makeEventLoop(
-            region.ListNodePowerParameters
-        )
+        proto_region, io = rpc_fixture.makeEventLoop(region.ListNodePowerParameters)
         proto_region.ListNodePowerParameters.side_effect = [
             succeed({"nodes": [example_power_parameters]}),
             succeed({"nodes": []}),
@@ -104,9 +94,7 @@ class TestNodePowerMonitorService(MAASTestCase):
         service = self.make_monitor_service()
 
         rpc_fixture = self.useFixture(MockClusterToRegionRPCFixture())
-        proto_region, io = rpc_fixture.makeEventLoop(
-            region.ListNodePowerParameters
-        )
+        proto_region, io = rpc_fixture.makeEventLoop(region.ListNodePowerParameters)
         client = getRegionClient()
         proto_region.ListNodePowerParameters.return_value = fail(
             exceptions.NoSuchCluster.from_uuid(client.localIdent)

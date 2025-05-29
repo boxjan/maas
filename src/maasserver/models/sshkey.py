@@ -61,9 +61,7 @@ def get_html_display_for_key(key, size):
         key_type = key_parts[0]
         key_string = key_parts[1]
         comment = key_parts[2]
-        room_for_key = size - (
-            len(key_type) + len(comment) + len(HELLIPSIS) + 2
-        )
+        room_for_key = size - (len(key_type) + len(comment) + len(HELLIPSIS) + 2)
         if room_for_key > 0:
             return "%s %.*s%s %s" % (
                 escape(key_type, quote=True),
@@ -101,9 +99,7 @@ class SSHKey(CleanSave, TimestampedModel):
 
     user = ForeignKey(User, null=False, editable=False, on_delete=CASCADE)
 
-    key = TextField(
-        null=False, editable=True, validators=[validate_ssh_public_key]
-    )
+    key = TextField(null=False, editable=True, validators=[validate_ssh_public_key])
 
     keysource = ForeignKey(
         KeySource, null=True, blank=True, editable=False, on_delete=CASCADE
@@ -137,6 +133,4 @@ class SSHKey(CleanSave, TimestampedModel):
             keysource=self.keysource, user=self.user, key=self.key
         ).exclude(id=self.id)
         if duplicated_key.exists():
-            raise ValidationError(
-                "This key has already been added for this user."
-            )
+            raise ValidationError("This key has already been added for this user.")

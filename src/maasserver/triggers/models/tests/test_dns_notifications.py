@@ -29,7 +29,9 @@ class TestDynamicDNSUpdateNotification(MAASTestCase):
             assert not notification.is_valid()
 
     def test_get_decoded_message(self):
-        payload = "adfbc39c6213a062afb584b90d508f52 DELETE mydomain mudkip A 192.168.33.163"
+        payload = (
+            "adfbc39c6213a062afb584b90d508f52 DELETE mydomain mudkip A 192.168.33.163"
+        )
         notification = DynamicDNSUpdateNotification(payload)
         assert (
             notification.get_decoded_message()

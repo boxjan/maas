@@ -40,10 +40,7 @@ class TestNodeDeviceHandler(MAASServerTestCase):
             factory.make_NodeDevice(node=node),
         ]
         self.assertCountEqual(
-            [
-                self.dehydrate_node_device(node_device)
-                for node_device in node_devices
-            ],
+            [self.dehydrate_node_device(node_device) for node_device in node_devices],
             handler.list({"system_id": node.system_id}),
         )
 

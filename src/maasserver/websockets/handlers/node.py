@@ -123,20 +123,15 @@ def node_prefetch(queryset):
     )
     return (
         queryset.all()
-        .select_related(
-            "owner", "zone", "pool", "domain", "bmc", "current_config"
-        )
+        .select_related("owner", "zone", "pool", "domain", "bmc", "current_config")
         .prefetch_related("current_config__blockdevice_set__filesystem_set")
         .prefetch_related(
-            "current_config__blockdevice_set__physicalblockdevice__"
-            "filesystem_set"
+            "current_config__blockdevice_set__physicalblockdevice__" "filesystem_set"
         )
         .prefetch_related(
             f"{blockdev_prefetch}__physicalblockdevice__partitiontable_set__partitions"
         )
-        .prefetch_related(
-            f"{blockdev_prefetch}__physicalblockdevice__numa_node"
-        )
+        .prefetch_related(f"{blockdev_prefetch}__physicalblockdevice__numa_node")
         .prefetch_related(f"{blockdev_prefetch}__virtualblockdevice")
         .prefetch_related(
             Prefetch(
@@ -156,9 +151,7 @@ def node_prefetch(queryset):
         .prefetch_related("nodemetadata_set")
         .prefetch_related("tags")
         .prefetch_related(
-            Prefetch(
-                "numanode_set", queryset=NUMANode.objects.order_by("index")
-            )
+            Prefetch("numanode_set", queryset=NUMANode.objects.order_by("index"))
         )
         .prefetch_related("numanode_set__hugepages_set")
     )
@@ -222,16 +215,12 @@ class NodeHandler(TimestampedModelHandler):
         return details
 
     def dehydrate_hugepages(self, hugepages):
-        return {
-            attr: getattr(hugepages, attr) for attr in ("page_size", "total")
-        }
+        return {attr: getattr(hugepages, attr) for attr in ("page_size", "total")}
 
     def dehydrate_last_image_sync(self, last_image_sync):
         """Return formatted datetime."""
         return (
-            dehydrate_datetime(last_image_sync)
-            if last_image_sync is not None
-            else None
+            dehydrate_datetime(last_image_sync) if last_image_sync is not None else None
         )
 
     def dehydrate_power_parameters(self, power_parameters):
@@ -287,15 +276,11 @@ class NodeHandler(TimestampedModelHandler):
         data["actions"] = list(compile_node_actions(obj, self.user).keys())
         data["link_type"] = NODE_TYPE_TO_LINK_TYPE[obj.node_type]
         data["tags"] = [tag.id for tag in obj.tags.all()]
-        if obj.node_type == NODE_TYPE.MACHINE or (
-            obj.is_controller and not for_list
-        ):
+        if obj.node_type == NODE_TYPE.MACHINE or (obj.is_controller and not for_list):
             # Disk count and storage amount is shown on the machine listing
             # page and the machine and controllers details page.
             blockdevices = self.get_blockdevices_for(obj)
-            if hasattr(obj, "physical_disk_count") and hasattr(
-                obj, "total_storage"
-            ):
+            if hasattr(obj, "physical_disk_count") and hasattr(obj, "total_storage"):
                 data["physical_disk_count"] = obj.physical_disk_count or 0
                 data["storage"] = round(
                     (obj.total_storage or 0) / (1000**3),
@@ -309,10 +294,7 @@ class NodeHandler(TimestampedModelHandler):
                 ]
                 data["physical_disk_count"] = len(physical_blockdevices)
                 data["storage"] = round(
-                    sum(
-                        blockdevice.size
-                        for blockdevice in physical_blockdevices
-                    )
+                    sum(blockdevice.size for blockdevice in physical_blockdevices)
                     / (1000**3),
                     1,
                 )
@@ -334,21 +316,16 @@ class NodeHandler(TimestampedModelHandler):
                             commissioning_script_results.append(script_result)
                             if commissioning_start_time is None or (
                                 script_result.started is not None
-                                and script_result.started
-                                < commissioning_start_time
+                                and script_result.started < commissioning_start_time
                             ):
-                                commissioning_start_time = (
-                                    script_result.started
-                                )
+                                commissioning_start_time = script_result.started
                             if (
                                 script_result.name in script_output_nsmap
-                                and script_result.status
-                                == SCRIPT_STATUS.PASSED
+                                and script_result.status == SCRIPT_STATUS.PASSED
                             ):
                                 log_results.add(script_result.name)
                         elif (
-                            script_result.script_set.result_type
-                            == RESULT_TYPE.TESTING
+                            script_result.script_set.result_type == RESULT_TYPE.TESTING
                         ):
                             testing_script_results.append(script_result)
                 data["commissioning_status"] = self.dehydrate_test_statuses(
@@ -366,9 +343,7 @@ class NodeHandler(TimestampedModelHandler):
             else:
                 all_test_results = []
                 if obj.id in self._script_results_for_list:
-                    for results in self._script_results_for_list[
-                        obj.id
-                    ].values():
+                    for results in self._script_results_for_list[obj.id].values():
                         all_test_results += results
 
                 data["testing_status"] = self.dehydrate_test_statuses_for_list(
@@ -403,9 +378,7 @@ class NodeHandler(TimestampedModelHandler):
             if hasattr(obj, "simple_status"):
                 data["simple_status"] = obj.simple_status
             else:
-                data[
-                    "simple_status"
-                ] = SIMPLIFIED_NODE_STATUSES_MAP_REVERSED.get(
+                data["simple_status"] = SIMPLIFIED_NODE_STATUSES_MAP_REVERSED.get(
                     obj.status, SIMPLIFIED_NODE_STATUS.OTHER
                 )
 
@@ -483,9 +456,7 @@ class NodeHandler(TimestampedModelHandler):
                         ),
                         (
                             self.dehydrate_volume_group(volume_group)
-                            for volume_group in VolumeGroup.objects.filter_by_node(
-                                obj
-                            )
+                            for volume_group in VolumeGroup.objects.filter_by_node(obj)
                         ),
                         (
                             self.dehydrate_cache_set(cache_set)
@@ -497,8 +468,7 @@ class NodeHandler(TimestampedModelHandler):
                     key=itemgetter("name"),
                 )
                 data["supported_filesystems"] = [
-                    {"key": key, "ui": ui}
-                    for key, ui in FILESYSTEM_FORMAT_TYPE_CHOICES
+                    {"key": key, "ui": ui} for key, ui in FILESYSTEM_FORMAT_TYPE_CHOICES
                 ]
                 data["storage_layout_issues"] = obj.storage_layout_issues()
                 data["special_filesystems"] = [
@@ -531,9 +501,7 @@ class NodeHandler(TimestampedModelHandler):
                                     # This partition may be modified by the
                                     # user.
                                     continue
-                                partition[
-                                    "used_for"
-                                ] = "VMware ESXi OS partition"
+                                partition["used_for"] = "VMware ESXi OS partition"
                                 partition["filesystem"] = {
                                     "id": -1,
                                     "label": "RESERVED",
@@ -559,9 +527,7 @@ class NodeHandler(TimestampedModelHandler):
                             if script_result.status == SCRIPT_STATUS.PASSED:
                                 # STDOUT is deferred in the cache so load it.
                                 script_result = (
-                                    ScriptResult.objects.filter(
-                                        id=script_result.id
-                                    )
+                                    ScriptResult.objects.filter(id=script_result.id)
                                     .only("id", "status", "stdout")
                                     .first()
                                 )
@@ -612,9 +578,7 @@ class NodeHandler(TimestampedModelHandler):
         )
 
         script_results_with_status_summary = (
-            ScriptResult.objects.filter(
-                id__in=Subquery(script_results_subquery)
-            )
+            ScriptResult.objects.filter(id__in=Subquery(script_results_subquery))
             .values_list("script_set__node_id", "script__hardware_type")
             .annotate(statuses=ArrayAgg("status", distinct=True))
         )
@@ -692,9 +656,7 @@ class NodeHandler(TimestampedModelHandler):
                         self._script_results[node_id][hardware_type].pop(i)
                         break
             else:
-                self._script_results[node_id][hardware_type].append(
-                    script_result
-                )
+                self._script_results[node_id][hardware_type].append(script_result)
 
     def _load_extra_data_before_dehydrate(self, nodes, for_list=False):
         if not for_list:
@@ -725,9 +687,7 @@ class NodeHandler(TimestampedModelHandler):
         if boot_disk:
             is_boot = blockdevice.id == boot_disk.id
         numa_node_index = (
-            blockdevice.numa_node.index
-            if hasattr(blockdevice, "numa_node")
-            else None
+            blockdevice.numa_node.index if hasattr(blockdevice, "numa_node") else None
         )
         data = {
             "id": blockdevice.id,
@@ -748,9 +708,7 @@ class NodeHandler(TimestampedModelHandler):
             "filesystem": self.dehydrate_filesystem(
                 blockdevice.get_effective_filesystem()
             ),
-            "partitions": self.dehydrate_partitions(
-                blockdevice.get_partitiontable()
-            ),
+            "partitions": self.dehydrate_partitions(blockdevice.get_partitiontable()),
             "numa_node": numa_node_index,
         }
         if isinstance(blockdevice, VirtualBlockDevice):
@@ -872,9 +830,7 @@ class NodeHandler(TimestampedModelHandler):
             subnet = link.pop("subnet", None)
             if subnet is not None:
                 link["subnet_id"] = subnet.id
-        numa_node_index = (
-            interface.numa_node.index if interface.numa_node else None
-        )
+        numa_node_index = interface.numa_node.index if interface.numa_node else None
         data = {
             "id": interface.id,
             "type": interface.type,
@@ -979,8 +935,7 @@ class NodeHandler(TimestampedModelHandler):
                 )
                 for ip_address in interface.ip_addresses.all()
                 if (
-                    ip_address.ip
-                    and ip_address.alloc_type == IPADDRESS_TYPE.DISCOVERED
+                    ip_address.ip and ip_address.alloc_type == IPADDRESS_TYPE.DISCOVERED
                 )
             ]
 
@@ -996,9 +951,7 @@ class NodeHandler(TimestampedModelHandler):
         first_ip = self._get_first_non_discovered_ip(ip_addresses)
         if first_ip is not None:
             if first_ip.alloc_type == IPADDRESS_TYPE.DHCP:
-                discovered_ip = self._get_first_discovered_ip_with_ip(
-                    ip_addresses
-                )
+                discovered_ip = self._get_first_discovered_ip_with_ip(ip_addresses)
                 if discovered_ip:
                     return "%s" % discovered_ip.ip
             elif first_ip.ip:
@@ -1163,9 +1116,7 @@ class NodeHandler(TimestampedModelHandler):
         if len(probed_details.xpath("/*/*")) == 0:
             return ""
         else:
-            return etree.tostring(
-                probed_details, encoding=str, pretty_print=True
-            )
+            return etree.tostring(probed_details, encoding=str, pretty_print=True)
 
     def get_summary_yaml(self, params):
         """Return the node summary YAML formatted."""
@@ -1244,9 +1195,7 @@ class NodeHandler(TimestampedModelHandler):
                 "physical_blockdevice_id",
                 "-id",
             )
-            .distinct(
-                "script_set__node_id", "script_name", "physical_blockdevice_id"
-            )
+            .distinct("script_set__node_id", "script_name", "physical_blockdevice_id")
         )
         node_script_results = [
             s for s in script_results if s.status in SCRIPT_STATUS_FAILED
@@ -1259,21 +1208,17 @@ class NodeHandler(TimestampedModelHandler):
         node_result_handler = NodeResultHandler(self.user, {}, None)
         if "filter" in params:
             qs = self.get_queryset(for_list=True)
-            system_ids = self._filter(
-                qs, "list", params.get("filter")
-            ).values_list("system_id", flat=True)
+            system_ids = self._filter(qs, "list", params.get("filter")).values_list(
+                "system_id", flat=True
+            )
         else:
             system_ids = params.get("system_ids")
 
-        script_results = self._get_latest_failed_testing_script_results(
-            system_ids
-        )
+        script_results = self._get_latest_failed_testing_script_results(system_ids)
         script_result_mappings = {}
         for script_result in script_results:
             system_id = script_result.script_set.node.system_id
-            mapping = node_result_handler.dehydrate(
-                script_result, {}, for_list=True
-            )
+            mapping = node_result_handler.dehydrate(script_result, {}, for_list=True)
             mapping["id"] = script_result.id
             script_result_mappings.setdefault(system_id, []).append(mapping)
         return script_result_mappings
@@ -1591,14 +1536,10 @@ class NodeHandler(TimestampedModelHandler):
                         {
                             "key": choice[0],
                             "label": SIMPLIFIED_NODE_STATUS_CHOICES_DICT[
-                                getattr(
-                                    SIMPLIFIED_NODE_STATUS, choice[0].upper()
-                                )
+                                getattr(SIMPLIFIED_NODE_STATUS, choice[0].upper())
                             ],
                         }
-                        for choice in sorted(
-                            SIMPLIFIED_NODE_STATUS_LABEL_CHOICES
-                        )
+                        for choice in sorted(SIMPLIFIED_NODE_STATUS_LABEL_CHOICES)
                     ]
                 elif key == "power_state":
                     return [

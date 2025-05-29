@@ -223,9 +223,7 @@ class NUMAPinningHugepagesResources:
 class NUMAPinningMemoryResources:
     """Memory usage details for NUMA pinning."""
 
-    hugepages: List[NUMAPinningHugepagesResources] = field(
-        default_factory=list
-    )
+    hugepages: List[NUMAPinningHugepagesResources] = field(default_factory=list)
     general: NUMAPinningGeneralMemoryResources = field(
         default_factory=NUMAPinningGeneralMemoryResources
     )
@@ -239,9 +237,7 @@ class NUMAPinningNodeResources:
     memory: NUMAPinningMemoryResources = field(
         default_factory=NUMAPinningMemoryResources
     )
-    cores: NUMAPinningCoresResources = field(
-        default_factory=NUMAPinningCoresResources
-    )
+    cores: NUMAPinningCoresResources = field(default_factory=NUMAPinningCoresResources)
     vms: List[int] = field(default_factory=list)
     interfaces: List[int] = field(default_factory=list)
 
@@ -340,9 +336,7 @@ class VMHostResources:
     """Resources for a VM host."""
 
     cores: VMHostResource = field(default_factory=VMHostResource)
-    memory: VMHostMemoryResources = field(
-        default_factory=VMHostMemoryResources
-    )
+    memory: VMHostMemoryResources = field(default_factory=VMHostMemoryResources)
     storage: VMHostResource = field(default_factory=VMHostResource)
     storage_pools: Dict[str, VMHostStoragePool] = field(default_factory=dict)
     vm_count: VMHostCount = field(default_factory=VMHostCount)
@@ -428,9 +422,7 @@ def _update_detailed_resource_counters(pod, resources):
 
     # only consider VMs in the tracked projects
     vms = list(
-        VirtualMachine.objects.annotate(
-            system_id=Coalesce("machine__system_id", None)
-        )
+        VirtualMachine.objects.annotate(system_id=Coalesce("machine__system_id", None))
         .filter(bmc=pod, project=pod.tracked_project)
         .all()
     )
@@ -605,9 +597,7 @@ def _get_global_vm_host_resources(pod):
                 numa_index=F("numa_node__index"),
                 allocated=Count("virtualmachineinterface"),
                 tracked=ExpressionWrapper(
-                    Q(
-                        virtualmachineinterface__vm__project=pod.tracked_project
-                    ),
+                    Q(virtualmachineinterface__vm__project=pod.tracked_project),
                     output_field=BooleanField(),
                 ),
                 sriov_attached=ExpressionWrapper(
@@ -625,9 +615,7 @@ def _get_global_vm_host_resources(pod):
                     id=entry["id"],
                     name=entry["name"],
                     numa_index=entry["numa_index"],
-                    virtual_functions=VMHostResource(
-                        free=entry["sriov_max_vf"]
-                    ),
+                    virtual_functions=VMHostResource(free=entry["sriov_max_vf"]),
                 )
                 host_interfaces[entry["id"]] = interface
             if not entry["sriov_attached"]:
@@ -664,8 +652,7 @@ def _update_numanode_resources_usage(
             if hugepages:
                 # round up to nearest page
                 vm_node_memory = (
-                    ceil(vm_node_memory / hugepages.page_size)
-                    * hugepages.page_size
+                    ceil(vm_node_memory / hugepages.page_size) * hugepages.page_size
                 )
                 allocated_numanode_hugepages[numa_idx] += vm_node_memory
         else:
@@ -689,9 +676,7 @@ def _get_vm_numanode_weights_and_cores(vm, numanodes):
     for numa_idx, numa_node in numanodes.items():
         common_cores = vm_cores & set(numa_node.cores)
         if common_cores:
-            numanode_weights[numa_idx] = len(common_cores) / len(
-                vm.pinned_cores
-            )
+            numanode_weights[numa_idx] = len(common_cores) / len(vm.pinned_cores)
             vm_cores.difference_update(common_cores)
             numanode_cores[numa_idx] = common_cores
         if not vm_cores:

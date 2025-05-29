@@ -84,14 +84,11 @@ class TestZonesRepository:
             assert total_pages == ceil(zones_result.total / page_size)
             if page == total_pages:  # last page may have fewer elements
                 assert len(zones_result.items) == (
-                    page_size
-                    - ((total_pages * page_size) % zones_result.total)
+                    page_size - ((total_pages * page_size) % zones_result.total)
                 )
             else:
                 assert len(zones_result.items) == page_size
-            for zone in created_zones[
-                ((page - 1) * page_size) : ((page * page_size))
-            ]:
+            for zone in created_zones[((page - 1) * page_size) : ((page * page_size))]:
                 assert zone in zones_result.items
 
     async def test_delete(
@@ -101,9 +98,7 @@ class TestZonesRepository:
         created_zone = await create_test_zone(fixture)
         assert (await zones_repository.delete(created_zone.id)) is None
 
-        zones = await fixture.get(
-            ZoneTable.name, eq(ZoneTable.c.id, created_zone.id)
-        )
+        zones = await fixture.get(ZoneTable.name, eq(ZoneTable.c.id, created_zone.id))
         assert zones == []
 
         # If the entity does not exist, silently ignore it.

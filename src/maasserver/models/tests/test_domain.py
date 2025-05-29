@@ -27,9 +27,7 @@ class TestDomainManagerGetDomainOr404(MAASServerTestCase):
         domain = factory.make_Domain()
         self.assertEqual(
             domain,
-            Domain.objects.get_domain_or_404(
-                domain.id, user, NodePermission.view
-            ),
+            Domain.objects.get_domain_or_404(domain.id, user, NodePermission.view),
         )
 
     def test_user_view_returns_domain_by_name(self):
@@ -69,9 +67,7 @@ class TestDomainManagerGetDomainOr404(MAASServerTestCase):
         domain = factory.make_Domain()
         self.assertEqual(
             domain,
-            Domain.objects.get_domain_or_404(
-                domain.id, admin, NodePermission.view
-            ),
+            Domain.objects.get_domain_or_404(domain.id, admin, NodePermission.view),
         )
 
     def test_admin_view_returns_domain_by_name(self):
@@ -89,9 +85,7 @@ class TestDomainManagerGetDomainOr404(MAASServerTestCase):
         domain = factory.make_Domain()
         self.assertEqual(
             domain,
-            Domain.objects.get_domain_or_404(
-                domain.id, admin, NodePermission.edit
-            ),
+            Domain.objects.get_domain_or_404(domain.id, admin, NodePermission.edit),
         )
 
     def test_admin_admin_returns_domain(self):
@@ -99,9 +93,7 @@ class TestDomainManagerGetDomainOr404(MAASServerTestCase):
         domain = factory.make_Domain()
         self.assertEqual(
             domain,
-            Domain.objects.get_domain_or_404(
-                domain.id, admin, NodePermission.admin
-            ),
+            Domain.objects.get_domain_or_404(domain.id, admin, NodePermission.admin),
         )
 
 
@@ -111,18 +103,14 @@ class TestDomainManager(MAASServerTestCase):
         domain = factory.make_Domain()
         factory.make_Domain()
         id = domain.id
-        self.assertCountEqual(
-            Domain.objects.filter_by_specifiers("%s" % id), [domain]
-        )
+        self.assertCountEqual(Domain.objects.filter_by_specifiers("%s" % id), [domain])
 
     def test_default_specifier_matches_name(self):
         factory.make_Domain()
         name = factory.make_name("domain-")
         domain = factory.make_Domain(name=name)
         factory.make_Domain()
-        self.assertCountEqual(
-            Domain.objects.filter_by_specifiers(name), [domain]
-        )
+        self.assertCountEqual(Domain.objects.filter_by_specifiers(name), [domain])
 
     def test_name_specifier_matches_name(self):
         factory.make_Domain()
@@ -164,15 +152,11 @@ class TestDomain(MAASServerTestCase):
         self.assertEqual(DEFAULT_DOMAIN_NAME, default_domain.get_name())
 
     def test_invalid_name_raises_exception(self):
-        self.assertRaises(
-            ValidationError, factory.make_Domain, name="invalid*name"
-        )
+        self.assertRaises(ValidationError, factory.make_Domain, name="invalid*name")
 
     def test_duplicating_internal_name_raises_exception(self):
         internal_domain = Config.objects.get_config("maas_internal_domain")
-        self.assertRaises(
-            ValidationError, factory.make_Domain, name=internal_domain
-        )
+        self.assertRaises(ValidationError, factory.make_Domain, name=internal_domain)
 
     def test_setting_internal_name_allows_old_internal_domain_name(self):
         internal_domain_old = Config.objects.get_config("maas_internal_domain")
@@ -207,9 +191,7 @@ class TestDomain(MAASServerTestCase):
         name = factory.make_name("name")
         forward_server = factory.make_ip_address()
         domain = factory.make_Domain(name=name, authoritative=True)
-        factory.make_ForwardDNSServer(
-            ip_address=forward_server, domains=[domain]
-        )
+        factory.make_ForwardDNSServer(ip_address=forward_server, domains=[domain])
         self.assertRaises(ValidationError, domain.validate_authority)
 
     def test_cant_be_deleted_if_contains_resources(self):
@@ -277,9 +259,7 @@ class TestDomain(MAASServerTestCase):
                     rrset={(30, "AAAA", sip.ip)}
                 )
             else:
-                expected_map[nsname] = HostnameRRsetMapping(
-                    rrset={(30, "A", sip.ip)}
-                )
+                expected_map[nsname] = HostnameRRsetMapping(rrset={(30, "A", sip.ip)})
         self.assertEqual(expected_map, mapping)
 
     def test_add_delegations_adds_nsrrset_and_glue_in_depth(self):
@@ -322,9 +302,7 @@ class TestDomain(MAASServerTestCase):
                     rrset={(30, "AAAA", sip.ip)}
                 )
             else:
-                expected_map[ns_part] = HostnameRRsetMapping(
-                    rrset={(30, "A", sip.ip)}
-                )
+                expected_map[ns_part] = HostnameRRsetMapping(rrset={(30, "A", sip.ip)})
         parent.add_delegations(mapping, default_name, [IPAddress("::1")], 30)
         self.assertEqual(expected_map, mapping)
 
@@ -354,16 +332,10 @@ class TestDomain(MAASServerTestCase):
     def test_add_delegations_does_not_list_region_for_non_auth(self):
         parent = factory.make_Domain()
         name = factory.make_name()
-        child = factory.make_Domain(
-            name=f"{name}.{parent.name}", authoritative=False
-        )
+        child = factory.make_Domain(name=f"{name}.{parent.name}", authoritative=False)
         default_name = Domain.objects.get_default_domain().name
-        ns_name = "{}.{}.".format(
-            factory.make_name("h"), factory.make_name("d")
-        )
-        factory.make_DNSData(
-            name="@", domain=child, rrtype="NS", rrdata=ns_name
-        )
+        ns_name = "{}.{}.".format(factory.make_name("h"), factory.make_name("d"))
+        factory.make_DNSData(name="@", domain=child, rrtype="NS", rrdata=ns_name)
         mappings = lazydict(get_hostname_dnsdata_mapping)
         mapping = mappings[parent]
         parent.add_delegations(mapping, default_name, [IPAddress("::1")], 30)
@@ -423,12 +395,8 @@ class TestDomain(MAASServerTestCase):
 
 class TestRenderRRData(MAASServerTestCase):
     def render_rrdata(self, domain, for_list=False):
-        rr_map = DNSData.objects.get_hostname_dnsdata_mapping(
-            domain, raw_ttl=True
-        )
-        ip_map = StaticIPAddress.objects.get_hostname_ip_mapping(
-            domain, raw_ttl=True
-        )
+        rr_map = DNSData.objects.get_hostname_dnsdata_mapping(domain, raw_ttl=True)
+        ip_map = StaticIPAddress.objects.get_hostname_ip_mapping(domain, raw_ttl=True)
         for hostname, info in ip_map.items():
             hostname = hostname[: -len(domain.name) - 1]
             if info.system_id is not None:

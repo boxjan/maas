@@ -113,9 +113,7 @@ def discover_and_sync_vmhost(vmhost, user):
 async def discover_and_sync_vmhost_async(vmhost, user):
     """Sync resources and information for the VM host from discovery."""
     try:
-        vmhost_power_parameters = await deferToDatabase(
-            vmhost.get_power_parameters
-        )
+        vmhost_power_parameters = await deferToDatabase(vmhost.get_power_parameters)
         discovered = await discover_pod(
             vmhost.power_type,
             vmhost_power_parameters,
@@ -132,9 +130,7 @@ async def discover_and_sync_vmhost_async(vmhost, user):
             "No rack controllers connected."
         )
     elif isinstance(discovered_pod, DiscoveredCluster):
-        vmhost = await sync_vmcluster_async(
-            discovered_pod, discovered, vmhost, user
-        )
+        vmhost = await sync_vmcluster_async(discovered_pod, discovered, vmhost, user)
     else:
         await deferToDatabase(
             transactional(_update_db), discovered_pod, discovered, vmhost, user
@@ -190,9 +186,7 @@ def _generate_cluster_power_params(vmhost, vmhost_address, first_host):
     return new_params
 
 
-def _get_or_create_clustered_host(
-    cluster, discovered_vmhost, power_parameters
-):
+def _get_or_create_clustered_host(cluster, discovered_vmhost, power_parameters):
     host = None
     try:
         host = Pod.objects.get(
@@ -241,9 +235,7 @@ def sync_vmcluster(discovered_cluster, discovered, vmhost, user):
             new_host = vmhost
             update_ret = True
 
-        new_host = _update_db(
-            discovered_vmhost, discovered, new_host, user, cluster
-        )
+        new_host = _update_db(discovered_vmhost, discovered, new_host, user, cluster)
         post_commit_do(
             reactor.callLater,
             0,

@@ -32,8 +32,6 @@ class PodHints(CleanSave, Model):
 
     cpu_speed = IntegerField(default=0)  # MHz
 
-    local_storage = BigIntegerField(  # Bytes
-        blank=False, null=False, default=0
-    )
+    local_storage = BigIntegerField(blank=False, null=False, default=0)  # Bytes
 
     cluster = ForeignKey(VMCluster, blank=True, null=True, on_delete=SET_NULL)

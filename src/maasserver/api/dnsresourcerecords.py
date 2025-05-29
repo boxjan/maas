@@ -67,9 +67,9 @@ class DNSResourceRecordsHandler(OperationsHandler):
                     user=request.user,
                     perm=NodePermission.view,
                 )
-            query = DNSData.objects.filter(
-                dnsresource__domain_id=domain.id
-            ).order_by("dnsresource__name")
+            query = DNSData.objects.filter(dnsresource__domain_id=domain.id).order_by(
+                "dnsresource__name"
+            )
         else:
             query = DNSData.objects.all().order_by(
                 "dnsresource__domain_id", "dnsresource__name"
@@ -203,9 +203,7 @@ class DNSResourceRecordHandler(OperationsHandler):
         @error-example "not-found"
             No DNSData matches the given query.
         """
-        return DNSData.objects.get_dnsdata_or_404(
-            id, request.user, NodePermission.view
-        )
+        return DNSData.objects.get_dnsdata_or_404(id, request.user, NodePermission.view)
 
     def update(self, request, id):
         """@description-title Update a DNS resource record

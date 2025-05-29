@@ -38,18 +38,14 @@ class TestDatabaseConfig:
             port=12345,
         )
         assert (
-            str(config.dsn)
-            == "postgresql+asyncpg://user:***@/unix.socket:12345/maasdb"
+            str(config.dsn) == "postgresql+asyncpg://user:***@/unix.socket:12345/maasdb"
         )
 
     def test_host(self):
         config = DatabaseConfig(
             "maasdb", username="user", password="pass", host="host", port=12345
         )
-        assert (
-            str(config.dsn)
-            == "postgresql+asyncpg://user:***@host:12345/maasdb"
-        )
+        assert str(config.dsn) == "postgresql+asyncpg://user:***@host:12345/maasdb"
 
 
 class TestGetDefaultDBConfig:

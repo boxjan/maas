@@ -68,9 +68,7 @@ def get_running_pids_with_command(
     pids = []
     for pid in running_pids:
         try:
-            pid_command = read_text_file(
-                os.path.join(proc_path, pid, "comm")
-            ).strip()
+            pid_command = read_text_file(os.path.join(proc_path, pid, "comm")).strip()
         except (FileNotFoundError, ProcessLookupError):
             # Process was closed while running.
             pass
@@ -80,9 +78,7 @@ def get_running_pids_with_command(
 
     if exclude_container_processes and not running_in_container():
         return [
-            pid
-            for pid in pids
-            if not is_pid_in_container(pid, proc_path=proc_path)
+            pid for pid in pids if not is_pid_in_container(pid, proc_path=proc_path)
         ]
     else:
         return pids

@@ -63,9 +63,7 @@ class TestBootSourceSelectionForm(MAASServerTestCase):
         boot_source_selection = factory.make_BootSourceSelection()
         boot_source = boot_source_selection.boot_source
         params = self.make_valid_source_selection_params(boot_source)
-        form = BootSourceSelectionForm(
-            instance=boot_source_selection, data=params
-        )
+        form = BootSourceSelectionForm(instance=boot_source_selection, data=params)
         self.assertTrue(form.is_valid(), form._errors)
         form.save()
         boot_source_selection = reload_object(boot_source_selection)
@@ -91,9 +89,7 @@ class TestBootSourceSelectionForm(MAASServerTestCase):
         # Duplicates should be detected for the same boot_source, os and
         # release, the other fields are irrelevant.
         dup_params = {"os": params["os"], "release": params["release"]}
-        form = BootSourceSelectionForm(
-            boot_source=boot_source, data=dup_params
-        )
+        form = BootSourceSelectionForm(boot_source=boot_source, data=dup_params)
         self.assertRaises(ValidationError, form.save)
 
     def test_validates_if_boot_source_cache_has_same_os_and_release(self):
@@ -176,11 +172,7 @@ class TestBootSourceSelectionForm(MAASServerTestCase):
         form = BootSourceSelectionForm(boot_source=boot_source, data=params)
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            {
-                "arches": [
-                    "No available images to download for %s" % params["arches"]
-                ]
-            },
+            {"arches": ["No available images to download for %s" % params["arches"]]},
             form._errors,
         )
 
@@ -217,8 +209,7 @@ class TestBootSourceSelectionForm(MAASServerTestCase):
         self.assertEqual(
             {
                 "subarches": [
-                    "No available images to download for %s"
-                    % params["subarches"]
+                    "No available images to download for %s" % params["subarches"]
                 ]
             },
             form._errors,
@@ -255,11 +246,7 @@ class TestBootSourceSelectionForm(MAASServerTestCase):
         form = BootSourceSelectionForm(boot_source=boot_source, data=params)
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            {
-                "labels": [
-                    "No available images to download for %s" % params["labels"]
-                ]
-            },
+            {"labels": ["No available images to download for %s" % params["labels"]]},
             form._errors,
         )
 

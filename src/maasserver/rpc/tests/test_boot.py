@@ -108,9 +108,7 @@ class TestGetConfig(MAASServerTestCase):
         :param kwargs:
         :return:
         """
-        architecture = make_usable_architecture(
-            self, arch_name=arch_name, extra=extra
-        )
+        architecture = make_usable_architecture(self, arch_name=arch_name, extra=extra)
         return factory.make_Node_with_Interface_on_Subnet(
             architecture="%s/generic" % architecture.split("/")[0], **kwargs
         )
@@ -168,9 +166,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         node = self.make_node(status=NODE_STATUS.DEPLOYING)
         mac = node.get_boot_interface().mac_address
-        mock_get_third_party_driver = self.patch(
-            boot_module, "get_third_party_driver"
-        )
+        mock_get_third_party_driver = self.patch(boot_module, "get_third_party_driver")
         Config.objects.set_config("default_distro_series", "focal")
         self.patch_autospec(boot_module, "event_log_pxe_request")
         get_config(
@@ -210,9 +206,7 @@ class TestGetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController()
         local_ip = factory.make_ip_address()
         remote_ip = factory.make_ip_address()
-        node = self.make_node_with_extra(
-            status=NODE_STATUS.DEPLOYED, netboot=False
-        )
+        node = self.make_node_with_extra(status=NODE_STATUS.DEPLOYED, netboot=False)
         node.boot_cluster_ip = local_ip
         node.osystem = factory.make_name("osystem")
         node.distro_series = factory.make_name("distro_series")
@@ -258,9 +252,7 @@ class TestGetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController()
         local_ip = factory.make_ip_address()
         remote_ip = factory.make_ip_address()
-        node = self.make_node_with_extra(
-            status=NODE_STATUS.DEPLOYED, netboot=False
-        )
+        node = self.make_node_with_extra(status=NODE_STATUS.DEPLOYED, netboot=False)
         node.boot_cluster_ip = local_ip
         node.osystem = factory.make_name("osystem")
         node.distro_series = factory.make_name("distro_series")
@@ -365,9 +357,7 @@ class TestGetConfig(MAASServerTestCase):
         node.save()
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        config = get_config(
-            rack_controller.system_id, local_ip, remote_ip, mac=mac
-        )
+        config = get_config(rack_controller.system_id, local_ip, remote_ip, mac=mac)
         self.assertEqual(config["purpose"], "xinstall")
 
     def test_custom_ephemeral_deployment(self):
@@ -392,9 +382,7 @@ class TestGetConfig(MAASServerTestCase):
             image_filetype=BOOT_RESOURCE_FILE_TYPE.ROOT_TGZ,
         )
 
-        config = get_config(
-            rack_controller.system_id, local_ip, remote_ip, mac=mac
-        )
+        config = get_config(rack_controller.system_id, local_ip, remote_ip, mac=mac)
         self.assertEqual(config["osystem"], "centos")
         self.assertEqual(config["release"], "8")
         self.assertEqual(config["arch"], arch)
@@ -433,9 +421,7 @@ class TestGetConfig(MAASServerTestCase):
             base_image="rhel/8",
         )
 
-        config = get_config(
-            rack_controller.system_id, local_ip, remote_ip, mac=mac
-        )
+        config = get_config(rack_controller.system_id, local_ip, remote_ip, mac=mac)
         ubuntu_rel = ubuntu.name.split("/")[1]
         self.assertEqual(config["osystem"], "ubuntu")
         self.assertEqual(config["release"], ubuntu_rel)
@@ -471,9 +457,7 @@ class TestGetConfig(MAASServerTestCase):
             base_image="rhel/8",
         )
 
-        config = get_config(
-            rack_controller.system_id, local_ip, remote_ip, mac=mac
-        )
+        config = get_config(rack_controller.system_id, local_ip, remote_ip, mac=mac)
         self.assertEqual(config["osystem"], "rhel")
         self.assertEqual(config["release"], "8")
         self.assertEqual(config["arch"], arch)
@@ -489,9 +473,7 @@ class TestGetConfig(MAASServerTestCase):
         self.assertEqual(config["purpose"], "xinstall")
         self.assertIn(f"/ubuntu/{arch}/hwe-", config["kernel"])
         self.assertIn(f"/ubuntu/{arch}/hwe-", config["initrd"])
-        self.assertIn(
-            f"/custom/{arch}/generic/rocky8", config["xinstall_path"]
-        )
+        self.assertIn(f"/custom/{arch}/generic/rocky8", config["xinstall_path"])
 
     # See https://github.com/canonical/cloud-init/issues/4418 for more details
     def test_preseed_url_not_using_domain_names_for_custom_ephemeral_deployments(
@@ -523,9 +505,7 @@ class TestGetConfig(MAASServerTestCase):
         node.save()
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        config = get_config(
-            rack_controller.system_id, local_ip, remote_ip, mac=mac
-        )
+        config = get_config(rack_controller.system_id, local_ip, remote_ip, mac=mac)
         assert ".maas-internal:5248" not in config["preseed_url"]
         assert local_ip in config["preseed_url"]
 
@@ -543,9 +523,7 @@ class TestGetConfig(MAASServerTestCase):
         means the get_config won't find the matching boot resource file with
         the kparams attribute.
         """
-        default_series = Config.objects.get_config(
-            name="commissioning_distro_series"
-        )
+        default_series = Config.objects.get_config(name="commissioning_distro_series")
         release = get_release_from_distro_info(default_series)
         hwe_kernel = "hwe-%s" % (release["version"].split()[0])
 
@@ -564,9 +542,7 @@ class TestGetConfig(MAASServerTestCase):
 
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        config = get_config(
-            rack_controller.system_id, local_ip, remote_ip, mac=mac
-        )
+        config = get_config(rack_controller.system_id, local_ip, remote_ip, mac=mac)
         extra = config.get("extra_opts", None)
 
         self.assertIn("b=c", extra)
@@ -637,9 +613,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         factory.make_default_ubuntu_release_bootable("amd64")
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual("amd64", observed_config["arch"])
 
     def test_defaults_to_i386_for_default(self):
@@ -654,9 +628,7 @@ class TestGetConfig(MAASServerTestCase):
             ).split("/")
         )
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         observed_arch = observed_config["arch"], observed_config["subarch"]
         self.assertEqual(expected_arch, observed_arch)
 
@@ -667,9 +639,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         make_usable_architecture(self)
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual("maas-enlist", observed_config.get("hostname"))
 
     def test_uses_local_domain_for_enlisting_node(self):
@@ -679,9 +649,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         make_usable_architecture(self)
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual("local", observed_config.get("domain"))
 
     def test_splits_domain_from_node_hostname(self):
@@ -708,13 +676,9 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address(ipv6=False)
         factory.make_default_ubuntu_release_bootable()
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual(
-            compose_enlistment_preseed_url(
-                base_url="http://%s:5248/" % local_ip
-            ),
+            compose_enlistment_preseed_url(base_url="http://%s:5248/" % local_ip),
             observed_config["preseed_url"],
         )
 
@@ -724,13 +688,9 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address(ipv6=True)
         factory.make_default_ubuntu_release_bootable()
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         assert (
-            compose_enlistment_preseed_url(
-                base_url="http://[%s]:5248/" % local_ip
-            )
+            compose_enlistment_preseed_url(base_url="http://[%s]:5248/" % local_ip)
             == observed_config["preseed_url"]
         )
 
@@ -741,9 +701,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         factory.make_default_ubuntu_release_bootable()
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         base_url = (
             "http://[%s]:5248/" % local_ip
             if IPAddress(local_ip).version == 6
@@ -764,9 +722,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         factory.make_default_ubuntu_release_bootable()
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual(
             compose_enlistment_preseed_url(
                 base_url="http://%s.%s:5248/"
@@ -785,9 +741,7 @@ class TestGetConfig(MAASServerTestCase):
         factory.make_default_ubuntu_release_bootable()
         Config.objects.set_config("use_rack_proxy", False)
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual(
             compose_enlistment_preseed_url(
                 default_region_ip=get_source_address(remote_ip)
@@ -838,9 +792,7 @@ class TestGetConfig(MAASServerTestCase):
         network = IPNetwork("10.1.1/24")
         local_ip = factory.pick_ip_in_network(network)
         remote_ip = factory.make_ip_address()
-        self.patch(server_address, "resolve_hostname").return_value = {
-            local_ip
-        }
+        self.patch(server_address, "resolve_hostname").return_value = {local_ip}
         rack_controller = factory.make_RackController(url=rack_url)
         node = self.make_node(primary_rack=rack_controller)
         mac = node.get_boot_interface().mac_address
@@ -860,9 +812,7 @@ class TestGetConfig(MAASServerTestCase):
         subnet = factory.make_Subnet()
         local_ip = factory.pick_ip_in_Subnet(subnet)
         remote_ip = factory.make_ip_address()
-        self.patch(server_address, "resolve_hostname").return_value = {
-            local_ip
-        }
+        self.patch(server_address, "resolve_hostname").return_value = {local_ip}
         rack_controller = factory.make_RackController(url=rack_url)
         node = self.make_node(primary_rack=rack_controller)
         mac = node.get_boot_interface().mac_address
@@ -886,9 +836,7 @@ class TestGetConfig(MAASServerTestCase):
         subnet.save()
         local_ip = factory.pick_ip_in_Subnet(subnet)
         remote_ip = factory.make_ip_address()
-        self.patch(server_address, "resolve_hostname").return_value = {
-            local_ip
-        }
+        self.patch(server_address, "resolve_hostname").return_value = {local_ip}
         node = self.make_node(primary_rack=rack_controller)
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
@@ -905,9 +853,7 @@ class TestGetConfig(MAASServerTestCase):
         network = IPNetwork("10.1.1/24")
         local_ip = factory.pick_ip_in_network(network)
         remote_ip = factory.make_ip_address()
-        self.patch(server_address, "resolve_hostname").return_value = {
-            local_ip
-        }
+        self.patch(server_address, "resolve_hostname").return_value = {local_ip}
         rack_controller = factory.make_RackController(url=rack_url)
         node = self.make_node(primary_rack=rack_controller)
         mac = node.get_boot_interface().mac_address
@@ -938,9 +884,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         make_usable_architecture(self, arch_name=boot_module.DEFAULT_ARCH)
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual("enlist", observed_config["purpose"])
 
     def test_returns_fs_host_as_cluster_controller(self):
@@ -951,9 +895,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         make_usable_architecture(self)
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual(local_ip, observed_config["fs_host"])
 
     def test_returns_extra_kernel_options(self):
@@ -964,9 +906,7 @@ class TestGetConfig(MAASServerTestCase):
         Config.objects.set_config("kernel_opts", extra_kernel_opts)
         make_usable_architecture(self)
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual(extra_kernel_opts, observed_config["extra_opts"])
 
     def test_returns_empty_string_for_no_extra_kernel_opts(self):
@@ -975,9 +915,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.make_ip_address()
         make_usable_architecture(self)
         self.patch_autospec(boot_module, "event_log_pxe_request")
-        observed_config = get_config(
-            rack_controller.system_id, local_ip, remote_ip
-        )
+        observed_config = get_config(rack_controller.system_id, local_ip, remote_ip)
         self.assertEqual("", observed_config["extra_opts"])
 
     def test_returns_commissioning_for_insane_state(self):
@@ -1044,9 +982,7 @@ class TestGetConfig(MAASServerTestCase):
             boot_module, "event_log_pxe_request"
         )
         get_config(rack_controller.system_id, local_ip, remote_ip, mac=mac)
-        event_log_pxe_request.assert_called_once_with(
-            node, node.get_boot_purpose()
-        )
+        event_log_pxe_request.assert_called_once_with(node, node.get_boot_purpose())
 
     def test_event_log_pxe_request_for_known_boot_purpose(self):
         purposes = [
@@ -1216,9 +1152,7 @@ class TestGetConfig(MAASServerTestCase):
         local_ip = factory.make_ip_address()
         remote_ip = factory.make_ip_address()
         status = random.choice(MONITORED_STATUSES)
-        node = self.make_node(
-            status=status, status_expires=factory.make_date()
-        )
+        node = self.make_node(status=status, status_expires=factory.make_date())
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
         get_config(rack_controller.system_id, local_ip, remote_ip, mac=mac)
@@ -1230,9 +1164,7 @@ class TestGetConfig(MAASServerTestCase):
         self.assertGreaterEqual(
             node.status_expires, expected_time - timedelta(minutes=1)
         )
-        self.assertLessEqual(
-            node.status_expires, expected_time + timedelta(minutes=1)
-        )
+        self.assertLessEqual(node.status_expires, expected_time + timedelta(minutes=1))
 
     def test_sets_boot_interface_vlan_to_match_rack_controller(self):
         rack_controller = factory.make_RackController()
@@ -1252,9 +1184,7 @@ class TestGetConfig(MAASServerTestCase):
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
         get_config(rack_controller.system_id, rack_ip.ip, remote_ip, mac=mac)
-        self.assertEqual(
-            rack_vlan, reload_object(node).get_boot_interface().vlan
-        )
+        self.assertEqual(rack_vlan, reload_object(node).get_boot_interface().vlan)
 
     def test_doesnt_change_boot_interface_vlan_when_using_dhcp_relay(self):
         rack_controller = factory.make_RackController()
@@ -1275,9 +1205,7 @@ class TestGetConfig(MAASServerTestCase):
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
         get_config(rack_controller.system_id, rack_ip.ip, remote_ip, mac=mac)
-        self.assertEqual(
-            relay_vlan, reload_object(node).get_boot_interface().vlan
-        )
+        self.assertEqual(relay_vlan, reload_object(node).get_boot_interface().vlan)
 
     def test_changes_boot_interface_vlan_not_relayed_through_rack(self):
         rack_controller = factory.make_RackController()
@@ -1299,9 +1227,7 @@ class TestGetConfig(MAASServerTestCase):
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
         get_config(rack_controller.system_id, rack_ip.ip, remote_ip, mac=mac)
-        self.assertEqual(
-            rack_vlan, reload_object(node).get_boot_interface().vlan
-        )
+        self.assertEqual(rack_vlan, reload_object(node).get_boot_interface().vlan)
 
     def test_returns_commissioning_os_series_for_other_oses(self):
         osystem = Config.objects.get_config("default_osystem")
@@ -1367,9 +1293,7 @@ class TestGetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController()
         local_ip = factory.make_ip_address()
         remote_ip = factory.make_ip_address()
-        node = self.make_node(
-            status=NODE_STATUS.COMMISSIONING, min_hwe_kernel="hwe-x"
-        )
+        node = self.make_node(status=NODE_STATUS.COMMISSIONING, min_hwe_kernel="hwe-x")
         make_usable_architecture(self)
         mac = node.get_boot_interface().mac_address
         self.patch_autospec(boot_module, "event_log_pxe_request")
@@ -1398,9 +1322,7 @@ class TestGetConfig(MAASServerTestCase):
         machine = factory.make_Machine_with_Interface_on_Subnet(
             status=NODE_STATUS.DEPLOYING, subnet=subnet_10
         )
-        factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine, subnet=subnet_20
-        )
+        factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine, subnet=subnet_20)
 
         # But actually the machine boots from the other subnet
         local_ip = (
@@ -1419,9 +1341,7 @@ class TestGetConfig(MAASServerTestCase):
             mac=None,
         )
 
-        reloaded_machine = Machine.objects.filter(
-            system_id=machine.system_id
-        ).first()
+        reloaded_machine = Machine.objects.filter(system_id=machine.system_id).first()
 
         # The second NIC is the new boot interface
         self.assertEqual(reloaded_machine.boot_interface.vlan.id, vlan_20.id)
@@ -1453,9 +1373,7 @@ class TestGetConfig(MAASServerTestCase):
         remote_ip = factory.pick_ip_in_Subnet(subnet_20)
 
         # The MAC address coming from the rack is always in the format XX-XX-XX-XX-XX-XX
-        unformatted_mac_address = machine.boot_interface.mac_address.replace(
-            ":", "-"
-        )
+        unformatted_mac_address = machine.boot_interface.mac_address.replace(":", "-")
 
         get_config(
             rack.system_id,
@@ -1465,9 +1383,7 @@ class TestGetConfig(MAASServerTestCase):
             query_count=58,
         )
 
-        reloaded_machine = Machine.objects.filter(
-            system_id=machine.system_id
-        ).first()
+        reloaded_machine = Machine.objects.filter(system_id=machine.system_id).first()
 
         # Expect that the boot interface vlan is moved to the same rack controller's vlan
         self.assertEqual(reloaded_machine.boot_interface.vlan.id, vlan_20.id)
@@ -1503,9 +1419,7 @@ class TestGetConfig(MAASServerTestCase):
         )
         commissioning_series = "bionic"
         commissioning_subarch = "ga-18.04"
-        Config.objects.set_config(
-            "commissioning_distro_series", commissioning_series
-        )
+        Config.objects.set_config("commissioning_distro_series", commissioning_series)
         distro_series = "xenial"
         rack_controller = factory.make_RackController()
         local_ip = factory.make_ip_address()
@@ -1544,12 +1458,8 @@ class TestGetConfig(MAASServerTestCase):
         )
         commissioning_series = "bionic"
         default_min_hwe_kernel = "ga-18.04"
-        Config.objects.set_config(
-            "commissioning_distro_series", commissioning_series
-        )
-        Config.objects.set_config(
-            "default_min_hwe_kernel", default_min_hwe_kernel
-        )
+        Config.objects.set_config("commissioning_distro_series", commissioning_series)
+        Config.objects.set_config("default_min_hwe_kernel", default_min_hwe_kernel)
         distro_series = "xenial"
         rack_controller = factory.make_RackController()
         local_ip = factory.make_ip_address()
@@ -1596,9 +1506,7 @@ class TestGetConfig(MAASServerTestCase):
         rack_controller = factory.make_RackController()
         local_ip = factory.make_ip_address()
         remote_ip = factory.make_ip_address()
-        node = self.make_node(
-            status=NODE_STATUS.DISK_ERASING, hwe_kernel=subarch
-        )
+        node = self.make_node(status=NODE_STATUS.DISK_ERASING, hwe_kernel=subarch)
         arch, platform = node.split_arch()
         factory.make_usable_boot_resource(
             name="ubuntu/jammy",
@@ -1654,9 +1562,7 @@ class TestGetConfig(MAASServerTestCase):
         local_ip = factory.make_ip_address()
         remote_ip = factory.make_ip_address()
         image_name = factory.make_name("custom-image")
-        base_image_series = random.choice(
-            ["trusty", "vivid", "wily", "xenial"]
-        )
+        base_image_series = random.choice(["trusty", "vivid", "wily", "xenial"])
         custom_image = factory.make_BootResource(
             rtype=BOOT_RESOURCE_TYPE.UPLOADED,
             name=image_name,
@@ -1700,9 +1606,7 @@ class TestGetConfig(MAASServerTestCase):
         )
         self.assertEqual(osystem, observed_config["osystem"])
         self.assertEqual(release, observed_config["release"])
-        self.assertEqual(
-            "nvme-core.multipath=0", observed_config["ephemeral_opts"]
-        )
+        self.assertEqual("nvme-core.multipath=0", observed_config["ephemeral_opts"])
 
     # XXX: roaksoax LP: #1739761 - Deploying precise is now done using
     # the commissioning ephemeral environment.
@@ -1714,9 +1618,7 @@ class TestGetConfig(MAASServerTestCase):
             None,
         )
         commissioning_series = "xenial"
-        Config.objects.set_config(
-            "commissioning_distro_series", commissioning_series
-        )
+        Config.objects.set_config("commissioning_distro_series", commissioning_series)
         distro_series = "precise"
         rack_controller = factory.make_RackController()
         local_ip = factory.make_ip_address()
@@ -1743,13 +1645,9 @@ class TestGetConfig(MAASServerTestCase):
             None,
         )
         commissioning_osystem = factory.make_name("os")
-        Config.objects.set_config(
-            "commissioning_osystem", commissioning_osystem
-        )
+        Config.objects.set_config("commissioning_osystem", commissioning_osystem)
         commissioning_series = factory.make_name("series")
-        Config.objects.set_config(
-            "commissioning_distro_series", commissioning_series
-        )
+        Config.objects.set_config("commissioning_distro_series", commissioning_series)
         rack_controller = factory.make_RackController()
         local_ip = factory.make_ip_address()
         remote_ip = factory.make_ip_address()
@@ -1835,9 +1733,7 @@ class TestGetBootFilenames(MAASServerTestCase):
             self.composeURL(
                 release,
                 boot_resource_set,
-                boot_resource_set.files.get(
-                    filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_DTB
-                ),
+                boot_resource_set.files.get(filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_DTB),
             ),
             boot_dbt,
         )
@@ -1872,9 +1768,7 @@ class TestGetBootFilenames(MAASServerTestCase):
             self.composeURL(
                 custom_res,
                 custom_rset,
-                custom_rset.files.get(
-                    filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_KERNEL
-                ),
+                custom_rset.files.get(filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_KERNEL),
             ),
             kernel,
         )
@@ -1882,9 +1776,7 @@ class TestGetBootFilenames(MAASServerTestCase):
             self.composeURL(
                 custom_res,
                 custom_rset,
-                custom_rset.files.get(
-                    filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_INITRD
-                ),
+                custom_rset.files.get(filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_INITRD),
             ),
             initrd,
         )
@@ -1892,9 +1784,7 @@ class TestGetBootFilenames(MAASServerTestCase):
             self.composeURL(
                 custom_res,
                 custom_rset,
-                custom_rset.files.get(
-                    filetype=BOOT_RESOURCE_FILE_TYPE.ROOT_TGZ
-                ),
+                custom_rset.files.get(filetype=BOOT_RESOURCE_FILE_TYPE.ROOT_TGZ),
             ),
             rootfs,
         )
@@ -1921,9 +1811,7 @@ class TestGetBootFilenames(MAASServerTestCase):
             self.composeURL(
                 custom_res,
                 custom_rset,
-                custom_rset.files.get(
-                    filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_KERNEL
-                ),
+                custom_rset.files.get(filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_KERNEL),
             ),
             kernel,
         )
@@ -1931,9 +1819,7 @@ class TestGetBootFilenames(MAASServerTestCase):
             self.composeURL(
                 custom_res,
                 custom_rset,
-                custom_rset.files.get(
-                    filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_INITRD
-                ),
+                custom_rset.files.get(filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_INITRD),
             ),
             initrd,
         )
@@ -1941,9 +1827,7 @@ class TestGetBootFilenames(MAASServerTestCase):
             self.composeURL(
                 custom_res,
                 custom_rset,
-                custom_rset.files.get(
-                    filetype=BOOT_RESOURCE_FILE_TYPE.ROOT_TGZ
-                ),
+                custom_rset.files.get(filetype=BOOT_RESOURCE_FILE_TYPE.ROOT_TGZ),
             ),
             rootfs,
         )
@@ -1987,9 +1871,7 @@ class TestGetBootFilenames(MAASServerTestCase):
             self.composeURL(
                 release,
                 boot_resource_set,
-                boot_resource_set.files.get(
-                    filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_DTB
-                ),
+                boot_resource_set.files.get(filetype=BOOT_RESOURCE_FILE_TYPE.BOOT_DTB),
             ),
             boot_dbt,
         )
@@ -2412,7 +2294,5 @@ class TestGetNodeFromMacOrHardwareUUID(MAASServerTestCase):
 
     def test_get_node_from_mac_or_hardware_uuid_with_hardware_uuid(self):
         node = factory.make_Node_with_Interface_on_Subnet()
-        result = get_node_from_mac_or_hardware_uuid(
-            hardware_uuid=node.hardware_uuid
-        )
+        result = get_node_from_mac_or_hardware_uuid(hardware_uuid=node.hardware_uuid)
         self.assertEqual(node, result)

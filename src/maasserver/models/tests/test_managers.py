@@ -33,7 +33,6 @@ class TestBulkManager(MAASLegacyTransactionServerTestCase):
         self.assertNumQueries(
             2,
             lambda: [
-                list(parent.bulkmanagertestmodel_set.iterator())
-                for parent in parents
+                list(parent.bulkmanagertestmodel_set.iterator()) for parent in parents
             ],
         )

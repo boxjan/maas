@@ -13,9 +13,9 @@ def fix_ownerdata_keys(apps, schema_editor):
 
     existing_node_keys = {
         node_id: set(values)
-        for node_id, values in OwnerData.objects.values_list(
-            "node_id"
-        ).annotate(keys=ArrayAgg("key"))
+        for node_id, values in OwnerData.objects.values_list("node_id").annotate(
+            keys=ArrayAgg("key")
+        )
     }
 
     for entry in OwnerData.objects.exclude(key__regex=r"^[\w.-]+$"):

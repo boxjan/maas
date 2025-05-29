@@ -66,9 +66,7 @@ def _migrate_networks_forward(
         # Find or create the specified VLAN
         if network.vlan_tag is not None and network.vlan_tag > 0:
             try:
-                vlan = VLAN.objects.get(
-                    vid=network.vlan_tag, fabric=default_fabric
-                )
+                vlan = VLAN.objects.get(vid=network.vlan_tag, fabric=default_fabric)
             except VLAN.DoesNotExist:
                 vlan = VLAN(vid=network.vlan_tag, fabric=default_fabric)
                 vlan.name = "vlan%d" % network.vlan_tag

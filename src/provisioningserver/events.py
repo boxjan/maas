@@ -63,13 +63,9 @@ class EVENT_TYPES:
     NODE_POST_INSTALL_EVENT_FAILED = "NODE_POST_INSTALL_EVENT_FAILED"
     NODE_DISKS_ERASED = "NODE_DISKS_ERASED"
     NODE_ENTERING_RESCUE_MODE_EVENT = "NODE_ENTERING_RESCUE_MODE_EVENT"
-    NODE_ENTERING_RESCUE_MODE_EVENT_FAILED = (
-        "NODE_ENTERING_RESCUE_MODE_EVENT_FAILED"
-    )
+    NODE_ENTERING_RESCUE_MODE_EVENT_FAILED = "NODE_ENTERING_RESCUE_MODE_EVENT_FAILED"
     NODE_EXITING_RESCUE_MODE_EVENT = "NODE_EXITING_RESCUE_MODE_EVENT"
-    NODE_EXITING_RESCUE_MODE_EVENT_FAILED = (
-        "NODE_EXITING_RESCUE_MODE_EVENT_FAILED"
-    )
+    NODE_EXITING_RESCUE_MODE_EVENT_FAILED = "NODE_EXITING_RESCUE_MODE_EVENT_FAILED"
     # Node hardware sync events
     NODE_HARDWARE_SYNC_BMC = "NODE_HARDWARE_SYNC_BMC"
     NODE_HARDWARE_SYNC_BLOCK_DEVICE = "NODE_HARDWARE_SYNC_BLOCK_DEVICE"
@@ -84,9 +80,7 @@ class EVENT_TYPES:
     REQUEST_NODE_ABORT_COMMISSIONING = "REQUEST_NODE_ABORT_COMMISSIONING"
     REQUEST_NODE_START_TESTING = "REQUEST_NODE_START_TESTING"
     REQUEST_NODE_ABORT_TESTING = "REQUEST_NODE_ABORT_TESTING"
-    REQUEST_NODE_OVERRIDE_FAILED_TESTING = (
-        "REQUEST_NODE_OVERRIDE_FAILED_TESTING"
-    )
+    REQUEST_NODE_OVERRIDE_FAILED_TESTING = "REQUEST_NODE_OVERRIDE_FAILED_TESTING"
     REQUEST_NODE_ABORT_DEPLOYMENT = "REQUEST_NODE_ABORT_DEPLOYMENT"
     REQUEST_NODE_ACQUIRE = "REQUEST_NODE_ACQUIRE"
     REQUEST_NODE_ERASE_DISK = "REQUEST_NODE_ERASE_DISK"
@@ -208,21 +202,13 @@ EVENT_DETAILS = {
     EVENT_TYPES.NODE_POWER_QUERY_FAILED: EventDetail(
         description="Failed to query node's BMC", level=WARN
     ),
-    EVENT_TYPES.NODE_TFTP_REQUEST: EventDetail(
-        description="TFTP Request", level=DEBUG
-    ),
-    EVENT_TYPES.NODE_HTTP_REQUEST: EventDetail(
-        description="HTTP Request", level=DEBUG
-    ),
-    EVENT_TYPES.NODE_PXE_REQUEST: EventDetail(
-        description="PXE Request", level=DEBUG
-    ),
+    EVENT_TYPES.NODE_TFTP_REQUEST: EventDetail(description="TFTP Request", level=DEBUG),
+    EVENT_TYPES.NODE_HTTP_REQUEST: EventDetail(description="HTTP Request", level=DEBUG),
+    EVENT_TYPES.NODE_PXE_REQUEST: EventDetail(description="PXE Request", level=DEBUG),
     EVENT_TYPES.NODE_INSTALLATION_FINISHED: EventDetail(
         description="Installation complete", level=DEBUG
     ),
-    EVENT_TYPES.NODE_DISKS_ERASED: EventDetail(
-        description="Disks erased", level=INFO
-    ),
+    EVENT_TYPES.NODE_DISKS_ERASED: EventDetail(description="Disks erased", level=INFO),
     EVENT_TYPES.NODE_CHANGED_STATUS: EventDetail(
         description="Node changed status", level=DEBUG
     ),
@@ -351,8 +337,7 @@ EVENT_DETAILS = {
     ),
     EVENT_TYPES.REQUEST_CONTROLLER_REFRESH: EventDetail(
         description=(
-            "Starting refresh of controller hardware and networking "
-            "information"
+            "Starting refresh of controller hardware and networking " "information"
         ),
         level=DEBUG,
     ),
@@ -380,9 +365,7 @@ EVENT_DETAILS = {
     EVENT_TYPES.SCRIPT_RESULT_ERROR: EventDetail(
         description="Script result lookup or storage error", level=ERROR
     ),
-    EVENT_TYPES.AUTHORISATION: EventDetail(
-        description="Authorisation", level=AUDIT
-    ),
+    EVENT_TYPES.AUTHORISATION: EventDetail(description="Authorisation", level=AUDIT),
     EVENT_TYPES.SETTINGS: EventDetail(description="Settings", level=AUDIT),
     EVENT_TYPES.NODE: EventDetail(description="Node", level=AUDIT),
     EVENT_TYPES.IMAGES: EventDetail(description="Images", level=AUDIT),
@@ -393,12 +376,8 @@ EVENT_DETAILS = {
     EVENT_TYPES.CONFIGURING_STORAGE: EventDetail(
         description="Configuring storage", level=INFO
     ),
-    EVENT_TYPES.INSTALLING_OS: EventDetail(
-        description="Installing OS", level=INFO
-    ),
-    EVENT_TYPES.CONFIGURING_OS: EventDetail(
-        description="Configuring OS", level=INFO
-    ),
+    EVENT_TYPES.INSTALLING_OS: EventDetail(description="Installing OS", level=INFO),
+    EVENT_TYPES.CONFIGURING_OS: EventDetail(description="Configuring OS", level=INFO),
     EVENT_TYPES.REBOOTING: EventDetail(description="Rebooting", level=INFO),
     EVENT_TYPES.PERFORMING_PXE_BOOT: EventDetail(
         description="Performing PXE boot", level=INFO
@@ -407,30 +386,22 @@ EVENT_DETAILS = {
         description="Loading ephemeral", level=INFO
     ),
     EVENT_TYPES.NEW: EventDetail(description="New", level=INFO),
-    EVENT_TYPES.COMMISSIONING: EventDetail(
-        description="Commissioning", level=INFO
-    ),
+    EVENT_TYPES.COMMISSIONING: EventDetail(description="Commissioning", level=INFO),
     EVENT_TYPES.FAILED_COMMISSIONING: EventDetail(
         description="Failed commissioning", level=INFO
     ),
     EVENT_TYPES.TESTING: EventDetail(description="Testing", level=INFO),
-    EVENT_TYPES.FAILED_TESTING: EventDetail(
-        description="Failed testing", level=INFO
-    ),
+    EVENT_TYPES.FAILED_TESTING: EventDetail(description="Failed testing", level=INFO),
     EVENT_TYPES.READY: EventDetail(description="Ready", level=INFO),
     EVENT_TYPES.DEPLOYING: EventDetail(description="Deploying", level=INFO),
     EVENT_TYPES.DEPLOYED: EventDetail(description="Deployed", level=INFO),
-    EVENT_TYPES.IMAGE_DEPLOYED: EventDetail(
-        description="Image Deployed", level=INFO
-    ),
+    EVENT_TYPES.IMAGE_DEPLOYED: EventDetail(description="Image Deployed", level=INFO),
     EVENT_TYPES.RELEASING: EventDetail(description="Releasing", level=INFO),
     EVENT_TYPES.RELEASED: EventDetail(description="Released", level=INFO),
     EVENT_TYPES.ENTERING_RESCUE_MODE: EventDetail(
         description="Entering rescue mode", level=INFO
     ),
-    EVENT_TYPES.RESCUE_MODE: EventDetail(
-        description="Rescue mode", level=INFO
-    ),
+    EVENT_TYPES.RESCUE_MODE: EventDetail(description="Rescue mode", level=INFO),
     EVENT_TYPES.FAILED_EXITING_RESCUE_MODE: EventDetail(
         description="Failed exiting rescue mode", level=INFO
     ),
@@ -440,12 +411,8 @@ EVENT_DETAILS = {
     EVENT_TYPES.GATHERING_INFO: EventDetail(
         description="Gathering information", level=INFO
     ),
-    EVENT_TYPES.RUNNING_TEST: EventDetail(
-        description="Running test", level=INFO
-    ),
-    EVENT_TYPES.SCRIPT_DID_NOT_COMPLETE: EventDetail(
-        description="Script", level=INFO
-    ),
+    EVENT_TYPES.RUNNING_TEST: EventDetail(description="Running test", level=INFO),
+    EVENT_TYPES.SCRIPT_DID_NOT_COMPLETE: EventDetail(description="Script", level=INFO),
     EVENT_TYPES.SCRIPT_RESULT_CHANGED_STATUS: EventDetail(
         description="Script result", level=DEBUG
     ),
@@ -458,9 +425,7 @@ EVENT_DETAILS = {
     EVENT_TYPES.ABORTED_DEPLOYMENT: EventDetail(
         description="Aborted deployment", level=INFO
     ),
-    EVENT_TYPES.ABORTED_TESTING: EventDetail(
-        description="Aborted testing", level=INFO
-    ),
+    EVENT_TYPES.ABORTED_TESTING: EventDetail(description="Aborted testing", level=INFO),
 }
 
 
@@ -718,7 +683,6 @@ def try_send_rack_event(event_type, description=""):
     d = send_rack_event(event_type, description)
     d.addErrback(
         log.err,
-        "Failure sending rack event to region: %s - %s"
-        % (event_type, description),
+        "Failure sending rack event to region: %s - %s" % (event_type, description),
     )
     return d

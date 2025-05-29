@@ -14,9 +14,7 @@ from provisioningserver.logger import LegacyLogger
 
 log = LegacyLogger()
 
-MAX_WORKERS_COUNT = int(
-    os.environ.get("MAAS_REGIOND_WORKER_COUNT", os.cpu_count())
-)
+MAX_WORKERS_COUNT = int(os.environ.get("MAAS_REGIOND_WORKER_COUNT", os.cpu_count()))
 
 
 def set_max_workers_count(worker_count):
@@ -130,9 +128,7 @@ class WorkersService(service.Service):
 
     def _spawnWorker(self, worker_id: str, runningImport: bool = False):
         """Spawn a new worker."""
-        worker = WorkerProcess(
-            self, worker_id=worker_id, runningImport=runningImport
-        )
+        worker = WorkerProcess(self, worker_id=worker_id, runningImport=runningImport)
         env = os.environ.copy()
         env["MAAS_REGIOND_PROCESS_MODE"] = "worker"
         env["MAAS_REGIOND_WORKER_ID"] = worker_id

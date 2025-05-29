@@ -192,9 +192,7 @@ class Fabric(CleanSave, TimestampedModel):
     def _create_default_vlan(self):
         from maasserver.models.vlan import DEFAULT_VID, DEFAULT_VLAN_NAME, VLAN
 
-        VLAN.objects.create(
-            name=DEFAULT_VLAN_NAME, vid=DEFAULT_VID, fabric=self
-        )
+        VLAN.objects.create(name=DEFAULT_VLAN_NAME, vid=DEFAULT_VID, fabric=self)
 
     def save(self, *args, **kwargs):
         # Name will get set by clean_name() if None or empty, and there is an

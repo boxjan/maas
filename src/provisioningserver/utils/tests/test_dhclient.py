@@ -54,9 +54,7 @@ class TestGetLatestFixedAddress(MAASTestCase):
     )
 
     def test_missing(self):
-        self.assertIsNone(
-            get_lastest_fixed_address(factory.make_name("lease"))
-        )
+        self.assertIsNone(get_lastest_fixed_address(factory.make_name("lease")))
 
     def test_empty(self):
         path = self.make_file(contents="")
@@ -72,9 +70,7 @@ class TestGetLatestFixedAddress(MAASTestCase):
 
     def test_ipv6(self):
         path = self.make_file(contents=self.IPV6_LEASE_FILE)
-        self.assertEqual(
-            "2001:db8:a0b:12f0::3", get_lastest_fixed_address(path)
-        )
+        self.assertEqual("2001:db8:a0b:12f0::3", get_lastest_fixed_address(path))
 
 
 class TestGetDhclientInfo(MAASTestCase):

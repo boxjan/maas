@@ -57,9 +57,7 @@ class TestStatusHandlerResource(MAASTestCase):
         request = DummyRequest([])
         if token is None:
             token = factory.make_name("token")
-        request.requestHeaders.addRawHeader(
-            b"authorization", "oauth_token=%s" % token
-        )
+        request.requestHeaders.addRawHeader(b"authorization", "oauth_token=%s" % token)
         if content is not None:
             request.content = BytesIO(content)
         return request
@@ -92,9 +90,7 @@ class TestStatusHandlerResource(MAASTestCase):
     def test_render_POST_bad_authorization(self):
         resource = StatusHandlerResource(sentinel.status_worker)
         request = DummyRequest([])
-        request.requestHeaders.addRawHeader(
-            b"authorization", factory.make_name("auth")
-        )
+        request.requestHeaders.addRawHeader(b"authorization", factory.make_name("auth"))
         output = resource.render_POST(request)
         self.assertEqual(b"", output)
         self.assertEqual(401, request.responseCode)
@@ -159,9 +155,7 @@ class TestStatusWorkerServiceTransactional(MAASTransactionServerTestCase):
     @transactional
     def make_nodes_with_tokens(self):
         nodes = [factory.make_Node() for _ in range(3)]
-        return [
-            (node, NodeKey.objects.get_token_for_node(node)) for node in nodes
-        ]
+        return [(node, NodeKey.objects.get_token_for_node(node)) for node in nodes]
 
     def make_message(self):
         return {
@@ -237,9 +231,7 @@ class TestStatusWorkerServiceTransactional(MAASTransactionServerTestCase):
             sentinel.node,
             [sentinel.message1, sentinel.message2],
         )
-        mock_processMessage.assert_called_once_with(
-            sentinel.node, sentinel.message1
-        )
+        mock_processMessage.assert_called_once_with(sentinel.node, sentinel.message1)
 
     @wait_for_reactor
     @inlineCallbacks
@@ -280,9 +272,7 @@ class TestStatusWorkerServiceTransactional(MAASTransactionServerTestCase):
             message = self.make_message()
             message["event_type"] = "start"
             message["name"] = name
-            nodes_with_tokens = yield deferToDatabase(
-                self.make_nodes_with_tokens
-            )
+            nodes_with_tokens = yield deferToDatabase(self.make_nodes_with_tokens)
             node, token = nodes_with_tokens[0]
             yield worker.queueMessage(token.key, message)
             mock_processMessage.assert_called_once_with(node, message)
@@ -433,9 +423,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         )
 
     def test_status_commissioning_failure_leaves_node_failed(self):
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         payload = {
             "event_type": "finish",
             "result": "FAILURE",
@@ -445,9 +433,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             "timestamp": datetime.utcnow(),
         }
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status)
         # Check last node event.
         self.assertEqual(
             [
@@ -473,9 +459,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         }
         self.assertEqual(user, node.owner)  # Node has an owner
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status)
         self.assertIsNone(reload_object(node).owner)
 
     def test_status_commissioning_failure_aborts_scripts(self):
@@ -497,9 +481,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         }
         self.assertEqual(user, node.owner)  # Node has an owner
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status)
         for script_result in node.get_latest_script_results:
             self.assertEqual(SCRIPT_STATUS.ABORTED, script_result.status)
 
@@ -528,9 +510,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         self.assertEqual(user, node.owner)  # Node has an owner
         self.processMessage(node, payload)
         self.assertEqual(NODE_STATUS.COMMISSIONING, reload_object(node).status)
-        self.assertEqual(
-            SCRIPT_STATUS.RUNNING, reload_object(script_result).status
-        )
+        self.assertEqual(SCRIPT_STATUS.RUNNING, reload_object(script_result).status)
 
     def test_status_commissioning_failure_ignored_when_rebooting_passed(self):
         user = factory.make_User()
@@ -559,9 +539,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         }
         self.processMessage(node, payload)
         self.assertEqual(NODE_STATUS.COMMISSIONING, reload_object(node).status)
-        self.assertEqual(
-            SCRIPT_STATUS.PASSED, reload_object(script_result).status
-        )
+        self.assertEqual(SCRIPT_STATUS.PASSED, reload_object(script_result).status)
 
     def test_status_installation_failure_leaves_node_failed(self):
         node = factory.make_Node(interface=True, status=NODE_STATUS.DEPLOYING)
@@ -574,9 +552,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             "timestamp": datetime.utcnow(),
         }
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status)
         # Check last node event.
         self.assertEqual(
             "Installation failed (refer to the installation"
@@ -637,9 +613,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             "timestamp": datetime.utcnow(),
         }
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status)
         # Check last node event.
         self.assertEqual(
             "Installation failed (refer to the installation"
@@ -662,9 +636,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         }
         self.assertEqual(user, node.owner)  # Node has an owner
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DEPLOYMENT, reload_object(node).status)
         self.assertIsNotNone(reload_object(node).owner)
 
     def test_status_installation_failure_fails_script_result(self):
@@ -699,9 +671,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             ],
         }
         self.processMessage(node, payload)
-        self.assertEqual(
-            SCRIPT_STATUS.FAILED, reload_object(script_result).status
-        )
+        self.assertEqual(SCRIPT_STATUS.FAILED, reload_object(script_result).status)
 
     def test_status_POST_files_none_are_ignored(self):
         user = factory.make_User()
@@ -731,12 +701,8 @@ class TestStatusWorkerService(MAASServerTestCase):
         self.assertEqual(0, len(list(node.current_installation_script_set)))
 
     def test_status_commissioning_failure_does_not_populate_tags(self):
-        populate_tags_for_single_node = self.patch(
-            api, "populate_tags_for_single_node"
-        )
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        populate_tags_for_single_node = self.patch(api, "populate_tags_for_single_node")
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         payload = {
             "event_type": "finish",
             "result": "FAILURE",
@@ -746,15 +712,11 @@ class TestStatusWorkerService(MAASServerTestCase):
             "timestamp": datetime.utcnow(),
         }
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status)
         populate_tags_for_single_node.assert_not_called()
 
     def test_status_erasure_failure_leaves_node_failed(self):
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.DISK_ERASING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.DISK_ERASING)
         payload = {
             "event_type": "finish",
             "result": "FAILURE",
@@ -764,9 +726,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             "timestamp": datetime.utcnow(),
         }
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DISK_ERASING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DISK_ERASING, reload_object(node).status)
         # Check last node event.
         self.assertEqual(
             "Failed to erase disks.",
@@ -774,12 +734,8 @@ class TestStatusWorkerService(MAASServerTestCase):
         )
 
     def test_status_erasure_failure_does_not_populate_tags(self):
-        populate_tags_for_single_node = self.patch(
-            api, "populate_tags_for_single_node"
-        )
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.DISK_ERASING
-        )
+        populate_tags_for_single_node = self.patch(api, "populate_tags_for_single_node")
+        node = factory.make_Node(interface=True, status=NODE_STATUS.DISK_ERASING)
         payload = {
             "event_type": "finish",
             "result": "FAILURE",
@@ -789,9 +745,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             "timestamp": datetime.utcnow(),
         }
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DISK_ERASING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DISK_ERASING, reload_object(node).status)
         populate_tags_for_single_node.assert_not_called()
 
     def test_status_erasure_failure_doesnt_clear_owner(self):
@@ -808,15 +762,11 @@ class TestStatusWorkerService(MAASServerTestCase):
             "timestamp": datetime.utcnow(),
         }
         self.processMessage(node, payload)
-        self.assertEqual(
-            NODE_STATUS.FAILED_DISK_ERASING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_DISK_ERASING, reload_object(node).status)
         self.assertEqual(user, node.owner)
 
     def test_status_with_file_bad_encoder_fails(self):
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         contents = b"These are the contents of the file."
         encoded_content = encode_as_base64(bz2.compress(contents))
         payload = {
@@ -838,9 +788,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         self.assertRaises(ValueError, self.processMessage, node, payload)
 
     def test_status_with_file_bad_compression_fails(self):
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         contents = b"These are the contents of the file."
         encoded_content = encode_as_base64(bz2.compress(contents))
         payload = {
@@ -867,9 +815,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             status=NODE_STATUS.COMMISSIONING,
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         contents = b"These are the contents of the file."
@@ -977,9 +923,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             status=NODE_STATUS.COMMISSIONING,
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         contents = b"These are the contents of the file."
@@ -1014,9 +958,7 @@ class TestStatusWorkerService(MAASServerTestCase):
             status=NODE_STATUS.COMMISSIONING,
             with_empty_script_sets=True,
         )
-        script_result = (
-            node.current_commissioning_script_set.scriptresult_set.first()
-        )
+        script_result = node.current_commissioning_script_set.scriptresult_set.first()
         script_result.status = SCRIPT_STATUS.RUNNING
         script_result.save()
         contents = b"These are the contents of the file."
@@ -1053,9 +995,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         }
         self.processMessage(node, payload)
         script_set = node.current_installation_script_set
-        script_result = script_set.find_script_result(
-            script_name=CURTIN_INSTALL_LOG
-        )
+        script_result = script_set.find_script_result(script_name=CURTIN_INSTALL_LOG)
         self.assertEqual(SCRIPT_STATUS.RUNNING, script_result.status)
 
     def test_resets_status_expires(self):
@@ -1088,9 +1028,7 @@ class TestStatusWorkerService(MAASServerTestCase):
         self.assertGreaterEqual(
             node.status_expires, expected_time - timedelta(minutes=1)
         )
-        self.assertLessEqual(
-            node.status_expires, expected_time + timedelta(minutes=1)
-        )
+        self.assertLessEqual(node.status_expires, expected_time + timedelta(minutes=1))
 
     def test_disk_erasing_machine_failed(self):
         node = factory.make_Node(
@@ -1224,10 +1162,7 @@ class TestCreateVMHostForDeployment(MAASServerTestCase):
         secret_manager = SecretManager()
         secret_manager.set_composite_secret(
             "deploy-metadata",
-            {
-                "lxd-certificate": cert.certificate_pem()
-                + cert.private_key_pem()
-            },
+            {"lxd-certificate": cert.certificate_pem() + cert.private_key_pem()},
             obj=node,
         )
         _create_vmhost_for_deployment(node)
@@ -1280,8 +1215,7 @@ class TestCreateVMHostForDeployment(MAASServerTestCase):
         secret_manager.set_composite_secret(
             "deploy-metadata",
             {
-                "lxd-certificate": cert.certificate_pem()
-                + cert.private_key_pem(),
+                "lxd-certificate": cert.certificate_pem() + cert.private_key_pem(),
                 "virsh-password": "xyz123",
             },
             obj=node,
@@ -1482,8 +1416,7 @@ class TestCreateVMHostForDeployment(MAASServerTestCase):
         secret_manager.set_composite_secret(
             "deploy-metadata",
             {
-                "lxd-certificate": cert.certificate_pem()
-                + cert.private_key_pem(),
+                "lxd-certificate": cert.certificate_pem() + cert.private_key_pem(),
                 "virsh-password": "xyz123",
             },
             obj=node,
@@ -1520,8 +1453,7 @@ class TestCreateVMHostForDeployment(MAASServerTestCase):
         secret_manager.set_composite_secret(
             "deploy-metadata",
             {
-                "lxd-certificate": cert.certificate_pem()
-                + cert.private_key_pem(),
+                "lxd-certificate": cert.certificate_pem() + cert.private_key_pem(),
                 "virsh-password": "xyz123",
             },
             obj=node,

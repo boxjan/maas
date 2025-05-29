@@ -96,7 +96,5 @@ class TestGetDeepestSubparser(MAASTestCase):
         foo = top_parser.subparsers.add_parser("foo", help="foo help")
         bar = foo.subparsers.add_parser("bar", help="bar help")
 
-        assert (
-            get_deepest_subparser(top_parser, ["foo", "bar", "--help"]) is bar
-        )
+        assert get_deepest_subparser(top_parser, ["foo", "bar", "--help"]) is bar
         assert get_deepest_subparser(top_parser, ["--random"]) is top_parser

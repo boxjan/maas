@@ -121,12 +121,8 @@ class TestMAASStats(MAASServerTestCase):
         self.assertEqual(stats, compare)
 
     def test_get_vm_hosts_stats(self):
-        pod1 = self.make_pod(
-            cpu=10, mem=100, cpu_over_commit=2, mem_over_commit=3
-        )
-        pod2 = self.make_pod(
-            cpu=20, mem=200, cpu_over_commit=3, mem_over_commit=2
-        )
+        pod1 = self.make_pod(cpu=10, mem=100, cpu_over_commit=2, mem_over_commit=3)
+        pod2 = self.make_pod(cpu=20, mem=200, cpu_over_commit=3, mem_over_commit=2)
 
         total_cores = pod1.cores + pod2.cores
         total_memory = pod1.memory + pod2.memory
@@ -175,14 +171,10 @@ class TestMAASStats(MAASServerTestCase):
 
     def test_get_vm_hosts_stats_machine_usage(self):
         lxd_vm_host = self.make_pod(cpu=10, mem=100, pod_type="lxd")
-        lxd_machine = factory.make_Machine(
-            bmc=lxd_vm_host, cpu_count=1, memory=10
-        )
+        lxd_machine = factory.make_Machine(bmc=lxd_vm_host, cpu_count=1, memory=10)
         factory.make_VirtualMachine(bmc=lxd_vm_host, machine=lxd_machine)
         virsh_vm_host = self.make_pod(cpu=20, mem=200, pod_type="virsh")
-        virsh_machine = factory.make_Machine(
-            bmc=virsh_vm_host, cpu_count=2, memory=20
-        )
+        virsh_machine = factory.make_Machine(bmc=virsh_vm_host, cpu_count=2, memory=20)
         factory.make_VirtualMachine(bmc=virsh_vm_host, machine=virsh_machine)
 
         stats = get_vm_hosts_stats(power_type="lxd")
@@ -254,27 +246,19 @@ class TestMAASStats(MAASServerTestCase):
         self.assertEqual(3, stats["no_trust_password"])
 
     def test_get_lxd_initial_auth_stats_maas_generated_cert(self):
-        factory.make_Pod(
-            pod_type="virsh", created_with_maas_generated_cert=True
-        )
+        factory.make_Pod(pod_type="virsh", created_with_maas_generated_cert=True)
         factory.make_Pod(pod_type="lxd", created_with_maas_generated_cert=None)
         for _ in range(3):
-            factory.make_Pod(
-                pod_type="lxd", created_with_maas_generated_cert=False
-            )
+            factory.make_Pod(pod_type="lxd", created_with_maas_generated_cert=False)
         for _ in range(5):
-            factory.make_Pod(
-                pod_type="lxd", created_with_maas_generated_cert=True
-            )
+            factory.make_Pod(pod_type="lxd", created_with_maas_generated_cert=True)
         stats = get_lxd_initial_auth_stats()
         self.assertEqual(5, stats["maas_generated_cert"])
         self.assertEqual(3, stats["user_provided_cert"])
 
     def test_get_lxd_initial_auth_stats_cert_expiration(self):
         factory.make_Pod(pod_type="virsh", created_with_cert_expiration_days=1)
-        factory.make_Pod(
-            pod_type="lxd", created_with_cert_expiration_days=None
-        )
+        factory.make_Pod(pod_type="lxd", created_with_cert_expiration_days=None)
         expected = {
             "10 days": (3, (0, 10)),
             "1 month": (5, (10, 31)),
@@ -494,9 +478,7 @@ class TestMAASStats(MAASServerTestCase):
 
     def test_get_machine_stats_only_physical_storage(self):
         node = factory.make_Machine(with_boot_disk=False)
-        factory.make_FilesystemGroup(
-            node=node, group_type=FILESYSTEM_GROUP_TYPE.RAID_0
-        )
+        factory.make_FilesystemGroup(node=node, group_type=FILESYSTEM_GROUP_TYPE.RAID_0)
         machine_stats = get_machine_stats()
         self.assertEqual(
             machine_stats["total_storage"],
@@ -516,9 +498,7 @@ class TestMAASStats(MAASServerTestCase):
         machine3 = factory.make_Machine(status=NODE_STATUS.DEPLOYED)
         factory.make_Machine(status=NODE_STATUS.DEPLOYED)
 
-        OwnerData.objects.set_owner_data(
-            machine1, {"key1": "value1", "key2": "value2"}
-        )
+        OwnerData.objects.set_owner_data(machine1, {"key1": "value1", "key2": "value2"})
         OwnerData.objects.set_owner_data(machine2, {"key1": "value1"})
         OwnerData.objects.set_owner_data(machine3, {"key2": "value2"})
 
@@ -531,9 +511,7 @@ class TestMAASStats(MAASServerTestCase):
         machine3 = factory.make_Machine(status=NODE_STATUS.DEPLOYED)
         factory.make_Machine(status=NODE_STATUS.DEPLOYED)
 
-        OwnerData.objects.set_owner_data(
-            machine1, {"key1": "value1", "key2": "value2"}
-        )
+        OwnerData.objects.set_owner_data(machine1, {"key1": "value1", "key2": "value2"})
         OwnerData.objects.set_owner_data(machine2, {"key1": "value3"})
         OwnerData.objects.set_owner_data(machine3, {"key2": "value2"})
 
@@ -765,31 +743,17 @@ class TestMAASStats(MAASServerTestCase):
         self.assertEqual(cluster_stats["vm_hosts"], 3)
         self.assertEqual(cluster_stats["vms"], 6)
         self.assertEqual(cluster_stats["available_resources"]["cores"], 24)
-        self.assertEqual(
-            cluster_stats["available_resources"]["memory"], 12 * GiB
-        )
-        self.assertEqual(
-            cluster_stats["available_resources"]["over_cores"], 24
-        )
-        self.assertEqual(
-            cluster_stats["available_resources"]["over_memory"], 12 * GiB
-        )
+        self.assertEqual(cluster_stats["available_resources"]["memory"], 12 * GiB)
+        self.assertEqual(cluster_stats["available_resources"]["over_cores"], 24)
+        self.assertEqual(cluster_stats["available_resources"]["over_memory"], 12 * GiB)
         self.assertEqual(
             cluster_stats["available_resources"]["storage_local"], 300 * GB
         )
-        self.assertEqual(
-            cluster_stats["available_resources"]["storage_shared"], 0
-        )
+        self.assertEqual(cluster_stats["available_resources"]["storage_shared"], 0)
         self.assertEqual(cluster_stats["utilized_resources"]["cores"], 12)
-        self.assertEqual(
-            cluster_stats["utilized_resources"]["memory"], 3 * GiB
-        )
-        self.assertEqual(
-            cluster_stats["utilized_resources"]["storage_local"], 60 * GB
-        )
-        self.assertEqual(
-            cluster_stats["utilized_resources"]["storage_shared"], 0
-        )
+        self.assertEqual(cluster_stats["utilized_resources"]["memory"], 3 * GiB)
+        self.assertEqual(cluster_stats["utilized_resources"]["storage_local"], 60 * GB)
+        self.assertEqual(cluster_stats["utilized_resources"]["storage_shared"], 0)
 
     def test_get_storage_layouts_stats(self):
         counts = {
@@ -868,9 +832,7 @@ class TestMAASStats(MAASServerTestCase):
             factory.make_Tag(definition="", kernel_opts=factory.make_name())
 
         for _ in range(3):
-            factory.make_Tag(
-                definition="//node", kernel_opts=factory.make_name()
-            )
+            factory.make_Tag(definition="//node", kernel_opts=factory.make_name())
 
         self.assertEqual(
             {
@@ -936,9 +898,7 @@ class TestGetBrownfieldStats(MAASServerTestCase):
         mac_addresses = [factory.make_mac_address() for _ in range(3)]
         sync_user = factory.make_User()
         return pod.sync(
-            DiscoveredPod(
-                architectures=["amd64/generic"], mac_addresses=mac_addresses
-            ),
+            DiscoveredPod(architectures=["amd64/generic"], mac_addresses=mac_addresses),
             sync_user,
         )
 
@@ -1202,9 +1162,7 @@ class TestStatsService(MAASTestCase):
 
     def test_calls__maybe_make_stats_request(self):
         service = stats.StatsService()
-        self.assertEqual(
-            (service.maybe_make_stats_request, (), {}), service.call
-        )
+        self.assertEqual((service.maybe_make_stats_request, (), {}), service.call)
 
     def test_maybe_make_stats_request_does_not_error(self):
         service = stats.StatsService()
@@ -1225,9 +1183,7 @@ class TestStatsServiceAsync(MAASTransactionServerTestCase):
             Config.objects.set_config("enable_analytics", True)
 
         service = stats.StatsService()
-        maybe_make_stats_request = asynchronous(
-            service.maybe_make_stats_request
-        )
+        maybe_make_stats_request = asynchronous(service.maybe_make_stats_request)
         maybe_make_stats_request().wait(TIMEOUT)
 
         mock_call.assert_called_once()
@@ -1239,9 +1195,7 @@ class TestStatsServiceAsync(MAASTransactionServerTestCase):
             Config.objects.set_config("enable_analytics", False)
 
         service = stats.StatsService()
-        maybe_make_stats_request = asynchronous(
-            service.maybe_make_stats_request
-        )
+        maybe_make_stats_request = asynchronous(service.maybe_make_stats_request)
         maybe_make_stats_request().wait(TIMEOUT)
 
         mock_call.assert_not_called()

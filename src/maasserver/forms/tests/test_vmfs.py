@@ -55,15 +55,10 @@ class TestCreateVMFSForm(MAASServerTestCase):
         form = CreateVMFSForm(node, data=data)
         self.assertFalse(
             form.is_valid(),
-            "Should be invalid because of missing block_devices and "
-            "partitions.",
+            "Should be invalid because of missing block_devices and " "partitions.",
         )
         self.assertEqual(
-            {
-                "__all__": [
-                    "At least one valid block device or partition is required."
-                ]
-            },
+            {"__all__": ["At least one valid block device or partition is required."]},
             form._errors,
         )
 
@@ -77,8 +72,7 @@ class TestCreateVMFSForm(MAASServerTestCase):
         form = CreateVMFSForm(node, data=data)
         self.assertFalse(
             form.is_valid(),
-            "Should be invalid because of block device does not "
-            "belonging to node.",
+            "Should be invalid because of block device does not " "belonging to node.",
         )
         self.assertEqual(
             {
@@ -100,8 +94,7 @@ class TestCreateVMFSForm(MAASServerTestCase):
         form = CreateVMFSForm(node, data=data)
         self.assertFalse(
             form.is_valid(),
-            "Should be invalid because of partition does not "
-            "belonging to node.",
+            "Should be invalid because of partition does not " "belonging to node.",
         )
         self.assertEqual(
             {
@@ -126,9 +119,7 @@ class TestCreateVMFSForm(MAASServerTestCase):
 
     def test_creates_volume_group_with_block_devices(self):
         node = make_Node_with_VMFS_layout()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
         block_device_ids = [block_device.id for block_device in block_devices]
         data = {
             "name": factory.make_name("name"),
@@ -147,12 +138,8 @@ class TestCreateVMFSForm(MAASServerTestCase):
 
     def test_creates_with_block_devices_by_name(self):
         node = make_Node_with_VMFS_layout()
-        block_devices = [
-            factory.make_PhysicalBlockDevice(node=node) for _ in range(3)
-        ]
-        block_device_names = [
-            block_device.name for block_device in block_devices
-        ]
+        block_devices = [factory.make_PhysicalBlockDevice(node=node) for _ in range(3)]
+        block_device_names = [block_device.name for block_device in block_devices]
         data = {
             "name": factory.make_name("name"),
             "block_devices": block_device_names,
@@ -174,12 +161,9 @@ class TestCreateVMFSForm(MAASServerTestCase):
             node=node,
             size=(MIN_BLOCK_DEVICE_SIZE * 3) + PARTITION_TABLE_EXTRA_SPACE,
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = [
-            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE) for _ in range(2)
         ]
         partition_ids = [partition.id for partition in partitions]
         data = {"name": factory.make_name("name"), "partitions": partition_ids}
@@ -197,12 +181,9 @@ class TestCreateVMFSForm(MAASServerTestCase):
             node=node,
             size=(MIN_BLOCK_DEVICE_SIZE * 3) + PARTITION_TABLE_EXTRA_SPACE,
         )
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partitions = [
-            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE)
-            for _ in range(2)
+            partition_table.add_partition(size=MIN_BLOCK_DEVICE_SIZE) for _ in range(2)
         ]
         partition_names = [partition.name for partition in partitions]
         data = {
@@ -213,8 +194,7 @@ class TestCreateVMFSForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), form._errors)
         volume_group = form.save()
         partitions_in_vg = [
-            filesystem.partition
-            for filesystem in volume_group.filesystems.all()
+            filesystem.partition for filesystem in volume_group.filesystems.all()
         ]
         self.assertCountEqual(partitions, partitions_in_vg)
 
@@ -258,9 +238,7 @@ class TestUpdateVMFSForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), form._errors)
         vmfs = form.save()
         part = block_device.get_partitiontable().partitions.first()
-        self.assertEqual(
-            vmfs.id, part.get_effective_filesystem().filesystem_group_id
-        )
+        self.assertEqual(vmfs.id, part.get_effective_filesystem().filesystem_group_id)
 
     def test_adds_block_device_by_name(self):
         node = make_Node_with_VMFS_layout()
@@ -271,17 +249,13 @@ class TestUpdateVMFSForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), form._errors)
         vmfs = form.save()
         part = block_device.get_partitiontable().partitions.first()
-        self.assertEqual(
-            vmfs.id, part.get_effective_filesystem().filesystem_group_id
-        )
+        self.assertEqual(vmfs.id, part.get_effective_filesystem().filesystem_group_id)
 
     def test_adds_partition(self):
         node = make_Node_with_VMFS_layout()
         vmfs = factory.make_VMFS(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         data = {"add_partitions": [partition.id]}
         form = UpdateVMFSForm(vmfs, data=data)
@@ -295,9 +269,7 @@ class TestUpdateVMFSForm(MAASServerTestCase):
         node = make_Node_with_VMFS_layout()
         vmfs = factory.make_VMFS(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         data = {"add_partitions": [partition.name]}
         form = UpdateVMFSForm(vmfs, data=data)
@@ -311,9 +283,7 @@ class TestUpdateVMFSForm(MAASServerTestCase):
         node = make_Node_with_VMFS_layout()
         vmfs = factory.make_VMFS(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         factory.make_Filesystem(
             fstype=FILESYSTEM_TYPE.LVM_PV,
@@ -330,9 +300,7 @@ class TestUpdateVMFSForm(MAASServerTestCase):
         node = make_Node_with_VMFS_layout()
         vmfs = factory.make_VMFS(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         factory.make_Filesystem(
             fstype=FILESYSTEM_TYPE.LVM_PV,

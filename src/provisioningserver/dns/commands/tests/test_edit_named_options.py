@@ -108,9 +108,7 @@ class TestGetNamedConfCommand(MAASTestCase):
 
     def test_exits_when_file_has_no_options_block(self):
         content = factory.make_string()
-        self.assertContentFailsWithMessage(
-            content, "Can't find options {} block"
-        )
+        self.assertContentFailsWithMessage(content, "Can't find options {} block")
 
     def test_exits_when_cant_parse_config(self):
         content = "options { forwarders {1.1.1.1} "
@@ -119,9 +117,7 @@ class TestGetNamedConfCommand(MAASTestCase):
 
     def test_exits_when_fails_to_make_backup(self):
         self.patch(shutil, "copyfile").side_effect = IOError("whatever")
-        self.assertContentFailsWithMessage(
-            OPTIONS_FILE, "Failed to make a backup"
-        )
+        self.assertContentFailsWithMessage(OPTIONS_FILE, "Failed to make a backup")
 
     def test_removes_existing_forwarders_config(self):
         options_file = self.make_file(contents=OPTIONS_FILE_WITH_FORWARDERS)
@@ -152,9 +148,7 @@ class TestGetNamedConfCommand(MAASTestCase):
 
         # Check that the file was re-written with the include statement.
         options = read_isc_file(options_file)
-        self.assertIn(
-            'include "%s";' % expected_path, make_isc_string(options)
-        )
+        self.assertIn('include "%s";' % expected_path, make_isc_string(options))
 
         # Check that the backup was made.
         options_file_base = os.path.dirname(options_file)

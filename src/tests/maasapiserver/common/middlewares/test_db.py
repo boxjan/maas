@@ -33,9 +33,7 @@ def query_count_app(
 async def query_count_client(
     query_count_app: FastAPI,
 ) -> AsyncIterator[AsyncClient]:
-    async with AsyncClient(
-        app=query_count_app, base_url="http://test"
-    ) as client:
+    async with AsyncClient(app=query_count_app, base_url="http://test") as client:
         yield client
 
 

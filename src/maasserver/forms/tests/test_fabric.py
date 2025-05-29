@@ -49,7 +49,5 @@ class TestFabricForm(MAASServerTestCase):
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
         self.assertEqual(new_name, reload_object(fabric).name)
-        self.assertEqual(
-            new_fabric_description, reload_object(fabric).description
-        )
+        self.assertEqual(new_fabric_description, reload_object(fabric).description)
         self.assertEqual(new_class_type, reload_object(fabric).class_type)

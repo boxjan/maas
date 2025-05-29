@@ -207,9 +207,7 @@ class WebApplicationService(StreamServerEndpointService):
         )
         underlay_root = Resource()
         underlay_root.putChild(b"MAAS", underlay_maas)
-        underlay_site = Site(
-            underlay_root, logFormatter=reducedWebLogFormatter
-        )
+        underlay_site = Site(underlay_root, logFormatter=reducedWebLogFormatter)
         underlay_site.requestFactory = CleanPathRequest
 
         # Setup the main resource as the twisted handler and the underlay
@@ -228,8 +226,8 @@ class WebApplicationService(StreamServerEndpointService):
         """Make the endpoint for the webapp."""
 
         worker_id = os.getenv("MAAS_REGIOND_WORKER_ID", "")
-        worker_socket_path = (
-            RegionHTTPService.build_unix_socket_path_for_worker(worker_id)
+        worker_socket_path = RegionHTTPService.build_unix_socket_path_for_worker(
+            worker_id
         )
 
         s = socket.socket(socket.AF_UNIX, socket.SOCK_STREAM)

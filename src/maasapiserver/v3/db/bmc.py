@@ -16,9 +16,7 @@ class BmcRepository(BaseRepository[Bmc, BmcRequest]):
     async def find_by_id(self, id: int) -> Bmc | None:
         raise Exception("Not implemented yet.")
 
-    async def list(
-        self, pagination_params: PaginationParams
-    ) -> ListResult[Bmc]:
+    async def list(self, pagination_params: PaginationParams) -> ListResult[Bmc]:
         raise Exception("Not implemented yet.")
 
     async def update(self, id: int, request: BmcRequest) -> Bmc:

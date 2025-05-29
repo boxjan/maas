@@ -105,9 +105,7 @@ class Migration(migrations.Migration):
                         ),
                         (
                             "timeout",
-                            models.DurationField(
-                                default=datetime.timedelta(0)
-                            ),
+                            models.DurationField(default=datetime.timedelta(0)),
                         ),
                         ("destructive", models.BooleanField(default=False)),
                         ("default", models.BooleanField(default=False)),
@@ -257,9 +255,7 @@ class Migration(migrations.Migration):
                         ),
                         (
                             "script_name",
-                            models.CharField(
-                                editable=False, max_length=255, null=True
-                            ),
+                            models.CharField(editable=False, max_length=255, null=True),
                         ),
                         (
                             "output",
@@ -287,15 +283,11 @@ class Migration(migrations.Migration):
                         ),
                         (
                             "started",
-                            models.DateTimeField(
-                                blank=True, editable=False, null=True
-                            ),
+                            models.DateTimeField(blank=True, editable=False, null=True),
                         ),
                         (
                             "ended",
-                            models.DateTimeField(
-                                blank=True, editable=False, null=True
-                            ),
+                            models.DateTimeField(blank=True, editable=False, null=True),
                         ),
                         ("suppressed", models.BooleanField(default=False)),
                         (

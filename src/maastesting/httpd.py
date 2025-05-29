@@ -46,8 +46,7 @@ class SilentHTTPRequestHandler(SimpleHTTPRequestHandler):
             # We'll allow it to be set, but just ignore it.
             #   http://www.w3.org/Protocols/rfc2616/rfc2616-sec14.html
             accepted.update(
-                encoding.strip().split(";", 1)[0]
-                for encoding in header.split(",")
+                encoding.strip().split(";", 1)[0] for encoding in header.split(",")
             )
         return "gzip" in accepted
 
@@ -144,9 +143,7 @@ class HTTPServerFixture(Fixture):
 
     def __init__(self, host="localhost", port=0):
         super().__init__()
-        self.server = ThreadingHTTPServer(
-            (host, port), SilentHTTPRequestHandler
-        )
+        self.server = ThreadingHTTPServer((host, port), SilentHTTPRequestHandler)
 
     @property
     def url(self):

@@ -11,9 +11,7 @@ import warnings
 def find_settings(whence):
     """Return settings from `whence`, which is assumed to be a module."""
     return {
-        name: value
-        for name, value in vars(whence).items()
-        if not name.startswith("_")
+        name: value for name, value in vars(whence).items() if not name.startswith("_")
     }
 
 
@@ -32,11 +30,7 @@ def fix_up_databases(databases):
     # Remove keys with null values from databases.
     databases.update(
         {
-            alias: {
-                key: value
-                for key, value in database.items()
-                if value is not None
-            }
+            alias: {key: value for key, value in database.items() if value is not None}
             for alias, database in databases.items()
         }
     )

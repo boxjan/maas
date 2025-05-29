@@ -122,9 +122,7 @@ class TestExtractArchiveTar(MAASTestCase):
         return sha256.hexdigest(), size
 
     def make_tar_xz(self, path):
-        tar_xz_path = os.path.join(
-            path, factory.make_name("archive") + ".tar.xz"
-        )
+        tar_xz_path = os.path.join(path, factory.make_name("archive") + ".tar.xz")
         files = {}
         with tarfile.open(tar_xz_path, "w:xz") as tar:
             with tempdir() as tmp:
@@ -221,16 +219,10 @@ class TestRepoWriter(MAASTestCase):
         subarch = factory.make_name("subarch")
         product = self.make_product(ftype="archive.tar.xz", subarch=subarch)
         product_mapping.add(product, subarch)
-        repo_writer = download_resources.RepoWriter(
-            None, None, product_mapping
-        )
-        self.patch(
-            download_resources, "products_exdata"
-        ).return_value = product
+        repo_writer = download_resources.RepoWriter(None, None, product_mapping)
+        self.patch(download_resources, "products_exdata").return_value = product
         # Prevent MAAS from trying to actually write the file.
-        mock_extract_archive_tar = self.patch(
-            download_resources, "extract_archive_tar"
-        )
+        mock_extract_archive_tar = self.patch(download_resources, "extract_archive_tar")
         mock_link_resources = self.patch(download_resources, "link_resources")
         # We only need to provide the product as the other fields are only used
         # when writing the actual files to disk.
@@ -262,12 +254,8 @@ class TestRepoWriter(MAASTestCase):
         subarch = factory.make_name("subarch")
         product = self.make_product(subarch=subarch)
         product_mapping.add(product, subarch)
-        repo_writer = download_resources.RepoWriter(
-            None, None, product_mapping
-        )
-        self.patch(
-            download_resources, "products_exdata"
-        ).return_value = product
+        repo_writer = download_resources.RepoWriter(None, None, product_mapping)
+        self.patch(download_resources, "products_exdata").return_value = product
         # Prevent MAAS from trying to actually write the file.
         mock_insert_file = self.patch(download_resources, "insert_file")
         mock_link_resources = self.patch(download_resources, "link_resources")
@@ -300,12 +288,8 @@ class TestRepoWriter(MAASTestCase):
         product_mapping = ProductMapping()
         product = self.make_product(subarch="hwe-16.04", rolling=True)
         product_mapping.add(product, "hwe-16.04")
-        repo_writer = download_resources.RepoWriter(
-            None, None, product_mapping
-        )
-        self.patch(
-            download_resources, "products_exdata"
-        ).return_value = product
+        repo_writer = download_resources.RepoWriter(None, None, product_mapping)
+        self.patch(download_resources, "products_exdata").return_value = product
         # Prevent MAAS from trying to actually write the file.
         mock_insert_file = self.patch(download_resources, "insert_file")
         mock_link_resources = self.patch(download_resources, "link_resources")
@@ -356,12 +340,8 @@ class TestRepoWriter(MAASTestCase):
                 subarch=subarch,
             )
             product_mapping.add(product, subarch)
-        repo_writer = download_resources.RepoWriter(
-            None, None, product_mapping
-        )
-        self.patch(
-            download_resources, "products_exdata"
-        ).return_value = product
+        repo_writer = download_resources.RepoWriter(None, None, product_mapping)
+        self.patch(download_resources, "products_exdata").return_value = product
         # Prevent MAAS from trying to actually write the file.
         mock_insert_file = self.patch(download_resources, "insert_file")
         mock_link_resources = self.patch(download_resources, "link_resources")
@@ -394,12 +374,8 @@ class TestRepoWriter(MAASTestCase):
         product_mapping = ProductMapping()
         product = self.make_product(subarch="ga-16.04", kflavor="generic")
         product_mapping.add(product, "ga-16.04")
-        repo_writer = download_resources.RepoWriter(
-            None, None, product_mapping
-        )
-        self.patch(
-            download_resources, "products_exdata"
-        ).return_value = product
+        repo_writer = download_resources.RepoWriter(None, None, product_mapping)
+        self.patch(download_resources, "products_exdata").return_value = product
         # Prevent MAAS from trying to actually write the file.
         mock_insert_file = self.patch(download_resources, "insert_file")
         mock_link_resources = self.patch(download_resources, "link_resources")
@@ -433,12 +409,8 @@ class TestRepoWriter(MAASTestCase):
         product_mapping = ProductMapping()
         product = self.make_product(subarch="hwe-16.04", kflavor="generic")
         product_mapping.add(product, "hwe-16.04")
-        repo_writer = download_resources.RepoWriter(
-            None, None, product_mapping
-        )
-        self.patch(
-            download_resources, "products_exdata"
-        ).return_value = product
+        repo_writer = download_resources.RepoWriter(None, None, product_mapping)
+        self.patch(download_resources, "products_exdata").return_value = product
         # Prevent MAAS from trying to actually write the file.
         mock_insert_file = self.patch(download_resources, "insert_file")
         mock_link_resources = self.patch(download_resources, "link_resources")
@@ -474,12 +446,8 @@ class TestRepoWriter(MAASTestCase):
             subarch="hwe-p", kflavor="generic", release="precise"
         )
         product_mapping.add(product, "hwe-p")
-        repo_writer = download_resources.RepoWriter(
-            None, None, product_mapping
-        )
-        self.patch(
-            download_resources, "products_exdata"
-        ).return_value = product
+        repo_writer = download_resources.RepoWriter(None, None, product_mapping)
+        self.patch(download_resources, "products_exdata").return_value = product
         # Prevent MAAS from trying to actually write the file.
         mock_insert_file = self.patch(download_resources, "insert_file")
         mock_link_resources = self.patch(download_resources, "link_resources")

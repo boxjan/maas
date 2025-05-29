@@ -38,9 +38,9 @@ class MDNSManager(Manager):
         # Check if this hostname was previously assigned to another IP address.
         deleted = False
         incoming_ip_version = IPAddress(ip).version
-        previous_bindings = self.filter(
-            hostname=hostname, interface=interface
-        ).exclude(ip=ip)
+        previous_bindings = self.filter(hostname=hostname, interface=interface).exclude(
+            ip=ip
+        )
         # Check if this hostname was previously assigned to a different IP.
         for binding in previous_bindings:
             if incoming_ip_version != IPAddress(binding.ip).version:

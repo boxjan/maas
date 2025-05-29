@@ -292,9 +292,7 @@ class TestValidateUserExternalAuthWithRBAC(MAASServerTestCase):
         )
         self.user.userprofile.auth_last_check = self.default_last_check
         self.user.userprofile.save()
-        self.auth_info = ExternalAuthInfo(
-            type="rbac", url="http://example.com"
-        )
+        self.auth_info = ExternalAuthInfo(type="rbac", url="http://example.com")
 
     def test_interval_not_expired(self):
         last_check = self.now - timedelta(minutes=10)
@@ -499,9 +497,7 @@ class MacaroonBakeryMockMixin:
         return mock_bakery
 
 
-class TestMacaroonAPIAuthentication(
-    MAASServerTestCase, MacaroonBakeryMockMixin
-):
+class TestMacaroonAPIAuthentication(MAASServerTestCase, MacaroonBakeryMockMixin):
     def setUp(self):
         super().setUp()
         SecretManager().set_composite_secret(
@@ -654,9 +650,7 @@ class TestMacaroonAuthorizationBackend(MAASServerTestCase):
         self.assertTrue(authenticated_user.is_active)
 
     def test_authenticate_no_identity(self):
-        self.assertIsNone(
-            self.backend.authenticate(self.get_request(), identity=None)
-        )
+        self.assertIsNone(self.backend.authenticate(self.get_request(), identity=None))
 
     def test_authenticate_external_auth_not_enabled(self):
         SecretManager().delete_secret("external-auth")
@@ -773,9 +767,7 @@ class TestKeyStore(MAASServerTestCase):
         factory.make_RootKey(expiration=self.now - timedelta(days=2))
         _, key_id = self.store.root_key()
         # expired keys have been removed
-        self.assertCountEqual(
-            [(int(key_id),)], RootKey.objects.values_list("id")
-        )
+        self.assertCountEqual([(int(key_id),)], RootKey.objects.values_list("id"))
 
     def test_get(self):
         material, key_id = self.store.root_key()
@@ -802,9 +794,7 @@ class TestKeyStore(MAASServerTestCase):
         self.assertIsNone(self.store.get(key_id))
 
 
-class TestMacaroonDischargeRequest(
-    MAASServerTestCase, MacaroonBakeryMockMixin
-):
+class TestMacaroonDischargeRequest(MAASServerTestCase, MacaroonBakeryMockMixin):
     def setUp(self):
         super().setUp()
         SecretManager().set_composite_secret(
@@ -835,17 +825,13 @@ class TestMacaroonDischargeRequest(
         self.assertEqual(third_party_urls, ["https://auth.example.com"])
 
     def test_discharge_request_validation_failed(self):
-        mock_bakery = self.mock_auth_info(
-            exception=VerificationError("expired!")
-        )
+        mock_bakery = self.mock_auth_info(exception=VerificationError("expired!"))
         mock_auth_request = self.patch(
             maasserver.macaroon_auth, "_authorization_request"
         )
         response = HttpResponse()  # to check that the same object is returned
         mock_auth_request.return_value = response
-        self.assertIs(
-            self.client.get("/accounts/discharge-request/"), response
-        )
+        self.assertIs(self.client.get("/accounts/discharge-request/"), response)
         mock_auth_request.assert_called_with(
             mock_bakery,
             auth_endpoint="https://auth.example.com",
@@ -908,9 +894,7 @@ class TestMacaroonDischargeRequest(
 
 class TestGetAuthenticationCaveat(TestCase):
     def test_caveat(self):
-        caveat = _get_authentication_caveat(
-            "https://example.com", domain="mydomain"
-        )
+        caveat = _get_authentication_caveat("https://example.com", domain="mydomain")
         self.assertEqual(caveat.location, "https://example.com")
         self.assertEqual(caveat.condition, "is-authenticated-user @mydomain")
 
@@ -939,9 +923,7 @@ class TestGetBakeryClient(MAASTestCase):
         [interaction_method] = client._interaction_methods
         self.assertIsInstance(interaction_method, WebBrowserInteractor)
         # use a custom method to interact with the form
-        self.assertIsNot(
-            interaction_method._open_web_browser, visit_page_with_browser
-        )
+        self.assertIsNot(interaction_method._open_web_browser, visit_page_with_browser)
 
     def test_with_credentials_invalid_format(self):
         self.patch(os, "environ", {"MAAS_CANDID_CREDENTIALS": "foobar"})
@@ -949,18 +931,14 @@ class TestGetBakeryClient(MAASTestCase):
         [interaction_method] = client._interaction_methods
         self.assertIsInstance(interaction_method, WebBrowserInteractor)
         # Use the in-browser interaction
-        self.assertIs(
-            interaction_method._open_web_browser, visit_page_with_browser
-        )
+        self.assertIs(interaction_method._open_web_browser, visit_page_with_browser)
 
     def test_default(self):
         client = _get_bakery_client()
         [interaction_method] = client._interaction_methods
         self.assertIsInstance(interaction_method, WebBrowserInteractor)
         # Use the in-browser interaction
-        self.assertIs(
-            interaction_method._open_web_browser, visit_page_with_browser
-        )
+        self.assertIs(interaction_method._open_web_browser, visit_page_with_browser)
 
 
 class TestCandidLogin(MAASTestCase):
@@ -977,9 +955,7 @@ class TestCandidLogin(MAASTestCase):
             headers={"Content-Type": "text/html"},
             url="http://example.com/newurl",
         )
-        self.patch(
-            maasserver.macaroon_auth.requests, "Session", lambda: mock_session
-        )
+        self.patch(maasserver.macaroon_auth.requests, "Session", lambda: mock_session)
         login = _candid_login("user:password")
         login("http://example.com/someurl")
         mock_session.get.assert_called_once_with(
@@ -1002,9 +978,7 @@ class TestCandidLogin(MAASTestCase):
         }
         mock_session = mock.Mock()
         mock_session.get.return_value = mock_response
-        self.patch(
-            maasserver.macaroon_auth.requests, "Session", lambda: mock_session
-        )
+        self.patch(maasserver.macaroon_auth.requests, "Session", lambda: mock_session)
         login = _candid_login("user:password")
         login("http://example.com/someurl")
         mock_session.get.assert_called_once_with(
@@ -1030,8 +1004,6 @@ class TestCandidLogin(MAASTestCase):
         }
         mock_session = mock.Mock()
         mock_session.get.return_value = mock_response
-        self.patch(
-            maasserver.macaroon_auth.requests, "Session", lambda: mock_session
-        )
+        self.patch(maasserver.macaroon_auth.requests, "Session", lambda: mock_session)
         login = _candid_login("user:password")
         self.assertRaises(RuntimeError, login, "http://example.com/someurl")

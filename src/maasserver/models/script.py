@@ -54,9 +54,7 @@ def translate_script_type(script_type):
     elif script_type == "release":
         return SCRIPT_TYPE.RELEASE
     else:
-        raise ValidationError(
-            "Script type must be commissioning, testing or release"
-        )
+        raise ValidationError("Script type must be commissioning, testing or release")
 
 
 def translate_hardware_type(hardware_type):
@@ -107,9 +105,7 @@ def translate_script_parallel(parallel):
     elif parallel in ["any", "enabled"]:
         return SCRIPT_PARALLEL.ANY
     else:
-        raise ValidationError(
-            "Script parallel must be disabled, instance, or any."
-        )
+        raise ValidationError("Script parallel must be disabled, instance, or any.")
 
 
 class ScriptManager(Manager):
@@ -122,9 +118,7 @@ class ScriptManager(Manager):
         automatically created.
         """
         if script is not None and not isinstance(script, VersionedTextFile):
-            script = VersionedTextFile.objects.create(
-                data=script, comment=comment
-            )
+            script = VersionedTextFile.objects.create(data=script, comment=comment)
 
         if timeout is not None:
             if isinstance(timeout, datetime.timedelta):
@@ -146,9 +140,7 @@ class Script(CleanSave, TimestampedModel):
 
     tags = ArrayField(TextField(), blank=True, null=True, default=list)
 
-    script_type = IntegerField(
-        choices=SCRIPT_TYPE_CHOICES, default=SCRIPT_TYPE.TESTING
-    )
+    script_type = IntegerField(choices=SCRIPT_TYPE_CHOICES, default=SCRIPT_TYPE.TESTING)
 
     # The hardware the script configures or tests.
     hardware_type = IntegerField(
@@ -182,9 +174,7 @@ class Script(CleanSave, TimestampedModel):
     # A list of hardware identifiers(modalias, PCI id, USB id, or name) this
     # script is applicable to. This script will always run on machines with
     # matching hardware.
-    for_hardware = ArrayField(
-        CharField(max_length=255), blank=True, default=list
-    )
+    for_hardware = ArrayField(CharField(max_length=255), blank=True, default=list)
 
     # Whether or not the script may reboot while running. Tells the status
     # monitor to wait until NODE_FAILURE_MONITORED_STATUS_TIMEOUTS before

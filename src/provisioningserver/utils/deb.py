@@ -95,9 +95,7 @@ def get_deb_versions_info(apt_pkg=None) -> Optional[DebVersionsInfo]:
     return DebVersionsInfo(current=current, update=update)
 
 
-def _get_deb_current_and_update(
-    cache, depcache, sources, policy, package_name
-):
+def _get_deb_current_and_update(cache, depcache, sources, policy, package_name):
     try:
         package = cache[package_name]
     except KeyError:

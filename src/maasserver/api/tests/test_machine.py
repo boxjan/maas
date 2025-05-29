@@ -93,10 +93,7 @@ class TestMachinesAPILoggedIn(APITestCase.ForUserAndAdmin):
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(
             [machine.system_id],
-            [
-                parsed_machine.get("system_id")
-                for parsed_machine in parsed_result
-            ],
+            [parsed_machine.get("system_id") for parsed_machine in parsed_result],
         )
 
 
@@ -131,9 +128,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
         domain_name = Domain.objects.get_default_domain().name
-        self.assertEqual(
-            f"{machine.hostname}.{domain_name}", parsed_result["fqdn"]
-        )
+        self.assertEqual(f"{machine.hostname}.{domain_name}", parsed_result["fqdn"])
         self.assertEqual(machine.system_id, parsed_result["system_id"])
 
     def test_GET_returns_boot_interface_object(self):
@@ -144,9 +139,7 @@ class TestMachineAPI(APITestCase.ForUser):
 
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
-        self.assertEqual(
-            boot_interface.id, parsed_result["boot_interface"]["id"]
-        )
+        self.assertEqual(boot_interface.id, parsed_result["boot_interface"]["id"])
         self.assertEqual(
             str(boot_interface.mac_address),
             parsed_result["boot_interface"]["mac_address"],
@@ -185,9 +178,7 @@ class TestMachineAPI(APITestCase.ForUser):
         )
         response = self.client.get(self.get_machine_uri(machine))
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertEqual([lease.ip], parsed_result["ip_addresses"])
 
@@ -223,9 +214,7 @@ class TestMachineAPI(APITestCase.ForUser):
                 "id": pool.id,
                 "name": pool.name,
                 "description": pool.description,
-                "resource_uri": reverse(
-                    "resourcepool_handler", args=[pool.id]
-                ),
+                "resource_uri": reverse("resourcepool_handler", args=[pool.id]),
             },
         )
 
@@ -248,13 +237,9 @@ class TestMachineAPI(APITestCase.ForUser):
         response = self.client.get(self.get_machine_uri(machine))
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
-        self.assertEqual(
-            machine.last_sync.isoformat()[:-3], parsed_result["last_sync"]
-        )
+        self.assertEqual(machine.last_sync.isoformat()[:-3], parsed_result["last_sync"])
         self.assertEqual(machine.sync_interval, parsed_result["sync_interval"])
-        self.assertEqual(
-            machine.next_sync.isoformat()[:-3], parsed_result["next_sync"]
-        )
+        self.assertEqual(machine.next_sync.isoformat()[:-3], parsed_result["next_sync"])
 
     def test_GET_refuses_to_access_nonexistent_machine(self):
         # When fetching a Machine, the api returns a 'Not Found' (404) error
@@ -283,9 +268,7 @@ class TestMachineAPI(APITestCase.ForUser):
         )
 
     def test_GET_returns_owner_name_when_allocated_to_self(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, owner=self.user
-        )
+        machine = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         response = self.client.get(self.get_machine_uri(machine))
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
@@ -315,19 +298,14 @@ class TestMachineAPI(APITestCase.ForUser):
 
     def test_GET_returns_physical_block_devices(self):
         machine = factory.make_Node(with_boot_disk=False)
-        devices = [
-            factory.make_PhysicalBlockDevice(node=machine) for _ in range(3)
-        ]
+        devices = [factory.make_PhysicalBlockDevice(node=machine) for _ in range(3)]
         response = self.client.get(self.get_machine_uri(machine))
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
         parsed_devices = [
-            device["name"]
-            for device in parsed_result["physicalblockdevice_set"]
+            device["name"] for device in parsed_result["physicalblockdevice_set"]
         ]
-        self.assertCountEqual(
-            [device.name for device in devices], parsed_devices
-        )
+        self.assertCountEqual([device.name for device in devices], parsed_devices)
 
     def test_GET_rejects_other_node_types(self):
         node = factory.make_Node_with_Interface_on_Subnet(
@@ -337,9 +315,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         response = self.client.get(self.get_machine_uri(node))
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_GET_returns_min_hwe_kernel_and_hwe_kernel(self):
         machine = factory.make_Node()
@@ -359,9 +335,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.assertEqual("hwe-v", parsed_result["min_hwe_kernel"])
 
     def test_GET_returns_ephemeral_deployment(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.READY, ephemeral_deploy=True
-        )
+        machine = factory.make_Node(status=NODE_STATUS.READY, ephemeral_deploy=True)
         response = self.client.get(self.get_machine_uri(machine))
 
         assert http.client.OK == response.status_code
@@ -388,9 +362,7 @@ class TestMachineAPI(APITestCase.ForUser):
             level=logging.INFO, description=type_description
         )
         # The first event won't be returned.
-        event = factory.make_Event(
-            type=event_type, description="Uninteresting event"
-        )
+        event = factory.make_Event(type=event_type, description="Uninteresting event")
         machine = event.node
         # The second (and last) event will be returned.
         message = "Interesting event"
@@ -419,9 +391,7 @@ class TestMachineAPI(APITestCase.ForUser):
 
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
-        self.assertEqual(
-            parent.system_id, parsed_result["parent"]["system_id"]
-        )
+        self.assertEqual(parent.system_id, parsed_result["parent"]["system_id"])
         self.assertEqual(
             reverse("machine_handler", args=[parent.system_id]),
             parsed_result["parent"]["resource_uri"],
@@ -553,12 +523,8 @@ class TestMachineAPI(APITestCase.ForUser):
         )
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "deploy"}
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
+        response = self.client.post(self.get_machine_uri(machine), {"op": "deploy"})
         response_info = json_load_bytes(response.content)
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(response_info["osystem"], osystem)
@@ -569,9 +535,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.patch(machines_module, "get_curtin_merged_config")
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -581,9 +545,7 @@ class TestMachineAPI(APITestCase.ForUser):
             osystem=osystem,
             architecture=make_usable_architecture(self),
         )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "deploy"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "deploy"})
         response_info = json_load_bytes(response.content)
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(response_info["osystem"], osystem)
@@ -593,9 +555,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.become_admin()
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -622,9 +582,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.patch(machines_module, "get_curtin_merged_config")
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -635,9 +593,7 @@ class TestMachineAPI(APITestCase.ForUser):
             architecture=make_usable_architecture(self),
             with_boot_disk=False,
         )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "deploy"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "deploy"})
         response_info = json_load_bytes(response.content)
         assert http.client.OK == response.status_code
         assert response_info["ephemeral_deploy"] is True
@@ -646,9 +602,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.become_admin()
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -672,9 +626,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.become_admin()
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -704,9 +656,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.become_admin()
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -755,9 +705,7 @@ class TestMachineAPI(APITestCase.ForUser):
         mock_get_curtin_merged_config.side_effect = Exception("error")
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -767,9 +715,7 @@ class TestMachineAPI(APITestCase.ForUser):
             osystem=osystem,
             architecture=make_usable_architecture(self),
         )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "deploy"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "deploy"})
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
         self.assertEqual(b"Failed to render preseed: error", response.content)
 
@@ -784,9 +730,7 @@ class TestMachineAPI(APITestCase.ForUser):
         )
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         bad_hwe_kernel = "hwe-" + chr(ord(distro_series[0]) - 1)
         response = self.client.post(
             self.get_machine_uri(machine),
@@ -845,9 +789,10 @@ class TestMachineAPI(APITestCase.ForUser):
         self.patch(node_module.Node, "_start_deployment")
         self.patch(node_module.Node, "_claim_auto_ips")
         self.patch(machines_module, "get_curtin_merged_config")
-        self.patch(
-            node_module, "get_maas_facing_server_addresses"
-        ).return_value = [IPAddress("127.0.0.1"), IPAddress("::1")]
+        self.patch(node_module, "get_maas_facing_server_addresses").return_value = [
+            IPAddress("127.0.0.1"),
+            IPAddress("::1"),
+        ]
         machine = factory.make_Node_with_Interface_on_Subnet(
             owner=self.user,
             interface=True,
@@ -875,8 +820,7 @@ class TestMachineAPI(APITestCase.ForUser):
         _, releases = make_usable_osystem(self)
         distro_series = releases[0]
         user_data = b64encode(
-            b"\xff\x00\xff\xfe\xff\xff\xfe"
-            + factory.make_string().encode("ascii")
+            b"\xff\x00\xff\xfe\xff\xff\xfe" + factory.make_string().encode("ascii")
         )
         response = self.client.post(
             self.get_machine_uri(machine),
@@ -887,9 +831,7 @@ class TestMachineAPI(APITestCase.ForUser):
             },
         )
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            user_data, NodeUserData.objects.get_user_data(machine)
-        )
+        self.assertEqual(user_data, NodeUserData.objects.get_user_data(machine))
 
     def test_POST_deploy_stores_user_data_plain_text(self):
         rack_controller = factory.make_RackController()
@@ -900,9 +842,10 @@ class TestMachineAPI(APITestCase.ForUser):
         self.patch(node_module.Node, "_start_deployment")
         self.patch(node_module.Node, "_claim_auto_ips")
         self.patch(machines_module, "get_curtin_merged_config")
-        self.patch(
-            node_module, "get_maas_facing_server_addresses"
-        ).return_value = [IPAddress("127.0.0.1"), IPAddress("::1")]
+        self.patch(node_module, "get_maas_facing_server_addresses").return_value = [
+            IPAddress("127.0.0.1"),
+            IPAddress("::1"),
+        ]
         machine = factory.make_Node_with_Interface_on_Subnet(
             owner=self.user,
             interface=True,
@@ -1028,9 +971,7 @@ class TestMachineAPI(APITestCase.ForUser):
             self.get_machine_uri(machine),
             {"op": "deploy", "distro_series": distro_series},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         response_content = json_load_bytes(response.content)
         self.assertEqual("virsh", response_content["power_type"])
 
@@ -1174,9 +1115,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         self.assertTrue(
-            machine.nodemetadata_set.filter(
-                key="vcenter_registration"
-            ).exists()
+            machine.nodemetadata_set.filter(key="vcenter_registration").exists()
         )
 
     def test_POST_deploy_stores_vcenter_registration_when_defined(self):
@@ -1208,9 +1147,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         self.assertTrue(
-            machine.nodemetadata_set.filter(
-                key="vcenter_registration"
-            ).exists()
+            machine.nodemetadata_set.filter(key="vcenter_registration").exists()
         )
 
     def test_POST_deploy_removes_vcenter_registration_when_false(self):
@@ -1224,9 +1161,7 @@ class TestMachineAPI(APITestCase.ForUser):
             status=NODE_STATUS.READY,
             architecture=make_usable_architecture(self),
         )
-        machine.nodemetadata_set.create(
-            key="vcenter_registration", value="True"
-        )
+        machine.nodemetadata_set.create(key="vcenter_registration", value="True")
         _, releases = make_usable_osystem(self, "esxi", ["6.7"])
         distro_series = releases[0]
         response = self.client.post(
@@ -1245,9 +1180,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         self.assertFalse(
-            machine.nodemetadata_set.filter(
-                key="vcenter_registration"
-            ).exists()
+            machine.nodemetadata_set.filter(key="vcenter_registration").exists()
         )
 
     def test_POST_deploy_sets_vcenter_registration_only_when_esxi(self):
@@ -1279,9 +1212,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         self.assertFalse(
-            machine.nodemetadata_set.filter(
-                key="vcenter_registration"
-            ).exists()
+            machine.nodemetadata_set.filter(key="vcenter_registration").exists()
         )
 
     def test_POST_deploy_sets_vcenter_registration_rbac_admin(self):
@@ -1319,9 +1250,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         self.assertTrue(
-            machine.nodemetadata_set.filter(
-                key="vcenter_registration"
-            ).exists()
+            machine.nodemetadata_set.filter(key="vcenter_registration").exists()
         )
 
     def test_POST_deploy_doesnt_set_vcenter_registration_rbac_user(self):
@@ -1358,9 +1287,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         self.assertFalse(
-            machine.nodemetadata_set.filter(
-                key="vcenter_registration"
-            ).exists()
+            machine.nodemetadata_set.filter(key="vcenter_registration").exists()
         )
 
     def test_POST_deploy_distro_series(self):
@@ -1432,9 +1359,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.patch(machines_module, "get_curtin_merged_config")
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -1453,9 +1378,7 @@ class TestMachineAPI(APITestCase.ForUser):
         response_info = json_load_bytes(response.content)
         self.assertTrue(response_info["ephemeral_deploy"])
 
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "deploy"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "deploy"})
         self.assertEqual(http.client.OK, response.status_code)
         response_info = json_load_bytes(response.content)
         self.assertFalse(response_info["ephemeral_deploy"])
@@ -1465,9 +1388,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.patch(machines_module, "get_curtin_merged_config")
         osystem = Config.objects.get_config("default_osystem")
         distro_series = Config.objects.get_config("default_distro_series")
-        make_usable_osystem(
-            self, osystem_name=osystem, releases=[distro_series]
-        )
+        make_usable_osystem(self, osystem_name=osystem, releases=[distro_series])
         machine = factory.make_Node(
             owner=self.user,
             interface=True,
@@ -1486,9 +1407,7 @@ class TestMachineAPI(APITestCase.ForUser):
         response_info = json_load_bytes(response.content)
         self.assertTrue(response_info["enable_hw_sync"])
 
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "deploy"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "deploy"})
         self.assertEqual(http.client.OK, response.status_code)
         response_info = json_load_bytes(response.content)
         self.assertFalse(response_info["enable_hw_sync"])
@@ -1498,13 +1417,9 @@ class TestMachineAPI(APITestCase.ForUser):
         self.patch(machines_module, "get_curtin_merged_config")
         osystem = Config.objects.get_config("default_osystem")
         _, releases = make_usable_osystem(self)
-        default_distro_series = Config.objects.get_config(
-            "default_distro_series"
-        )
+        default_distro_series = Config.objects.get_config("default_distro_series")
         distro_series = (
-            releases[0]
-            if releases[0] != default_distro_series
-            else releases[1]
+            releases[0] if releases[0] != default_distro_series else releases[1]
         )
 
         machine = factory.make_Node(
@@ -1525,9 +1440,7 @@ class TestMachineAPI(APITestCase.ForUser):
         response_info = json_load_bytes(response.content)
         self.assertEqual(response_info["distro_series"], distro_series)
 
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "deploy"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "deploy"})
         self.assertEqual(http.client.OK, response.status_code)
         response_info = json_load_bytes(response.content)
         self.assertEqual(response_info["distro_series"], default_distro_series)
@@ -1554,10 +1467,7 @@ class TestMachineAPI(APITestCase.ForUser):
         )
         self.assertCountEqual(
             [NODE_STATUS.RELEASING] * len(owned_machines),
-            [
-                machine.status
-                for machine in reload_objects(Node, owned_machines)
-            ],
+            [machine.status for machine in reload_objects(Node, owned_machines)],
         )
 
     def test_POST_release_fails_with_locked(self):
@@ -1568,15 +1478,11 @@ class TestMachineAPI(APITestCase.ForUser):
             power_type="virsh",
             power_state=POWER_STATE.ON,
         )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "release"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "release"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_POST_release_starts_disk_erasing(self):
-        self.patch(node_module.Node, "_start").return_value = defer.succeed(
-            None
-        )
+        self.patch(node_module.Node, "_start").return_value = defer.succeed(None)
         machine = factory.make_Node(
             owner=self.user,
             status=NODE_STATUS.DEPLOYED,
@@ -1587,9 +1493,7 @@ class TestMachineAPI(APITestCase.ForUser):
             self.get_machine_uri(machine), {"op": "release", "erase": "true"}
         )
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.DISK_ERASING, reload_object(machine).status
-        )
+        self.assertEqual(NODE_STATUS.DISK_ERASING, reload_object(machine).status)
 
     def test_POST_release_releases_failed_machine(self):
         self.patch(node_module.Machine, "_stop")
@@ -1602,20 +1506,14 @@ class TestMachineAPI(APITestCase.ForUser):
         response = self.client.post(
             self.get_machine_uri(owned_machine), {"op": "release"}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         owned_machine = Machine.objects.get(id=owned_machine.id)
         self.assertEqual(owned_machine.status, NODE_STATUS.RELEASING)
         self.assertEqual(owned_machine.owner, self.user)
 
     def test_POST_release_does_nothing_for_ready_machine(self):
-        machine = factory.make_Node_with_Interface_on_Subnet(
-            status=NODE_STATUS.READY
-        )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "release"}
-        )
+        machine = factory.make_Node_with_Interface_on_Subnet(status=NODE_STATUS.READY)
+        response = self.client.post(self.get_machine_uri(machine), {"op": "release"})
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(NODE_STATUS.READY, reload_object(machine).status)
 
@@ -1626,18 +1524,12 @@ class TestMachineAPI(APITestCase.ForUser):
                 NODE_TYPE_CHOICES, but_not=[NODE_TYPE.MACHINE]
             ),
         )
-        response = self.client.post(
-            self.get_machine_uri(node), {"op": "release"}
-        )
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        response = self.client.post(self.get_machine_uri(node), {"op": "release"})
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_POST_release_on_ready_is_noop(self):
         machine = factory.make_Node(status=NODE_STATUS.READY)
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "release"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "release"})
         self.assertEqual(http.client.OK, response.status_code)
 
     def test_POST_release_fails_for_other_machine_states(self):
@@ -1668,12 +1560,8 @@ class TestMachineAPI(APITestCase.ForUser):
         )
 
     def test_POST_release_in_wrong_state_reports_current_state(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.RETIRED, owner=self.user
-        )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "release"}
-        )
+        machine = factory.make_Node(status=NODE_STATUS.RETIRED, owner=self.user)
+        response = self.client.post(self.get_machine_uri(machine), {"op": "release"})
         self.assertEqual(
             (
                 http.client.CONFLICT,
@@ -1689,9 +1577,7 @@ class TestMachineAPI(APITestCase.ForUser):
         machine = factory.make_Node(
             status=NODE_STATUS.ALLOCATED, owner=factory.make_User()
         )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "release"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "release"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
         self.assertEqual(NODE_STATUS.ALLOCATED, reload_object(machine).status)
 
@@ -1704,12 +1590,8 @@ class TestMachineAPI(APITestCase.ForUser):
             power_state=POWER_STATE.ON,
         )
         self.become_admin()
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "release"}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "release"})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(NODE_STATUS.RELEASING, reload_object(machine).status)
 
     def test_POST_release_combines_with_allocate(self):
@@ -1720,15 +1602,11 @@ class TestMachineAPI(APITestCase.ForUser):
             power_state=POWER_STATE.ON,
             with_boot_disk=True,
         )
-        response = self.client.post(
-            reverse("machines_handler"), {"op": "allocate"}
-        )
+        response = self.client.post(reverse("machines_handler"), {"op": "allocate"})
         self.assertEqual(NODE_STATUS.ALLOCATED, reload_object(machine).status)
         machine_uri = json_load_bytes(response.content)["resource_uri"]
         response = self.client.post(machine_uri, {"op": "release"})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(NODE_STATUS.RELEASING, reload_object(machine).status)
 
     def test_POST_allocate_passes_comment(self):
@@ -1782,12 +1660,8 @@ class TestMachineAPI(APITestCase.ForUser):
             hwe_kernel="hwe-v",
         )
         self.assertEqual("hwe-v", reload_object(machine).hwe_kernel)
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "release"}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "release"})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(NODE_STATUS.RELEASING, reload_object(machine).status)
         self.assertIsNone(reload_object(machine).hwe_kernel)
 
@@ -1886,9 +1760,7 @@ class TestMachineAPI(APITestCase.ForUser):
         )
 
     def test_POST_commission_commissions_machine(self):
-        self.patch(node_module.Node, "_start").return_value = defer.succeed(
-            None
-        )
+        self.patch(node_module.Node, "_start").return_value = defer.succeed(None)
         machine = factory.make_Node(
             status=NODE_STATUS.READY,
             owner=factory.make_User(),
@@ -1896,22 +1768,14 @@ class TestMachineAPI(APITestCase.ForUser):
             interface=True,
         )
         self.become_admin()
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "commission"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "commission"})
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.COMMISSIONING, reload_object(machine).status
-        )
+        self.assertEqual(NODE_STATUS.COMMISSIONING, reload_object(machine).status)
 
     def test_POST_commission_commissions_machine_with_options(self):
         load_builtin_scripts()
-        factory.make_Script(
-            script_type=SCRIPT_TYPE.COMMISSIONING, tags=["bmc-config"]
-        )
-        self.patch(node_module.Node, "_start").return_value = defer.succeed(
-            None
-        )
+        factory.make_Script(script_type=SCRIPT_TYPE.COMMISSIONING, tags=["bmc-config"])
+        self.patch(node_module.Node, "_start").return_value = defer.succeed(None)
         machine = factory.make_Node(
             status=NODE_STATUS.READY,
             owner=factory.make_User(),
@@ -1927,16 +1791,13 @@ class TestMachineAPI(APITestCase.ForUser):
         commissioning_script_selected_by_tag = choice(commissioning_scripts)
         commissioning_script_selected_by_name = choice(commissioning_scripts)
         expected_commissioning_scripts = list(NODE_INFO_SCRIPTS)
-        expected_commissioning_scripts.append(
-            commissioning_script_selected_by_tag.name
-        )
+        expected_commissioning_scripts.append(commissioning_script_selected_by_tag.name)
         expected_commissioning_scripts.append(
             commissioning_script_selected_by_name.name
         )
 
         testing_scripts = [
-            factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
-            for _ in range(10)
+            factory.make_Script(script_type=SCRIPT_TYPE.TESTING) for _ in range(10)
         ]
         testing_script_selected_by_tag = choice(testing_scripts)
         testing_script_selected_by_name = choice(testing_scripts)
@@ -1994,20 +1855,14 @@ class TestMachineAPI(APITestCase.ForUser):
         )
 
     def test_POST_lock_deployed(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.DEPLOYED, owner=self.user
-        )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "lock"}
-        )
+        machine = factory.make_Node(status=NODE_STATUS.DEPLOYED, owner=self.user)
+        response = self.client.post(self.get_machine_uri(machine), {"op": "lock"})
         self.assertEqual(http.client.OK, response.status_code)
         machine = reload_object(machine)
         self.assertTrue(machine.locked)
 
     def test_POST_lock_with_comment(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.DEPLOYED, owner=self.user
-        )
+        machine = factory.make_Node(status=NODE_STATUS.DEPLOYED, owner=self.user)
         node_lock = self.patch(node_module.Node, "lock")
         comment = factory.make_name("comment")
         self.client.post(
@@ -2017,9 +1872,7 @@ class TestMachineAPI(APITestCase.ForUser):
 
     def test_POST_lock_not_deployed(self):
         machine = factory.make_Node(status=NODE_STATUS.READY, owner=self.user)
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "lock"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "lock"})
         self.assertEqual(http.client.CONFLICT, response.status_code)
         machine = reload_object(machine)
         self.assertFalse(machine.locked)
@@ -2028,16 +1881,12 @@ class TestMachineAPI(APITestCase.ForUser):
         machine = factory.make_Node(
             status=NODE_STATUS.DEPLOYED, locked=True, owner=self.user
         )
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "lock"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "lock"})
         self.assertEqual(http.client.CONFLICT, response.status_code)
 
     def test_POST_unlock(self):
         machine = factory.make_Node(locked=True, owner=self.user)
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "unlock"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "unlock"})
         self.assertEqual(http.client.OK, response.status_code)
         machine = reload_object(machine)
         self.assertFalse(machine.locked)
@@ -2053,9 +1902,7 @@ class TestMachineAPI(APITestCase.ForUser):
 
     def test_POST_unlock_unlocked(self):
         machine = factory.make_Node(owner=self.user)
-        response = self.client.post(
-            self.get_machine_uri(machine), {"op": "unlock"}
-        )
+        response = self.client.post(self.get_machine_uri(machine), {"op": "unlock"})
         self.assertEqual(http.client.CONFLICT, response.status_code)
 
     def test_PUT_updates_machine_superuser(self):
@@ -2147,9 +1994,7 @@ class TestMachineAPI(APITestCase.ForUser):
             architecture=make_usable_architecture(self),
             power_type="manual",
         )
-        response = self.client.put(
-            self.get_machine_uri(machine), {"hostname": "bar"}
-        )
+        response = self.client.put(self.get_machine_uri(machine), {"hostname": "bar"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_PUT_omitted_hostname(self):
@@ -2165,9 +2010,7 @@ class TestMachineAPI(APITestCase.ForUser):
         response = self.client.put(
             self.get_machine_uri(machine), {"architecture": arch}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertTrue(Machine.objects.filter(hostname=hostname).exists())
 
     def test_PUT_rejects_other_node_types(self):
@@ -2179,9 +2022,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         response = self.client.put(self.get_machine_uri(node))
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_PUT_ignores_unknown_fields(self):
         self.become_admin()
@@ -2221,17 +2062,13 @@ class TestMachineAPI(APITestCase.ForUser):
     def test_PUT_non_admin_cannot_change_power_type(self):
         original_power_type = "ipmi"
         new_power_type = "openbmc"
-        machine = factory.make_Node(
-            owner=self.user, power_type=original_power_type
-        )
+        machine = factory.make_Node(owner=self.user, power_type=original_power_type)
         response = self.client.put(
             self.get_machine_uri(machine), {"power_type": new_power_type}
         )
 
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
-        self.assertEqual(
-            original_power_type, reload_object(machine).power_type
-        )
+        self.assertEqual(original_power_type, reload_object(machine).power_type)
 
     def test_resource_uri_points_back_at_machine(self):
         self.become_admin()
@@ -2258,9 +2095,7 @@ class TestMachineAPI(APITestCase.ForUser):
         self.become_admin()
         machine = factory.make_Node()
         token = NodeKey.objects.get_token_for_node(machine)
-        response = self.client.get(
-            self.get_machine_uri(machine), {"op": "get_token"}
-        )
+        response = self.client.get(self.get_machine_uri(machine), {"op": "get_token"})
         self.assertEqual(
             json_load_bytes(response.content),
             {
@@ -2273,17 +2108,13 @@ class TestMachineAPI(APITestCase.ForUser):
     def test_get_token_no_token(self):
         self.become_admin()
         machine = factory.make_Node()
-        response = self.client.get(
-            self.get_machine_uri(machine), {"op": "get_token"}
-        )
+        response = self.client.get(self.get_machine_uri(machine), {"op": "get_token"})
         self.assertIsNone(json_load_bytes(response.content))
 
     def test_get_token_no_admin(self):
         machine = factory.make_Node()
         NodeKey.objects.get_token_for_node(machine)
-        response = self.client.get(
-            self.get_machine_uri(machine), {"op": "get_token"}
-        )
+        response = self.client.get(self.get_machine_uri(machine), {"op": "get_token"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_PUT_rejects_invalid_data(self):
@@ -2296,9 +2127,7 @@ class TestMachineAPI(APITestCase.ForUser):
             architecture=make_usable_architecture(self),
             power_type="manual",
         )
-        response = self.client.put(
-            self.get_machine_uri(machine), {"hostname": "."}
-        )
+        response = self.client.put(self.get_machine_uri(machine), {"hostname": "."})
         parsed_result = json_load_bytes(response.content)
 
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
@@ -2403,9 +2232,7 @@ class TestMachineAPI(APITestCase.ForUser):
             power_parameters=power_parameters,
             architecture=make_usable_architecture(self),
         )
-        response = self.client.put(
-            self.get_machine_uri(machine), {"power_type": ""}
-        )
+        response = self.client.put(self.get_machine_uri(machine), {"power_type": ""})
 
         machine = reload_object(machine)
         self.assertEqual(
@@ -2553,9 +2380,7 @@ class TestMachineAPI(APITestCase.ForUser):
 
         self.assertEqual(http.client.OK, response.status_code)
         machine = reload_object(machine)
-        self.assertEqual(
-            (old_zone, new_name), (machine.zone, machine.hostname)
-        )
+        self.assertEqual((old_zone, new_name), (machine.zone, machine.hostname))
 
     def test_PUT_clears_zone(self):
         self.skipTest(
@@ -2678,9 +2503,7 @@ class TestMachineAPI(APITestCase.ForUser):
         )  # We won't support exabytes yet
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
-        self.assertEqual(
-            "Invalid size for swap: 5E", parsed_result["swap_size"][0]
-        )
+        self.assertEqual("Invalid size for swap: 5E", parsed_result["swap_size"][0])
 
     def test_DELETE_deletes_machine(self):
         # The api allows to delete a Machine.
@@ -2700,9 +2523,7 @@ class TestMachineAPI(APITestCase.ForUser):
             ),
         )
         response = self.client.delete(self.get_machine_uri(node))
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_DELETE_deletes_machine_fails_if_not_admin(self):
         # Only superusers can delete machines.
@@ -2850,9 +2671,7 @@ class TestSetStorageLayout(APITestCase.ForUser):
         response = self.client.post(
             self.get_machine_uri(machine), {"op": "set_storage_layout"}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_409_when_machine_not_ready(self):
         self.become_admin()
@@ -2860,9 +2679,7 @@ class TestSetStorageLayout(APITestCase.ForUser):
         response = self.client.post(
             self.get_machine_uri(machine), {"op": "set_storage_layout"}
         )
-        self.assertEqual(
-            http.client.CONFLICT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.CONFLICT, response.status_code, response.content)
 
     def test_400_when_storage_layout_missing(self):
         self.become_admin()
@@ -2896,8 +2713,7 @@ class TestSetStorageLayout(APITestCase.ForUser):
         self.assertEqual(
             {
                 "boot_size": [
-                    "Size is too small. Minimum size is %s."
-                    % MIN_BOOT_PARTITION_SIZE
+                    "Size is too small. Minimum size is %s." % MIN_BOOT_PARTITION_SIZE
                 ]
             },
             json_load_bytes(response.content),
@@ -2905,9 +2721,7 @@ class TestSetStorageLayout(APITestCase.ForUser):
 
     def test_400_when_no_boot_disk(self):
         self.become_admin()
-        machine = factory.make_Node(
-            status=NODE_STATUS.READY, with_boot_disk=False
-        )
+        machine = factory.make_Node(status=NODE_STATUS.READY, with_boot_disk=False)
         response = self.client.post(
             self.get_machine_uri(machine),
             {"op": "set_storage_layout", "storage_layout": "flat"},
@@ -2916,8 +2730,7 @@ class TestSetStorageLayout(APITestCase.ForUser):
             http.client.BAD_REQUEST, response.status_code, response.content
         )
         self.assertEqual(
-            "Machine is missing a boot disk; no storage layout can be "
-            "applied.",
+            "Machine is missing a boot disk; no storage layout can be " "applied.",
             response.content.decode(settings.DEFAULT_CHARSET),
         )
 
@@ -2965,9 +2778,7 @@ class TestSetStorageLayout(APITestCase.ForUser):
             self.get_machine_uri(machine),
             {"op": "set_storage_layout", "storage_layout": "flat"},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         mock_set_storage_layout.assert_called_once_with(
             "flat", params=ANY, allow_fallback=False
         )
@@ -2981,9 +2792,7 @@ class TestMountSpecial(APITestCase.ForUser):
         return reverse("machine_handler", args=[machine.system_id])
 
     def test_fstype_and_mount_point_is_required_but_options_is_not(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, owner=self.user
-        )
+        machine = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         response = self.client.post(
             self.get_machine_uri(machine), {"op": "mount_special"}
         )
@@ -2997,9 +2806,7 @@ class TestMountSpecial(APITestCase.ForUser):
         )
 
     def test_fstype_must_be_a_non_storage_type(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, owner=self.user
-        )
+        machine = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         for fstype in Filesystem.TYPES_REQUIRING_STORAGE:
             response = self.client.post(
                 self.get_machine_uri(machine),
@@ -3019,9 +2826,7 @@ class TestMountSpecial(APITestCase.ForUser):
             )
 
     def test_mount_point_must_be_absolute(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, owner=self.user
-        )
+        machine = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         response = self.client.post(
             self.get_machine_uri(machine),
             {
@@ -3059,9 +2864,7 @@ class TestMountSpecialScenarios(APITestCase.ForUser):
             fstype=self.fstype,
         )
         response = self.client.get(self.get_machine_uri(machine))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         machine_response = json_load_bytes(response.content)
         self.assertEqual(
             machine_response.get("special_filesystems"),
@@ -3091,9 +2894,7 @@ class TestMountSpecialScenarios(APITestCase.ForUser):
             acquired=True,
         )
         response = self.client.get(self.get_machine_uri(machine))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         machine_response = json_load_bytes(response.content)
         self.assertEqual(
             machine_response.get("special_filesystems"),
@@ -3123,9 +2924,7 @@ class TestMountSpecialScenarios(APITestCase.ForUser):
             acquired=True,
         )
         response = self.client.get(self.get_machine_uri(machine))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         machine_response = json_load_bytes(response.content)
         self.assertEqual(
             machine_response.get("special_filesystems"),
@@ -3152,9 +2951,7 @@ class TestMountSpecialScenarios(APITestCase.ForUser):
                 "mount_options": mount_options,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         special_fss = machine.current_config.special_filesystems
         self.assertEqual(len(special_fss), 1)
         special_fs = special_fss[0]
@@ -3196,9 +2993,7 @@ class TestMountSpecialScenarios(APITestCase.ForUser):
 
     def test_admin_mounts_non_storage_filesystem_on_ready_machine(self):
         self.become_admin()
-        self.assertCanMountFilesystem(
-            factory.make_Node(status=NODE_STATUS.READY)
-        )
+        self.assertCanMountFilesystem(factory.make_Node(status=NODE_STATUS.READY))
 
     def test_admin_cannot_mount_on_non_ready_or_allocated_machine(self):
         self.become_admin()
@@ -3230,9 +3025,7 @@ class TestUnmountSpecial(APITestCase.ForUser):
         return reverse("machine_handler", args=[machine.system_id])
 
     def test_mount_point_is_required(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, owner=self.user
-        )
+        machine = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         response = self.client.post(
             self.get_machine_uri(machine), {"op": "unmount_special"}
         )
@@ -3243,9 +3036,7 @@ class TestUnmountSpecial(APITestCase.ForUser):
         )
 
     def test_mount_point_must_be_absolute(self):
-        machine = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, owner=self.user
-        )
+        machine = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         response = self.client.post(
             self.get_machine_uri(machine),
             {
@@ -3281,9 +3072,7 @@ class TestUnmountSpecialScenarios(APITestCase.ForUser):
             self.get_machine_uri(machine),
             {"op": "unmount_special", "mount_point": filesystem.mount_point},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertFalse(machine.current_config.special_filesystems.exists())
 
     def test_user_unmounts_non_storage_filesystem_on_allocated_machine(self):
@@ -3322,9 +3111,7 @@ class TestUnmountSpecialScenarios(APITestCase.ForUser):
 
     def test_admin_unmounts_non_storage_filesystem_on_ready_machine(self):
         self.become_admin()
-        self.assertCanUnmountFilesystem(
-            factory.make_Node(status=NODE_STATUS.READY)
-        )
+        self.assertCanUnmountFilesystem(factory.make_Node(status=NODE_STATUS.READY))
 
     def test_admin_cannot_unmount_on_non_ready_or_allocated_machine(self):
         self.become_admin()
@@ -3357,28 +3144,18 @@ class TestDefaultGateways(APITestCase.ForUser):
         return reverse("machine_handler", args=[machine.system_id])
 
     def test_403_when_not_admin(self):
-        machine = factory.make_Node(
-            owner=self.user, status=NODE_STATUS.ALLOCATED
-        )
+        machine = factory.make_Node(owner=self.user, status=NODE_STATUS.ALLOCATED)
         response = self.client.post(
             self.get_machine_uri(machine), {"op": "clear_default_gateways"}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_clears_default_gateways(self):
         self.become_admin()
-        machine = factory.make_Node(
-            owner=self.user, status=NODE_STATUS.ALLOCATED
-        )
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine
-        )
+        machine = factory.make_Node(owner=self.user, status=NODE_STATUS.ALLOCATED)
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine)
         network_v4 = factory.make_ipv4_network()
-        subnet_v4 = factory.make_Subnet(
-            cidr=str(network_v4.cidr), vlan=interface.vlan
-        )
+        subnet_v4 = factory.make_Subnet(cidr=str(network_v4.cidr), vlan=interface.vlan)
         link_v4 = factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.AUTO,
             ip="",
@@ -3387,9 +3164,7 @@ class TestDefaultGateways(APITestCase.ForUser):
         )
         machine.gateway_link_ipv4 = link_v4
         network_v6 = factory.make_ipv6_network()
-        subnet_v6 = factory.make_Subnet(
-            cidr=str(network_v6.cidr), vlan=interface.vlan
-        )
+        subnet_v6 = factory.make_Subnet(cidr=str(network_v6.cidr), vlan=interface.vlan)
         link_v6 = factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.AUTO,
             ip="",
@@ -3401,20 +3176,14 @@ class TestDefaultGateways(APITestCase.ForUser):
         response = self.client.post(
             self.get_machine_uri(machine), {"op": "clear_default_gateways"}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         machine = reload_object(machine)
         self.assertIsNone(machine.gateway_link_ipv4)
         self.assertIsNone(machine.gateway_link_ipv6)
 
     def test_returns_null_gateway_if_no_explicit_gateway_exists(self):
-        machine = factory.make_Node(
-            owner=self.user, status=NODE_STATUS.ALLOCATED
-        )
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine
-        )
+        machine = factory.make_Node(owner=self.user, status=NODE_STATUS.ALLOCATED)
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine)
         network_v4 = factory.make_ipv4_network()
         subnet_v4 = factory.make_Subnet(
             cidr=str(network_v4.cidr), vlan=interface.vlan, gateway_ip=None
@@ -3436,9 +3205,7 @@ class TestDefaultGateways(APITestCase.ForUser):
             interface=interface,
         )
         response = self.client.get(self.get_machine_uri(machine))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         response = json_load_bytes(response.content)
         self.assertEqual(
             {
@@ -3449,16 +3216,10 @@ class TestDefaultGateways(APITestCase.ForUser):
         )
 
     def test_returns_effective_gateway_if_no_explicit_gateway_set(self):
-        machine = factory.make_Node(
-            owner=self.user, status=NODE_STATUS.ALLOCATED
-        )
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine
-        )
+        machine = factory.make_Node(owner=self.user, status=NODE_STATUS.ALLOCATED)
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine)
         network_v4 = factory.make_ipv4_network()
-        subnet_v4 = factory.make_Subnet(
-            cidr=str(network_v4.cidr), vlan=interface.vlan
-        )
+        subnet_v4 = factory.make_Subnet(cidr=str(network_v4.cidr), vlan=interface.vlan)
         factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.AUTO,
             ip="",
@@ -3466,9 +3227,7 @@ class TestDefaultGateways(APITestCase.ForUser):
             interface=interface,
         )
         network_v6 = factory.make_ipv6_network()
-        subnet_v6 = factory.make_Subnet(
-            cidr=str(network_v6.cidr), vlan=interface.vlan
-        )
+        subnet_v6 = factory.make_Subnet(cidr=str(network_v6.cidr), vlan=interface.vlan)
         factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.AUTO,
             ip="",
@@ -3476,9 +3235,7 @@ class TestDefaultGateways(APITestCase.ForUser):
             interface=interface,
         )
         response = self.client.get(self.get_machine_uri(machine))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         response = json_load_bytes(response.content)
         self.assertEqual(
             {
@@ -3495,16 +3252,10 @@ class TestDefaultGateways(APITestCase.ForUser):
         )
 
     def test_returns_links_if_set(self):
-        machine = factory.make_Node(
-            owner=self.user, status=NODE_STATUS.ALLOCATED
-        )
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine
-        )
+        machine = factory.make_Node(owner=self.user, status=NODE_STATUS.ALLOCATED)
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine)
         network_v4 = factory.make_ipv4_network()
-        subnet_v4 = factory.make_Subnet(
-            cidr=str(network_v4.cidr), vlan=interface.vlan
-        )
+        subnet_v4 = factory.make_Subnet(cidr=str(network_v4.cidr), vlan=interface.vlan)
         link_v4 = factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.AUTO,
             ip="",
@@ -3513,9 +3264,7 @@ class TestDefaultGateways(APITestCase.ForUser):
         )
         machine.gateway_link_ipv4 = link_v4
         network_v6 = factory.make_ipv6_network()
-        subnet_v6 = factory.make_Subnet(
-            cidr=str(network_v6.cidr), vlan=interface.vlan
-        )
+        subnet_v6 = factory.make_Subnet(cidr=str(network_v6.cidr), vlan=interface.vlan)
         link_v6 = factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.AUTO,
             ip="",
@@ -3525,9 +3274,7 @@ class TestDefaultGateways(APITestCase.ForUser):
         machine.gateway_link_ipv6 = link_v6
         machine.save()
         response = self.client.get(self.get_machine_uri(machine))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         response = json_load_bytes(response.content)
         self.assertEqual(
             {
@@ -3569,9 +3316,7 @@ class TestGetCurtinConfig(APITestCase.ForUser):
         )
 
     def test_returns_curtin_config_in_yaml(self):
-        machine = factory.make_Node(
-            owner=self.user, status=NODE_STATUS.DEPLOYING
-        )
+        machine = factory.make_Node(owner=self.user, status=NODE_STATUS.DEPLOYING)
         fake_config = {"config": factory.make_name("config")}
         mock_get_curtin_merged_config = self.patch(
             machines_module, "get_curtin_merged_config"
@@ -3580,9 +3325,7 @@ class TestGetCurtinConfig(APITestCase.ForUser):
         response = self.client.get(
             self.get_machine_uri(machine), {"op": "get_curtin_config"}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             yaml.safe_dump(fake_config, default_flow_style=False),
             response.content.decode(settings.DEFAULT_CHARSET),
@@ -3633,10 +3376,8 @@ class TestRestoreNetworkingConfiguration(APITestCase.ForUser):
             name=COMMISSIONING_OUTPUT_NAME,
             script_type=SCRIPT_TYPE.COMMISSIONING,
         )
-        commissioning_script_set = (
-            ScriptSet.objects.create_commissioning_script_set(
-                machine, scripts=[lxd_script.name]
-            )
+        commissioning_script_set = ScriptSet.objects.create_commissioning_script_set(
+            machine, scripts=[lxd_script.name]
         )
         machine.current_commissioning_script_set = commissioning_script_set
         output = test_hooks.make_lxd_output_json()
@@ -3650,9 +3391,7 @@ class TestRestoreNetworkingConfiguration(APITestCase.ForUser):
         # Create NUMA nodes.
         test_hooks.create_numa_nodes(machine)
 
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=machine
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=machine)
         network = factory.make_ipv4_network()
         subnet = factory.make_Subnet(cidr=str(network.cidr))
 
@@ -3684,9 +3423,7 @@ class TestRestoreNetworkingConfiguration(APITestCase.ForUser):
             self.get_machine_uri(machine),
             {"op": "restore_networking_configuration"},
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_restore_networking_configuration_checks_machine_status(self):
         self.become_admin()
@@ -3739,9 +3476,7 @@ class TestRestoreStorageConfiguration(APITestCase.ForUser):
             self.get_machine_uri(machine),
             {"op": "restore_storage_configuration"},
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_restore_storage_configuration_checks_machine_status(self):
         self.become_admin()
@@ -3802,9 +3537,7 @@ class TestRestoreDefaultConfiguration(APITestCase.ForUser):
             self.get_machine_uri(machine),
             {"op": "restore_default_configuration"},
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_restore_default_configuration_checks_machine_status(self):
         self.become_admin()
@@ -3831,21 +3564,15 @@ class TestMarkBroken(APITestCase.ForUser):
         return reverse("machine_handler", args=[machine.system_id])
 
     def test_mark_broken_changes_status(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.COMMISSIONING, owner=self.user
-        )
-        response = self.client.post(
-            self.get_node_uri(node), {"op": "mark_broken"}
-        )
+        node = factory.make_Node(status=NODE_STATUS.COMMISSIONING, owner=self.user)
+        response = self.client.post(self.get_node_uri(node), {"op": "mark_broken"})
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(NODE_STATUS.BROKEN, reload_object(node).status)
 
     def test_mark_broken_updates_error_description(self):
         # 'error_description' parameter was renamed 'comment' for consistency
         # make sure this comment updates the node's error_description
-        node = factory.make_Node(
-            status=NODE_STATUS.COMMISSIONING, owner=self.user
-        )
+        node = factory.make_Node(status=NODE_STATUS.COMMISSIONING, owner=self.user)
         comment = factory.make_name("comment")
         response = self.client.post(
             self.get_node_uri(node), {"op": "mark_broken", "comment": comment}
@@ -3859,9 +3586,7 @@ class TestMarkBroken(APITestCase.ForUser):
 
     def test_mark_broken_updates_error_description_compatibility(self):
         # test old 'error_description' parameter is honored for compatibility
-        node = factory.make_Node(
-            status=NODE_STATUS.COMMISSIONING, owner=self.user
-        )
+        node = factory.make_Node(status=NODE_STATUS.COMMISSIONING, owner=self.user)
         error_description = factory.make_name("error_description")
         response = self.client.post(
             self.get_node_uri(node),
@@ -3875,9 +3600,7 @@ class TestMarkBroken(APITestCase.ForUser):
         )
 
     def test_mark_broken_passes_comment(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.COMMISSIONING, owner=self.user
-        )
+        node = factory.make_Node(status=NODE_STATUS.COMMISSIONING, owner=self.user)
         node_mark_broken = self.patch(node_module.Machine, "mark_broken")
         comment = factory.make_name("comment")
         self.client.post(
@@ -3886,18 +3609,14 @@ class TestMarkBroken(APITestCase.ForUser):
         node_mark_broken.assert_called_once_with(self.user, comment)
 
     def test_mark_broken_handles_missing_comment(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.COMMISSIONING, owner=self.user
-        )
+        node = factory.make_Node(status=NODE_STATUS.COMMISSIONING, owner=self.user)
         node_mark_broken = self.patch(node_module.Machine, "mark_broken")
         self.client.post(self.get_node_uri(node), {"op": "mark_broken"})
         node_mark_broken.assert_called_once_with(self.user, None)
 
     def test_mark_broken_requires_ownership(self):
         node = factory.make_Node(status=NODE_STATUS.COMMISSIONING)
-        response = self.client.post(
-            self.get_node_uri(node), {"op": "mark_broken"}
-        )
+        response = self.client.post(self.get_node_uri(node), {"op": "mark_broken"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_mark_broken_allowed_from_any_other_state(self):
@@ -3907,9 +3626,7 @@ class TestMarkBroken(APITestCase.ForUser):
                 continue
 
             node = factory.make_Node(status=status, owner=self.user)
-            response = self.client.post(
-                self.get_node_uri(node), {"op": "mark_broken"}
-            )
+            response = self.client.post(self.get_node_uri(node), {"op": "mark_broken"})
             self.assertEqual(response.status_code, http.client.OK, response)
             node = reload_object(node)
             self.assertEqual(node.status, NODE_STATUS.BROKEN)
@@ -3923,17 +3640,13 @@ class TestMarkFixed(APITestCase.ForUser):
     def test_mark_fixed_changes_status(self):
         self.become_admin()
         node = factory.make_Node(status=NODE_STATUS.BROKEN)
-        response = self.client.post(
-            self.get_node_uri(node), {"op": "mark_fixed"}
-        )
+        response = self.client.post(self.get_node_uri(node), {"op": "mark_fixed"})
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(NODE_STATUS.READY, reload_object(node).status)
 
     def test_mark_fixed_requires_admin(self):
         node = factory.make_Node(status=NODE_STATUS.BROKEN)
-        response = self.client.post(
-            self.get_node_uri(node), {"op": "mark_fixed"}
-        )
+        response = self.client.post(self.get_node_uri(node), {"op": "mark_fixed"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_mark_fixed_passes_comment(self):
@@ -4016,6 +3729,4 @@ class TestExitRescueMode(APITransactionTestCase.ForUser):
                 self.get_machine_uri(machine), {"op": "exit_rescue_mode"}
             )
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            NODE_STATUS.EXITING_RESCUE_MODE, reload_object(machine).status
-        )
+        self.assertEqual(NODE_STATUS.EXITING_RESCUE_MODE, reload_object(machine).status)

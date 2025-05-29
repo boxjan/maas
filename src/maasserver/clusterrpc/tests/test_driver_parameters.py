@@ -52,9 +52,7 @@ class TestGetPowerTypeParametersFromJSON(MAASServerTestCase):
                 ],
             }
         ]
-        power_type_parameters = get_driver_parameters_from_json(
-            json_parameters
-        )
+        power_type_parameters = get_driver_parameters_from_json(json_parameters)
         self.assertEqual(["", "something"], list(power_type_parameters))
 
     def test_creates_dict_char_fields(self):
@@ -73,9 +71,7 @@ class TestGetPowerTypeParametersFromJSON(MAASServerTestCase):
                 ],
             }
         ]
-        power_type_parameters = get_driver_parameters_from_json(
-            json_parameters
-        )
+        power_type_parameters = get_driver_parameters_from_json(json_parameters)
         for name, field in power_type_parameters.items():
             self.assertIsInstance(field, DictCharField)
 
@@ -102,9 +98,7 @@ class TestGetPowerTypeParametersFromJSON(MAASServerTestCase):
         power_type_parameters = get_driver_parameters_from_json(
             json_parameters, {field_name: new_default}
         )
-        self.assertEqual(
-            new_default, power_type_parameters[name].fields[0].initial
-        )
+        self.assertEqual(new_default, power_type_parameters[name].fields[0].initial)
 
     def test_manual_does_not_require_power_params(self):
         json_parameters = [
@@ -123,9 +117,7 @@ class TestGetPowerTypeParametersFromJSON(MAASServerTestCase):
                 ],
             }
         ]
-        power_type_parameters = get_driver_parameters_from_json(
-            json_parameters
-        )
+        power_type_parameters = get_driver_parameters_from_json(json_parameters)
         self.assertFalse(power_type_parameters["manual"].required)
 
     def test_parameter_with_multiple_choice(self):
@@ -149,9 +141,7 @@ class TestGetPowerTypeParametersFromJSON(MAASServerTestCase):
                 ],
             }
         ]
-        power_type_parameters = get_driver_parameters_from_json(
-            json_parameters
-        )
+        power_type_parameters = get_driver_parameters_from_json(json_parameters)
         self.assertTrue(power_type_parameters["ipmi"])
 
 
@@ -196,9 +186,7 @@ class TestMakeFormField(MAASServerTestCase):
         invalid_msg = compose_invalid_choice_text(
             json_field["name"], json_field["choices"]
         )
-        self.assertEqual(
-            invalid_msg, django_field.error_messages["invalid_choice"]
-        )
+        self.assertEqual(invalid_msg, django_field.error_messages["invalid_choice"])
         self.assertEqual(json_field["default"], django_field.initial)
 
     def test_creates_mac_address_field_for_mac_addresses(self):
@@ -323,9 +311,7 @@ class TestMakeSettingField(MAASServerTestCase):
 
 class TestAddPowerTypeParameters(MAASServerTestCase):
     def make_field(self):
-        return make_setting_field(
-            self.getUniqueString(), self.getUniqueString()
-        )
+        return make_setting_field(self.getUniqueString(), self.getUniqueString())
 
     def make_multiple_choice_field(self):
         choices = [
@@ -449,9 +435,7 @@ class TestAddPowerTypeParameters(MAASServerTestCase):
 
 class TestAddNOSTypeParameters(MAASServerTestCase):
     def make_field(self):
-        return make_setting_field(
-            self.getUniqueString(), self.getUniqueString()
-        )
+        return make_setting_field(self.getUniqueString(), self.getUniqueString())
 
     def test_adding_existing_types_is_a_no_op(self):
         existing_parameters = [

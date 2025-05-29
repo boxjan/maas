@@ -84,17 +84,13 @@ class Migration(migrations.Migration):
                 (
                     "bus_number",
                     models.PositiveIntegerField(
-                        validators=[
-                            django.core.validators.MaxValueValidator(65536)
-                        ]
+                        validators=[django.core.validators.MaxValueValidator(65536)]
                     ),
                 ),
                 (
                     "device_number",
                     models.PositiveIntegerField(
-                        validators=[
-                            django.core.validators.MaxValueValidator(65536)
-                        ]
+                        validators=[django.core.validators.MaxValueValidator(65536)]
                     ),
                 ),
                 (

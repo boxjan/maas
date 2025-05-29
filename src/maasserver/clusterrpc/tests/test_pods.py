@@ -65,9 +65,7 @@ class TestDiscoverPodProjects(MAASTransactionServerTestCase):
 
         self.patch(pods_module, "getAllClients").return_value = clients
         discovered = yield discover_pod_projects(factory.make_name("pod"), {})
-        self.assertEqual(
-            ({rack_id: projects for rack_id in rack_ids}, {}), discovered
-        )
+        self.assertEqual(({rack_id: projects for rack_id in rack_ids}, {}), discovered)
 
     @wait_for_reactor
     @inlineCallbacks
@@ -147,9 +145,7 @@ class TestDiscoverPod(MAASTransactionServerTestCase):
 
         self.patch(pods_module, "getAllClients").return_value = clients
         discovered = yield discover_pod(factory.make_name("pod"), {})
-        self.assertEqual(
-            ({rack_id: pod for rack_id in rack_ids}, {}), discovered
-        )
+        self.assertEqual(({rack_id: pod for rack_id in rack_ids}, {}), discovered)
 
     @wait_for_reactor
     @inlineCallbacks
@@ -185,9 +181,7 @@ class TestDiscoverPod(MAASTransactionServerTestCase):
 
         self.patch(pods_module, "getAllClients").return_value = clients
         discovered = yield discover_pod(pod_type, {})
-        self.assertEqual(
-            ({valid_rack_id: pod}, {error_rack_id: exception}), discovered
-        )
+        self.assertEqual(({valid_rack_id: pod}, {error_rack_id: exception}), discovered)
 
     @wait_for_reactor
     @inlineCallbacks
@@ -202,9 +196,7 @@ class TestDiscoverPod(MAASTransactionServerTestCase):
         client.side_effect = defer_way_later
 
         self.patch(pods_module, "getAllClients").return_value = [client]
-        discovered = yield discover_pod(
-            factory.make_name("pod"), {}, timeout=0.5
-        )
+        discovered = yield discover_pod(factory.make_name("pod"), {}, timeout=0.5)
         self.assertEqual({}, discovered[0])
         self.assertIsInstance(discovered[1][rack_id], CancelledError)
 

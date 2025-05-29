@@ -28,9 +28,7 @@ INITIAL_PARTITION_OFFSET = 4 * 1024 * 1024
 END_OF_PARTITION_TABLE_SPACE = 1 * 1024 * 1024
 
 # The amount of extra space a partition table will use.
-PARTITION_TABLE_EXTRA_SPACE = (
-    INITIAL_PARTITION_OFFSET + END_OF_PARTITION_TABLE_SPACE
-)
+PARTITION_TABLE_EXTRA_SPACE = INITIAL_PARTITION_OFFSET + END_OF_PARTITION_TABLE_SPACE
 
 # The amount of space required to be reserved for the prep partition. Prep
 # partition is required by all ppc64el architectures. Because of the way the
@@ -58,9 +56,7 @@ class PartitionTable(CleanSave, TimestampedModel):
         default=PARTITION_TABLE_TYPE.GPT,
     )
 
-    block_device = ForeignKey(
-        BlockDevice, null=False, blank=False, on_delete=CASCADE
-    )
+    block_device = ForeignKey(BlockDevice, null=False, blank=False, on_delete=CASCADE)
 
     def get_node(self):
         """`Node` this partition belongs to."""
@@ -85,18 +81,14 @@ class PartitionTable(CleanSave, TimestampedModel):
         node_arch, _ = self.get_node().split_arch()
         if node_arch == "ppc64el":
             extra_space += PREP_PARTITION_SIZE
-        elif (
-            node_arch == "amd64" and self.get_node().bios_boot_method != "uefi"
-        ):
+        elif node_arch == "amd64" and self.get_node().bios_boot_method != "uefi":
             extra_space += BIOS_GRUB_PARTITION_SIZE
         return extra_space
 
     def get_used_size(self, ignore_partitions=[]):
         """Return the used size of partitions on the table."""
         ignore_ids = [
-            partition.id
-            for partition in ignore_partitions
-            if partition.id is not None
+            partition.id for partition in ignore_partitions if partition.id is not None
         ]
         used_size = sum(
             partition.size
@@ -126,24 +118,18 @@ class PartitionTable(CleanSave, TimestampedModel):
             size = self.get_available_size()
             if self.table_type == PARTITION_TABLE_TYPE.MBR:
                 size = min(size, get_max_mbr_partition_size())
-        size = round_size_to_nearest_block(
-            size, PARTITION_ALIGNMENT_SIZE, False
-        )
+        size = round_size_to_nearest_block(size, PARTITION_ALIGNMENT_SIZE, False)
         return Partition.objects.create(
             partition_table=self, size=size, uuid=uuid, bootable=bootable
         )
 
     def delete_partition(self, partition):
         if partition.partition_table_id != self.id:
-            raise ValidationError(
-                "Partition doesn't belong to the partition table"
-            )
+            raise ValidationError("Partition doesn't belong to the partition table")
         index = partition.index
         partition.delete()
         # renumber partitions
-        for partition in self.partitions.filter(index__gt=index).order_by(
-            "index"
-        ):
+        for partition in self.partitions.filter(index__gt=index).order_by("index"):
             partition.index -= 1
             partition.save()
 
@@ -172,8 +158,7 @@ class PartitionTable(CleanSave, TimestampedModel):
                     raise ValidationError(
                         {
                             "block_device": [
-                                "Cannot create a partition table on a "
-                                "Bcache volume."
+                                "Cannot create a partition table on a " "Bcache volume."
                             ]
                         }
                     )

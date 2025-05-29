@@ -158,9 +158,7 @@ class TestConversionFunctions(MAASTestCase):
     def test_bytes_to_int(self):
         self.assertEqual(65535, bytes_to_int(b"\xff\xff"))
         self.assertEqual(16777215, bytes_to_int(b"\xff\xff\xff"))
-        self.assertEqual(
-            281474976710655, bytes_to_int(b"\xff\xff\xff\xff\xff\xff")
-        )
+        self.assertEqual(281474976710655, bytes_to_int(b"\xff\xff\xff\xff\xff\xff"))
 
     def test_hex_str_to_bytes(self):
         self.assertEqual(b"\x00\x00", hex_str_to_bytes("0x0000"))
@@ -184,9 +182,7 @@ class TestConversionFunctions(MAASTestCase):
         )
 
     def test_format_eui(self):
-        self.assertEqual(
-            "0a:0b:0c:0d:0e:0f", format_eui(EUI("0A-0B-0C-0D-0E-0F"))
-        )
+        self.assertEqual("0a:0b:0c:0d:0e:0f", format_eui(EUI("0A-0B-0C-0D-0E-0F")))
 
 
 class TestFindIPViaARP(MAASTestCase):
@@ -309,9 +305,7 @@ class TestFindMACViaARP(MAASTestCase):
         call_and_check = self.patch_call("")
         find_mac_via_arp(factory.make_ipv4_address())
         env = get_env_with_locale(locale="C")
-        call_and_check.assert_called_once_with(
-            ["ip", "--json", "neigh"], env=env
-        )
+        call_and_check.assert_called_once_with(["ip", "--json", "neigh"], env=env)
 
     def test_works_with_real_call(self):
         # No error.
@@ -319,26 +313,20 @@ class TestFindMACViaARP(MAASTestCase):
 
     def test_fails_on_nonsensical_output(self):
         self.patch_call("Weird output...")
-        self.assertRaises(
-            Exception, find_mac_via_arp, factory.make_ipv4_address()
-        )
+        self.assertRaises(Exception, find_mac_via_arp, factory.make_ipv4_address())
 
     def test_returns_None_if_not_found(self):
         self.patch_call(self.make_output())
         self.assertIsNone(find_mac_via_arp(factory.make_ipv4_address()))
 
     def test_resolves_IPv4_address_to_MAC(self):
-        self.patch_call(
-            self.make_output(ip="10.55.60.9", mac="3c:41:92:68:2e:00")
-        )
+        self.patch_call(self.make_output(ip="10.55.60.9", mac="3c:41:92:68:2e:00"))
         mac_address_observed = find_mac_via_arp("10.55.60.9")
         self.assertEqual("3c:41:92:68:2e:00", mac_address_observed)
 
     def test_resolves_IPv6_address_to_MAC(self):
         self.patch_call(
-            self.make_output(
-                ip="fd10::a76:d7fe:fe93:7cb", mac="3c:41:92:6b:2e:00"
-            )
+            self.make_output(ip="fd10::a76:d7fe:fe93:7cb", mac="3c:41:92:6b:2e:00")
         )
         mac_address_observed = find_mac_via_arp("fd10::a76:d7fe:fe93:7cb")
         self.assertEqual("3c:41:92:6b:2e:00", mac_address_observed)
@@ -423,12 +411,8 @@ class TestGetAllAddressesForInterface(MAASTestCase):
     def test_returns_address_for_inet_class(self):
         ip = self.ip_address_factory()
         interface = factory.make_name("eth", sep="")
-        patch_interfaces(
-            self, {interface: {self.inet_class: [{"addr": str(ip)}]}}
-        )
-        self.assertEqual(
-            [ip], list(get_all_addresses_for_interface(interface))
-        )
+        patch_interfaces(self, {interface: {self.inet_class: [{"addr": str(ip)}]}})
+        self.assertEqual([ip], list(get_all_addresses_for_interface(interface)))
 
     def test_ignores_non_address_information(self):
         network = self.network_factory()
@@ -444,18 +428,14 @@ class TestGetAllAddressesForInterface(MAASTestCase):
                             "broadcast": str(network.broadcast),
                             "netmask": str(network.netmask),
                             "peer": str(
-                                factory.pick_ip_in_network(
-                                    network, but_not=[ip]
-                                )
+                                factory.pick_ip_in_network(network, but_not=[ip])
                             ),
                         }
                     ]
                 }
             },
         )
-        self.assertEqual(
-            [ip], list(get_all_addresses_for_interface(interface))
-        )
+        self.assertEqual([ip], list(get_all_addresses_for_interface(interface)))
 
     def test_ignores_link_address(self):
         interface = factory.make_name("eth", sep="")
@@ -628,9 +608,7 @@ class TestResolveHostToAddrs(MAASTestCase):
         result = resolve_hostname(hostname, 4)
         self.assertIsInstance(result, set)
         self.assertEqual({IPAddress(ip)}, result)
-        fake.assert_called_once_with(
-            hostname, 0, family=AF_INET, proto=IPPROTO_TCP
-        )
+        fake.assert_called_once_with(hostname, 0, family=AF_INET, proto=IPPROTO_TCP)
 
     def test_resolves_IPv6_address(self):
         ip = factory.make_ipv6_address()
@@ -639,14 +617,10 @@ class TestResolveHostToAddrs(MAASTestCase):
         result = resolve_hostname(hostname, 6)
         self.assertIsInstance(result, set)
         self.assertEqual({IPAddress(ip)}, result)
-        fake.assert_called_once_with(
-            hostname, 0, family=AF_INET6, proto=IPPROTO_TCP
-        )
+        fake.assert_called_once_with(hostname, 0, family=AF_INET6, proto=IPPROTO_TCP)
 
     def test_returns_empty_if_address_does_not_resolve(self):
-        self.patch_getaddrinfo_fail(
-            gaierror(EAI_NONAME, "Name or service not known")
-        )
+        self.patch_getaddrinfo_fail(gaierror(EAI_NONAME, "Name or service not known"))
         self.assertEqual(set(), resolve_hostname(factory.make_hostname(), 4))
 
     def test_returns_empty_if_address_resolves_to_no_data(self):
@@ -655,15 +629,11 @@ class TestResolveHostToAddrs(MAASTestCase):
 
     def test_propagates_other_gaierrors(self):
         self.patch_getaddrinfo_fail(gaierror(EAI_BADFLAGS, "Bad parameters"))
-        self.assertRaises(
-            gaierror, resolve_hostname, factory.make_hostname(), 4
-        )
+        self.assertRaises(gaierror, resolve_hostname, factory.make_hostname(), 4)
 
     def test_propagates_unexpected_errors(self):
         self.patch_getaddrinfo_fail(KeyError("Huh what?"))
-        self.assertRaises(
-            KeyError, resolve_hostname, factory.make_hostname(), 4
-        )
+        self.assertRaises(KeyError, resolve_hostname, factory.make_hostname(), 4)
 
     def test_resolve_host_to_addrinfo_returns_full_information(self):
         ip = factory.make_ipv4_address()
@@ -672,9 +642,7 @@ class TestResolveHostToAddrs(MAASTestCase):
         result = resolve_host_to_addrinfo(hostname, 4)
         self.assertIsInstance(result, list)
         self.assertEqual([(None, None, None, None, (ip, 0))], result)
-        fake.assert_called_once_with(
-            hostname, 0, family=AF_INET, proto=IPPROTO_TCP
-        )
+        fake.assert_called_once_with(hostname, 0, family=AF_INET, proto=IPPROTO_TCP)
 
 
 class TestIntersectIPRange(MAASTestCase):
@@ -761,9 +729,7 @@ class TestMAASIPSet(MAASTestCase):
         addr1 = "fe80::1"
         addr2 = IPAddress("fe80::2")
         range1 = make_iprange("fe80::3", purpose="DNS")
-        range2 = make_iprange(
-            "fe80::100", "fe80::ffff:ffff:ffff:ffff", purpose="DHCP"
-        )
+        range2 = make_iprange("fe80::100", "fe80::ffff:ffff:ffff:ffff", purpose="DHCP")
         s = MAASIPSet([range2, range1, addr1, addr2])
         for item in s:
             self.assertEqual(MAASIPRange, type(item))
@@ -873,9 +839,7 @@ class TestMAASIPSet(MAASTestCase):
         addr1 = "fe80::1"
         addr2 = IPAddress("fe80::2")
         range1 = make_iprange("fe80::3", purpose="DNS")
-        range2 = make_iprange(
-            "fe80::100", "fe80::ffff:ffff:ffff:fffe", purpose="DHCP"
-        )
+        range2 = make_iprange("fe80::100", "fe80::ffff:ffff:ffff:fffe", purpose="DHCP")
         s = MAASIPSet([range2, range1, addr1, addr2])
         u = s.get_unused_ranges("fe80::/64")
         self.assertNotIn("fe80::1", u)
@@ -893,9 +857,7 @@ class TestMAASIPSet(MAASTestCase):
         addr1 = "fe80::1"
         addr2 = IPAddress("fe80::2")
         range1 = make_iprange("fe80::3", purpose="DNS")
-        range2 = make_iprange(
-            "fe80::100", "fe80::ffff:ffff:ffff:fffe", purpose="DHCP"
-        )
+        range2 = make_iprange("fe80::100", "fe80::ffff:ffff:ffff:fffe", purpose="DHCP")
         s = MAASIPSet([range2, range1, addr1, addr2])
         u = s.get_unused_ranges("fe80::/32")
         self.assertNotIn("fe80::1", u)
@@ -1199,9 +1161,7 @@ class TestIPRangeStatistics(MAASTestCase):
         self.assertIsNone(stats.suggested_gateway)
 
     def test_suggests_half_available_for_ipv6(self):
-        s = MAASIPSet(
-            [MAASIPRange("2001:db8::1", "2001:db8::ffff:ffff:ffff:ff00")]
-        )
+        s = MAASIPSet([MAASIPRange("2001:db8::1", "2001:db8::ffff:ffff:ffff:ff00")])
         u = s.get_full_range("2001:db8::/64")
         stats = IPRangeStatistics(u)
         self.assertEqual("2001:db8::", stats.suggested_gateway)
@@ -1256,15 +1216,9 @@ class TestGetAllInterfacesDefinition(MAASTestCase):
     ):
         self.patch(network_module, "get_ip_addr").return_value = ip_addr
         self.patch(network_module, "get_ip_route").return_value = iproute_info
-        self.patch(
-            network_module, "get_dhclient_info"
-        ).return_value = dhclient_info
-        self.patch(
-            network_module, "running_in_container"
-        ).return_value = in_container
-        observed_result = get_all_interfaces_definition(
-            annotate_with_monitored=False
-        )
+        self.patch(network_module, "get_dhclient_info").return_value = dhclient_info
+        self.patch(network_module, "running_in_container").return_value = in_container
+        observed_result = get_all_interfaces_definition(annotate_with_monitored=False)
         self.assertEqual(observed_result, expected_results)
 
     def test_ignores_loopback(self):
@@ -1383,9 +1337,7 @@ class TestGetAllInterfacesDefinition(MAASTestCase):
             }
         }
 
-        self.assertInterfacesResult(
-            ip_addr, {}, {}, expected_result, in_container=True
-        )
+        self.assertInterfacesResult(ip_addr, {}, {}, expected_result, in_container=True)
 
     def test_simple_with_dhcp(self):
         ip_addr = {
@@ -1411,9 +1363,7 @@ class TestGetAllInterfacesDefinition(MAASTestCase):
                 "source": "machine-resources",
             }
         }
-        self.assertInterfacesResult(
-            ip_addr, {}, dhclient_info, expected_result
-        )
+        self.assertInterfacesResult(ip_addr, {}, dhclient_info, expected_result)
 
     def test_fixing_links(self):
         ip_addr = {
@@ -1666,9 +1616,7 @@ class TestGetAllInterfacesSourceAddresses(MAASTestCase):
             "192.168.122.1",
             None,
         ]
-        self.assertEqual(
-            {"192.168.122.1"}, get_all_interface_source_addresses()
-        )
+        self.assertEqual({"192.168.122.1"}, get_all_interface_source_addresses())
 
 
 class InterfaceLinksTestCase(MAASTestCase):
@@ -1698,9 +1646,7 @@ class TestHasIPv4Address(InterfaceLinksTestCase):
 
     def test_returns_false_for_ipv6_address(self):
         address = "%s/64" % factory.make_ipv6_address()
-        self.assertFalse(
-            has_ipv4_address(self.make_interface(addresses=[address]))
-        )
+        self.assertFalse(has_ipv4_address(self.make_interface(addresses=[address])))
 
     def test_returns_true_for_ipv4_address(self):
         address = "%s/24" % factory.make_ipv4_address()
@@ -1721,9 +1667,7 @@ class TestGetIfnameIfdataForDestination(MAASTestCase):
                 ]
             },
         }
-        self.get_source_address_mock = self.patch(
-            network_module, "get_source_address"
-        )
+        self.get_source_address_mock = self.patch(network_module, "get_source_address")
 
     def test_returns_interface_for_expected_source_ip(self):
         self.get_source_address_mock.return_value = "2001:db8::1"
@@ -1747,15 +1691,11 @@ class TestGetIfnameIfdataForDestination(MAASTestCase):
 
     def test_handles_loopback_addresses(self):
         self.get_source_address_mock.return_value = "127.0.0.1"
-        ifname, ifdata = get_ifname_ifdata_for_destination(
-            "127.0.0.1", self.interfaces
-        )
+        ifname, ifdata = get_ifname_ifdata_for_destination("127.0.0.1", self.interfaces)
         self.assertEqual("lo", ifname)
         self.assertEqual(LOOPBACK_INTERFACE_INFO, ifdata)
         self.get_source_address_mock.return_value = "::1"
-        ifname, ifdata = get_ifname_ifdata_for_destination(
-            "::1", self.interfaces
-        )
+        ifname, ifdata = get_ifname_ifdata_for_destination("::1", self.interfaces)
         self.assertEqual("lo", ifname)
         self.assertEqual(LOOPBACK_INTERFACE_INFO, ifdata)
 
@@ -1805,9 +1745,7 @@ class TestGetInterfaceChildren(MAASTestCase):
             "eth1.100": {"parents": ["eth1"]},
         }
         children_map = get_interface_children(interfaces)
-        self.assertEqual(
-            {"eth0": {"eth0.100"}, "eth1": {"eth1.100"}}, children_map
-        )
+        self.assertEqual({"eth0": {"eth0.100"}, "eth1": {"eth1.100"}}, children_map)
 
     def test_calculates_children_from_bond_and_vlan_parents(self):
         interfaces = {
@@ -1836,9 +1774,7 @@ class TestInterfaceChildren(MAASTestCase):
             "bond0": {"parents": ["eth0", "eth1"]},
         }
         children_map = get_interface_children(interfaces)
-        eth0_children = list(
-            interface_children("eth0", interfaces, children_map)
-        )
+        eth0_children = list(interface_children("eth0", interfaces, children_map))
         self.assertCountEqual(
             eth0_children,
             [
@@ -1846,9 +1782,7 @@ class TestInterfaceChildren(MAASTestCase):
                 ("bond0", {"parents": ["eth0", "eth1"]}),
             ],
         )
-        eth1_children = list(
-            interface_children("eth1", interfaces, children_map)
-        )
+        eth1_children = list(interface_children("eth1", interfaces, children_map))
         self.assertCountEqual(
             eth1_children,
             [
@@ -1863,9 +1797,7 @@ class TestInterfaceChildren(MAASTestCase):
             "eth0.100": {"parents": ["eth0"]},
         }
         children_map = get_interface_children(interfaces)
-        eth0_children = list(
-            interface_children("eth0", interfaces, children_map)
-        )
+        eth0_children = list(interface_children("eth0", interfaces, children_map))
         self.assertEqual("eth0.100", eth0_children[0].name)
         self.assertEqual({"parents": ["eth0"]}, eth0_children[0].data)
 
@@ -1878,9 +1810,7 @@ class TestGetDefaultMonitoredInterfaces(MAASTestCase):
             "eth0": {"parents": [], "type": "physical", "enabled": False},
             "eth1": {"parents": [], "type": "physical", "enabled": True},
         }
-        self.assertEqual(
-            get_default_monitored_interfaces(interfaces), ["eth1"]
-        )
+        self.assertEqual(get_default_monitored_interfaces(interfaces), ["eth1"])
 
     def test_returns_enabled_bond_interfaces_instead_of_physical(self):
         interfaces = {
@@ -1899,9 +1829,7 @@ class TestGetDefaultMonitoredInterfaces(MAASTestCase):
                 "enabled": False,
             },
         }
-        self.assertEqual(
-            get_default_monitored_interfaces(interfaces), ["bond0"]
-        )
+        self.assertEqual(get_default_monitored_interfaces(interfaces), ["bond0"])
 
     def test_monitors_virtual_bridges_but_not_physical_bridges(self):
         interfaces = {
@@ -1920,9 +1848,7 @@ class TestGetDefaultMonitoredInterfaces(MAASTestCase):
             "eth0": {"parents": [], "type": "physical", "enabled": True},
             "eth0.100": {"parents": ["eth0"], "type": "vlan", "enabled": True},
         }
-        self.assertEqual(
-            get_default_monitored_interfaces(interfaces), ["eth0"]
-        )
+        self.assertEqual(get_default_monitored_interfaces(interfaces), ["eth0"])
 
 
 class TestAnnotateWithDefaultMonitoredInterfaces(MAASTestCase):
@@ -1965,15 +1891,11 @@ class TestIsLoopbackAddress(MAASTestCase):
 
     def test_handles_random_ipv4_address(self):
         address = factory.make_ipv4_address()
-        self.assertEqual(
-            is_loopback_address(address), IPAddress(address).is_loopback()
-        )
+        self.assertEqual(is_loopback_address(address), IPAddress(address).is_loopback())
 
     def test_handles_random_ipv6_address(self):
         address = factory.make_ipv6_address()
-        self.assertEqual(
-            is_loopback_address(address), IPAddress(address).is_loopback()
-        )
+        self.assertEqual(is_loopback_address(address), IPAddress(address).is_loopback())
 
     def test_handles_ipv6_format_ipv4_loopback(self):
         network = IPNetwork("127.0.0.0/8")
@@ -2184,9 +2106,7 @@ class TestReverseResolveMixIn:
 class TestReverseResolve(TestReverseResolveMixIn, MAASTestCase):
     """Tests for `reverseResolve`."""
 
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     @inlineCallbacks
     def test_uses_resolver_from_getResolver_by_default(self):
@@ -2198,9 +2118,7 @@ class TestReverseResolve(TestReverseResolveMixIn, MAASTestCase):
     def test_uses_passed_in_IResolver_if_specified(self):
         self.set_fake_twisted_dns_reply([])
         some_other_resolver = self.get_mock_iresolver()
-        yield reverseResolve(
-            factory.make_ip_address(), resolver=some_other_resolver
-        )
+        yield reverseResolve(factory.make_ip_address(), resolver=some_other_resolver)
         self.getResolver.mock_not_called()
         some_other_resolver.lookupPointer.mock_called_once()
 
@@ -2266,19 +2184,13 @@ class TestCoerceHostname(MAASTestCase):
         self.assertEqual("abc123", coerce_to_valid_hostname("-abc123-"))
 
     def test_replaces_whitespace_and_special_characters(self):
-        self.assertEqual(
-            "abc123-ubuntu", coerce_to_valid_hostname("abc123 (ubuntu)")
-        )
+        self.assertEqual("abc123-ubuntu", coerce_to_valid_hostname("abc123 (ubuntu)"))
 
     def test_makes_hostname_lowercase(self):
-        self.assertEqual(
-            "ubunturocks", coerce_to_valid_hostname("UbuntuRocks")
-        )
+        self.assertEqual("ubunturocks", coerce_to_valid_hostname("UbuntuRocks"))
 
     def test_preserve_hostname_case(self):
-        self.assertEqual(
-            "UbuntuRocks", coerce_to_valid_hostname("UbuntuRocks", False)
-        )
+        self.assertEqual("UbuntuRocks", coerce_to_valid_hostname("UbuntuRocks", False))
 
     def test_returns_none_if_result_empty(self):
         self.assertIsNone(coerce_to_valid_hostname("-人間性-"))
@@ -2289,16 +2201,12 @@ class TestCoerceHostname(MAASTestCase):
 
 class TestGetSourceAddress(MAASTestCase):
     def test_accepts_ipnetwork(self):
-        self.assertEqual(
-            "127.0.0.1", get_source_address(IPNetwork("127.0.0.1/8"))
-        )
+        self.assertEqual("127.0.0.1", get_source_address(IPNetwork("127.0.0.1/8")))
 
     def test_ipnetwork_works_for_ipv4_slash32(self):
         mock = self.patch(network_module, "get_source_address_for_ipaddress")
         mock.return_value = "10.0.0.1"
-        self.assertEqual(
-            "10.0.0.1", get_source_address(IPNetwork("10.0.0.1/32"))
-        )
+        self.assertEqual("10.0.0.1", get_source_address(IPNetwork("10.0.0.1/32")))
 
     def test_ipnetwork_works_for_ipv6_slash128(self):
         mock = self.patch(network_module, "get_source_address_for_ipaddress")
@@ -2325,9 +2233,7 @@ class TestGetSourceAddress(MAASTestCase):
         )
 
     def test_accepts_ipaddress(self):
-        self.assertEqual(
-            "127.0.0.1", get_source_address(IPAddress("127.0.0.1"))
-        )
+        self.assertEqual("127.0.0.1", get_source_address(IPAddress("127.0.0.1")))
 
     def test_accepts_string(self):
         self.assertEqual("127.0.0.1", get_source_address("127.0.0.1"))
@@ -2419,32 +2325,22 @@ class TestSafeGetaddrinfo(MAASTestCase):
             )
         ]
         getaddrinfo.return_value = expected
-        result = safe_getaddrinfo(
-            "0.0.0.0", 53, family=AF_INET, proto=IPPROTO_TCP
-        )
+        result = safe_getaddrinfo("0.0.0.0", 53, family=AF_INET, proto=IPPROTO_TCP)
         self.assertCountEqual(expected, result)
 
     def test_safe_getaddrinfo_uses_getaddrinfo_for_dual_stack(self):
         getaddrinfo = self.patch(network_module, "getaddrinfo")
-        expected = [
-            (0, socket.SOCK_STREAM, IPPROTO_TCP, "", ("0.0.0.0", 53, 0, 0))
-        ]
+        expected = [(0, socket.SOCK_STREAM, IPPROTO_TCP, "", ("0.0.0.0", 53, 0, 0))]
         getaddrinfo.return_value = expected
         result = safe_getaddrinfo("0.0.0.0", 53, family=0, proto=IPPROTO_TCP)
         self.assertCountEqual(expected, result)
 
     def test_safe_getaddrinfo_uses_resolver_for_v6(self):
-        expected = [
-            (AF_INET6, socket.SOCK_STREAM, IPPROTO_TCP, "", ("::", 53, 0, 0))
-        ]
+        expected = [(AF_INET6, socket.SOCK_STREAM, IPPROTO_TCP, "", ("::", 53, 0, 0))]
         mock_resolver = Mock()
         mock_resolver.lookupIPV6Address = lambda _: succeed(
             (
-                [
-                    RRHeader(
-                        name="::", type=AAAA, payload=Record_AAAA(address="::")
-                    )
-                ],
+                [RRHeader(name="::", type=AAAA, payload=Record_AAAA(address="::"))],
                 [],
                 [],
             )
@@ -2455,9 +2351,7 @@ class TestSafeGetaddrinfo(MAASTestCase):
         self.assertCountEqual(expected, result)
 
     def test_safe_get_addrinfo_uses_resolver_for_v6_with_hostname(self):
-        expected = [
-            (AF_INET6, socket.SOCK_STREAM, IPPROTO_TCP, "", ("::1", 53, 0, 0))
-        ]
+        expected = [(AF_INET6, socket.SOCK_STREAM, IPPROTO_TCP, "", ("::1", 53, 0, 0))]
         mock_resolver = Mock()
         mock_resolver.lookupIPV6Address = lambda _: succeed(
             (
@@ -2475,9 +2369,7 @@ class TestSafeGetaddrinfo(MAASTestCase):
         get_resolver = self.patch(network_module, "getResolver")
         get_resolver.return_value = mock_resolver
         # tests that _v6_lookup works in a synchronous context
-        result = safe_getaddrinfo(
-            "example.com", 53, family=AF_INET6, proto=IPPROTO_TCP
-        )
+        result = safe_getaddrinfo("example.com", 53, family=AF_INET6, proto=IPPROTO_TCP)
         self.assertCountEqual(expected, result)
 
     def test_safe_get_addrinfo_only_v6_result_and_want_v4(self):
@@ -2508,9 +2400,7 @@ class TestSafeGetaddrinfo(MAASTestCase):
         get_resolver = self.patch(network_module, "getResolver")
         get_resolver.return_value = mock_resolver
         self.assertEqual(
-            safe_getaddrinfo(
-                "example.com", 80, family=AF_INET6, proto=IPPROTO_TCP
-            ),
+            safe_getaddrinfo("example.com", 80, family=AF_INET6, proto=IPPROTO_TCP),
             [],
         )
 
@@ -2529,8 +2419,6 @@ class TestSafeGetaddrinfo(MAASTestCase):
 
     def test_safe_get_addrinfo_is_ipv4_address_but_want_v6(self):
         self.assertEqual(
-            safe_getaddrinfo(
-                "0.0.0.0", 80, family=AF_INET6, proto=IPPROTO_TCP
-            ),
+            safe_getaddrinfo("0.0.0.0", 80, family=AF_INET6, proto=IPPROTO_TCP),
             [],
         )

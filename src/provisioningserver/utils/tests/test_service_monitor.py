@@ -55,15 +55,11 @@ EMPTY_SET = frozenset()
 
 
 def pick_observed_state(*, but_not=EMPTY_SET):
-    return factory.pick_enum(
-        SERVICE_STATE, but_not={SERVICE_STATE.ANY, *but_not}
-    )
+    return factory.pick_enum(SERVICE_STATE, but_not={SERVICE_STATE.ANY, *but_not})
 
 
 def pick_expected_state(*, but_not=EMPTY_SET):
-    return factory.pick_enum(
-        SERVICE_STATE, but_not={SERVICE_STATE.UNKNOWN, *but_not}
-    )
+    return factory.pick_enum(SERVICE_STATE, but_not={SERVICE_STATE.UNKNOWN, *but_not})
 
 
 def make_fake_service(expected_state=None, status_info=None):
@@ -134,9 +130,7 @@ class TestServiceState(MAASTestCase):
 
         self.assertEqual(
             status_string,
-            self.expected_status_strings[
-                self.state_observed, self.state_expected
-            ],
+            self.expected_status_strings[self.state_observed, self.state_expected],
         )
 
     @inlineCallbacks
@@ -178,9 +172,7 @@ class TestServiceMonitor(MAASTestCase):
     def run_under_snap(self):
         self.patch(snap, "running_in_snap").return_value = True
         # Snap always uses pebble
-        self.patch(
-            service_monitor_module, "_running_under_pebble"
-        ).return_value = True
+        self.patch(service_monitor_module, "_running_under_pebble").return_value = True
         self.patch(os, "environ", {"PEBBLE": "/snap/data/pebble"})
 
     def make_service_monitor(self, fake_services=None, pebble_agent=None):
@@ -233,9 +225,7 @@ class TestServiceMonitor(MAASTestCase):
         name = factory.make_name("service")
         active_state = pick_observed_state()
         process_state = random.choice(["running", "dead"])
-        yield service_monitor._updateServiceState(
-            name, active_state, process_state
-        )
+        yield service_monitor._updateServiceState(name, active_state, process_state)
         service_lock.acquire.assert_not_called()
         service_lock.release.assert_not_called()
 
@@ -288,13 +278,11 @@ class TestServiceMonitor(MAASTestCase):
         for service in fake_services:
             active_state = pick_observed_state()
             process_state = random.choice(["running", "dead"])
-            expected_states[service.name] = ServiceState(
-                active_state, process_state
-            )
+            expected_states[service.name] = ServiceState(active_state, process_state)
         service_monitor = self.make_service_monitor(fake_services)
-        self.patch(
-            service_monitor, "ensureService"
-        ).side_effect = lambda name: succeed(expected_states[name])
+        self.patch(service_monitor, "ensureService").side_effect = lambda name: succeed(
+            expected_states[name]
+        )
         observed = yield service_monitor.ensureServices()
         self.assertEqual(expected_states, observed)
 
@@ -364,29 +352,21 @@ class TestServiceMonitor(MAASTestCase):
     def test_restartService_performs_restart(self):
         fake_service = make_fake_service(SERVICE_STATE.ON)
         service_monitor = self.make_service_monitor([fake_service])
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = succeed(None)
         service_state = ServiceState(SERVICE_STATE.ON, "running")
         mock_getServiceState = self.patch(service_monitor, "getServiceState")
         mock_getServiceState.return_value = succeed(service_state)
         observed = yield service_monitor.restartService(fake_service.name)
         self.assertEqual(service_state, observed)
-        mock_getServiceState.assert_called_once_with(
-            fake_service.name, now=True
-        ),
-        mock_performServiceAction.assert_called_once_with(
-            fake_service, "restart"
-        )
+        mock_getServiceState.assert_called_once_with(fake_service.name, now=True),
+        mock_performServiceAction.assert_called_once_with(fake_service, "restart")
 
     @inlineCallbacks
     def test_restartService_raises_ServiceActionError_if_not_on(self):
         fake_service = make_fake_service(SERVICE_STATE.ON)
         service_monitor = self.make_service_monitor([fake_service])
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = succeed(None)
         active_state = pick_observed_state(but_not={SERVICE_STATE.ON})
         service_state = ServiceState(active_state, "dead")
@@ -419,9 +399,7 @@ class TestServiceMonitor(MAASTestCase):
     def test_reloadService_calls_ensureService_then_reloads(self):
         fake_service = make_fake_service(SERVICE_STATE.ON)
         service_monitor = self.make_service_monitor([fake_service])
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = succeed(None)
         mock_ensureService = self.patch(service_monitor, "ensureService")
         mock_ensureService.return_value = succeed(
@@ -429,9 +407,7 @@ class TestServiceMonitor(MAASTestCase):
         )
         yield service_monitor.reloadService(fake_service.name)
         mock_ensureService.assert_called_once_with(fake_service.name)
-        mock_performServiceAction.assert_called_once_with(
-            fake_service, "reload"
-        )
+        mock_performServiceAction.assert_called_once_with(fake_service, "reload")
 
     @inlineCallbacks
     def test_reloadService_raises_error_if_fails_to_start(self):
@@ -458,9 +434,7 @@ class TestServiceMonitor(MAASTestCase):
     def test_reloadService_always_calls_ensureService_then_reloads(self):
         fake_service = make_fake_service(SERVICE_STATE.ON)
         service_monitor = self.make_service_monitor([fake_service])
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = succeed(None)
         mock_ensureService = self.patch(service_monitor, "ensureService")
         mock_ensureService.return_value = succeed(
@@ -468,9 +442,7 @@ class TestServiceMonitor(MAASTestCase):
         )
         yield service_monitor.reloadService(fake_service.name, if_on=True)
         mock_ensureService.assert_called_once_with(fake_service.name)
-        mock_performServiceAction.assert_called_once_with(
-            fake_service, "reload"
-        )
+        mock_performServiceAction.assert_called_once_with(fake_service, "reload")
 
     @inlineCallbacks
     def test_reloadService_always_raises_error_if_fails_to_start(self):
@@ -490,9 +462,7 @@ class TestServiceMonitor(MAASTestCase):
     def test_killService_performs_kill_then_ensureService(self):
         fake_service = make_fake_service(SERVICE_STATE.ON)
         service_monitor = self.make_service_monitor([fake_service])
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = succeed(None)
         mock_ensureService = self.patch(service_monitor, "ensureService")
         mock_ensureService.return_value = succeed(
@@ -506,9 +476,7 @@ class TestServiceMonitor(MAASTestCase):
     def test_killService_doesnt_fail_on_ServiceActionError(self):
         fake_service = make_fake_service(SERVICE_STATE.ON)
         service_monitor = self.make_service_monitor([fake_service])
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = fail(ServiceActionError())
         mock_ensureService = self.patch(service_monitor, "ensureService")
         mock_ensureService.return_value = succeed(
@@ -524,18 +492,14 @@ class TestServiceMonitor(MAASTestCase):
         with self.assertRaisesRegex(
             ServiceActionError, "^Service monitor timed out after"
         ):
-            yield monitor._execCmd(
-                ["sleep", "0.01"], {}, timeout=0.001, retries=1
-            )
+            yield monitor._execCmd(["sleep", "0.01"], {}, timeout=0.001, retries=1)
         # Pause long enough for the reactor to cleanup the process.
         yield pause(0.03)
 
     @inlineCallbacks
     def test_execCmd_retries(self):
         monitor = ServiceMonitor(make_fake_service())
-        mock_deferWithTimeout = self.patch(
-            service_monitor_module, "deferWithTimeout"
-        )
+        mock_deferWithTimeout = self.patch(service_monitor_module, "deferWithTimeout")
         mock_deferWithTimeout.side_effect = always_fail_with(CancelledError())
         with self.assertRaisesRegex(
             ServiceActionError, "^Service monitor timed out after"
@@ -620,9 +584,7 @@ class TestServiceMonitor(MAASTestCase):
         action = "start"
         mock_pebble_request = self.patch(service_monitor, "_pebble_request")
         mock_pebble_request.return_value = succeed({})
-        result = yield service_monitor._execPebbleServiceAction(
-            service_name, action
-        )
+        result = yield service_monitor._execPebbleServiceAction(service_name, action)
         mock_pebble_request.assert_called_once_with(
             # The environment contains LC_ALL and LANG too.
             "POST",
@@ -651,12 +613,8 @@ class TestServiceMonitor(MAASTestCase):
         service_monitor = self.make_service_monitor()
         service_name = factory.make_name("service")
         action = factory.make_name("action")
-        with self.assertRaisesRegex(
-            ValueError, f"^Unknown pebble action '{action}'$"
-        ):
-            yield service_monitor._execPebbleServiceAction(
-                service_name, action
-            )
+        with self.assertRaisesRegex(ValueError, f"^Unknown pebble action '{action}'$"):
+            yield service_monitor._execPebbleServiceAction(service_name, action)
 
     @inlineCallbacks
     def test_execPebbleServiceAction_service_performs_valid_get_request(self):
@@ -667,9 +625,7 @@ class TestServiceMonitor(MAASTestCase):
         mock_pebble_request.return_value = succeed(
             {"result": {"name": service_name, "current": "active"}}
         )
-        yield service_monitor._execPebbleServiceAction(
-            service_name, "services"
-        )
+        yield service_monitor._execPebbleServiceAction(service_name, "services")
         mock_pebble_request.assert_called_once_with(
             "GET",
             f"/v1/services?names={service_name}",
@@ -714,9 +670,7 @@ class TestServiceMonitor(MAASTestCase):
         mock_pebble_request = self.patch(service_monitor, "_pebble_request")
 
         mock_pebble_request.return_value = succeed({})
-        with self.assertRaisesRegex(
-            ValueError, "^Multiple signal names provided$"
-        ):
+        with self.assertRaisesRegex(ValueError, "^Multiple signal names provided$"):
             yield service_monitor._execPebbleServiceAction(
                 service_name,
                 "signal",
@@ -736,9 +690,7 @@ class TestServiceMonitor(MAASTestCase):
             ValueError,
             r"^Provide signal name in 'SIG\.\*' format in extra_opts$",
         ):
-            yield service_monitor._execPebbleServiceAction(
-                service_name, "signal"
-            )
+            yield service_monitor._execPebbleServiceAction(service_name, "signal")
         mock_pebble_request.assert_not_called()
 
     @inlineCallbacks
@@ -792,9 +744,7 @@ class TestServiceMonitor(MAASTestCase):
 
         error = "TEST"
         mock_pebble_request.side_effect = [fail(ValueError(error))]
-        result = yield service_monitor._execPebbleServiceAction(
-            service_name, "start"
-        )
+        result = yield service_monitor._execPebbleServiceAction(service_name, "start")
         self.assertEqual((1, None, error), result)
 
     @inlineCallbacks
@@ -811,9 +761,7 @@ class TestServiceMonitor(MAASTestCase):
         )
         self.assertEqual(1, code)
         self.assertIsNone(output)
-        self.assertEqual(
-            "Expected to have change id in async request response", error
-        )
+        self.assertEqual("Expected to have change id in async request response", error)
 
     @inlineCallbacks
     def test_execPebbleServiceAction_extract_service_status_raises_when_no_results(
@@ -853,9 +801,7 @@ class TestServiceMonitor(MAASTestCase):
         call_args = mock_agent.mock_calls[0].args
         self.assertEqual(b"POST", call_args[0])
         self.assertEqual(b"unix://localhost/endpoint", call_args[1])
-        self.assertEqual(
-            Headers({"Content-Type": ["application/json"]}), call_args[2]
-        )
+        self.assertEqual(Headers({"Content-Type": ["application/json"]}), call_args[2])
 
         consumed = b""
 
@@ -908,9 +854,7 @@ class TestServiceMonitor(MAASTestCase):
         mock_agent.request.return_value = succeed(mock_response)
         service_monitor = self.make_service_monitor(pebble_agent=mock_agent)
 
-        with self.assertRaisesRegex(
-            ValueError, "Unexpected pebble response code"
-        ):
+        with self.assertRaisesRegex(ValueError, "Unexpected pebble response code"):
             yield service_monitor._pebble_request("GET", "/400")
 
     @inlineCallbacks
@@ -948,9 +892,7 @@ class TestServiceMonitor(MAASTestCase):
     def test_pebble_create_agent_creates_correct_snap_agent(self):
         """Checks whether snap paths are used by _pebble_create_agents in snap env"""
         self.run_under_snap()
-        paths = SnapPaths(
-            snap="/snap/base", data="/snap/data", common="/snap/common"
-        )
+        paths = SnapPaths(snap="/snap/base", data="/snap/data", common="/snap/common")
         self.patch(snap.SnapPaths, "from_environ").return_value = paths
         service_monitor = self.make_service_monitor()
         agent = service_monitor._pebble_create_agent()
@@ -1000,9 +942,7 @@ class TestServiceMonitor(MAASTestCase):
             agent._endpointFactory,
             service_monitor_module.UnixClientEndpointFactory,
         )
-        self.assertEqual(
-            env["PEBBLE_SOCKET"], agent._endpointFactory._socket_path
-        )
+        self.assertEqual(env["PEBBLE_SOCKET"], agent._endpointFactory._socket_path)
 
     @inlineCallbacks
     def test_pebble_wait_on_change_monitors_changes(self):
@@ -1012,20 +952,14 @@ class TestServiceMonitor(MAASTestCase):
         change_id = 42
         request_count = 0
 
-        def pebble_request_side_effect(
-            method, endpoint, payload=None, agent=None
-        ):
+        def pebble_request_side_effect(method, endpoint, payload=None, agent=None):
             nonlocal request_count
             if method == "GET" and endpoint == f"/v1/changes/{change_id}":
                 request_count += 1
                 if request_count == 1:
-                    return succeed(
-                        {"result": {"status": "Doing", "ready": False}}
-                    )
+                    return succeed({"result": {"status": "Doing", "ready": False}})
                 else:
-                    return succeed(
-                        {"result": {"status": "Done", "ready": True}}
-                    )
+                    return succeed({"result": {"status": "Done", "ready": True}})
             else:
                 raise AssertionError(
                     f"Unexpected request: {method} {endpoint} {payload}"
@@ -1071,9 +1005,7 @@ class TestServiceMonitor(MAASTestCase):
         mock_pebble_request.return_value = succeed(
             {"result": {"status": "Undone", "ready": True}}
         )
-        with self.assertRaisesRegex(
-            ValueError, f"Pebble change {change_id} is undone"
-        ):
+        with self.assertRaisesRegex(ValueError, f"Pebble change {change_id} is undone"):
             yield service_monitor._pebble_wait_on_change(change_id, backoff=0)
 
     @inlineCallbacks
@@ -1168,9 +1100,7 @@ class TestServiceMonitor(MAASTestCase):
         error_output = factory.make_name("error")
         mock_execSystemDServiceAction.return_value = (1, "", error_output)
         action = factory.make_name("action")
-        with FakeLogger(
-            "maas.service_monitor", level=logging.ERROR
-        ) as maaslog:
+        with FakeLogger("maas.service_monitor", level=logging.ERROR) as maaslog:
             with self.assertRaisesRegex(
                 ServiceActionError,
                 f"^Service '{service.name}' failed to {action}: {error_output}$",
@@ -1189,15 +1119,11 @@ class TestServiceMonitor(MAASTestCase):
             service_monitor, "_loadSystemDServiceState"
         )
         mock_loadSystemDServiceState.return_value = sentinel.result
-        self.assertEqual(
-            sentinel.result, service_monitor._loadServiceState(service)
-        )
+        self.assertEqual(sentinel.result, service_monitor._loadServiceState(service))
 
     @inlineCallbacks
     def test_loadServiceState_uses_pebble(self):
-        self.patch(
-            service_monitor_module, "_running_under_pebble"
-        ).return_value = True
+        self.patch(service_monitor_module, "_running_under_pebble").return_value = True
         service = make_fake_service(SERVICE_STATE.ON)
         service_monitor = self.make_service_monitor([service])
         mock_loadPebbleServiceState = self.patch(
@@ -1570,9 +1496,7 @@ class TestServiceMonitor(MAASTestCase):
             ServiceState(SERVICE_STATE.ON, invalid_process_state)
         )
 
-        with FakeLogger(
-            "maas.service_monitor", level=logging.WARNING
-        ) as maaslog:
+        with FakeLogger("maas.service_monitor", level=logging.WARNING) as maaslog:
             yield service_monitor._ensureService(service)
         self.assertEqual(
             f"Service '{service.service_name}' is on but not in the expected state of 'running', "
@@ -1631,9 +1555,7 @@ class TestServiceMonitor(MAASTestCase):
             ServiceState(SERVICE_STATE.DEAD, invalid_process_state)
         )
 
-        with FakeLogger(
-            "maas.service_monitor", level=logging.WARNING
-        ) as maaslog:
+        with FakeLogger("maas.service_monitor", level=logging.WARNING) as maaslog:
             yield service_monitor._ensureService(service)
         self.assertEqual(
             f"Service '{service.service_name}' is dead but not in the expected state of 'Result: exit-code', "
@@ -1651,9 +1573,7 @@ class TestServiceMonitor(MAASTestCase):
             succeed(ServiceState(SERVICE_STATE.OFF, "waiting")),
             succeed(ServiceState(SERVICE_STATE.ON, "running")),
         ]
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = succeed(None)
 
         with FakeLogger("maas.service_monitor", level=logging.INFO) as maaslog:
@@ -1677,9 +1597,7 @@ class TestServiceMonitor(MAASTestCase):
             succeed(ServiceState(SERVICE_STATE.ON, "running")),
             succeed(ServiceState(SERVICE_STATE.OFF, "waiting")),
         ]
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = succeed(None)
 
         with FakeLogger("maas.service_monitor", level=logging.INFO) as maaslog:
@@ -1703,18 +1621,14 @@ class TestServiceMonitor(MAASTestCase):
             succeed(ServiceState(SERVICE_STATE.OFF, "waiting")),
             succeed(ServiceState(SERVICE_STATE.OFF, "waiting")),
         ]
-        mock_performServiceAction = self.patch(
-            service_monitor, "_performServiceAction"
-        )
+        mock_performServiceAction = self.patch(service_monitor, "_performServiceAction")
         mock_performServiceAction.return_value = succeed(None)
 
         with self.assertRaisesRegex(
             ServiceActionError,
             rf"^Service '{service.service_name}' failed to start\.",
         ):
-            with FakeLogger(
-                "maas.service_monitor", level=logging.INFO
-            ) as maaslog:
+            with FakeLogger("maas.service_monitor", level=logging.INFO) as maaslog:
                 yield service_monitor._ensureService(service)
         self.assertIn(
             f"Service '{service.service_name}' is not on, it will be started.",
@@ -1758,9 +1672,7 @@ class TestToggleableService(MAASTestCase):
         service = self.make_toggleable_service()
         service.expected_state = sentinel.state
         service.expected_state_reason = sentinel.reason
-        self.assertEqual(
-            (sentinel.state, sentinel.reason), service.getExpectedState()
-        )
+        self.assertEqual((sentinel.state, sentinel.reason), service.getExpectedState())
 
     def test_is_on_returns_True_when_expected_state_on(self):
         service = self.make_toggleable_service()

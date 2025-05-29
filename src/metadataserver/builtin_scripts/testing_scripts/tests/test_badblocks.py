@@ -64,9 +64,7 @@ class TestRunBadBlocks(MAASTestCase):
         blocksize = random.randint(512, 4096)
         self.patch(badblocks, "get_block_size").return_value = blocksize
         parallel_blocks = random.randint(1, 50000)
-        self.patch(
-            badblocks, "get_parallel_blocks"
-        ).return_value = parallel_blocks
+        self.patch(badblocks, "get_parallel_blocks").return_value = parallel_blocks
         self.patch(os, "environ", {"RESULT_PATH": factory.make_name()})
         cmd = [
             "sudo",
@@ -104,18 +102,14 @@ class TestRunBadBlocks(MAASTestCase):
         self.assertEqual(1, badblocks.run_badblocks(storage))
         mock_popen.assert_called_once_with(cmd, stdout=PIPE, stderr=STDOUT)
         mock_open.assert_called_once_with(ANY, "w")
-        mock_yaml_safe_dump.assert_called_once_with(
-            results, mock_open.return_value
-        )
+        mock_yaml_safe_dump.assert_called_once_with(results, mock_open.return_value)
 
     def test_run_badblocks_destructive(self):
         storage = factory.make_name("storage")
         blocksize = random.randint(512, 4096)
         self.patch(badblocks, "get_block_size").return_value = blocksize
         parallel_blocks = random.randint(1, 50000)
-        self.patch(
-            badblocks, "get_parallel_blocks"
-        ).return_value = parallel_blocks
+        self.patch(badblocks, "get_parallel_blocks").return_value = parallel_blocks
         cmd = [
             "sudo",
             "-n",

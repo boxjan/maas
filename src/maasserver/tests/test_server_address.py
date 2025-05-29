@@ -30,9 +30,7 @@ class TestGetMAASFacingServerHost(MAASServerTestCase):
     def test_get_maas_facing_server_host_returns_host_name(self):
         hostname = make_hostname()
         self.set_maas_url(hostname)
-        self.assertEqual(
-            hostname, server_address.get_maas_facing_server_host()
-        )
+        self.assertEqual(hostname, server_address.get_maas_facing_server_host())
 
     def test_get_maas_facing_server_host_returns_ip_if_ip_configured(self):
         ip = factory.make_ipv4_address()
@@ -43,16 +41,12 @@ class TestGetMAASFacingServerHost(MAASServerTestCase):
         hostname = factory.make_hostname()
         maas_url = "http://%s" % hostname
         rack = factory.make_RackController(url=maas_url)
-        self.assertEqual(
-            hostname, server_address.get_maas_facing_server_host(rack)
-        )
+        self.assertEqual(hostname, server_address.get_maas_facing_server_host(rack))
 
     def test_get_maas_facing_server_host_strips_out_port(self):
         hostname = make_hostname()
         self.set_maas_url(hostname, with_port=True)
-        self.assertEqual(
-            hostname, server_address.get_maas_facing_server_host()
-        )
+        self.assertEqual(hostname, server_address.get_maas_facing_server_host())
 
     def test_get_maas_facing_server_host_parses_IPv6_address_in_URL(self):
         ip = factory.make_ipv6_address()
@@ -109,9 +103,7 @@ class TestGetMAASFacingServerAddresses(MAASServerTestCase):
         ip = factory.make_ipv4_address()
         maas_url = "http://%s" % ip
         rack = factory.make_RackController(url=maas_url)
-        self.assertEqual(
-            str(ip), server_address.get_maas_facing_server_host(rack)
-        )
+        self.assertEqual(str(ip), server_address.get_maas_facing_server_host(rack))
 
     def test_resolves_hostname(self):
         hostname = make_hostname()
@@ -155,20 +147,14 @@ class TestGetMAASFacingServerAddresses(MAASServerTestCase):
 
     def test_does_not_return_link_local_addresses(self):
         global_ipv6 = factory.make_ipv6_address()
-        local_ipv6 = {
-            "fe80::%d:9876:5432:10" % randint(0, 9999) for _ in range(5)
-        }
+        local_ipv6 = {"fe80::%d:9876:5432:10" % randint(0, 9999) for _ in range(5)}
         self.patch_resolve_hostname([global_ipv6] + list(local_ipv6))
         self.patch_get_maas_facing_server_host()
-        self.assertEqual(
-            [IPAddress(global_ipv6)], get_maas_facing_server_addresses()
-        )
+        self.assertEqual([IPAddress(global_ipv6)], get_maas_facing_server_addresses())
 
     def test_returns_link_local_addresses_if_asked(self):
         global_ipv6 = factory.make_ipv6_address()
-        local_ipv6 = {
-            "fe80::%d:9876:5432:10" % randint(0, 9999) for _ in range(5)
-        }
+        local_ipv6 = {"fe80::%d:9876:5432:10" % randint(0, 9999) for _ in range(5)}
         self.patch_resolve_hostname([global_ipv6] + list(local_ipv6))
         self.patch_get_maas_facing_server_host()
         self.assertCountEqual(
@@ -204,9 +190,7 @@ class TestGetMAASFacingServerAddresses(MAASServerTestCase):
         factory.make_Interface(node=r3, ip="192.168.0.4")
         # Make the "current" region controller r1.
         self.patch(server_address.MAAS_ID, "get").return_value = r1.system_id
-        region_ips = get_maas_facing_server_addresses(
-            rack, include_alternates=True
-        )
+        region_ips = get_maas_facing_server_addresses(rack, include_alternates=True)
         self.assertEqual(
             region_ips,
             [
@@ -230,9 +214,7 @@ class TestGetMAASFacingServerAddresses(MAASServerTestCase):
         factory.make_Interface(node=r2, ip="192.168.0.2")
         # Make the "current" region controller r1.
         self.patch(server_address.MAAS_ID, "get").return_value = r1.system_id
-        region_ips = get_maas_facing_server_addresses(
-            rack, include_alternates=True
-        )
+        region_ips = get_maas_facing_server_addresses(rack, include_alternates=True)
         self.assertEqual(
             [IPAddress("192.168.0.2"), IPAddress("192.168.0.1")],
             region_ips,
@@ -253,9 +235,7 @@ class TestGetMAASFacingServerAddresses(MAASServerTestCase):
         factory.make_Interface(node=r3, ip="192.168.0.5")
         # Make the "current" region controller r1.
         self.patch(server_address.MAAS_ID, "get").return_value = r1.system_id
-        region_ips = get_maas_facing_server_addresses(
-            rack, include_alternates=True
-        )
+        region_ips = get_maas_facing_server_addresses(rack, include_alternates=True)
         self.assertEqual(
             region_ips,
             [
@@ -282,9 +262,7 @@ class TestGetMAASFacingServerAddresses(MAASServerTestCase):
         factory.make_Interface(node=r3, ip="192.168.1.5")
         # Make the "current" region controller r1.
         self.patch(server_address.MAAS_ID, "get").return_value = r1.system_id
-        region_ips = get_maas_facing_server_addresses(
-            rack, include_alternates=True
-        )
+        region_ips = get_maas_facing_server_addresses(rack, include_alternates=True)
         self.assertEqual(
             region_ips,
             [
@@ -313,9 +291,7 @@ class TestGetMAASFacingServerAddresses(MAASServerTestCase):
         factory.make_Interface(node=r3, ip="2001:db8::4")
         # Make the "current" region controller r1.
         self.patch(server_address.MAAS_ID, "get").return_value = r1.system_id
-        region_ips = get_maas_facing_server_addresses(
-            rack, include_alternates=True
-        )
+        region_ips = get_maas_facing_server_addresses(rack, include_alternates=True)
         self.assertEqual(
             region_ips,
             [

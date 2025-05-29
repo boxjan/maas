@@ -62,9 +62,7 @@ def network_clashes(network, other_networks):
 
 
 class Factory:
-    random_letters = map(
-        random.choice, repeat(string.ascii_letters + string.digits)
-    )
+    random_letters = map(random.choice, repeat(string.ascii_letters + string.digits))
 
     random_letters_with_spaces = map(
         random.choice, repeat(string.ascii_letters + string.digits + " ")
@@ -75,9 +73,7 @@ class Factory:
         random.choice, repeat(string.ascii_letters + ".@+-")
     )
 
-    random_http_responses = map(
-        random.choice, repeat(tuple(http.client.responses))
-    )
+    random_http_responses = map(random.choice, repeat(tuple(http.client.responses)))
 
     random_octet = partial(random.randint, 0, 255)
 
@@ -111,9 +107,7 @@ class Factory:
 
     def make_string(self, size=10, spaces=False, prefix=""):
         """Return a `str` filled with random ASCII letters or digits."""
-        source = (
-            self.random_letters_with_spaces if spaces else self.random_letters
-        )
+        source = self.random_letters_with_spaces if spaces else self.random_letters
         return prefix + "".join(islice(source, size))
 
     def make_hex_string(self, size=4, choices=string.hexdigits):
@@ -183,9 +177,7 @@ class Factory:
         :type but_not: Sequence.
         """
         if issubclass(enum, Enum):
-            return random.choice(
-                [value for value in enum if value not in but_not]
-            )
+            return random.choice([value for value in enum if value not in but_not])
         else:
             return random.choice(
                 [
@@ -344,9 +336,7 @@ class Factory:
                 return network
         raise TooManyRandomRetries("Could not find available network")
 
-    def make_ipv4_network(
-        self, slash=None, *, but_not=EMPTY_SET, disjoint_from=None
-    ):
+    def make_ipv4_network(self, slash=None, *, but_not=EMPTY_SET, disjoint_from=None):
         """Generate a random IPv4 network.
 
         :param slash: Netmask or bit width of the network, e.g. 24 or
@@ -369,9 +359,7 @@ class Factory:
             random_address_factory=self.make_ipv4_address,
         )
 
-    def make_ipv6_network(
-        self, slash=None, *, but_not=EMPTY_SET, disjoint_from=None
-    ):
+    def make_ipv6_network(self, slash=None, *, but_not=EMPTY_SET, disjoint_from=None):
         """Generate a random IPv6 network.
 
         :param slash: Netmask or bit width of the network. If not
@@ -394,9 +382,7 @@ class Factory:
             random_address_factory=self.make_ipv6_address,
         )
 
-    def make_ip4_or_6_network(
-        self, version=None, host_bits=None, but_not=EMPTY_SET
-    ):
+    def make_ip4_or_6_network(self, version=None, host_bits=None, but_not=EMPTY_SET):
         """Generate a random IPv4 or IPv6 network."""
         slash = None
         if version is None:
@@ -418,9 +404,7 @@ class Factory:
             address = IPAddress(random.randint(first, last))
             if address not in but_not:
                 return str(address)
-        raise TooManyRandomRetries(
-            "Could not find available IP in static range"
-        )
+        raise TooManyRandomRetries("Could not find available IP in static range")
 
     def pick_ip_in_static_range(self, ngi, *, but_not=EMPTY_SET):
         first = ngi.get_static_ip_range().first
@@ -430,9 +414,7 @@ class Factory:
             address = IPAddress(random.randint(first, last))
             if address not in but_not:
                 return str(address)
-        raise TooManyRandomRetries(
-            "Could not find available IP in static range"
-        )
+        raise TooManyRandomRetries("Could not find available IP in static range")
 
     def pick_ip_in_network(self, network, *, but_not=EMPTY_SET):
         excluded_set = IPSet()
@@ -477,10 +459,7 @@ class Factory:
         """
         for _ in range(100):
             ip_range = tuple(
-                sorted(
-                    IPAddress(factory.pick_ip_in_network(network))
-                    for _ in range(2)
-                )
+                sorted(IPAddress(factory.pick_ip_in_network(network)) for _ in range(2))
             )
             if ip_range[0] < ip_range[1]:
                 return ip_range
@@ -681,9 +660,7 @@ class Factory:
             query = self.make_name("query")
         if fragment is None:
             fragment = self.make_name("fragment")
-        return urllib.parse.ParseResult(
-            scheme, netloc, path, params, query, fragment
-        )
+        return urllib.parse.ParseResult(scheme, netloc, path, params, query, fragment)
 
     def make_url(
         self,
@@ -771,9 +748,7 @@ class Factory:
             output=factory.make_bytes(),
         )
 
-    def make_kernel_string(
-        self, can_be_release_or_version=False, generic_only=False
-    ):
+    def make_kernel_string(self, can_be_release_or_version=False, generic_only=False):
         ubuntu = UbuntuDistroInfo()
         # Only select from MAAS supported releases so we don't have to deal
         # with versions name overlap(e.g Warty and Wily).

@@ -74,15 +74,11 @@ class ControllerInfoManager(Manager):
                 {
                     "snap_revision": versions.current.revision,
                     "snap_cohort": versions.cohort,
-                    "update_origin": str(versions.channel)
-                    if versions.channel
-                    else "",
+                    "update_origin": str(versions.channel) if versions.channel else "",
                 }
             )
         elif versions.install_type == CONTROLLER_INSTALL_TYPE.DEB:
-            details["update_origin"] = self._parse_deb_origin(
-                versions.current.origin
-            )
+            details["update_origin"] = self._parse_deb_origin(versions.current.origin)
 
         if versions.update:
             details.update(
@@ -277,9 +273,7 @@ def get_target_version() -> Optional[TargetVersion]:
                 # only point to a branch if it's a release one, as other branches
                 # are in general intended as a temporary change for testing
                 channel.branch = ""
-            snap_channel = (
-                min(channel, snap_channel) if snap_channel else channel
-            )
+            snap_channel = min(channel, snap_channel) if snap_channel else channel
     else:
         # compose the channel from the target version
         snap_channel = channel_from_version(version)
@@ -318,11 +312,7 @@ def _process_udpate_issues_notification():
     # installation sources" notification before
     multiple_versions = info.values("version").distinct().count() > 1
     multiple_upgrade_versions = (
-        info.exclude(update_version="")
-        .values("update_version")
-        .distinct()
-        .count()
-        > 1
+        info.exclude(update_version="").values("update_version").distinct().count() > 1
     )
 
     def set_warning(reason, message):
@@ -345,19 +335,13 @@ def _process_udpate_issues_notification():
             )
 
     if any((multiple_install_types, multiple_origins, multiple_cohorts)):
-        set_warning(
-            "install_source", "Controllers have different installation sources"
-        )
+        set_warning("install_source", "Controllers have different installation sources")
     elif multiple_upgrade_versions:
-        set_warning(
-            "upgrade_versions", "Controllers report different upgrade versions"
-        )
+        set_warning("upgrade_versions", "Controllers report different upgrade versions")
     elif multiple_versions:
         set_warning("versions", "Controllers have different versions")
     else:
-        Notification.objects.filter(
-            ident=UPGRADE_ISSUE_NOTIFICATION_IDENT
-        ).delete()
+        Notification.objects.filter(ident=UPGRADE_ISSUE_NOTIFICATION_IDENT).delete()
 
 
 def _process_update_status_notification():
@@ -367,9 +351,7 @@ def _process_update_status_notification():
             message = "MAAS has been updated to version {version}."
             context["status"] = "completed"
         else:
-            message = (
-                "MAAS {version} is available, controllers will upgrade soon."
-            )
+            message = "MAAS {version} is available, controllers will upgrade soon."
             context["status"] = "inprogress"
 
         defaults = {

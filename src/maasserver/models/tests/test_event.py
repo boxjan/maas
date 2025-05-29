@@ -51,9 +51,7 @@ class TestEvent(MAASServerTestCase):
             system_id=node.system_id,
             type_name=type_name,
             type_description=description,
-            type_level=random.choice(
-                [logging.ERROR, logging.WARNING, logging.INFO]
-            ),
+            type_level=random.choice([logging.ERROR, logging.WARNING, logging.INFO]),
             event_action=action,
             event_description=description,
         )
@@ -78,9 +76,7 @@ class TestEvent(MAASServerTestCase):
             system_id=node.system_id,
             type_name=type_name,
             type_description=description,
-            type_level=random.choice(
-                [logging.ERROR, logging.WARNING, logging.INFO]
-            ),
+            type_level=random.choice([logging.ERROR, logging.WARNING, logging.INFO]),
             event_action=action,
             event_description=description,
         )
@@ -99,9 +95,7 @@ class TestEvent(MAASServerTestCase):
             system_id=node.system_id,
             type_name=type_name,
             type_description=description,
-            type_level=random.choice(
-                [logging.ERROR, logging.WARNING, logging.INFO]
-            ),
+            type_level=random.choice([logging.ERROR, logging.WARNING, logging.INFO]),
             event_action=action,
             event_description=description,
             user=node.owner,
@@ -148,9 +142,7 @@ class TestEvent(MAASServerTestCase):
             system_id=node.system_id,
             type_name=type_name,
             type_description=description,
-            type_level=random.choice(
-                [logging.ERROR, logging.WARNING, logging.INFO]
-            ),
+            type_level=random.choice([logging.ERROR, logging.WARNING, logging.INFO]),
             event_action=action,
             event_description=description,
         )
@@ -163,9 +155,7 @@ class TestEvent(MAASServerTestCase):
             system_id=node.system_id,
             type_name=type_name,
             type_description=description,
-            type_level=random.choice(
-                [logging.ERROR, logging.WARNING, logging.INFO]
-            ),
+            type_level=random.choice([logging.ERROR, logging.WARNING, logging.INFO]),
             event_action=action,
             event_description=description,
         )

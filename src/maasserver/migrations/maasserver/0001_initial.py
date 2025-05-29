@@ -77,18 +77,14 @@ class Migration(migrations.Migration):
                     "size",
                     models.BigIntegerField(
                         help_text="Size of block device in bytes.",
-                        validators=[
-                            django.core.validators.MinValueValidator(4194304)
-                        ],
+                        validators=[django.core.validators.MinValueValidator(4194304)],
                     ),
                 ),
                 (
                     "block_size",
                     models.IntegerField(
                         help_text="Size of a block on the device in bytes.",
-                        validators=[
-                            django.core.validators.MinValueValidator(512)
-                        ],
+                        validators=[django.core.validators.MinValueValidator(512)],
                     ),
                 ),
                 (
@@ -504,9 +500,7 @@ class Migration(migrations.Migration):
                 ("updated", models.DateTimeField(editable=False)),
                 (
                     "name",
-                    models.CharField(
-                        unique=True, max_length=255, editable=False
-                    ),
+                    models.CharField(unique=True, max_length=255, editable=False),
                 ),
                 (
                     "description",
@@ -537,9 +531,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=256,
                         null=True,
-                        validators=[
-                            maasserver.models.fabric.validate_fabric_name
-                        ],
+                        validators=[maasserver.models.fabric.validate_fabric_name],
                     ),
                 ),
                 (
@@ -590,9 +582,7 @@ class Migration(migrations.Migration):
                 ("dhcp", models.NullBooleanField()),
                 (
                     "host_reserve",
-                    models.PositiveIntegerField(
-                        default=1, null=True, blank=True
-                    ),
+                    models.PositiveIntegerField(default=1, null=True, blank=True),
                 ),
                 (
                     "bridge",
@@ -602,9 +592,7 @@ class Migration(migrations.Migration):
                         null=True,
                         help_text="If specified, this bridge name is used on the hosts",
                         validators=[
-                            django.core.validators.RegexValidator(
-                                "^[\\w\\-_]+$"
-                            )
+                            django.core.validators.RegexValidator("^[\\w\\-_]+$")
                         ],
                     ),
                 ),
@@ -729,9 +717,7 @@ class Migration(migrations.Migration):
                 ("updated", models.DateTimeField(editable=False)),
                 (
                     "uuid",
-                    models.CharField(
-                        unique=True, max_length=36, editable=False
-                    ),
+                    models.CharField(unique=True, max_length=36, editable=False),
                 ),
                 (
                     "group_type",
@@ -798,9 +784,7 @@ class Migration(migrations.Migration):
                         help_text="Interface name.",
                         max_length=255,
                         validators=[
-                            django.core.validators.RegexValidator(
-                                "^[\\w\\-_.:]+$"
-                            )
+                            django.core.validators.RegexValidator("^[\\w\\-_.:]+$")
                         ],
                     ),
                 ),
@@ -820,9 +804,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "mac_address",
-                    maasserver.migrations.fields.MACAddressField(
-                        null=True, blank=True
-                    ),
+                    maasserver.migrations.fields.MACAddressField(null=True, blank=True),
                 ),
                 (
                     "ipv4_params",
@@ -911,9 +893,7 @@ class Migration(migrations.Migration):
                 ("updated", models.DateTimeField(editable=False)),
                 (
                     "sha256",
-                    models.CharField(
-                        unique=True, max_length=64, editable=False
-                    ),
+                    models.CharField(unique=True, max_length=64, editable=False),
                 ),
                 ("total_size", models.BigIntegerField(editable=False)),
                 ("content", maasserver.fields.LargeObjectField()),
@@ -1041,9 +1021,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "installable",
-                    models.BooleanField(
-                        default=True, db_index=True, editable=False
-                    ),
+                    models.BooleanField(default=True, db_index=True, editable=False),
                 ),
                 (
                     "routers",
@@ -1057,9 +1035,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "agent_name",
-                    models.CharField(
-                        default="", max_length=255, null=True, blank=True
-                    ),
+                    models.CharField(default="", max_length=255, null=True, blank=True),
                 ),
                 (
                     "error_description",
@@ -1069,9 +1045,7 @@ class Migration(migrations.Migration):
                 ("memory", models.IntegerField(default=0)),
                 (
                     "swap_size",
-                    models.BigIntegerField(
-                        default=None, null=True, blank=True
-                    ),
+                    models.BigIntegerField(default=None, null=True, blank=True),
                 ),
                 (
                     "power_type",
@@ -1099,9 +1073,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "power_state_updated",
-                    models.DateTimeField(
-                        default=None, null=True, editable=False
-                    ),
+                    models.DateTimeField(default=None, null=True, editable=False),
                 ),
                 (
                     "error",
@@ -1164,9 +1136,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "name",
-                    maasserver.fields.DomainNameField(
-                        blank=True, max_length=80
-                    ),
+                    maasserver.fields.DomainNameField(blank=True, max_length=80),
                 ),
                 (
                     "status",
@@ -1176,9 +1146,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "api_key",
-                    models.CharField(
-                        unique=True, max_length=18, editable=False
-                    ),
+                    models.CharField(unique=True, max_length=18, editable=False),
                 ),
                 (
                     "dhcp_key",
@@ -1240,9 +1208,7 @@ class Migration(migrations.Migration):
                         max_length=255,
                         blank=True,
                         validators=[
-                            django.core.validators.RegexValidator(
-                                "^[\\w:.-]+$"
-                            )
+                            django.core.validators.RegexValidator("^[\\w:.-]+$")
                         ],
                     ),
                 ),
@@ -1308,9 +1274,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "foreign_dhcp_ip",
-                    models.GenericIPAddressField(
-                        default=None, null=True, blank=True
-                    ),
+                    models.GenericIPAddressField(default=None, null=True, blank=True),
                 ),
                 (
                     "nodegroup",
@@ -1337,16 +1301,12 @@ class Migration(migrations.Migration):
                 ("updated", models.DateTimeField(editable=False)),
                 (
                     "uuid",
-                    models.CharField(
-                        max_length=36, unique=True, null=True, blank=True
-                    ),
+                    models.CharField(max_length=36, unique=True, null=True, blank=True),
                 ),
                 (
                     "size",
                     models.BigIntegerField(
-                        validators=[
-                            django.core.validators.MinValueValidator(4194304)
-                        ]
+                        validators=[django.core.validators.MinValueValidator(4194304)]
                     ),
                 ),
                 ("bootable", models.BooleanField(default=False)),
@@ -1401,9 +1361,7 @@ class Migration(migrations.Migration):
                         blank=True,
                         max_length=256,
                         null=True,
-                        validators=[
-                            maasserver.models.space.validate_space_name
-                        ],
+                        validators=[maasserver.models.space.validate_space_name],
                     ),
                 ),
             ],
@@ -1427,9 +1385,7 @@ class Migration(migrations.Migration):
                 (
                     "key",
                     models.TextField(
-                        validators=[
-                            maasserver.models.sshkey.validate_ssh_public_key
-                        ]
+                        validators=[maasserver.models.sshkey.validate_ssh_public_key]
                     ),
                 ),
                 (
@@ -1539,9 +1495,7 @@ class Migration(migrations.Migration):
                         help_text="Identifying name for this subnet.",
                         max_length=255,
                         validators=[
-                            django.core.validators.RegexValidator(
-                                "^[.: \\w/-]+$"
-                            )
+                            django.core.validators.RegexValidator("^[.: \\w/-]+$")
                         ],
                     ),
                 ),
@@ -1590,9 +1544,7 @@ class Migration(migrations.Migration):
                         max_length=256,
                         unique=True,
                         validators=[
-                            django.core.validators.RegexValidator(
-                                "^[a-zA-Z0-9_-]+$"
-                            )
+                            django.core.validators.RegexValidator("^[a-zA-Z0-9_-]+$")
                         ],
                     ),
                 ),
@@ -1652,9 +1604,7 @@ class Migration(migrations.Migration):
                 ("mtu", models.IntegerField(default=1500)),
                 (
                     "fabric",
-                    models.ForeignKey(
-                        to="maasserver.Fabric", on_delete=models.CASCADE
-                    ),
+                    models.ForeignKey(to="maasserver.Fabric", on_delete=models.CASCADE),
                 ),
             ],
             options={"verbose_name": "VLAN", "verbose_name_plural": "VLANs"},
@@ -1679,9 +1629,7 @@ class Migration(migrations.Migration):
                     models.CharField(
                         unique=True,
                         max_length=256,
-                        validators=[
-                            django.core.validators.RegexValidator("^[\\w-]+$")
-                        ],
+                        validators=[django.core.validators.RegexValidator("^[\\w-]+$")],
                     ),
                 ),
                 ("description", models.TextField(blank=True)),
@@ -1742,9 +1690,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "uuid",
-                    models.CharField(
-                        unique=True, max_length=36, editable=False
-                    ),
+                    models.CharField(unique=True, max_length=36, editable=False),
                 ),
             ],
             bases=("maasserver.blockdevice",),
@@ -1903,9 +1849,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="interface",
             name="ip_addresses",
-            field=models.ManyToManyField(
-                to="maasserver.StaticIPAddress", blank=True
-            ),
+            field=models.ManyToManyField(to="maasserver.StaticIPAddress", blank=True),
         ),
         migrations.AddField(
             model_name="interface",
@@ -2152,9 +2096,7 @@ class Migration(migrations.Migration):
         migrations.AlterUniqueTogether(
             name="filestorage", unique_together={("filename", "owner")}
         ),
-        migrations.AlterIndexTogether(
-            name="event", index_together={("node", "id")}
-        ),
+        migrations.AlterIndexTogether(name="event", index_together={("node", "id")}),
         migrations.AlterUniqueTogether(
             name="bootsourceselection",
             unique_together={("boot_source", "os", "release")},

@@ -22,9 +22,7 @@ from metadataserver.enum import HARDWARE_TYPE
 
 class NodeResultHandler(TimestampedModelHandler):
     class Meta:
-        queryset = ScriptResult.objects.prefetch_related(
-            "script", "script_set"
-        ).defer(
+        queryset = ScriptResult.objects.prefetch_related("script", "script_set").defer(
             "output",
             "stdout",
             "stderr",
@@ -110,9 +108,7 @@ class NodeResultHandler(TimestampedModelHandler):
             for key, value in results.get("results", {}).items():
                 if obj.script is not None:
                     if isinstance(obj.script.results, dict):
-                        title = obj.script.results.get(key, {}).get(
-                            "title", key
-                        )
+                        title = obj.script.results.get(key, {}).get("title", key)
                         description = obj.script.results.get(key, {}).get(
                             "description", ""
                         )
@@ -180,13 +176,9 @@ class NodeResultHandler(TimestampedModelHandler):
         )
 
         if "result_type" in params:
-            queryset = queryset.filter(
-                script_set__result_type=params["result_type"]
-            )
+            queryset = queryset.filter(script_set__result_type=params["result_type"])
         if "hardware_type" in params:
-            queryset = queryset.filter(
-                script__hardware_type=params["hardware_type"]
-            )
+            queryset = queryset.filter(script__hardware_type=params["hardware_type"])
         if "physical_blockdevice_id" in params:
             queryset = queryset.filter(
                 physical_blockdevice_id=params["physical_blockdevice_id"]
@@ -215,9 +207,7 @@ class NodeResultHandler(TimestampedModelHandler):
         if data_type == "combined":
             data_type = "output"
         script_result = (
-            ScriptResult.objects.filter(id=id)
-            .only("status", data_type)
-            .first()
+            ScriptResult.objects.filter(id=id).only("status", data_type).first()
         )
         if script_result is None:
             return "Unknown ScriptResult id %s" % id

@@ -41,9 +41,7 @@ class TestEnvironmentVariables:
                 environment = os.environ.copy()
         assert environment[untouched_var] == untouched_value
 
-    def test_restores_variables_to_previous_values(
-        self, factory, make_variable
-    ):
+    def test_restores_variables_to_previous_values(self, factory, make_variable):
         var, prior_value = make_variable()
         temp_value = factory.make_name("temp-value")
         with env.environment_variables({var: prior_value}):
@@ -52,9 +50,7 @@ class TestEnvironmentVariables:
             environment = os.environ.copy()
         assert environment[var] == prior_value
 
-    def test_restores_previously_unset_variables_to_being_unset(
-        self, make_variable
-    ):
+    def test_restores_previously_unset_variables_to_being_unset(self, make_variable):
         var, value = make_variable()
         assert var not in os.environ
         with env.environment_variables({var: value}):
@@ -103,9 +99,7 @@ class TestFileBackedValue:
         file_value.path.write_text(content)
         assert file_value.get() == content
 
-    def test_get_strips_contents_if_file_contains_something(
-        self, factory, file_value
-    ):
+    def test_get_strips_contents_if_file_contains_something(self, factory, file_value):
         content = factory.make_name("content")
         file_value.path.write_text(f"   {content}    ")
         assert file_value.get() == content
@@ -140,9 +134,7 @@ class TestFileBackedValue:
         assert not file_value.path.exists()
         assert file_value.get() is None
 
-    def test_set_None_does_nothing_if_maas_id_file_does_not_exist(
-        self, file_value
-    ):
+    def test_set_None_does_nothing_if_maas_id_file_does_not_exist(self, file_value):
         file_value.set(None)
         assert not file_value.path.exists()
 
@@ -164,9 +156,7 @@ class TestFileBackedValue:
         file_value.set(None)
         assert file_value.get() is None
 
-    def test_set_None_clears_cache_if_file_does_not_exist(
-        self, factory, file_value
-    ):
+    def test_set_None_clears_cache_if_file_does_not_exist(self, factory, file_value):
         content = factory.make_name("content")
         file_value.set(content)
         assert file_value.get() == content
@@ -174,9 +164,7 @@ class TestFileBackedValue:
         file_value.set(None)
         assert file_value.get() is None
 
-    def test_set_does_not_cache_when_write_fails(
-        self, mocker, factory, file_value
-    ):
+    def test_set_does_not_cache_when_write_fails(self, mocker, factory, file_value):
         mock_atomic_write = mocker.patch.object(env, "atomic_write")
         exception = factory.make_exception()
         mock_atomic_write.side_effect = exception

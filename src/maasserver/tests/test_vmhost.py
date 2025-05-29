@@ -226,12 +226,8 @@ class TestDiscoverAndSyncVMHostAsync(MAASTransactionServerTestCase):
             parameters=power_parameters,
         )
         user = await deferToDatabase(factory.make_User)
-        vmhost = await vmhost_module.discover_and_sync_vmhost_async(
-            orig_vmhost, user
-        )
-        vmhost_power_parameters = await deferToDatabase(
-            vmhost.get_power_parameters
-        )
+        vmhost = await vmhost_module.discover_and_sync_vmhost_async(orig_vmhost, user)
+        vmhost_power_parameters = await deferToDatabase(vmhost.get_power_parameters)
         self.assertEqual(vmhost.id, orig_vmhost.id)
         self.assertEqual(vmhost.bmc_type, BMC_TYPE.POD)
         self.assertEqual(vmhost.architectures, ["amd64/generic"])
@@ -322,12 +318,8 @@ class TestSyncVMCluster(MAASServerTestCase):
         orig_vmhost = factory.make_Pod(
             zone=zone, pod_type=pod_info["type"], parameters=power_parameters
         )
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -336,9 +328,7 @@ class TestSyncVMCluster(MAASServerTestCase):
             orig_vmhost, factory.make_User()
         )
         self.assertEqual(vmhost.hints.cluster.name, discovered_cluster.name)
-        self.assertEqual(
-            vmhost.hints.cluster.project, discovered_cluster.project
-        )
+        self.assertEqual(vmhost.hints.cluster.project, discovered_cluster.project)
 
     def test_sync_vmcluster_creates_additional_pods(self):
         (
@@ -352,12 +342,8 @@ class TestSyncVMCluster(MAASServerTestCase):
         orig_vmhost = factory.make_Pod(
             zone=zone, pod_type=pod_info["type"], parameters=power_parameters
         )
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -382,12 +368,8 @@ class TestSyncVMCluster(MAASServerTestCase):
         orig_vmhost = factory.make_Pod(
             zone=zone, pod_type=pod_info["type"], parameters=power_parameters
         )
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -412,12 +394,8 @@ class TestSyncVMCluster(MAASServerTestCase):
         orig_vmhost = factory.make_Pod(
             zone=zone, pod_type=pod_info["type"], parameters=power_parameters
         )
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -432,9 +410,7 @@ class TestSyncVMCluster(MAASServerTestCase):
     def test_discovered_vmhosts_doesnt_update_console_logging_tag_if_exists(
         self,
     ):
-        tag = factory.make_Tag(
-            name="pod-console-logging", kernel_opts="foo bar"
-        )
+        tag = factory.make_Tag(name="pod-console-logging", kernel_opts="foo bar")
         (
             discovered_cluster,
             discovered_racks,
@@ -446,12 +422,8 @@ class TestSyncVMCluster(MAASServerTestCase):
         orig_vmhost = factory.make_Pod(
             zone=zone, pod_type=pod_info["type"], parameters=power_parameters
         )
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -477,12 +449,8 @@ class TestSyncVMCluster(MAASServerTestCase):
         orig_vmhost = factory.make_Pod(
             zone=zone, pod_type=pod_info["type"], parameters=power_parameters
         )
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -516,9 +484,7 @@ class TestSyncVMCluster(MAASServerTestCase):
                 cluster=cluster,
                 name=pod.name,
                 pod_type="lxd",
-                parameters={
-                    "power_address": discovered_cluster.pod_addresses[i]
-                },
+                parameters={"power_address": discovered_cluster.pod_addresses[i]},
             )
             for i, pod in enumerate(discovered_cluster.pods)
         ]
@@ -529,9 +495,7 @@ class TestSyncVMCluster(MAASServerTestCase):
             factory.make_admin(),
         )
         self.assertEqual(updated_vmhost.name, vmhosts[0].name)
-        self.assertCountEqual(
-            cluster.hosts(), updated_vmhost.hints.cluster.hosts()
-        )
+        self.assertCountEqual(cluster.hosts(), updated_vmhost.hints.cluster.hosts())
 
     def test_sync_vmcluster_uses_existing_cluster_name_when_exists(
         self,
@@ -560,12 +524,8 @@ class TestSyncVMCluster(MAASServerTestCase):
             )
             for address in discovered_cluster.pod_addresses
         ]
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -628,12 +588,8 @@ class TestSyncVMCluster(MAASServerTestCase):
             )
             for i, address in enumerate(discovered_cluster.pod_addresses)
         ]
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -643,9 +599,7 @@ class TestSyncVMCluster(MAASServerTestCase):
             vmhosts[0], factory.make_User()
         )
         self.assertEqual(updated_vmhost.cluster.name, cluster.name)
-        hosts = Pod.objects.filter(
-            name__in=[vmhost.name for vmhost in vmhosts]
-        )
+        hosts = Pod.objects.filter(name__in=[vmhost.name for vmhost in vmhosts])
         self.assertEqual(len(vmhosts), len(hosts))
         self.assertEqual(updated_vmhost.cluster.id, cluster.id)
 
@@ -677,12 +631,8 @@ class TestSyncVMCluster(MAASServerTestCase):
             )
             for i, address in enumerate(discovered_cluster.pod_addresses)
         ]
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -692,9 +642,7 @@ class TestSyncVMCluster(MAASServerTestCase):
         )
         self.assertEqual(updated_vmhost.id, vmhosts[1].id)
         self.assertEqual(updated_vmhost.name, vmhosts[1].name)
-        hosts = Pod.objects.filter(
-            name__in=[vmhost.name for vmhost in vmhosts]
-        )
+        hosts = Pod.objects.filter(name__in=[vmhost.name for vmhost in vmhosts])
         self.assertEqual(len(vmhosts), len(hosts))
         self.assertEqual(updated_vmhost.cluster.id, cluster.id)
 
@@ -709,15 +657,9 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             discovered_racks,
             failed_racks,
         ) = await deferToDatabase(fake_cluster_discovery, self)
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
-        vmhost_module.discover_pod.return_value = succeed(
-            (successes, failures)
-        )
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
+        vmhost_module.discover_pod.return_value = succeed((successes, failures))
         zone = await deferToDatabase(factory.make_Zone)
         pod_info = await deferToDatabase(make_lxd_pod_info)
         power_parameters = {"power_address": pod_info["power_address"]}
@@ -728,13 +670,9 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             parameters=power_parameters,
         )
         user = await deferToDatabase(factory.make_User)
-        vmhost = await vmhost_module.discover_and_sync_vmhost_async(
-            orig_vmhost, user
-        )
+        vmhost = await vmhost_module.discover_and_sync_vmhost_async(orig_vmhost, user)
         self.assertEqual(vmhost.hints.cluster.name, discovered_cluster.name)
-        self.assertEqual(
-            vmhost.hints.cluster.project, discovered_cluster.project
-        )
+        self.assertEqual(vmhost.hints.cluster.project, discovered_cluster.project)
 
     @wait_for_reactor
     async def test_sync_vmcluster_async_creates_additional(self):
@@ -743,15 +681,9 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             discovered_racks,
             failed_racks,
         ) = await deferToDatabase(fake_cluster_discovery, self)
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
-        vmhost_module.discover_pod.return_value = succeed(
-            (successes, failures)
-        )
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
+        vmhost_module.discover_pod.return_value = succeed((successes, failures))
         zone = await deferToDatabase(factory.make_Zone)
         pod_info = await deferToDatabase(make_lxd_pod_info)
         power_parameters = {"power_address": pod_info["power_address"]}
@@ -762,9 +694,7 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             parameters=power_parameters,
         )
         user = await deferToDatabase(factory.make_User)
-        vmhost = await vmhost_module.discover_and_sync_vmhost_async(
-            orig_vmhost, user
-        )
+        vmhost = await vmhost_module.discover_and_sync_vmhost_async(orig_vmhost, user)
 
         def _get_cluster_pod_names():
             hints = PodHints.objects.filter(cluster=vmhost.hints.cluster)
@@ -781,15 +711,9 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             discovered_racks,
             failed_racks,
         ) = await deferToDatabase(fake_cluster_discovery, self)
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
-        vmhost_module.discover_pod.return_value = succeed(
-            (successes, failures)
-        )
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
+        vmhost_module.discover_pod.return_value = succeed((successes, failures))
         zone = await deferToDatabase(factory.make_Zone)
         pod_info = await deferToDatabase(make_lxd_pod_info)
         power_parameters = {"power_address": pod_info["power_address"]}
@@ -800,9 +724,7 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             parameters=power_parameters,
         )
         user = await deferToDatabase(factory.make_User)
-        vmhost = await vmhost_module.discover_and_sync_vmhost_async(
-            orig_vmhost, user
-        )
+        vmhost = await vmhost_module.discover_and_sync_vmhost_async(orig_vmhost, user)
 
         def _check_cluster():
             cluster = VMCluster.objects.get(id=vmhost.hints.cluster_id)
@@ -818,15 +740,9 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             discovered_racks,
             failed_racks,
         ) = await deferToDatabase(fake_cluster_discovery, self)
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
-        vmhost_module.discover_pod.return_value = succeed(
-            (successes, failures)
-        )
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
+        vmhost_module.discover_pod.return_value = succeed((successes, failures))
         zone = await deferToDatabase(factory.make_Zone)
         pod_info = await deferToDatabase(make_lxd_pod_info)
         power_parameters = {"power_address": pod_info["power_address"]}
@@ -837,9 +753,7 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             parameters=power_parameters,
         )
         user = await deferToDatabase(factory.make_User)
-        vmhost = await vmhost_module.discover_and_sync_vmhost_async(
-            orig_vmhost, user
-        )
+        vmhost = await vmhost_module.discover_and_sync_vmhost_async(orig_vmhost, user)
 
         def _get_vmhosts_tags():
             hosts = vmhost.hints.cluster.hosts()
@@ -856,15 +770,9 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             discovered_racks,
             failed_racks,
         ) = await deferToDatabase(fake_cluster_discovery, self)
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
-        vmhost_module.discover_pod.return_value = succeed(
-            (successes, failures)
-        )
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
+        vmhost_module.discover_pod.return_value = succeed((successes, failures))
         zone = await deferToDatabase(factory.make_Zone)
         pool = await deferToDatabase(factory.make_ResourcePool)
         cluster = await deferToDatabase(
@@ -883,9 +791,7 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
                 cluster=cluster,
                 name=pod.name,
                 pod_type="lxd",
-                parameters={
-                    "power_address": discovered_cluster.pod_addresses[i]
-                },
+                parameters={"power_address": discovered_cluster.pod_addresses[i]},
             )
             for i, pod in enumerate(discovered_cluster.pods)
         ]
@@ -899,9 +805,7 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
         self.assertEqual(updated_vmhost.name, vmhosts[0].name)
 
         def _compare_cluster():
-            self.assertCountEqual(
-                cluster.hosts(), updated_vmhost.hints.cluster.hosts()
-            )
+            self.assertCountEqual(cluster.hosts(), updated_vmhost.hints.cluster.hosts())
 
         await deferToDatabase(_compare_cluster)
 
@@ -939,15 +843,9 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             ]
 
         vmhosts = await deferToDatabase(_create_vmhosts)
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
-        vmhost_module.discover_pod.return_value = succeed(
-            (successes, failures)
-        )
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
+        vmhost_module.discover_pod.return_value = succeed((successes, failures))
         user = await deferToDatabase(factory.make_User)
         updated_vmhost = await vmhost_module.discover_and_sync_vmhost_async(
             vmhosts[0], user
@@ -977,12 +875,8 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
             pool=pool,
             pod_type="lxd",
         )
-        successes = {
-            rack_id: discovered_cluster for rack_id in discovered_racks
-        }
-        failures = {
-            rack_id: factory.make_exception() for rack_id in failed_racks
-        }
+        successes = {rack_id: discovered_cluster for rack_id in discovered_racks}
+        failures = {rack_id: factory.make_exception() for rack_id in failed_racks}
         self.patch(vmhost_module, "discover_pod").return_value = (
             successes,
             failures,
@@ -1046,11 +940,7 @@ class TestSyncVMClusterAsync(MAASTransactionServerTestCase):
         self.assertEqual(updated_cluster.name, cluster.name)
 
         def get_new_len():
-            return len(
-                Pod.objects.filter(
-                    name__in=[vmhost.name for vmhost in vmhosts]
-                )
-            )
+            return len(Pod.objects.filter(name__in=[vmhost.name for vmhost in vmhosts]))
 
         new_len = await deferToDatabase(get_new_len)
 
@@ -1065,15 +955,11 @@ class TestRequestCommissioningResults(MAASTransactionServerTestCase):
     async def test_request_commissioning_results_call(self):
         client = Mock()
         client.return_value = succeed(None)
-        self.patch(
-            vmhost_module, "getClientFromIdentifiers"
-        ).return_value = client
+        self.patch(vmhost_module, "getClientFromIdentifiers").return_value = client
         machine = await deferToDatabase(factory.make_Machine)
         pod = await deferToDatabase(factory.make_Pod, host=machine)
         power_params = await deferToDatabase(pod.get_power_parameters)
-        token = await deferToDatabase(
-            NodeKey.objects.get_token_for_node, machine
-        )
+        token = await deferToDatabase(NodeKey.objects.get_token_for_node, machine)
         await vmhost_module.request_commissioning_results(pod)
         client.assert_called_once_with(
             SendPodCommissioningResults,
@@ -1085,7 +971,5 @@ class TestRequestCommissioningResults(MAASTransactionServerTestCase):
             consumer_key=token.consumer.key,
             token_key=token.key,
             token_secret=token.secret,
-            metadata_url=urlparse(
-                "http://localhost:5240/MAAS/metadata/latest/"
-            ),
+            metadata_url=urlparse("http://localhost:5240/MAAS/metadata/latest/"),
         )

@@ -120,9 +120,7 @@ class IPCMaster(RPCProtocol):
     @RPCRegisterConnection.responder
     def rpc_register_connection(self, pid, connid, ident, host, port):
         """Register worker has connection from RPC client."""
-        self.factory.service.registerWorkerRPCConnection(
-            pid, connid, ident, host, port
-        )
+        self.factory.service.registerWorkerRPCConnection(pid, connid, ident, host, port)
         return {}
 
     @RPCUnregisterConnection.responder
@@ -323,9 +321,9 @@ class IPCMasterService(service.Service):
     def _updateEndpoints(self, process, addresses):
         """Update the endpoints for `pid` and `port`."""
         previous_endpoint_ids = set(
-            RegionControllerProcessEndpoint.objects.filter(
-                process=process
-            ).values_list("id", flat=True)
+            RegionControllerProcessEndpoint.objects.filter(process=process).values_list(
+                "id", flat=True
+            )
         )
         if addresses:
             for addr, port in addresses:
@@ -373,9 +371,7 @@ class IPCMasterService(service.Service):
                 return result
 
             def log_rpc_open(result):
-                log.msg(
-                    "Worker pid:%d opened RPC listener on port:%s." % result
-                )
+                log.msg("Worker pid:%d opened RPC listener on port:%s." % result)
 
             d = deferToDatabase(create_endpoints, (pid, port))
             d.addCallback(set_result)
@@ -404,33 +400,26 @@ class IPCMasterService(service.Service):
             @transactional
             def register_connection(pid, connid, ident, host, port):
                 process = self._getProcessObjFor(pid)
-                _, created = self._registerConnection(
-                    process, ident, host, port
-                )
+                _, created = self._registerConnection(process, ident, host, port)
                 return (pid, connid, ident, host, port, created)
 
             def log_connection(result):
                 pid, conn = result[0], result[1:]
                 log.msg(
-                    "Worker pid:%d registered RPC connection to %s."
-                    % (pid, conn[1:-1])
+                    "Worker pid:%d registered RPC connection to %s." % (pid, conn[1:-1])
                 )
                 return conn
 
             def set_result(conn):
                 connid, *conn, created = conn
                 if created:
-                    self.connections[pid]["rpc"]["connections"][
-                        connid
-                    ] = tuple(conn)
+                    self.connections[pid]["rpc"]["connections"][connid] = tuple(conn)
                 else:
-                    self.connections[pid]["rpc"]["burst_connections"][
-                        connid
-                    ] = tuple(conn)
+                    self.connections[pid]["rpc"]["burst_connections"][connid] = tuple(
+                        conn
+                    )
 
-            d = deferToDatabase(
-                register_connection, pid, connid, ident, host, port
-            )
+            d = deferToDatabase(register_connection, pid, connid, ident, host, port)
             d.addCallback(log_connection)
             d.addCallback(set_result)
             return d
@@ -472,8 +461,7 @@ class IPCMasterService(service.Service):
                 def log_disconnect(result):
                     pid, conn = result[0], result[1:]
                     log.msg(
-                        "Worker pid:%d lost RPC connection to %s."
-                        % (pid, conn[1:])
+                        "Worker pid:%d lost RPC connection to %s." % (pid, conn[1:])
                     )
                     return conn
 
@@ -486,14 +474,11 @@ class IPCMasterService(service.Service):
                 d.addCallback(set_result)
                 return d
             else:
-                burst_connections = self.connections[pid]["rpc"][
-                    "burst_connections"
-                ]
+                burst_connections = self.connections[pid]["rpc"]["burst_connections"]
                 conn = burst_connections.pop(connid, None)
                 if conn:
                     log.msg(
-                        "Worker pid:%d lost burst connection to %s."
-                        % (pid, conn[1:])
+                        "Worker pid:%d lost burst connection to %s." % (pid, conn[1:])
                     )
 
     @synchronous
@@ -505,9 +490,7 @@ class IPCMasterService(service.Service):
         the existing connections need to be re-created.
         """
         if not connections:
-            RegionRackRPCConnection.objects.filter(
-                endpoint__process=process
-            ).delete()
+            RegionRackRPCConnection.objects.filter(endpoint__process=process).delete()
         else:
             previous_connection_ids = set(
                 RegionRackRPCConnection.objects.filter(
@@ -567,9 +550,9 @@ class IPCMasterService(service.Service):
         # Get all the existing processes for the region controller. This is
         # used to remove the old processes that we did not update.
         previous_process_ids = set(
-            RegionControllerProcess.objects.filter(
-                region=region_obj
-            ).values_list("id", flat=True)
+            RegionControllerProcess.objects.filter(region=region_obj).values_list(
+                "id", flat=True
+            )
         )
 
         # Loop through all the current workers to update the records in the
@@ -592,9 +575,7 @@ class IPCMasterService(service.Service):
 
         # Delete all the old processes that are dead.
         if previous_process_ids:
-            RegionControllerProcess.objects.filter(
-                id__in=previous_process_ids
-            ).delete()
+            RegionControllerProcess.objects.filter(id__in=previous_process_ids).delete()
 
         # Remove any old processes not owned by this controller. Every
         # controller should update its processes based on the `UPDATE_INTERVAL`

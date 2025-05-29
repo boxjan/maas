@@ -21,6 +21,4 @@ class VmClustersService(Service):
         """
         Move all the VMClusters from 'old_zone_id' to 'new_zone_id'.
         """
-        return await self.vmcluster_repository.move_to_zone(
-            old_zone_id, new_zone_id
-        )
+        return await self.vmcluster_repository.move_to_zone(old_zone_id, new_zone_id)

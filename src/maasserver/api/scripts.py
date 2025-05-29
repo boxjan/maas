@@ -163,9 +163,7 @@ class NodeScriptsHandler(OperationsHandler):
             else:
                 qs = qs.filter(hardware_type=hardware_type)
 
-        include_script = get_optional_param(
-            request.GET, "include_script", False, Bool
-        )
+        include_script = get_optional_param(request.GET, "include_script", False, Bool)
         filters = get_optional_param(request.GET, "filters", None, String)
         if filters is not None:
             filters = set(filters.split(","))
@@ -429,14 +427,10 @@ class NodeScriptHandler(OperationsHandler):
         if revision is not None:
             for rev in script.script.previous_versions():
                 if rev.id == revision:
-                    return HttpResponse(
-                        rev.data, content_type="application/binary"
-                    )
+                    return HttpResponse(rev.data, content_type="application/binary")
             raise MAASAPIValidationError("%s not found in history" % revision)
         else:
-            return HttpResponse(
-                script.script.data, content_type="application/binary"
-            )
+            return HttpResponse(script.script.data, content_type="application/binary")
 
     @admin_method
     @operation(idempotent=False)
@@ -481,8 +475,7 @@ class NodeScriptHandler(OperationsHandler):
                 request,
                 None,
                 description=(
-                    "Reverted script '%s' to revision '%s'."
-                    % (script.name, revert_to)
+                    "Reverted script '%s' to revision '%s'." % (script.name, revert_to)
                 ),
             )
             return script

@@ -33,9 +33,7 @@ def noderesult_to_scriptresult(apps, schema_editor):
             continue
 
         # ScriptResults don't store the extention in the name.
-        if node_result.name.endswith(".out") or node_result.name.endswith(
-            ".err"
-        ):
+        if node_result.name.endswith(".out") or node_result.name.endswith(".err"):
             script_name = node_result.name[0:-4]
         else:
             script_name = node_result.name

@@ -81,8 +81,7 @@ class HMCZPowerDriver(PowerDriver):
         for cpc in client.cpcs.list():
             if not cpc.dpm_enabled:
                 maaslog.warning(
-                    f"DPM is not enabled on '{cpc.get_property('name')}', "
-                    "skipping"
+                    f"DPM is not enabled on '{cpc.get_property('name')}', " "skipping"
                 )
                 continue
             with contextlib.suppress(NotFound):
@@ -189,9 +188,7 @@ class HMCZPowerDriver(PowerDriver):
         # You can only specify one boot device on IBM Z
         boot_device = order[0]
         if boot_device.get("mac_address"):
-            nic = partition.nics.find(
-                **{"mac-address": boot_device["mac_address"]}
-            )
+            nic = partition.nics.find(**{"mac-address": boot_device["mac_address"]})
             partition.update_properties(
                 {
                     "boot-device": "network-adapter",
@@ -245,8 +242,7 @@ def probe_hmcz_and_enlist(
     for cpc in client.cpcs.list():
         if not cpc.dpm_enabled:
             maaslog.warning(
-                f"DPM is not enabled on '{cpc.get_property('name')}', "
-                "skipping"
+                f"DPM is not enabled on '{cpc.get_property('name')}', " "skipping"
             )
             continue
         for partition in cpc.partitions.list():
@@ -254,10 +250,7 @@ def probe_hmcz_and_enlist(
                 continue
 
             system_id = yield create_node(
-                [
-                    nic.get_property("mac-address")
-                    for nic in partition.nics.list()
-                ],
+                [nic.get_property("mac-address") for nic in partition.nics.list()],
                 "s390x",
                 "hmcz",
                 {

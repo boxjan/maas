@@ -28,9 +28,7 @@ def make_context():
     }
 
 
-def make_command(
-    ipmitool, power_address, power_user, power_pass, power_hwaddress
-):
+def make_command(ipmitool, power_address, power_user, power_pass, power_hwaddress):
     return (
         ipmitool,
         "-I",
@@ -109,9 +107,7 @@ class TestMoonshotIPMIPowerDriver(MAASTestCase):
         context = make_context()
         moonshot_driver = MoonshotIPMIPowerDriver()
         call_and_check_mock = self.patch(moonshot_module, "call_and_check")
-        call_and_check_mock.side_effect = ExternalProcessError(
-            1, "ipmitool something"
-        )
+        call_and_check_mock.side_effect = ExternalProcessError(1, "ipmitool something")
 
         self.assertRaises(
             PowerActionError,
@@ -153,6 +149,4 @@ class TestMoonshotIPMIPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         moonshot_driver.power_query(system_id, context)
 
-        _issue_ipmitool_command_mock.assert_called_once_with(
-            "status", **context
-        )
+        _issue_ipmitool_command_mock.assert_called_once_with("status", **context)

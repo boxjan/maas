@@ -137,9 +137,7 @@ class TestDNSResource(MAASServerTestCase):
         label = "{}.{}".format(factory.make_name("a"), factory.make_name("d"))
         name = f"{label}.{parent}"
         factory.make_Domain(name=parent)
-        self.assertEqual(
-            (label, parent), separate_fqdn(name, domainname=parent)
-        )
+        self.assertEqual((label, parent), separate_fqdn(name, domainname=parent))
 
     def test_creates_dnsresource(self):
         name = factory.make_name("name")
@@ -206,9 +204,7 @@ class TestDNSResource(MAASServerTestCase):
         dnsresource2 = DNSResource(name=name, domain=domain)
         self.assertRaisesRegex(
             ValidationError,
-            re.escape(
-                "{'__all__': " "['Labels must be unique within their zone.']"
-            ),
+            re.escape("{'__all__': " "['Labels must be unique within their zone.']"),
             dnsresource2.save,
             force_update=True,
         )
@@ -216,24 +212,18 @@ class TestDNSResource(MAASServerTestCase):
     def test_invalid_name_raises_exception(self):
         self.assertRaisesRegex(
             ValidationError,
-            re.escape(
-                "{'__all__': " "['Invalid dnsresource name: invalid*name.']"
-            ),
+            re.escape("{'__all__': " "['Invalid dnsresource name: invalid*name.']"),
             factory.make_DNSResource,
             name="invalid*name",
         )
 
     def test_underscore_label_raises_exception(self):
-        self.assertRaises(
-            ValidationError, factory.make_DNSResource, name="under_score"
-        )
+        self.assertRaises(ValidationError, factory.make_DNSResource, name="under_score")
 
     def test_rejects_address_with_cname(self):
         name = factory.make_name("name")
         domain = factory.make_Domain()
-        dnsdata = factory.make_DNSData(
-            rrtype="CNAME", name=name, domain=domain
-        )
+        dnsdata = factory.make_DNSData(rrtype="CNAME", name=name, domain=domain)
         ipaddress = factory.make_StaticIPAddress()
         dnsrr = dnsdata.dnsresource
         dnsrr.ip_addresses.add(ipaddress)
@@ -347,9 +337,7 @@ class TestUpdateDynamicHostname(MAASServerTestCase):
         DNSResource.objects.update_dynamic_hostname(sip, hostname_new)
         dnsrr = DNSResource.objects.get(name=hostname_new)
         self.assertIn(sip, dnsrr.ip_addresses.all())
-        self.assertIsNone(
-            DNSResource.objects.filter(name=hostname_old).first()
-        )
+        self.assertIsNone(DNSResource.objects.filter(name=hostname_old).first())
 
 
 class TestReleaseDynamicHostname(MAASServerTestCase):

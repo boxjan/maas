@@ -18,9 +18,7 @@ class MAASClusterFixture(ClusterFixture):
         self.connection = connections[
             DEFAULT_DB_ALIAS if database is None else database
         ]
-        super().__init__(
-            datadir=self.connection.settings_dict["HOST"], preserve=True
-        )
+        super().__init__(datadir=self.connection.settings_dict["HOST"], preserve=True)
 
     @property
     def dbname(self):

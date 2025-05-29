@@ -40,9 +40,7 @@ CHANGED_EVENTS_INFO_TO_DEBUG = [
 
 def change_event_levels_from_info_to_debug(apps, schema_editor):
     EventType = apps.get_model("maasserver", "EventType")
-    for event_type in EventType.objects.filter(
-        name__in=CHANGED_EVENTS_INFO_TO_DEBUG
-    ):
+    for event_type in EventType.objects.filter(name__in=CHANGED_EVENTS_INFO_TO_DEBUG):
         event_type.level = DEBUG
         event_type.save()
 

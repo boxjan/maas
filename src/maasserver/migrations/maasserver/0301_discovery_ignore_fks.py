@@ -12,9 +12,7 @@ class Migration(migrations.Migration):
         migrations.RemoveField(model_name="discovery", name="neighbour"),
         migrations.RemoveField(model_name="discovery", name="mdns"),
         migrations.RemoveField(model_name="discovery", name="observer"),
-        migrations.RemoveField(
-            model_name="discovery", name="observer_interface"
-        ),
+        migrations.RemoveField(model_name="discovery", name="observer_interface"),
         migrations.RemoveField(model_name="discovery", name="fabric"),
         migrations.RemoveField(model_name="discovery", name="vlan"),
         migrations.RemoveField(model_name="discovery", name="subnet"),

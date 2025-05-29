@@ -44,9 +44,7 @@ def get_maas_common_command():
         return os.path.join(dev_root, "bin/maas-common")
     elif snap.running_in_snap():
         # there's no maas-common in the snap as maas-rack is always present
-        return os.path.join(
-            snap.SnapPaths.from_environ().snap, "bin/maas-rack"
-        )
+        return os.path.join(snap.SnapPaths.from_environ().snap, "bin/maas-rack")
     else:
         return get_path("usr/lib/maas/maas-common")
 
@@ -96,9 +94,7 @@ def _write_temp_file(content, filename):
         )
     except OSError as error:
         if error.filename is None:
-            error.filename = os.path.join(
-                directory, prefix + "XXXXXX" + suffix
-            )
+            error.filename = os.path.join(directory, prefix + "XXXXXX" + suffix)
         raise
     else:
         with os.fdopen(temp_fd, "wb") as f:
@@ -116,9 +112,7 @@ def _write_temp_file(content, filename):
         return temp_file
 
 
-def atomic_write(
-    content, filename, overwrite=True, mode=0o600, uid=None, gid=None
-):
+def atomic_write(content, filename, overwrite=True, mode=0o600, uid=None, gid=None):
     """Write `content` into the file `filename` in an atomic fashion.
 
     This requires write permissions to the directory that `filename` is in.
@@ -144,9 +138,7 @@ def atomic_write(
             raise  # Something's seriously wrong.
     else:
         try:
-            chown(
-                temp_file, uid or prev_stats.st_uid, gid or prev_stats.st_gid
-            )
+            chown(temp_file, uid or prev_stats.st_uid, gid or prev_stats.st_gid)
         except PermissionError as error:
             # if the permissions of `filename` couldn't be applied to
             # `temp_file` then the temporary file needs to be removed and then
@@ -210,9 +202,7 @@ def atomic_delete(filename):
     will be on the same filesystem as the destination) and then deletes the
     temporary file. Such a rename is atomic in POSIX.
     """
-    fd, del_filename = tempfile.mkstemp(
-        ".deleted", ".", os.path.dirname(filename)
-    )
+    fd, del_filename = tempfile.mkstemp(".deleted", ".", os.path.dirname(filename))
     try:
         os.close(fd)
         rename(filename, del_filename)
@@ -596,20 +586,15 @@ class NamedLock(SystemLock):
     letters.
     """
 
-    ACCEPTABLE_CHARACTERS = frozenset().union(
-        string.ascii_letters, string.digits, "-"
-    )
+    ACCEPTABLE_CHARACTERS = frozenset().union(string.ascii_letters, string.digits, "-")
 
     def __init__(self, name, reactor=None):
         if not isinstance(name, str):
-            raise TypeError(
-                "Lock name must be str, not %s" % type(name).__qualname__
-            )
+            raise TypeError("Lock name must be str, not %s" % type(name).__qualname__)
         elif not self.ACCEPTABLE_CHARACTERS.issuperset(name):
             illegal = set(name) - self.ACCEPTABLE_CHARACTERS
             raise ValueError(
-                "Lock name contains illegal characters: %s"
-                % "".join(sorted(illegal))
+                "Lock name contains illegal characters: %s" % "".join(sorted(illegal))
             )
         else:
             lockpath = get_data_path("run", "lock", "maas:%s" % name)

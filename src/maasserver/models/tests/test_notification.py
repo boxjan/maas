@@ -147,9 +147,7 @@ class TestFindingAndDismissingNotifications(MAASServerTestCase):
         self.assertNotifications(admin, [])
 
     def test_not_dismissable(self):
-        notification = Notification(
-            message="Some notification", dismissable=False
-        )
+        notification = Notification(message="Some notification", dismissable=False)
         self.assertRaises(
             NotificationNotDismissable,
             notification.dismiss,
@@ -168,11 +166,7 @@ class TestNotification(MAASServerTestCase):
         notification = Notification(message=message, context=context)
         self.assertEqual(
             notification.render(),
-            "There are "
-            + str(thing_b)
-            + " of "
-            + thing_a
-            + " in my suitcase.",
+            "There are " + str(thing_b) + " of " + thing_a + " in my suitcase.",
         )
 
     def test_render_allows_markup_in_message_but_escapes_context(self):
@@ -204,9 +198,7 @@ class TestNotification(MAASServerTestCase):
             # is_relevant_to returns True, the notification is in the set
             # returned by find_for_user. Likewise, if is_relevant_to returns
             # False, the notification is not in the find_for_user set.
-            self.assertEqual(
-                notification.is_relevant_to(user), should_be_relevant
-            )
+            self.assertEqual(notification.is_relevant_to(user), should_be_relevant)
             self.assertEqual(
                 Notification.objects.find_for_user(user)
                 .filter(id=notification.id)

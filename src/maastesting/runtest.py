@@ -61,8 +61,7 @@ class InvalidTest(Exception):
 def check_for_generator(result):
     if isinstance(result, types.GeneratorType):
         raise InvalidTest(
-            "Test returned a generator. Should it be "
-            "decorated with inlineCallbacks?"
+            "Test returned a generator. Should it be " "decorated with inlineCallbacks?"
         )
     else:
         return result
@@ -212,14 +211,10 @@ class MAASCrochetRunTest(MAASRunTest):
         # However, this is done by both testtools and Twisted's trial, and we
         # do it for consistency with them.
         if not self._tickReactor(0.5):
-            raise MAASCrochetReactorStalled(
-                "Reactor did not respond after 500ms."
-            )
+            raise MAASCrochetReactorStalled("Reactor did not respond after 500ms.")
         # Ensure that all threadpools are quiet. Do this first because we must
         # crash the whole run if they don't go quiet before the next test.
-        dirtyPools, threadStacks = blockingCallFromThread(
-            reactor, self._cleanThreads
-        )
+        dirtyPools, threadStacks = blockingCallFromThread(reactor, self._cleanThreads)
         if len(dirtyPools) != 0:
             raise MAASCrochetDirtyThreadsError(dirtyPools, threadStacks)
         # Find leftover delayed calls and selectables in use.
@@ -264,9 +259,7 @@ class MAASCrochetRunTest(MAASRunTest):
     def _cleanThreads(self):
         """Find threadpools still in use and wait for them to quiesce."""
         noisy = [
-            pool
-            for pool in self._getThreadpools()
-            if not self._isThreadpoolQuiet(pool)
+            pool for pool in self._getThreadpools() if not self._isThreadpoolQuiet(pool)
         ]
 
         if len(noisy) == 0:

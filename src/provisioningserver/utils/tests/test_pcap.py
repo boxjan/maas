@@ -46,9 +46,7 @@ class TestPCAP(MAASTestCase):
 
     def test_raises_PCAPError_for_invalid_PCAP_stream(self):
         stream = io.BytesIO(b"\0" * 24)
-        with self.assertRaisesRegex(
-            PCAPError, "Stream is not in native PCAP format."
-        ):
+        with self.assertRaisesRegex(PCAPError, "Stream is not in native PCAP format."):
             PCAP(stream)
 
     def test_raises_PCAPError_for_invalid_PCAP_header(self):

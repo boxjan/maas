@@ -40,9 +40,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
         dhcp_snippet.value = dhcp_snippet.value.update(factory.make_string())
         dhcp_snippet.save()
         response = self.client.get(self.get_dhcp_snippet_uri(dhcp_snippet))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_dhcp_snippet = json.loads(response.content.decode())
         self.assertEqual(
             {
@@ -78,9 +76,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
         dhcp_snippet.save()
         uri = "/MAAS/api/2.0/dhcp-snippets/%s/" % dhcp_snippet.name
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_dhcp_snippet = json.loads(response.content.decode())
         self.assertEqual(
             {
@@ -113,9 +109,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
         response = self.client.get(
             reverse("dhcp_snippet_handler", args=[random.randint(0, 100)])
         )
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_update(self):
         self.patch(dhcpsnippet, "validate_dhcp_config").return_value = {}
@@ -125,9 +119,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
         response = self.client.put(
             self.get_dhcp_snippet_uri(dhcp_snippet), {"value": new_value}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         dhcp_snippet = reload_object(dhcp_snippet)
         self.assertEqual(new_value, dhcp_snippet.value.data)
 
@@ -137,17 +129,13 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
         response = self.client.put(
             self.get_dhcp_snippet_uri(dhcp_snippet), {"value": new_value}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_delete_deletes_dhcp_snippet(self):
         self.become_admin()
         dhcp_snippet = factory.make_DHCPSnippet()
         response = self.client.delete(self.get_dhcp_snippet_uri(dhcp_snippet))
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(dhcp_snippet))
         event = Event.objects.get(type__level=AUDIT)
         self.assertIsNotNone(event)
@@ -158,9 +146,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
     def test_delete_admin_only(self):
         dhcp_snippet = factory.make_DHCPSnippet()
         response = self.client.delete(self.get_dhcp_snippet_uri(dhcp_snippet))
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(dhcp_snippet))
 
     def test_delete_404_when_invalid_id(self):
@@ -168,18 +154,14 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
         response = self.client.delete(
             reverse("dhcp_snippet_handler", args=[random.randint(0, 100)])
         )
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_revert(self):
         self.become_admin()
         dhcp_snippet = factory.make_DHCPSnippet()
         textfile_ids = [dhcp_snippet.value.id]
         for _ in range(10):
-            dhcp_snippet.value = dhcp_snippet.value.update(
-                factory.make_string()
-            )
+            dhcp_snippet.value = dhcp_snippet.value.update(factory.make_string())
             dhcp_snippet.save()
             textfile_ids.append(dhcp_snippet.value.id)
         revert_to = random.randint(-10, -1)
@@ -189,9 +171,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
             self.get_dhcp_snippet_uri(dhcp_snippet),
             {"op": "revert", "to": revert_to},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_dhcp_snippet = json.loads(response.content.decode())
         self.assertEqual(
             VersionedTextFile.objects.get(id=textfile_ids[revert_to - 1]).data,
@@ -216,9 +196,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
     def test_revert_admin_only(self):
         dhcp_snippet = factory.make_DHCPSnippet()
         for _ in range(10):
-            dhcp_snippet.value = dhcp_snippet.value.update(
-                factory.make_string()
-            )
+            dhcp_snippet.value = dhcp_snippet.value.update(factory.make_string())
             dhcp_snippet.save()
         value_id = dhcp_snippet.value.id
         revert_to = random.randint(-10, -1)
@@ -226,9 +204,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
             self.get_dhcp_snippet_uri(dhcp_snippet),
             {"op": "revert", "to": revert_to},
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertEqual(value_id, reload_object(dhcp_snippet).value.id)
 
     def test_revert_requires_to(self):
@@ -240,9 +216,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
         self.assertEqual(
             http.client.BAD_REQUEST, response.status_code, response.content
         )
-        self.assertEqual(
-            b"You must specify where to revert to", response.content
-        )
+        self.assertEqual(b"You must specify where to revert to", response.content)
 
     def test_revert_requires_to_to_be_an_int(self):
         self.become_admin()
@@ -254,9 +228,7 @@ class TestDHCPSnippetAPI(APITestCase.ForUser):
         self.assertEqual(
             http.client.BAD_REQUEST, response.status_code, response.content
         )
-        self.assertEqual(
-            "%s is an invalid 'to' value" % to, response.content.decode()
-        )
+        self.assertEqual("%s is an invalid 'to' value" % to, response.content.decode())
 
     def test_revert_errors_on_invalid_id(self):
         self.become_admin()
@@ -283,24 +255,17 @@ class TestDHCPSnippetsAPI(APITestCase.ForUser):
         return reverse("dhcp_snippets_handler", args=[])
 
     def test_hander_path(self):
-        self.assertEqual(
-            "/MAAS/api/2.0/dhcp-snippets/", self.get_dhcp_snippets_uri()
-        )
+        self.assertEqual("/MAAS/api/2.0/dhcp-snippets/", self.get_dhcp_snippets_uri())
 
     def test_read(self):
         for _ in range(3):
             factory.make_DHCPSnippet()
         response = self.client.get(self.get_dhcp_snippets_uri())
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        expected_ids = [
-            dhcp_snippet.id for dhcp_snippet in DHCPSnippet.objects.all()
-        ]
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        expected_ids = [dhcp_snippet.id for dhcp_snippet in DHCPSnippet.objects.all()]
         result_ids = [
-            dhcp_snippet["id"]
-            for dhcp_snippet in json.loads(response.content.decode())
+            dhcp_snippet["id"] for dhcp_snippet in json.loads(response.content.decode())
         ]
         self.assertCountEqual(expected_ids, result_ids)
 
@@ -330,6 +295,4 @@ class TestDHCPSnippetsAPI(APITestCase.ForUser):
         response = self.client.post(
             self.get_dhcp_snippets_uri(), {"value": factory.make_string()}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)

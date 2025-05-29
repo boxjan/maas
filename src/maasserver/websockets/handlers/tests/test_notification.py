@@ -49,9 +49,7 @@ def assertNotificationEqual(testcase, response, reference_notification):
     )
     testcase.assertEqual(response["message"], reference_notification.render())
     testcase.assertEqual(response["category"], reference_notification.category)
-    testcase.assertEqual(
-        response["dismissable"], reference_notification.dismissable
-    )
+    testcase.assertEqual(response["dismissable"], reference_notification.dismissable)
 
 
 class TestNotificationHandler(MAASServerTestCase):
@@ -167,9 +165,7 @@ class TestNotificationHandlerListening(MAASServerTestCase):
         dismissal = "%d:%d" % (notification.id, user.id)
 
         self.assertIs(
-            handler.on_listen(
-                "notificationdismissal", sentinel.action, dismissal
-            ),
+            handler.on_listen("notificationdismissal", sentinel.action, dismissal),
             sentinel.on_listen,
         )
         super_on_listen.assert_called_once_with(
@@ -188,9 +184,7 @@ class TestNotificationHandlerListening(MAASServerTestCase):
         dismissal = "%d:%d" % (notification.id, random.randrange(1, 99999))
 
         self.assertIsNone(
-            handler.on_listen(
-                "notificationdismissal", sentinel.action, dismissal
-            )
+            handler.on_listen("notificationdismissal", sentinel.action, dismissal)
         )
         super_on_listen.assert_not_called()
 

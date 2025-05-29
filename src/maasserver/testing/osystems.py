@@ -33,9 +33,7 @@ def make_osystem_with_releases(
         releases = [factory.make_name("release") for _ in range(3)]
     if osystem_name not in OperatingSystemRegistry:
         OperatingSystemRegistry.register_item(osystem_name, CustomOS())
-        testcase.addCleanup(
-            OperatingSystemRegistry.unregister_item, osystem_name
-        )
+        testcase.addCleanup(OperatingSystemRegistry.unregister_item, osystem_name)
     # Make sure the commissioning Ubuntu release and all created releases
     # are available to all architectures.
     architectures = [
@@ -68,8 +66,7 @@ def patch_usable_osystems(testcase, osystems=None, allow_empty=True):
         start = 1
     if osystems is None:
         osystems = [
-            make_osystem_with_releases(testcase)
-            for _ in range(randint(start, 2))
+            make_osystem_with_releases(testcase) for _ in range(randint(start, 2))
         ]
     # Make sure the Commissioning release is always available.
     factory.make_default_ubuntu_release_bootable()

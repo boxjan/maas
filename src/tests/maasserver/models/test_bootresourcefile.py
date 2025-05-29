@@ -63,9 +63,7 @@ class TestFileStore:
         exec_workflow_mock.assert_not_called()
         assert bootres_file.sha256 == bootres_file_shared.sha256
 
-    def test_filestore_remove_set(
-        self, exec_workflow_mock, bootres_set, bootres_file
-    ):
+    def test_filestore_remove_set(self, exec_workflow_mock, bootres_set, bootres_file):
         BootResourceFile.objects.filestore_remove_set(bootres_set)
         exec_workflow_mock.assert_called()
         workflow = exec_workflow_mock.call_args.args[0]
@@ -74,9 +72,7 @@ class TestFileStore:
         assert param.files[0].sha256 == bootres_file.sha256
         assert param.files[0].filename_on_disk == bootres_file.filename_on_disk
 
-    def test_filestore_remove_sets(
-        self, exec_workflow_mock, bootres_set, bootres_file
-    ):
+    def test_filestore_remove_sets(self, exec_workflow_mock, bootres_set, bootres_file):
         qset = BootResourceSet.objects.filter(id=bootres_set.id)
         BootResourceFile.objects.filestore_remove_sets(qset)
         exec_workflow_mock.assert_called()
@@ -98,9 +94,7 @@ class TestFileStore:
         BootResourceFile.objects.filestore_remove_sets(qset)
         exec_workflow_mock.assert_not_called()
 
-    def test_filestore_remove_resource(
-        self, exec_workflow_mock, bootres, bootres_file
-    ):
+    def test_filestore_remove_resource(self, exec_workflow_mock, bootres, bootres_file):
         BootResourceFile.objects.filestore_remove_resource(bootres)
         exec_workflow_mock.assert_called()
         workflow = exec_workflow_mock.call_args.args[0]
@@ -162,16 +156,14 @@ class TestFileStore:
             # ensure the collision is only on the first 7 chars!
             factory.make_hex_string(
                 1,
-                choices=string.hexdigits.replace(
-                    bootres_file.sha256[7], ""
-                ).replace(other_bootres_file_sha[7], ""),
+                choices=string.hexdigits.replace(bootres_file.sha256[7], "").replace(
+                    other_bootres_file_sha[7], ""
+                ),
             )
             + factory.make_hex_string(55)
         )
         filename_on_disk_without_collision = (
-            BootResourceFile.objects.calculate_filename_on_disk(
-                new_sha_with_collision
-            )
+            BootResourceFile.objects.calculate_filename_on_disk(new_sha_with_collision)
         )
         # The filename_on_disk is properly taking only the first 8 chars.
         assert filename_on_disk_without_collision == new_sha_with_collision[:8]
@@ -182,9 +174,7 @@ class TestFileStore:
             # ensure the collision is only on the first 20 chars!
             factory.make_hex_string(
                 1,
-                choices=string.hexdigits.replace(
-                    other_bootres_file_sha[8], ""
-                ),
+                choices=string.hexdigits.replace(other_bootres_file_sha[8], ""),
             )
             + factory.make_hex_string(54)
         )
@@ -204,9 +194,7 @@ class TestFileStore:
     ):
         new_sha_with_collision = factory.make_hex_string(64)
         filename_on_disk_without_collision = (
-            BootResourceFile.objects.calculate_filename_on_disk(
-                new_sha_with_collision
-            )
+            BootResourceFile.objects.calculate_filename_on_disk(new_sha_with_collision)
         )
         assert filename_on_disk_without_collision == new_sha_with_collision[:7]
 
@@ -215,10 +203,6 @@ class TestFileStore:
         bootres_file,
     ):
         filename_on_disk_without_collision = (
-            BootResourceFile.objects.calculate_filename_on_disk(
-                bootres_file.sha256
-            )
+            BootResourceFile.objects.calculate_filename_on_disk(bootres_file.sha256)
         )
-        assert (
-            filename_on_disk_without_collision == bootres_file.filename_on_disk
-        )
+        assert filename_on_disk_without_collision == bootres_file.filename_on_disk

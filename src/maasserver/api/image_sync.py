@@ -47,9 +47,7 @@ class ImagesSyncProgressHandler(OperationsHandler):
     @admin_method
     def create(self, request):
         data = request.data
-        region = get_object_or_404(
-            RegionController, system_id=data.get("system_id")
-        )
+        region = get_object_or_404(RegionController, system_id=data.get("system_id"))
         size = data.get("size")
         ids = data.getlist("ids")
         qs = BootResourceFile.objects.filter(id__in=ids).prefetch_related(

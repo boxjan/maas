@@ -347,9 +347,7 @@ class ConfigurationDatabase:
 
     def __iter__(self):
         with self.cursor() as cursor:
-            results = cursor.execute(
-                "SELECT name FROM configuration"
-            ).fetchall()
+            results = cursor.execute("SELECT name FROM configuration").fetchall()
         return (name for (name,) in results)
 
     def __getitem__(self, name):
@@ -376,9 +374,7 @@ class ConfigurationDatabase:
     def __delitem__(self, name):
         if self.mutable:
             with self.cursor() as cursor:
-                cursor.execute(
-                    "DELETE FROM configuration" " WHERE name = ?", (name,)
-                )
+                cursor.execute("DELETE FROM configuration" " WHERE name = ?", (name,))
         else:
             raise ConfigurationImmutable(f"{self}: Cannot set `{name}'.")
 
@@ -489,8 +485,7 @@ class ConfigurationFile:
             self.dirty = False
         else:
             raise ValueError(
-                "Configuration in %s is not a mapping: %r"
-                % (self.path, config)
+                "Configuration in %s is not a mapping: %r" % (self.path, config)
             )
 
     def save(self):
@@ -503,9 +498,7 @@ class ConfigurationFile:
             mode = stat.st_mode
         # Write, retaining the file's mode.
         atomic_write(
-            yaml.safe_dump(
-                self.config, default_flow_style=False, encoding="utf-8"
-            ),
+            yaml.safe_dump(self.config, default_flow_style=False, encoding="utf-8"),
             self.path,
             mode=mode,
         )
@@ -674,8 +667,7 @@ class Configuration:
             super().__setattr__(name, value)
         else:
             raise AttributeError(
-                "%r object has no attribute %r"
-                % (self.__class__.__name__, name)
+                "%r object has no attribute %r" % (self.__class__.__name__, name)
             )
 
     @classmethod

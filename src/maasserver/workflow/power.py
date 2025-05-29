@@ -266,9 +266,7 @@ def get_temporal_task_queue_for_bmc(machine: Any) -> str:
     # the BMC by routing instead of having direct layer 2 access.
     # TODO: check that picked rack/agent has connection to Temporal
     # with_connection=True is a temporary solution that relies on RPC
-    racks = machine.bmc.get_routable_usable_rack_controllers(
-        with_connection=True
-    )
+    racks = machine.bmc.get_routable_usable_rack_controllers(with_connection=True)
     if racks:
         return f"{racks[0].system_id}@agent:power"
 

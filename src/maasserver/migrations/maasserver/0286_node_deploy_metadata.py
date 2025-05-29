@@ -14,9 +14,7 @@ def migrate_node_metadata(apps, schema_editor):
     node_metadata = NodeMetadata.objects.filter(
         key__in=("lxd_certificate", "virsh_password")
     )
-    for node_id, key, value in node_metadata.values_list(
-        "node_id", "key", "value"
-    ):
+    for node_id, key, value in node_metadata.values_list("node_id", "key", "value"):
         node_secrets[node_id][key.replace("_", "-")] = value
 
     now = datetime.utcnow()

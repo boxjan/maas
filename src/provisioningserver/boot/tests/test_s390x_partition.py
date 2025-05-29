@@ -21,9 +21,7 @@ class TestS390XPartitionBootMethod(MAASTestCase):
         self.assertEqual("s390x_partition", s390x_partition.name)
         self.assertEqual("s390x_partition", s390x_partition.bios_boot_method)
         self.assertEqual("s390x_partition", s390x_partition.template_subdir)
-        self.assertEqual(
-            "s390x_partition/maas", s390x_partition.bootloader_path
-        )
+        self.assertEqual("s390x_partition/maas", s390x_partition.bootloader_path)
         self.assertEqual("00:20", s390x_partition.arch_octet)
         self.assertIsNone(s390x_partition.user_class)
 
@@ -58,9 +56,7 @@ class TestS390XPartitionBootMethod(MAASTestCase):
         params = make_kernel_parameters(
             self,
             arch="s390x",
-            purpose=random.choice(
-                ["commissioning", "enlist", "install", "xinstall"]
-            ),
+            purpose=random.choice(["commissioning", "enlist", "install", "xinstall"]),
         )
 
         output = s390x_partition.get_reader(None, params, mac)
@@ -78,9 +74,7 @@ class TestS390XPartitionBootMethod(MAASTestCase):
         params = make_kernel_parameters(
             self,
             arch="s390x",
-            purpose=random.choice(
-                ["commissioning", "enlist", "install", "xinstall"]
-            ),
+            purpose=random.choice(["commissioning", "enlist", "install", "xinstall"]),
         )
 
         output = s390x_partition.get_reader(None, params)

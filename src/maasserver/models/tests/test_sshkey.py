@@ -136,9 +136,7 @@ class TestGetHTMLDisplayForKey(MAASServerTestCase):
         key = factory.make_string(size + 1)
         display = get_html_display_for_key(key, size)
         self.assertEqual(size, len(display))
-        self.assertEqual(
-            "%.*s%s" % (size - len(HELLIPSIS), key, HELLIPSIS), display
-        )
+        self.assertEqual("%.*s%s" % (size - len(HELLIPSIS), key, HELLIPSIS), display)
 
     def test_display_escapes_commentless_key_for_html(self):
         # The key's comment may contain characters that are not safe for
@@ -194,9 +192,7 @@ class TestGetHTMLDisplayForKey(MAASServerTestCase):
         key = self.make_key(10, 10, 100)
         display = get_html_display_for_key(key, 50)
         self.assertEqual(50, len(display))
-        self.assertEqual(
-            "%.*s%s" % (50 - len(HELLIPSIS), key, HELLIPSIS), display
-        )
+        self.assertEqual("%.*s%s" % (50 - len(HELLIPSIS), key, HELLIPSIS), display)
 
     def test_display_limits_size_with_large_key_type(self):
         # If the key has a large 'key_type' part, the key is simply
@@ -204,9 +200,7 @@ class TestGetHTMLDisplayForKey(MAASServerTestCase):
         key = self.make_key(100, 10, 10)
         display = get_html_display_for_key(key, 50)
         self.assertEqual(50, len(display))
-        self.assertEqual(
-            "%.*s%s" % (50 - len(HELLIPSIS), key, HELLIPSIS), display
-        )
+        self.assertEqual("%.*s%s" % (50 - len(HELLIPSIS), key, HELLIPSIS), display)
 
     def test_display_cropped_key(self):
         # If the key has a small key_type, a small comment and a large
@@ -251,9 +245,7 @@ class TestSSHKey(MAASServerTestCase):
         user = factory.make_User()
         key = SSHKey(key=key_string, user=user)
         display = key.display_html()
-        self.assertEqual(
-            "ssh-rsa AAAAB3NzaC1yc&hellip; ubuntu@test_rsa0.pub", display
-        )
+        self.assertEqual("ssh-rsa AAAAB3NzaC1yc&hellip; ubuntu@test_rsa0.pub", display)
 
     def test_sshkey_display_is_marked_as_HTML_safe(self):
         key_string = get_data("data/test_rsa0.pub")
@@ -263,9 +255,7 @@ class TestSSHKey(MAASServerTestCase):
         self.assertIsInstance(display, SafeString)
 
     def test_sshkey_user_and_key_unique_together_create(self):
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         keysource = factory.make_KeySource(protocol=protocol, auth_id=auth_id)
         key_string = get_data("data/test_rsa0.pub")
@@ -276,9 +266,7 @@ class TestSSHKey(MAASServerTestCase):
         self.assertRaises(ValidationError, key2.full_clean)
 
     def test_sshkey_user_and_key_unique_together_change_key(self):
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         keysource = factory.make_KeySource(protocol=protocol, auth_id=auth_id)
         key_string1 = get_data("data/test_rsa1.pub")
@@ -325,9 +313,7 @@ class TestSSHKeyManager(MAASServerTestCase):
         self.assertCountEqual([], keys)
 
     def test_get_keys_for_user_with_keys(self):
-        user1, created_keys = factory.make_user_with_keys(
-            n_keys=3, username="user1"
-        )
+        user1, created_keys = factory.make_user_with_keys(n_keys=3, username="user1")
         # user2
         factory.make_user_with_keys(n_keys=2)
         keys = SSHKey.objects.get_keys_for_user(user1)

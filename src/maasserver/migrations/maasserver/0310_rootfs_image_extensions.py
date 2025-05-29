@@ -31,13 +31,7 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunSQL(
-            rename_uploaded_rootfs_images_sql(ROOT_TGZ, "root.tgz")
-        ),
-        migrations.RunSQL(
-            rename_uploaded_rootfs_images_sql(ROOT_TBZ, "root.tbz")
-        ),
-        migrations.RunSQL(
-            rename_uploaded_rootfs_images_sql(ROOT_TXZ, "root.txz")
-        ),
+        migrations.RunSQL(rename_uploaded_rootfs_images_sql(ROOT_TGZ, "root.tgz")),
+        migrations.RunSQL(rename_uploaded_rootfs_images_sql(ROOT_TBZ, "root.tbz")),
+        migrations.RunSQL(rename_uploaded_rootfs_images_sql(ROOT_TXZ, "root.txz")),
     ]

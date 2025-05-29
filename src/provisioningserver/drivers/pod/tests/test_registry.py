@@ -21,9 +21,7 @@ class TestPodDriverRegistry(MAASTestCase):
     def test_registry(self):
         self.assertEqual([], list(PodDriverRegistry))
         PodDriverRegistry.register_item("driver", sentinel.driver)
-        self.assertIn(
-            sentinel.driver, (item for name, item in PodDriverRegistry)
-        )
+        self.assertIn(sentinel.driver, (item for name, item in PodDriverRegistry))
 
     def test_get_schema(self):
         fake_driver_one = make_pod_driver_base()

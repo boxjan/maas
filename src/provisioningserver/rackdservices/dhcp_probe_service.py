@@ -112,9 +112,7 @@ class DHCPProbeService(TimerService):
         """
         client = yield self._tryGetClient()
         if client is None:
-            maaslog.error(
-                "Can't initiate DHCP probe; no RPC connection to region."
-            )
+            maaslog.error("Can't initiate DHCP probe; no RPC connection to region.")
             return
 
         # Iterate over interfaces and probe each one.
@@ -140,9 +138,7 @@ class DHCPProbeService(TimerService):
                     # XXX For now, only send the region one server, since
                     # it can only track one per VLAN (this could be considered
                     # a bug).
-                    yield self._inform_region_of_dhcp(
-                        client, interface, servers.pop()
-                    )
+                    yield self._inform_region_of_dhcp(client, interface, servers.pop())
                 else:
                     yield self._inform_region_of_dhcp(client, interface, None)
         self.log("External DHCP probe complete.")

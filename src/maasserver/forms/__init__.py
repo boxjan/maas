@@ -214,9 +214,7 @@ class APIEditMixin:
     def full_clean(self):
         """For missing fields, default to the model's existing value."""
         self.submitted_data = self.data
-        self.data = get_overridden_query_dict(
-            self.initial, self.data, self.fields
-        )
+        self.data = get_overridden_query_dict(self.initial, self.data, self.fields)
         super().full_clean()
 
     def _post_clean(self):
@@ -278,9 +276,7 @@ class WithPowerTypeMixin:
                 try:
                     parameters = json.loads(parameters)
                 except json.JSONDecodeError:
-                    raise ValidationError(
-                        "Failed to parse JSON %s" % params_field_name
-                    )
+                    raise ValidationError("Failed to parse JSON %s" % params_field_name)
 
         # Integrate the machines existing parameters if unset by form.
         if machine:
@@ -298,19 +294,13 @@ class WithPowerTypeMixin:
         """
         type_field_name = "power_type"
         params_field_name = "power_parameters"
-        type_value = WithPowerTypeMixin._get_power_type_value(
-            form, data, machine
-        )
+        type_value = WithPowerTypeMixin._get_power_type_value(form, data, machine)
         choices = [BLANK_CHOICE] + get_driver_choices()
         form.fields[type_field_name] = forms.ChoiceField(
             required=type_required, choices=choices, initial=type_value
         )
-        parameters = WithPowerTypeMixin._get_power_parameters(
-            form, data, machine
-        )
-        skip_check = (
-            form.data.get(f"{params_field_name}_{SKIP_CHECK_NAME}") == "true"
-        )
+        parameters = WithPowerTypeMixin._get_power_parameters(form, data, machine)
+        skip_check = form.data.get(f"{params_field_name}_{SKIP_CHECK_NAME}") == "true"
         form.fields[params_field_name] = get_driver_parameters(
             parameters, skip_check=skip_check
         )[type_value]
@@ -329,9 +319,7 @@ class WithPowerTypeMixin:
         # smoser, we think.
         type_field_name = "power_type"
         params_field_name = "power_parameters"
-        skip_check = (
-            form.data.get(f"{params_field_name}_{SKIP_CHECK_NAME}") == "true"
-        )
+        skip_check = form.data.get(f"{params_field_name}_{SKIP_CHECK_NAME}") == "true"
         # Try to contact the cluster controller; if it's down then we
         # prevent saving the form as we can't validate the power
         # parameters and type.
@@ -409,18 +397,12 @@ class MAASModelFormMetaclass(ModelFormMetaclass):
     def __new__(mcs, name, bases, attrs):
         new_class = super().__new__(mcs, name, bases, attrs)
         meta = getattr(new_class, "Meta", None)
-        new_class._meta.permission_create = getattr(
-            meta, "permission_create", None
-        )
-        new_class._meta.permission_edit = getattr(
-            meta, "permission_edit", None
-        )
+        new_class._meta.permission_create = getattr(meta, "permission_create", None)
+        new_class._meta.permission_edit = getattr(meta, "permission_edit", None)
         return new_class
 
 
-class MAASModelForm(
-    APIEditMixin, forms.ModelForm, metaclass=MAASModelFormMetaclass
-):
+class MAASModelForm(APIEditMixin, forms.ModelForm, metaclass=MAASModelFormMetaclass):
     """A form for editing models, with MAAS-specific behaviour.
 
     Specifically, it is much like Django's ``ModelForm``, but removes
@@ -455,9 +437,7 @@ class MAASModelForm(
             # deprecated in 1.6, but to be on the safe side we'll use whichever
             # class is actually being used.
             dict_type = self.fields.__class__
-            self.fields = dict_type(
-                [ui_submission_field] + list(self.fields.items())
-            )
+            self.fields = dict_type([ui_submission_field] + list(self.fields.items()))
 
     def _update_errors(self, errors):
         """Provide Django 1.11-like behaviour in 1.8 as well."""
@@ -571,16 +551,12 @@ def find_osystem_and_release_from_release_name(name):
                 # If the given release matches the osystem name add it to
                 # our list of possibilities. This allows a user to specify
                 # Ubuntu and get the latest release available.
-                possible_short_names.append(
-                    {"osystem": osystem, "release": release}
-                )
+                possible_short_names.append({"osystem": osystem, "release": release})
             elif osystem.name != "ubuntu" and release.name.startswith(name):
                 # Check if the given name is a shortened version of a known
                 # name, e.g. centos7 for centos70.  We don't allow short names
                 # for Ubuntu releases
-                possible_short_names.append(
-                    {"osystem": osystem, "release": release}
-                )
+                possible_short_names.append({"osystem": osystem, "release": release})
     if len(possible_short_names) > 0:
         # Do a reverse sort of all the possibilities and pick the top one.
         # This allows a user to do a short hand with versioning to pick the
@@ -616,9 +592,7 @@ class CheckboxInputTrueDefault(CheckboxInput):
         if name not in data:
             return True
         else:
-            return super(CheckboxInput, self).value_from_datadict(
-                data, files, name
-            )
+            return super(CheckboxInput, self).value_from_datadict(data, files, name)
 
 
 class NodeForm(MAASModelForm):
@@ -711,9 +685,7 @@ class NodeForm(MAASModelForm):
         ),
     )
 
-    disable_ipv4 = forms.BooleanField(
-        required=False, widget=forms.HiddenInput()
-    )
+    disable_ipv4 = forms.BooleanField(required=False, widget=forms.HiddenInput())
 
     class Meta:
         model = Node
@@ -765,9 +737,7 @@ class MachineForm(NodeForm):
             if architectures
             else [BLANK_CHOICE]
         )
-        invalid_arch_message = compose_invalid_choice_text(
-            "architecture", choices
-        )
+        invalid_arch_message = compose_invalid_choice_text("architecture", choices)
         required = requires_macs_and_architecture(self.data) or requires_arch
         self._need_boot_images = required
         self.fields["architecture"] = forms.ChoiceField(
@@ -787,9 +757,7 @@ class MachineForm(NodeForm):
         if self.has_owner:
             os_choices = list_osystem_choices(osystems)
             distro_choices = list_release_choices(osystems)
-            invalid_osystem_message = compose_invalid_choice_text(
-                "osystem", os_choices
-            )
+            invalid_osystem_message = compose_invalid_choice_text("osystem", os_choices)
             invalid_distro_series_message = compose_invalid_choice_text(
                 "distro_series", distro_choices
             )
@@ -805,9 +773,7 @@ class MachineForm(NodeForm):
                 choices=distro_choices,
                 required=False,
                 initial="",
-                error_messages={
-                    "invalid_choice": invalid_distro_series_message
-                },
+                error_messages={"invalid_choice": invalid_distro_series_message},
             )
         else:
             self.fields["osystem"] = forms.ChoiceField(
@@ -827,9 +793,7 @@ class MachineForm(NodeForm):
     def clean_min_hwe_kernel(self):
         min_hwe_kernel = self.cleaned_data.get("min_hwe_kernel")
         if self.new_node and not min_hwe_kernel:
-            min_hwe_kernel = Config.objects.get_config(
-                "default_min_hwe_kernel"
-            )
+            min_hwe_kernel = Config.objects.get_config("default_min_hwe_kernel")
         return validate_min_hwe_kernel(min_hwe_kernel)
 
     def clean(self):
@@ -855,9 +819,7 @@ class MachineForm(NodeForm):
         osystem = cleaned_data.get("osystem") or self.instance.osystem
         enable_hw_sync = cleaned_data.get("enable_hw_sync")
 
-        if enable_hw_sync and (
-            osystem not in LINUX_OSYSTEMS and osystem != "custom"
-        ):
+        if enable_hw_sync and (osystem not in LINUX_OSYSTEMS and osystem != "custom"):
             set_form_error(
                 self,
                 "enable_hw_sync",
@@ -923,9 +885,7 @@ class MachineForm(NodeForm):
         self.data["osystem"] = ""
         self.data["distro_series"] = ""
         if series is not None and series != "":
-            osystem, release = find_osystem_and_release_from_release_name(
-                series
-            )
+            osystem, release = find_osystem_and_release_from_release_name(series)
             if osystem is not None:
                 key_required = get_release_requires_key(release)
                 self.data["osystem"] = osystem.name
@@ -965,14 +925,10 @@ class MachineForm(NodeForm):
         # LP:1807991 - If requested when creating a new Machine, set the status
         # to COMMISSIONING when the object is created.
         is_anonymous = (
-            self.request
-            and self.request.user
-            and self.request.user.is_anonymous
+            self.request and self.request.user and self.request.user.is_anonymous
         )
         commission = (
-            is_anonymous
-            and not self.instance.id
-            and self.cleaned_data["commission"]
+            is_anonymous and not self.instance.id and self.cleaned_data["commission"]
         )
         if commission:
             self.instance.update_status(NODE_STATUS.COMMISSIONING)
@@ -1051,10 +1007,7 @@ class DeviceForm(NodeForm):
         # If the device has a parent and no domain was provided,
         # inherit the parent's domain.
         if device.parent:
-            if (
-                not self.cleaned_data.get("domain", None)
-                and device.parent.domain
-            ):
+            if not self.cleaned_data.get("domain", None) and device.parent.domain:
                 device.domain = device.parent.domain
 
         zone = self.cleaned_data.get("zone")
@@ -1131,12 +1084,8 @@ class AdminNodeForm(NodeForm):
         queryset=ResourcePool.objects.all(),
         to_field_name="name",
     )
-    cpu_count = forms.IntegerField(
-        required=False, initial=0, label="CPU Count"
-    )
-    memory = forms.IntegerField(
-        required=False, initial=0, label="Memory (MiB)"
-    )
+    cpu_count = forms.IntegerField(required=False, initial=0, label="CPU Count")
+    memory = forms.IntegerField(required=False, initial=0, label="Memory (MiB)")
 
     class Meta:
         model = Node
@@ -1214,9 +1163,7 @@ class AdminMachineForm(MachineForm, AdminNodeForm, WithPowerTypeMixin):
         # Foreign relations need to have an id to relate to, have to
         # save here
         machine.save()
-        script_set = ScriptSet.objects.create_deployed_machine_script_set(
-            machine
-        )
+        script_set = ScriptSet.objects.create_deployed_machine_script_set(machine)
         machine.current_commissioning_script_set = script_set
 
         # ensure a token is available for the machine
@@ -1451,9 +1398,9 @@ class WithMACAddressesMixin:
             else:
                 # This node does not exist yet, we should only check if this
                 # MAC address is already attached to another node.
-                query = Interface.objects.filter(
-                    mac_address=mac.lower()
-                ).exclude(type=INTERFACE_TYPE.UNKNOWN)
+                query = Interface.objects.filter(mac_address=mac.lower()).exclude(
+                    type=INTERFACE_TYPE.UNKNOWN
+                )
             for iface in query:
                 node = iface.node_config.node
                 errors.append(self._mac_in_use_on_node_error(mac, node))
@@ -1496,9 +1443,7 @@ class WithMACAddressesMixin:
         return node
 
 
-class AdminMachineWithMACAddressesForm(
-    WithMACAddressesMixin, AdminMachineForm
-):
+class AdminMachineWithMACAddressesForm(WithMACAddressesMixin, AdminMachineForm):
     """A version of the AdminMachineForm which includes the multi-MAC address
     field.
     """
@@ -1528,9 +1473,7 @@ def get_machine_create_form(user):
 class ProfileForm(MAASModelForm):
     # We use the field 'last_name' to store the user's full name (and
     # don't display Django's 'first_name' field).
-    last_name = forms.CharField(
-        label="Full name", max_length=30, required=False
-    )
+    last_name = forms.CharField(label="Full name", max_length=30, required=False)
 
     # We use the email field for Ubuntu SSO.
     email = forms.EmailField(
@@ -1548,15 +1491,9 @@ class ProfileForm(MAASModelForm):
 
 
 class NewUserCreationForm(UserCreationForm):
-    is_superuser = forms.BooleanField(
-        label="MAAS administrator", required=False
-    )
-    last_name = forms.CharField(
-        label="Full name", max_length=30, required=False
-    )
-    email = forms.EmailField(
-        label="E-mail address", max_length=75, required=True
-    )
+    is_superuser = forms.BooleanField(label="MAAS administrator", required=False)
+    last_name = forms.CharField(label="Full name", max_length=30, required=False)
+    email = forms.EmailField(label="E-mail address", max_length=75, required=True)
 
     class Meta(UserCreationForm.Meta):
         fields = (
@@ -1602,20 +1539,14 @@ class NewUserCreationForm(UserCreationForm):
         """
         email = self.cleaned_data["email"]
         if User.objects.filter(email__iexact=email).exists():
-            raise forms.ValidationError(
-                "User with this E-mail address already exists."
-            )
+            raise forms.ValidationError("User with this E-mail address already exists.")
         return email
 
 
 class EditUserForm(UserChangeForm):
     # Override the default label.
-    is_superuser = forms.BooleanField(
-        label="MAAS administrator", required=False
-    )
-    last_name = forms.CharField(
-        label="Full name", max_length=30, required=False
-    )
+    is_superuser = forms.BooleanField(label="MAAS administrator", required=False)
+    last_name = forms.CharField(label="Full name", max_length=30, required=False)
 
     class Meta:
         model = User
@@ -1762,15 +1693,9 @@ class StorageSettingsForm(ConfigForm):
     """Settings page, storage section."""
 
     default_storage_layout = get_config_field("default_storage_layout")
-    enable_disk_erasing_on_release = get_config_field(
-        "enable_disk_erasing_on_release"
-    )
-    disk_erase_with_secure_erase = get_config_field(
-        "disk_erase_with_secure_erase"
-    )
-    disk_erase_with_quick_erase = get_config_field(
-        "disk_erase_with_quick_erase"
-    )
+    enable_disk_erasing_on_release = get_config_field("enable_disk_erasing_on_release")
+    disk_erase_with_secure_erase = get_config_field("disk_erase_with_secure_erase")
+    disk_erase_with_quick_erase = get_config_field("disk_erase_with_quick_erase")
 
 
 class CommissioningForm(ConfigForm):
@@ -1867,9 +1792,7 @@ class UbuntuForm(Form):
     def _load_initials(self):
         """Load the initial values for the fields."""
         self.initial["main_archive"] = PackageRepository.get_main_archive().url
-        self.initial[
-            "ports_archive"
-        ] = PackageRepository.get_ports_archive().url
+        self.initial["ports_archive"] = PackageRepository.get_ports_archive().url
 
     def save(self, *args, **kwargs):
         """Save the content of the fields into the database.
@@ -1936,8 +1859,7 @@ ERROR_MESSAGE_STATIC_RANGE_IN_USE = (
 
 
 ERROR_MESSAGE_DYNAMIC_RANGE_SPANS_SLASH_16S = (
-    "All addresses in the dynamic range must be within the same /16 "
-    "network."
+    "All addresses in the dynamic range must be within the same /16 " "network."
 )
 
 ERROR_MESSAGE_INVALID_RANGE = (
@@ -2290,21 +2212,17 @@ class BootSourceSelectionForm(MAASModelForm):
             set_form_error(
                 self,
                 "arches",
-                "No available images to download for %s"
-                % cleaned_data["arches"],
+                "No available images to download for %s" % cleaned_data["arches"],
             )
 
         # Validate subarchitectures.
         required_subarches_set = {sa for sa in cleaned_data["subarches"]}
         wildcard_subarches = "*" in required_subarches_set
-        if not wildcard_subarches and not required_subarches_set <= set(
-            subarches
-        ):
+        if not wildcard_subarches and not required_subarches_set <= set(subarches):
             set_form_error(
                 self,
                 "subarches",
-                "No available images to download for %s"
-                % cleaned_data["subarches"],
+                "No available images to download for %s" % cleaned_data["subarches"],
             )
 
         # Validate labels.
@@ -2314,8 +2232,7 @@ class BootSourceSelectionForm(MAASModelForm):
             set_form_error(
                 self,
                 "labels",
-                "No available images to download for %s"
-                % cleaned_data["labels"],
+                "No available images to download for %s" % cleaned_data["labels"],
             )
 
         return cleaned_data
@@ -2359,9 +2276,7 @@ class LicenseKeyForm(MAASModelForm):
         distro_choices = list_release_choices(
             releases, include_default=False, with_key_required=False
         )
-        invalid_osystem_message = compose_invalid_choice_text(
-            "osystem", os_choices
-        )
+        invalid_osystem_message = compose_invalid_choice_text("osystem", os_choices)
         invalid_distro_series_message = compose_invalid_choice_text(
             "distro_series", distro_choices
         )
@@ -2418,9 +2333,7 @@ class LicenseKeyForm(MAASModelForm):
         cleaned_key = cleaned_data["license_key"]
         cleaned_osystem = cleaned_data["osystem"]
         cleaned_series = cleaned_data["distro_series"]
-        if not validate_license_key(
-            cleaned_osystem, cleaned_series, cleaned_key
-        ):
+        if not validate_license_key(cleaned_osystem, cleaned_series, cleaned_key):
             raise ValidationError("Invalid license key.")
 
 
@@ -2495,9 +2408,7 @@ class BootResourceForm(MAASModelForm):
             choices = [BLANK_CHOICE]
         else:
             choices = list_architecture_choices(architectures)
-        invalid_arch_message = compose_invalid_choice_text(
-            "architecture", choices
-        )
+        invalid_arch_message = compose_invalid_choice_text("architecture", choices)
         self.fields["architecture"] = forms.ChoiceField(
             choices=choices,
             required=True,
@@ -2514,13 +2425,9 @@ class BootResourceForm(MAASModelForm):
         # already used in the SimpleStreams.
         reserved_names = [
             "{}/{}".format(bsc["os"], bsc["release"])
-            for bsc in BootSourceCache.objects.values(
-                "os", "release"
-            ).distinct()
+            for bsc in BootSourceCache.objects.values("os", "release").distinct()
         ]
-        reserved_names += [
-            i for name in reserved_names for i in name.split("/")
-        ]
+        reserved_names += [i for name in reserved_names for i in name.split("/")]
         # Reserve base operating system names
         reserved_names += supported_osystems
         return reserved_names
@@ -2609,18 +2516,12 @@ class BootResourceForm(MAASModelForm):
                     "custom images require a valid base image version to be set"
                 )
 
-        supported_base_images = {
-            os_name: os for os_name, os in OperatingSystemRegistry
-        }
+        supported_base_images = {os_name: os for os_name, os in OperatingSystemRegistry}
         if not (
             base_osystem in supported_base_images
-            and supported_base_images[base_osystem].is_release_supported(
-                base_version
-            )
+            and supported_base_images[base_osystem].is_release_supported(base_version)
         ):
-            raise ValidationError(
-                "please select a valid base image OS and version"
-            )
+            raise ValidationError("please select a valid base image OS and version")
 
         return "/".join([base_osystem, base_version])
 
@@ -2670,8 +2571,8 @@ class BootResourceForm(MAASModelForm):
             size,
             sha256,
         ):
-            filename_on_disk = (
-                BootResourceFile.objects.calculate_filename_on_disk(sha256)
+            filename_on_disk = BootResourceFile.objects.calculate_filename_on_disk(
+                sha256
             )
             rfile = BootResourceFile.objects.create(
                 resource_set=resource_set,
@@ -2721,9 +2622,7 @@ class BootResourceForm(MAASModelForm):
         # LP:1660418 - Delete new versions of user uploaded BootResources to
         # avoid duplicated images in the database that are unusable.
         if not self.cleaned_data["keep_old"]:
-            old_brfs = BootResourceFile.objects.filter(
-                resource_set__resource=resource
-            )
+            old_brfs = BootResourceFile.objects.filter(resource_set__resource=resource)
             old_brfs = old_brfs.exclude(resource_set=resource_set)
             BootResourceFile.objects.filestore_remove_files(old_brfs)
             old_brfs.delete()
@@ -2762,11 +2661,7 @@ class BootResourceNoContentForm(BootResourceForm):
         sha256 = data["sha256"]
         size = data["size"]
 
-        if (
-            BootResourceFile.objects.filter(sha256=sha256)
-            .exclude(size=size)
-            .exists()
-        ):
+        if BootResourceFile.objects.filter(sha256=sha256).exclude(size=size).exists():
             raise ValidationError(
                 "File already exists with sha256 that is of " "different size."
             )
@@ -2882,9 +2777,7 @@ class FormatBlockDeviceForm(Form):
     """Form used to format a block device."""
 
     uuid = UUID4Field(required=False)
-    fstype = forms.ChoiceField(
-        choices=FILESYSTEM_FORMAT_TYPE_CHOICES, required=True
-    )
+    fstype = forms.ChoiceField(choices=FILESYSTEM_FORMAT_TYPE_CHOICES, required=True)
     label = forms.CharField(required=False)
 
     def __init__(self, block_device, *args, **kwargs):
@@ -2899,13 +2792,9 @@ class FormatBlockDeviceForm(Form):
         cleaned_data = super().clean()
         if "fstype" not in cleaned_data:
             return cleaned_data
-        partition_table = PartitionTable.objects.filter(
-            block_device=self.block_device
-        )
+        partition_table = PartitionTable.objects.filter(block_device=self.block_device)
         if partition_table.exists():
-            raise ValidationError(
-                "Cannot format block device with a partition table."
-            )
+            raise ValidationError("Cannot format block device with a partition table.")
         return cleaned_data
 
     def save(self):
@@ -2979,9 +2868,7 @@ class FormatPartitionForm(Form):
     """Form used to format a partition - to add a Filesystem to it."""
 
     uuid = UUID4Field(required=False)
-    fstype = forms.ChoiceField(
-        choices=FILESYSTEM_FORMAT_TYPE_CHOICES, required=True
-    )
+    fstype = forms.ChoiceField(choices=FILESYSTEM_FORMAT_TYPE_CHOICES, required=True)
     label = forms.CharField(required=False)
 
     def __init__(self, partition, *args, **kwargs):
@@ -2992,9 +2879,7 @@ class FormatPartitionForm(Form):
     def clean(self):
         cleaned_data = super().clean()
         if self.partition.is_vmfs_partition():
-            set_form_error(
-                self, "VMFS", "Base VMFS partitions may not be formatted."
-            )
+            set_form_error(self, "VMFS", "Base VMFS partitions may not be formatted.")
         return cleaned_data
 
     def save(self):
@@ -3052,9 +2937,7 @@ class NUMANodeFormMixin:
 
         # replace the ID of the NUMANode with the index
         numa_node_id = self.initial["numa_node"]
-        self.initial["numa_node"] = self.node.numanode_set.get(
-            id=numa_node_id
-        ).index
+        self.initial["numa_node"] = self.node.numanode_set.get(id=numa_node_id).index
 
     def clean_numa_node(self):
         index = self.cleaned_data["numa_node"]
@@ -3069,9 +2952,7 @@ class NUMANodeFormMixin:
             index = self.instance.numa_node.index if self.is_update else 0
 
         try:
-            self.cleaned_data["numa_node"] = self.node.numanode_set.get(
-                index=index
-            )
+            self.cleaned_data["numa_node"] = self.node.numanode_set.get(index=index)
         except NUMANode.DoesNotExist:
             raise ValidationError("Invalid NUMA node")
         return self.cleaned_data["numa_node"]
@@ -3107,9 +2988,7 @@ class CreatePhysicalBlockDeviceForm(MAASModelForm, NUMANodeFormMixin):
     id_path = AbsolutePathField(required=False)
     size = BytesField(required=True)
     block_size = BytesField(required=True)
-    numa_node = forms.IntegerField(
-        required=False, min_value=0, label="NUMA node"
-    )
+    numa_node = forms.IntegerField(required=False, min_value=0, label="NUMA node")
 
     class Meta:
         model = PhysicalBlockDevice
@@ -3218,9 +3097,7 @@ class UpdateVirtualBlockDeviceForm(
         if not is_logical_volume and size_has_changed:
             if "size" in self.errors:
                 del self.errors["size"]
-            set_form_error(
-                self, "size", "Size cannot be changed on this device."
-            )
+            set_form_error(self, "size", "Size cannot be changed on this device.")
         return cleaned_data
 
 
@@ -3286,9 +3163,7 @@ def convert_partition_name_to_id(node_config, value):
     if not value:
         return value
     try:
-        return Partition.objects.get_partition_by_id_or_name(
-            node_config, value
-        ).id
+        return Partition.objects.get_partition_by_id_or_name(node_config, value).id
     except Partition.DoesNotExist:
         return value
 
@@ -3329,9 +3204,7 @@ def clean_cache_set_name_to_id(field):
         if not value:
             return value
         try:
-            cache_set = CacheSet.objects.get_cache_set_by_id_or_name(
-                value, self.node
-            )
+            cache_set = CacheSet.objects.get_cache_set_by_id_or_name(value, self.node)
         except CacheSet.DoesNotExist:
             return value
         return cache_set.id
@@ -3382,9 +3255,7 @@ class CreateCacheSetForm(Form):
         cache_device = self.cleaned_data.get("cache_device")
         cache_partition = self.cleaned_data.get("cache_partition")
         if cache_device and cache_partition:
-            raise ValidationError(
-                "Cannot set both cache_device and cache_partition."
-            )
+            raise ValidationError("Cannot set both cache_device and cache_partition.")
         elif not cache_device and not cache_partition:
             raise ValidationError(
                 "Either cache_device or cache_partition must be specified."
@@ -3397,19 +3268,13 @@ class CreateCacheSetForm(Form):
         This implementation of `save` does not support the `commit` argument.
         """
         if self.cleaned_data["cache_device"]:
-            cache_device = BlockDevice.objects.get(
-                id=self.cleaned_data["cache_device"]
-            )
+            cache_device = BlockDevice.objects.get(id=self.cleaned_data["cache_device"])
             partition = cache_device.create_partition_if_boot_disk()
             if partition is not None:
-                return CacheSet.objects.get_or_create_cache_set_for_partition(
-                    partition
-                )
+                return CacheSet.objects.get_or_create_cache_set_for_partition(partition)
             else:
-                return (
-                    CacheSet.objects.get_or_create_cache_set_for_block_device(
-                        cache_device
-                    )
+                return CacheSet.objects.get_or_create_cache_set_for_block_device(
+                    cache_device
                 )
         elif self.cleaned_data["cache_partition"]:
             cache_partition = Partition.objects.get(
@@ -3422,12 +3287,12 @@ class CreateCacheSetForm(Form):
     def _set_up_field_choices(self):
         """Sets up choices for `cache_device` and `cache_partition` fields."""
         # Select the unused, non-partitioned block devices of this node.
-        free_block_devices = (
-            BlockDevice.objects.get_free_block_devices_for_node(self.node)
+        free_block_devices = BlockDevice.objects.get_free_block_devices_for_node(
+            self.node
         )
-        block_device_choices = [
-            (bd.id, bd.name) for bd in free_block_devices
-        ] + [(bd.name, bd.name) for bd in free_block_devices]
+        block_device_choices = [(bd.id, bd.name) for bd in free_block_devices] + [
+            (bd.name, bd.name) for bd in free_block_devices
+        ]
 
         # Select the unused partitions of this node.
         free_partitions = list(
@@ -3474,9 +3339,7 @@ class UpdateCacheSetForm(Form):
         if self.cleaned_data["cache_device"]:
             filesystem = self.cache_set.get_filesystem()
             filesystem.partition = None
-            block_device = BlockDevice.objects.get(
-                id=self.cleaned_data["cache_device"]
-            )
+            block_device = BlockDevice.objects.get(id=self.cleaned_data["cache_device"])
             partition = block_device.create_partition_if_boot_disk()
             if partition is not None:
                 filesystem.partition = partition
@@ -3507,9 +3370,7 @@ class UpdateCacheSetForm(Form):
         ]
 
         # Select the unused partitions of this node.
-        partitions = list(
-            Partition.objects.get_free_partitions_for_node(self.node)
-        )
+        partitions = list(Partition.objects.get_free_partitions_for_node(self.node))
         # Add the used partition, if its a partition.
         if isinstance(device, Partition):
             partitions.append(device)
@@ -3529,9 +3390,7 @@ class CreateBcacheForm(Form):
     backing_device = forms.ChoiceField(required=False)
     backing_partition = forms.ChoiceField(required=False)
     cache_set = forms.ChoiceField(required=True)
-    cache_mode = forms.ChoiceField(
-        choices=CACHE_MODE_TYPE_CHOICES, required=True
-    )
+    cache_mode = forms.ChoiceField(choices=CACHE_MODE_TYPE_CHOICES, required=True)
 
     clean_backing_device = clean_block_device_name_to_id("backing_device")
     clean_backing_partition = clean_partition_name_to_id("backing_partition")
@@ -3585,12 +3444,12 @@ class CreateBcacheForm(Form):
         """Sets up choices for `cache_set`, `backing_device`,
         and `backing_partition` fields."""
         # Select the unused, non-partitioned block devices of this node.
-        free_block_devices = (
-            BlockDevice.objects.get_free_block_devices_for_node(self.node)
+        free_block_devices = BlockDevice.objects.get_free_block_devices_for_node(
+            self.node
         )
-        block_device_choices = [
-            (bd.id, bd.name) for bd in free_block_devices
-        ] + [(bd.name, bd.name) for bd in free_block_devices]
+        block_device_choices = [(bd.id, bd.name) for bd in free_block_devices] + [
+            (bd.name, bd.name) for bd in free_block_devices
+        ]
 
         # Select the unused partitions of this node.
         free_partitions = list(
@@ -3600,9 +3459,7 @@ class CreateBcacheForm(Form):
             (partition.id, partition.name) for partition in free_partitions
         ] + [(partition.name, partition.name) for partition in free_partitions]
 
-        self.fields["cache_set"].choices = get_cache_set_choices_for_node(
-            self.node
-        )
+        self.fields["cache_set"].choices = get_cache_set_choices_for_node(self.node)
         self.fields["backing_device"].choices = block_device_choices
         self.fields["backing_partition"].choices = partition_choices
 
@@ -3615,9 +3472,7 @@ class UpdateBcacheForm(Form):
     backing_device = forms.ChoiceField(required=False)
     backing_partition = forms.ChoiceField(required=False)
     cache_set = forms.ChoiceField(required=False)
-    cache_mode = forms.ChoiceField(
-        choices=CACHE_MODE_TYPE_CHOICES, required=False
-    )
+    cache_mode = forms.ChoiceField(choices=CACHE_MODE_TYPE_CHOICES, required=False)
 
     clean_backing_device = clean_block_device_name_to_id("backing_device")
     clean_backing_partition = clean_partition_name_to_id("backing_partition")
@@ -3696,15 +3551,13 @@ class UpdateBcacheForm(Form):
         # Select the unused, non-partitioned block devices of this node, append
         # the ones currently used by bcache and exclude the virtual block
         # device created by the cache.
-        free_block_devices = (
-            BlockDevice.objects.get_free_block_devices_for_node(self.node)
+        free_block_devices = BlockDevice.objects.get_free_block_devices_for_node(
+            self.node
         )
         free_block_devices = free_block_devices.exclude(
             id=self.bcache.virtual_device.id
         )
-        current_block_devices = self.bcache.filesystems.exclude(
-            block_device=None
-        )
+        current_block_devices = self.bcache.filesystems.exclude(block_device=None)
         block_device_choices = (
             [(bd.id, bd.name) for bd in free_block_devices]
             + [(bd.name, bd.name) for bd in free_block_devices]
@@ -3720,31 +3573,18 @@ class UpdateBcacheForm(Form):
 
         # Select the unused partitions of this node, append the bcache ones (if
         # they exist).
-        free_partitions = Partition.objects.get_free_partitions_for_node(
-            self.node
-        )
+        free_partitions = Partition.objects.get_free_partitions_for_node(self.node)
         current_partitions = self.bcache.filesystems.exclude(partition=None)
         partition_choices = (
             [(partition.id, partition.name) for partition in free_partitions]
-            + [
-                (partition.name, partition.name)
-                for partition in free_partitions
-            ]
-            + [
-                (fs.partition_id, fs.partition.name)
-                for fs in current_partitions
-            ]
-            + [
-                (fs.partition.name, fs.partition.name)
-                for fs in current_partitions
-            ]
+            + [(partition.name, partition.name) for partition in free_partitions]
+            + [(fs.partition_id, fs.partition.name) for fs in current_partitions]
+            + [(fs.partition.name, fs.partition.name) for fs in current_partitions]
         )
 
         self.fields["backing_device"].choices = block_device_choices
         self.fields["backing_partition"].choices = partition_choices
-        self.fields["cache_set"].choices = get_cache_set_choices_for_node(
-            self.node
-        )
+        self.fields["cache_set"].choices = get_cache_set_choices_for_node(self.node)
 
 
 class CreateRaidForm(Form):
@@ -3752,9 +3592,7 @@ class CreateRaidForm(Form):
 
     name = forms.CharField(required=False)
     uuid = UUID4Field(required=False)
-    level = forms.ChoiceField(
-        choices=FILESYSTEM_GROUP_RAID_TYPE_CHOICES, required=True
-    )
+    level = forms.ChoiceField(choices=FILESYSTEM_GROUP_RAID_TYPE_CHOICES, required=True)
     block_devices = forms.MultipleChoiceField(required=False)
     partitions = forms.MultipleChoiceField(required=False)
     spare_devices = forms.MultipleChoiceField(required=False)
@@ -3774,17 +3612,15 @@ class CreateRaidForm(Form):
 
         """
         # Select the unused, non-partitioned block devices of this node.
-        free_block_devices = (
-            BlockDevice.objects.get_free_block_devices_for_node(self.node)
-        )
-        block_device_choices = [
-            (bd.id, bd.name) for bd in free_block_devices
-        ] + [(bd.name, bd.name) for bd in free_block_devices]
-
-        # Select the unused partitions of this node.
-        free_partitions = Partition.objects.get_free_partitions_for_node(
+        free_block_devices = BlockDevice.objects.get_free_block_devices_for_node(
             self.node
         )
+        block_device_choices = [(bd.id, bd.name) for bd in free_block_devices] + [
+            (bd.name, bd.name) for bd in free_block_devices
+        ]
+
+        # Select the unused partitions of this node.
+        free_partitions = Partition.objects.get_free_partitions_for_node(self.node)
         partition_choices = [
             (partition.id, partition.name) for partition in free_partitions
         ] + [(partition.name, partition.name) for partition in free_partitions]
@@ -3807,12 +3643,10 @@ class CreateRaidForm(Form):
         if (
             "block_devices" in cleaned_data
             and "partitions" in cleaned_data
-            and len(cleaned_data["block_devices"] + cleaned_data["partitions"])
-            == 0
+            and len(cleaned_data["block_devices"] + cleaned_data["partitions"]) == 0
         ):
             raise ValidationError(
-                "At least one block device or partition must be added to the "
-                "array."
+                "At least one block device or partition must be added to the " "array."
             )
         return cleaned_data
 
@@ -3822,22 +3656,16 @@ class CreateRaidForm(Form):
         This implementation of `save` does not support the `commit` argument.
         """
         block_devices = list(
-            BlockDevice.objects.filter(
-                id__in=self.cleaned_data["block_devices"]
-            )
+            BlockDevice.objects.filter(id__in=self.cleaned_data["block_devices"])
         )
         partitions = list(
             Partition.objects.filter(id__in=self.cleaned_data["partitions"])
         )
         spare_devices = list(
-            BlockDevice.objects.filter(
-                id__in=self.cleaned_data["spare_devices"]
-            )
+            BlockDevice.objects.filter(id__in=self.cleaned_data["spare_devices"])
         )
         spare_partitions = list(
-            Partition.objects.filter(
-                id__in=self.cleaned_data["spare_partitions"]
-            )
+            Partition.objects.filter(id__in=self.cleaned_data["spare_partitions"])
         )
         boot_disk = self.node.get_boot_disk()
         if boot_disk.id in chain(
@@ -3878,24 +3706,14 @@ class UpdateRaidForm(Form):
     remove_spare_devices = forms.MultipleChoiceField(required=False)
     remove_spare_partitions = forms.MultipleChoiceField(required=False)
 
-    clean_add_block_devices = clean_block_device_names_to_ids(
-        "add_block_devices"
-    )
+    clean_add_block_devices = clean_block_device_names_to_ids("add_block_devices")
     clean_add_partitions = clean_partition_names_to_ids("add_partitions")
-    clean_add_spare_devices = clean_block_device_names_to_ids(
-        "add_spare_devices"
-    )
-    clean_add_spare_partitions = clean_partition_names_to_ids(
-        "add_spare_partitions"
-    )
+    clean_add_spare_devices = clean_block_device_names_to_ids("add_spare_devices")
+    clean_add_spare_partitions = clean_partition_names_to_ids("add_spare_partitions")
 
-    clean_remove_block_devices = clean_block_device_names_to_ids(
-        "remove_block_devices"
-    )
+    clean_remove_block_devices = clean_block_device_names_to_ids("remove_block_devices")
     clean_remove_partitions = clean_partition_names_to_ids("remove_partitions")
-    clean_remove_spare_devices = clean_block_device_names_to_ids(
-        "remove_spare_devices"
-    )
+    clean_remove_spare_devices = clean_block_device_names_to_ids("remove_spare_devices")
     clean_remove_spare_partitions = clean_partition_names_to_ids(
         "remove_spare_partitions"
     )
@@ -3917,40 +3735,32 @@ class UpdateRaidForm(Form):
 
         """
         # Select the unused, non-partitioned block devices of this node.
-        free_block_devices = (
-            BlockDevice.objects.get_free_block_devices_for_node(self.node)
-        )
-        add_block_device_choices = [
-            (bd.id, bd.name) for bd in free_block_devices
-        ] + [(bd.name, bd.name) for bd in free_block_devices]
-
-        # Select the unused partitions of this node.
-        free_partitions = Partition.objects.get_free_partitions_for_node(
+        free_block_devices = BlockDevice.objects.get_free_block_devices_for_node(
             self.node
         )
+        add_block_device_choices = [(bd.id, bd.name) for bd in free_block_devices] + [
+            (bd.name, bd.name) for bd in free_block_devices
+        ]
+
+        # Select the unused partitions of this node.
+        free_partitions = Partition.objects.get_free_partitions_for_node(self.node)
         add_partition_choices = [(p.id, p.name) for p in free_partitions] + [
             (p.name, p.name) for p in free_partitions
         ]
 
         # Select the used block devices of this RAID.
-        current_block_devices = self.raid.filesystems.exclude(
-            block_device=None
-        )
+        current_block_devices = self.raid.filesystems.exclude(block_device=None)
         remove_block_device_choices = [
-            (fs.block_device.id, fs.block_device.name)
-            for fs in current_block_devices
+            (fs.block_device.id, fs.block_device.name) for fs in current_block_devices
         ] + [
-            (fs.block_device.name, fs.block_device.name)
-            for fs in current_block_devices
+            (fs.block_device.name, fs.block_device.name) for fs in current_block_devices
         ]
 
         # Select the used partitions of this RAID.
         current_partitions = self.raid.filesystems.exclude(partition=None)
         remove_partition_choices = [
             (fs.partition.id, fs.partition.name) for fs in current_partitions
-        ] + [
-            (fs.partition.name, fs.partition.name) for fs in current_partitions
-        ]
+        ] + [(fs.partition.name, fs.partition.name) for fs in current_partitions]
 
         # Sets up the choices for additive fields.
         self.fields["add_block_devices"].choices = add_block_device_choices
@@ -3959,16 +3769,10 @@ class UpdateRaidForm(Form):
         self.fields["add_spare_partitions"].choices = add_partition_choices
 
         # Sets up the choices for removal fields.
-        self.fields[
-            "remove_block_devices"
-        ].choices = remove_block_device_choices
+        self.fields["remove_block_devices"].choices = remove_block_device_choices
         self.fields["remove_partitions"].choices = remove_partition_choices
-        self.fields[
-            "remove_spare_devices"
-        ].choices = remove_block_device_choices
-        self.fields[
-            "remove_spare_partitions"
-        ].choices = remove_partition_choices
+        self.fields["remove_spare_devices"].choices = remove_block_device_choices
+        self.fields["remove_spare_partitions"].choices = remove_partition_choices
 
     def save(self):
         """Save updates to the RAID.
@@ -3978,9 +3782,9 @@ class UpdateRaidForm(Form):
 
         current_block_device_ids = [
             fs.block_device.id
-            for fs in self.raid.filesystems.filter(
-                fstype=FILESYSTEM_TYPE.RAID
-            ).exclude(block_device=None)
+            for fs in self.raid.filesystems.filter(fstype=FILESYSTEM_TYPE.RAID).exclude(
+                block_device=None
+            )
         ]
         current_spare_device_ids = [
             fs.block_device.id
@@ -3990,9 +3794,9 @@ class UpdateRaidForm(Form):
         ]
         current_partition_ids = [
             fs.partition.id
-            for fs in self.raid.filesystems.filter(
-                fstype=FILESYSTEM_TYPE.RAID
-            ).exclude(partition=None)
+            for fs in self.raid.filesystems.filter(fstype=FILESYSTEM_TYPE.RAID).exclude(
+                partition=None
+            )
         ]
         current_spare_partition_ids = [
             fs.partition.id
@@ -4005,23 +3809,15 @@ class UpdateRaidForm(Form):
             self.cleaned_data["remove_block_devices"]
             + self.cleaned_data["remove_spare_devices"]
         ):
-            if (
-                device_id
-                in current_block_device_ids + current_spare_device_ids
-            ):
+            if device_id in current_block_device_ids + current_spare_device_ids:
                 self.raid.remove_device(BlockDevice.objects.get(id=device_id))
 
         for partition_id in (
             self.cleaned_data["remove_partitions"]
             + self.cleaned_data["remove_spare_partitions"]
         ):
-            if (
-                partition_id
-                in current_partition_ids + current_spare_partition_ids
-            ):
-                self.raid.remove_partition(
-                    Partition.objects.get(id=partition_id)
-                )
+            if partition_id in current_partition_ids + current_spare_partition_ids:
+                self.raid.remove_partition(Partition.objects.get(id=partition_id))
 
         for device_id in self.cleaned_data["add_block_devices"]:
             if device_id not in current_block_device_ids:
@@ -4037,13 +3833,9 @@ class UpdateRaidForm(Form):
                 block_device = BlockDevice.objects.get(id=device_id)
                 partition = block_device.create_partition_if_boot_disk()
                 if partition is not None:
-                    self.raid.add_partition(
-                        partition, FILESYSTEM_TYPE.RAID_SPARE
-                    )
+                    self.raid.add_partition(partition, FILESYSTEM_TYPE.RAID_SPARE)
                 else:
-                    self.raid.add_device(
-                        block_device, FILESYSTEM_TYPE.RAID_SPARE
-                    )
+                    self.raid.add_device(block_device, FILESYSTEM_TYPE.RAID_SPARE)
 
         for partition_id in self.cleaned_data["add_partitions"]:
             if partition_id not in current_partition_ids:
@@ -4093,16 +3885,14 @@ class CreateVolumeGroupForm(Form):
         partitions and block devices that fit this node.
         """
         # Select the unused, non-partitioned block devices of this node.
-        free_block_devices = (
-            BlockDevice.objects.get_free_block_devices_for_node(self.node)
+        free_block_devices = BlockDevice.objects.get_free_block_devices_for_node(
+            self.node
         )
         self.fields["block_devices"].choices = [
             (bd.id, bd.name) for bd in free_block_devices
         ] + [(bd.name, bd.name) for bd in free_block_devices]
         # Select the unused partitions of this node.
-        free_partitions = Partition.objects.get_free_partitions_for_node(
-            self.node
-        )
+        free_partitions = Partition.objects.get_free_partitions_for_node(self.node)
         self.fields["partitions"].choices = [
             (partition.id, partition.name) for partition in free_partitions
         ] + [(partition.name, partition.name) for partition in free_partitions]
@@ -4113,12 +3903,10 @@ class CreateVolumeGroupForm(Form):
         if "name" not in cleaned_data:
             return cleaned_data
         has_block_devices = (
-            "block_devices" in cleaned_data
-            and len(cleaned_data["block_devices"]) > 0
+            "block_devices" in cleaned_data and len(cleaned_data["block_devices"]) > 0
         )
         has_partitions = (
-            "partitions" in cleaned_data
-            and len(cleaned_data["partitions"]) > 0
+            "partitions" in cleaned_data and len(cleaned_data["partitions"]) > 0
         )
         has_block_device_and_partition_errors = (
             "block_devices" in self._errors or "partitions" in self._errors
@@ -4139,9 +3927,7 @@ class CreateVolumeGroupForm(Form):
         This implementation of `save` does not support the `commit` argument.
         """
         block_devices = list(
-            BlockDevice.objects.filter(
-                id__in=self.cleaned_data["block_devices"]
-            )
+            BlockDevice.objects.filter(id__in=self.cleaned_data["block_devices"])
         )
         partitions = list(
             Partition.objects.filter(id__in=self.cleaned_data["partitions"])
@@ -4165,12 +3951,8 @@ class UpdateVolumeGroupForm(Form):
     add_partitions = forms.MultipleChoiceField(required=False)
     remove_partitions = forms.MultipleChoiceField(required=False)
 
-    clean_add_block_devices = clean_block_device_names_to_ids(
-        "add_block_devices"
-    )
-    clean_remove_block_devices = clean_block_device_names_to_ids(
-        "remove_block_devices"
-    )
+    clean_add_block_devices = clean_block_device_names_to_ids("add_block_devices")
+    clean_remove_block_devices = clean_block_device_names_to_ids("remove_block_devices")
     clean_add_partitions = clean_partition_names_to_ids("add_partitions")
     clean_remove_partitions = clean_partition_names_to_ids("remove_partitions")
 
@@ -4187,24 +3969,20 @@ class UpdateVolumeGroupForm(Form):
         partitions and block devices that fit this node.
         """
         # Select the unused, non-partitioned block devices of this node.
-        free_block_devices = (
-            BlockDevice.objects.get_free_block_devices_for_node(self.node)
+        free_block_devices = BlockDevice.objects.get_free_block_devices_for_node(
+            self.node
         )
         self.fields["add_block_devices"].choices = [
             (bd.id, bd.name) for bd in free_block_devices
         ] + [(bd.name, bd.name) for bd in free_block_devices]
         # Select the unused partitions of this node.
-        free_partitions = Partition.objects.get_free_partitions_for_node(
-            self.node
-        )
+        free_partitions = Partition.objects.get_free_partitions_for_node(self.node)
         self.fields["add_partitions"].choices = [
             (partition.id, partition.name) for partition in free_partitions
         ] + [(partition.name, partition.name) for partition in free_partitions]
         # Select the block devices in the volume group.
-        used_block_devices = (
-            BlockDevice.objects.get_block_devices_in_filesystem_group(
-                self.volume_group
-            )
+        used_block_devices = BlockDevice.objects.get_block_devices_in_filesystem_group(
+            self.volume_group
         )
         self.fields["remove_block_devices"].choices = [
             (bd.id, bd.name) for bd in used_block_devices
@@ -4230,10 +4008,8 @@ class UpdateVolumeGroupForm(Form):
         # Create the new list of block devices.
         add_block_device_ids = self.cleaned_data["add_block_devices"]
         remove_block_device_ids = self.cleaned_data["remove_block_devices"]
-        block_devices = (
-            BlockDevice.objects.get_block_devices_in_filesystem_group(
-                self.volume_group
-            )
+        block_devices = BlockDevice.objects.get_block_devices_in_filesystem_group(
+            self.volume_group
         )
         block_devices = [
             block_device
@@ -4263,9 +4039,7 @@ class UpdateVolumeGroupForm(Form):
         _move_boot_disk_to_partitions(block_devices, partitions)
 
         # Update the block devices and partitions in the volume group.
-        self.volume_group.update_block_devices_and_partitions(
-            block_devices, partitions
-        )
+        self.volume_group.update_block_devices_and_partitions(block_devices, partitions)
         self.volume_group.save()
         return self.volume_group
 
@@ -4302,8 +4076,7 @@ class CreateLogicalVolumeForm(Form):
                 del self._errors["size"]
             raise ValidationError(
                 "Volume group (%s) cannot hold any more logical volumes, "
-                "because it doesn't have enough free space."
-                % (self.volume_group.name)
+                "because it doesn't have enough free space." % (self.volume_group.name)
             )
         return cleaned_data
 
@@ -4337,9 +4110,7 @@ class CreateVMFSForm(CreateVolumeGroupForm):
     def save(self):
         """Persist the `VMFS` into the database."""
         block_devices = list(
-            BlockDevice.objects.filter(
-                id__in=self.cleaned_data["block_devices"]
-            )
+            BlockDevice.objects.filter(id__in=self.cleaned_data["block_devices"])
         )
         partitions = list(
             Partition.objects.filter(id__in=self.cleaned_data["partitions"])

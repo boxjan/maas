@@ -59,9 +59,7 @@ class TestAddArguments(MAASTestCase):
                 # a nice ArgumentError exception, which unfortunately,
                 # gets caught and sent to exit.
                 if "--init" in test_arg_names and "--uuid" in test_arg_names:
-                    with self.assertRaisesRegex(SystemExit, "2"), patch(
-                        "sys.stderr"
-                    ):
+                    with self.assertRaisesRegex(SystemExit, "2"), patch("sys.stderr"):
                         parser.parse_known_args(args_under_test)
 
                 else:
@@ -73,9 +71,9 @@ class TestAddArguments(MAASTestCase):
                         parsed_param_name = param_name[2:].replace("-", "_")
 
                         if param_name not in test_arg_names:
-                            expected_args[
-                                parsed_param_name
-                            ] = default_arg_values[param_name]
+                            expected_args[parsed_param_name] = default_arg_values[
+                                param_name
+                            ]
                         else:
                             expected_args[parsed_param_name] = observed_args[
                                 parsed_param_name

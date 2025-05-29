@@ -334,13 +334,9 @@ class VmHostHandler(OperationsHandler):
         @error-example (content) "no-perms"
             This method is reserved for admin users.
         """
-        pod = Pod.objects.get_pod_or_404(
-            id, request.user, PodPermission.compose
-        )
+        pod = Pod.objects.get_pod_or_404(id, request.user, PodPermission.compose)
         if Capabilities.COMPOSABLE not in pod.capabilities:
-            raise MAASAPIValidationError(
-                "VM host does not support composability."
-            )
+            raise MAASAPIValidationError("VM host does not support composability.")
         form = ComposeMachineForm(data=request.data, pod=pod, request=request)
         if form.is_valid():
             machine = form.compose()
@@ -464,9 +460,7 @@ class VmHostsHandler(OperationsHandler):
         @success-example (json) "success-json" [exkey=read-vmhosts]
         placeholder text
         """
-        return Pod.objects.get_pods(request.user, PodPermission.view).order_by(
-            "id"
-        )
+        return Pod.objects.get_pods(request.user, PodPermission.view).order_by("id")
 
     @admin_method
     def create(self, request):

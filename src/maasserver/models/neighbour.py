@@ -36,10 +36,7 @@ class NeighbourQueriesMixin(MAASQueriesMixin):
             "mac": "__mac_address",
         }
         return super().get_specifiers_q(
-            specifiers,
-            specifier_types=specifier_types,
-            separator=separator,
-            **kwargs
+            specifiers, specifier_types=specifier_types, separator=separator, **kwargs
         )
 
 
@@ -90,9 +87,9 @@ class NeighbourManager(Manager, NeighbourQueriesMixin):
         Returns True if a binding was (deleted and a log was generated).
         """
         deleted = False
-        previous_bindings = self.filter(
-            interface=interface, ip=ip, vid=vid
-        ).exclude(mac_address=mac)
+        previous_bindings = self.filter(interface=interface, ip=ip, vid=vid).exclude(
+            mac_address=mac
+        )
         # Technically there should be just one existing mapping for this
         # (interface, ip, vid), but the defensive thing to do is to delete
         # them all.

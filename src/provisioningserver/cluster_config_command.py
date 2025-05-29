@@ -13,9 +13,7 @@ from formencode.validators import StringBool
 from provisioningserver.config import ClusterConfiguration
 
 
-def update_maas_cluster_conf(
-    urls=None, tftp_port=None, tftp_root=None, debug=None
-):
+def update_maas_cluster_conf(urls=None, tftp_port=None, tftp_root=None, debug=None):
     """This function handles the logic behind using the parameters passed to
     run and setting / initializing values in the config backend.
 

@@ -121,9 +121,7 @@ class MockRegionToClusterRPCFixture(fixtures.Fixture):
         self.secret = _get_shared_secret_for_tests()
         # We need the event-loop up and running.
         if not eventloop.loop.running:
-            raise RuntimeError(
-                "Please start the event-loop before using this fixture."
-            )
+            raise RuntimeError("Please start the event-loop before using this fixture.")
         self.rpc = get_service_in_eventloop("rpc").wait(TIMEOUT)
         # The RPC service uses a defaultdict(set) to manage connections, but
         # let's check those assumptions.
@@ -132,9 +130,7 @@ class MockRegionToClusterRPCFixture(fixtures.Fixture):
         # Populate a connections mapping with a fake connection for each
         # rack controller known at present.
         fake_connections = defaultdict(set)
-        for system_id in RackController.objects.values_list(
-            "system_id", flat=True
-        ):
+        for system_id in RackController.objects.values_list("system_id", flat=True):
             connection = FakeConnection(system_id)
             fake_connections[connection.ident].add(connection)
         # Patch the fake connections into place for this fixture's lifetime.
@@ -182,11 +178,9 @@ class MockRegionToClusterRPCFixture(fixtures.Fixture):
         protocol_factory = make_amp_protocol_factory(*commands)
         protocol = protocol_factory()
         ident_response = {"ident": controller.system_id}
-        protocol.Identify.side_effect = lambda _: defer.succeed(
-            ident_response.copy()
-        )
-        protocol.Authenticate.side_effect = (
-            lambda _, message: authenticate_with_secret(self.secret, message)
+        protocol.Identify.side_effect = lambda _: defer.succeed(ident_response.copy())
+        protocol.Authenticate.side_effect = lambda _, message: authenticate_with_secret(
+            self.secret, message
         )
         return protocol, self.addCluster(protocol)
 
@@ -259,9 +253,7 @@ class MockLiveRegionToClusterRPCFixture(fixtures.Fixture):
         self.monkey = MonkeyPatcher()
         # We need the event-loop up and running.
         if not eventloop.loop.running:
-            raise RuntimeError(
-                "Please start the event-loop before using this fixture."
-            )
+            raise RuntimeError("Please start the event-loop before using this fixture.")
         self.rpc = get_service_in_eventloop("rpc").wait(TIMEOUT)
         # Where we're going to put the UNIX socket files.
         self.sockdir = self.useFixture(fixtures.TempDir()).path
@@ -332,8 +324,8 @@ class MockLiveRegionToClusterRPCFixture(fixtures.Fixture):
         protocol_factory = make_amp_protocol_factory(*commands)
         protocol = protocol_factory()
 
-        protocol.Authenticate.side_effect = (
-            lambda _, message: authenticate_with_secret(self.secret, message)
+        protocol.Authenticate.side_effect = lambda _, message: authenticate_with_secret(
+            self.secret, message
         )
         self.addCluster(protocol, rack_controller).wait(TIMEOUT)
         # The connection is now established, but there is a brief

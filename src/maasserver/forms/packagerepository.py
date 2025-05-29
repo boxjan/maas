@@ -49,9 +49,7 @@ class PackageRepositoryForm(MAASModelForm):
     # multiple-values submissions.
     distributions = UnconstrainedMultipleChoiceField(label="Distribution list")
 
-    disabled_pockets = UnconstrainedMultipleChoiceField(
-        label="Disabled Pocket list"
-    )
+    disabled_pockets = UnconstrainedMultipleChoiceField(label="Disabled Pocket list")
 
     disabled_components = UnconstrainedMultipleChoiceField(
         label="Disabled Component list"
@@ -153,8 +151,7 @@ class PackageRepositoryForm(MAASModelForm):
             return []
         if self.instance is not None and not self.instance.default and values:
             raise ValidationError(
-                "This is a custom repository. Please update 'components' "
-                "instead."
+                "This is a custom repository. Please update 'components' " "instead."
             )
         # Check that a valid component is being passed.
         for component in values:

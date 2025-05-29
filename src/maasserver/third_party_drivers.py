@@ -142,9 +142,7 @@ def get_third_party_driver(node, detected_aliases=None, series=""):
     third_party_drivers_config = DriversConfig.load_from_cache()
     third_party_drivers = third_party_drivers_config["drivers"]
 
-    matched_driver = match_aliases_to_driver(
-        detected_aliases, third_party_drivers
-    )
+    matched_driver = match_aliases_to_driver(detected_aliases, third_party_drivers)
 
     if matched_driver is None:
         return {}

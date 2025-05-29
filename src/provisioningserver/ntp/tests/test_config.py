@@ -25,10 +25,7 @@ def read_configuration(path):
 
 
 def extract_servers_and_pools(configuration):
-    return [
-        address
-        for _, address, _ in extract_servers_and_pools_full(configuration)
-    ]
+    return [address for _, address, _ in extract_servers_and_pools_full(configuration)]
 
 
 def extract_servers_and_pools_full(configuration):
@@ -79,14 +76,10 @@ class TestConfigure(MAASTestCase):
         offset = 3
         config.configure(servers, peers, offset)
         ntp_conf_path = get_tentative_data_path("etc", config._NTP_CONF_NAME)
-        ntp_maas_conf_path = get_tentative_data_path(
-            "etc", config._NTP_MAAS_CONF_NAME
-        )
+        ntp_maas_conf_path = get_tentative_data_path("etc", config._NTP_MAAS_CONF_NAME)
         ntp_conf = read_configuration(ntp_conf_path)
         self.assertEqual([], extract_servers_and_pools(ntp_conf))
-        self.assertEqual(
-            [ntp_maas_conf_path], extract_included_files(ntp_conf)
-        )
+        self.assertEqual([ntp_maas_conf_path], extract_included_files(ntp_conf))
         ntp_maas_conf = read_configuration(ntp_maas_conf_path)
         self.assertEqual(servers, extract_servers_and_pools(ntp_maas_conf))
         self.assertEqual(peers, extract_peers(ntp_maas_conf))
@@ -146,9 +139,7 @@ class TestNormaliseAddress(MAASTestCase):
 
 
 def extract_tos_options(configuration):
-    commands = re.findall(
-        r"^ *local stratum +([^\r\n]+)$", configuration, re.MULTILINE
-    )
+    commands = re.findall(r"^ *local stratum +([^\r\n]+)$", configuration, re.MULTILINE)
     return list(chain.from_iterable(map(str.split, commands)))
 
 
@@ -236,9 +227,7 @@ class TestRenderNTPMAASConf(MAASTestCase):
             factory.make_hostname(),
         ]
         ntp_maas_conf = config._render_ntp_maas_conf(servers, [], 0)
-        self.assertTrue(
-            ntp_maas_conf.startswith("# MAAS NTP configuration.\n")
-        )
+        self.assertTrue(ntp_maas_conf.startswith("# MAAS NTP configuration.\n"))
         servers_or_pools = extract_servers_and_pools_full(ntp_maas_conf)
         # Hostnames are rendered as `pool` commands so that all IP addresses
         # resolved via DNS are included in clock selection.
@@ -258,13 +247,9 @@ class TestRenderNTPMAASConf(MAASTestCase):
             factory.make_hostname(),
         ]
         ntp_maas_conf = config._render_ntp_maas_conf([], peers, 0)
-        self.assertTrue(
-            ntp_maas_conf.startswith("# MAAS NTP configuration.\n")
-        )
+        self.assertTrue(ntp_maas_conf.startswith("# MAAS NTP configuration.\n"))
         observed_peers = extract_peers_full(ntp_maas_conf)
-        self.assertEqual(
-            [("peer", peer, "") for peer in peers], observed_peers
-        )
+        self.assertEqual([("peer", peer, "") for peer in peers], observed_peers)
 
     def test_renders_ipv6_mapped_ipv4_addresses_as_plain_ipv4(self):
         server_as_ipv4 = factory.make_ipv4_address()

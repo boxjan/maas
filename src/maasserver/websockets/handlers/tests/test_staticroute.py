@@ -53,9 +53,7 @@ class TestStaticRouteHandler(MAASServerTestCase):
     def test_create(self):
         user = factory.make_admin()
         source = factory.make_Subnet()
-        destination = factory.make_Subnet(
-            version=source.get_ipnetwork().version
-        )
+        destination = factory.make_Subnet(version=source.get_ipnetwork().version)
         gateway_ip = factory.pick_ip_in_Subnet(source)
         metric = random.randint(0, 500)
         handler = StaticRouteHandler(user, {}, None)
@@ -77,9 +75,7 @@ class TestStaticRouteHandler(MAASServerTestCase):
     def test_create_admin_only(self):
         user = factory.make_User()
         source = factory.make_Subnet()
-        destination = factory.make_Subnet(
-            version=source.get_ipnetwork().version
-        )
+        destination = factory.make_Subnet(version=source.get_ipnetwork().version)
         gateway_ip = factory.pick_ip_in_Subnet(source)
         metric = random.randint(0, 500)
         handler = StaticRouteHandler(user, {}, None)
@@ -120,9 +116,7 @@ class TestStaticRouteHandler(MAASServerTestCase):
         staticroute = factory.make_StaticRoute()
         handler = StaticRouteHandler(user, {}, None)
         handler.delete({"id": staticroute.id})
-        self.assertIsNone(
-            get_one(StaticRoute.objects.filter(id=staticroute.id))
-        )
+        self.assertIsNone(get_one(StaticRoute.objects.filter(id=staticroute.id)))
 
     def test_delete_admin_only(self):
         user = factory.make_User()

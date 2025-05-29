@@ -102,12 +102,9 @@ class TestDiscoveryHandler(MAASServerTestCase):
         # Test for the expected order independent of how the database
         # decided to sort.
         expected_discoveries = [
-            self.dehydrate_discovery(discovery, for_list=True)
-            for discovery in [d3, d4]
+            self.dehydrate_discovery(discovery, for_list=True) for discovery in [d3, d4]
         ]
-        self.assertEqual(
-            expected_discoveries, handler.list({"start": first_seen})
-        )
+        self.assertEqual(expected_discoveries, handler.list({"start": first_seen}))
 
 
 class TestDiscoveryHandlerClear(MAASServerTestCase):
@@ -187,9 +184,7 @@ class TestDiscoveryHandlerDeleteByMACAndIP(MAASServerTestCase):
         disco = factory.make_Discovery()
         num_discoveries = Discovery.objects.count()
         self.assertEqual(1, num_discoveries)
-        result = handler.delete_by_mac_and_ip(
-            dict(ip=disco.ip, mac=disco.mac_address)
-        )
+        result = handler.delete_by_mac_and_ip(dict(ip=disco.ip, mac=disco.mac_address))
         num_discoveries = Discovery.objects.count()
         self.assertEqual(0, num_discoveries)
         self.assertEqual(1, result)

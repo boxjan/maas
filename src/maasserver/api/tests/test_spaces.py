@@ -53,15 +53,11 @@ class TestSpacesAPI(APITestCase.ForUser):
         fill_empty_spaces()
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [space.id for space in Space.objects.all()]
         result_ids = [
             space["id"]
-            for space in json.loads(
-                response.content.decode(settings.DEFAULT_CHARSET)
-            )
+            for space in json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         ]
         self.assertCountEqual(expected_ids, result_ids)
 
@@ -70,15 +66,11 @@ class TestSpacesAPI(APITestCase.ForUser):
         uri = get_spaces_uri()
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [-1]
         result_ids = [
             space["id"]
-            for space in json.loads(
-                response.content.decode(settings.DEFAULT_CHARSET)
-            )
+            for space in json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         ]
         self.assertEqual(expected_ids, result_ids)
 
@@ -89,16 +81,12 @@ class TestSpacesAPI(APITestCase.ForUser):
         fill_empty_spaces(space)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         # Does not include the undefined space.
         expected_ids = [space.id]
         result_ids = [
             space["id"]
-            for space in json.loads(
-                response.content.decode(settings.DEFAULT_CHARSET)
-            )
+            for space in json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         ]
         self.assertCountEqual(expected_ids, result_ids)
 
@@ -108,31 +96,23 @@ class TestSpacesAPI(APITestCase.ForUser):
         uri = get_spaces_uri()
         fill_empty_spaces()
         response = self.client.post(uri, {"name": space_name})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             space_name,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "name"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["name"],
         )
 
     def test_create_admin_only(self):
         space_name = factory.make_name("space")
         uri = get_spaces_uri()
         response = self.client.post(uri, {"name": space_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_create_does_not_require_name(self):
         self.become_admin()
         uri = get_spaces_uri()
         response = self.client.post(uri, {})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual("space-%d" % data["id"], data["name"])
 
@@ -140,9 +120,7 @@ class TestSpacesAPI(APITestCase.ForUser):
 class TestSpaceAPI(APITestCase.ForUser):
     def test_handler_path(self):
         space = factory.make_Space()
-        self.assertEqual(
-            "/MAAS/api/2.0/spaces/%s/" % space.id, get_space_uri(space)
-        )
+        self.assertEqual("/MAAS/api/2.0/spaces/%s/" % space.id, get_space_uri(space))
 
     def test_read(self):
         name = factory.make_name("name")
@@ -152,12 +130,8 @@ class TestSpaceAPI(APITestCase.ForUser):
         uri = get_space_uri(space)
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_space = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_space = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(parsed_space["id"], space.id)
         self.assertEqual(parsed_space["name"], space.get_name())
         self.assertEqual(parsed_space["description"], space.description)
@@ -171,9 +145,7 @@ class TestSpaceAPI(APITestCase.ForUser):
         uri = get_undefined_space_uri()
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_space = response.json()
         self.assertEqual(parsed_space.get("id"), -1)
         self.assertEqual(parsed_space.get("name"), Space.UNDEFINED)
@@ -185,9 +157,7 @@ class TestSpaceAPI(APITestCase.ForUser):
         vlan = factory.make_VLAN(space=space)
         uri = get_space_uri(space)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_space = response.json()
         parsed_vlan = parsed_space["vlans"][0]
         self.assertEqual(parsed_vlan.get("id"), vlan.id)
@@ -199,25 +169,19 @@ class TestSpaceAPI(APITestCase.ForUser):
         subnet = factory.make_Subnet(space=space)
         uri = get_space_uri(space)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_space = response.json()
         parsed_subnet = parsed_space["subnets"][0]
         self.assertEqual(parsed_subnet.get("id"), subnet.id)
         self.assertEqual(parsed_subnet.get("cidr"), str(subnet.cidr))
         self.assertEqual(parsed_subnet["vlan"].get("id"), subnet.vlan.id)
         self.assertEqual(parsed_subnet["vlan"].get("vid"), subnet.vlan.vid)
-        self.assertEqual(
-            parsed_subnet["vlan"].get("fabric_id"), subnet.vlan.fabric_id
-        )
+        self.assertEqual(parsed_subnet["vlan"].get("fabric_id"), subnet.vlan.fabric_id)
 
     def test_read_404_when_bad_id(self):
         uri = reverse("space_handler", args=[random.randint(100, 1000)])
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_update(self):
         self.become_admin()
@@ -225,14 +189,10 @@ class TestSpaceAPI(APITestCase.ForUser):
         new_name = factory.make_name("space")
         uri = get_space_uri(space)
         response = self.client.put(uri, {"name": new_name})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             new_name,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "name"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["name"],
         )
         self.assertEqual(new_name, reload_object(space).name)
 
@@ -250,18 +210,14 @@ class TestSpaceAPI(APITestCase.ForUser):
         new_name = factory.make_name("space")
         uri = get_space_uri(space)
         response = self.client.put(uri, {"name": new_name})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_delete_deletes_space(self):
         self.become_admin()
         space = factory.make_Space()
         uri = get_space_uri(space)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(space))
 
     def test_delete_undefined_vlan_not_allowed(self):
@@ -277,15 +233,11 @@ class TestSpaceAPI(APITestCase.ForUser):
         space = factory.make_Space()
         uri = get_space_uri(space)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(space))
 
     def test_delete_404_when_invalid_id(self):
         self.become_admin()
         uri = reverse("space_handler", args=[random.randint(100, 1000)])
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)

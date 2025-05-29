@@ -107,28 +107,20 @@ class TestGetThirdPartyDriver(MAASServerTestCase):
     def test_matching_series(self):
         node = factory.make_Node()
         driver = {"series": ["xenial", "bionic"], "name": "somedriver"}
-        self.patch(
-            third_party_drivers, "match_aliases_to_driver"
-        ).return_value = driver
+        self.patch(third_party_drivers, "match_aliases_to_driver").return_value = driver
         self.assertEqual(get_third_party_driver(node, series="bionic"), driver)
 
     def test_not_matching_series(self):
         node = factory.make_Node()
         driver = {"series": ["xenial", "bionic"], "name": "somedriver"}
-        self.patch(
-            third_party_drivers, "match_aliases_to_driver"
-        ).return_value = driver
+        self.patch(third_party_drivers, "match_aliases_to_driver").return_value = driver
         self.assertEqual(get_third_party_driver(node, series="precise"), {})
 
     def test_series_without_available_series(self):
         node = factory.make_Node()
         driver = {"name": "somedriver"}
-        self.patch(
-            third_party_drivers, "match_aliases_to_driver"
-        ).return_value = driver
-        self.assertEqual(
-            get_third_party_driver(node, series="precise"), driver
-        )
+        self.patch(third_party_drivers, "match_aliases_to_driver").return_value = driver
+        self.assertEqual(get_third_party_driver(node, series="precise"), driver)
 
 
 class TestDriversConfig(MAASServerTestCase):

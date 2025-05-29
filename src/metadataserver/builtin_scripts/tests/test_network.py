@@ -137,13 +137,9 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.assertEqual(123, eth0_vlan123.vlan.vid)
         self.assertEqual(INTERFACE_TYPE.VLAN, eth0_vlan456.type)
         self.assertEqual(456, eth0_vlan456.vlan.vid)
-        self.assertEqual(
-            eth0_vlan123.vlan.fabric_id, eth0_vlan456.vlan.fabric_id
-        )
+        self.assertEqual(eth0_vlan123.vlan.fabric_id, eth0_vlan456.vlan.fabric_id)
         self.assertIsNotNone(eth0.vlan_id)
-        self.assertNotIn(
-            eth0.vlan_id, [eth0_vlan456.vlan_id, eth0_vlan123.vlan_id]
-        )
+        self.assertNotIn(eth0.vlan_id, [eth0_vlan456.vlan_id, eth0_vlan123.vlan_id])
         self.assertEqual(eth0.vlan.fabric_id, eth0_vlan123.vlan.fabric_id)
         self.assertEqual(eth0.vlan.fabric_id, eth0_vlan456.vlan.fabric_id)
 
@@ -179,13 +175,9 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.assertEqual(123, eth0_vlan123.vlan.vid)
         self.assertEqual(INTERFACE_TYPE.VLAN, eth0_vlan456.type)
         self.assertEqual(456, eth0_vlan456.vlan.vid)
-        self.assertEqual(
-            eth0_vlan123.vlan.fabric_id, eth0_vlan456.vlan.fabric_id
-        )
+        self.assertEqual(eth0_vlan123.vlan.fabric_id, eth0_vlan456.vlan.fabric_id)
         self.assertIsNotNone(eth0.vlan_id)
-        self.assertNotIn(
-            eth0.vlan_id, [eth0_vlan456.vlan_id, eth0_vlan123.vlan_id]
-        )
+        self.assertNotIn(eth0.vlan_id, [eth0_vlan456.vlan_id, eth0_vlan123.vlan_id])
         self.assertEqual(eth0.vlan.fabric_id, eth0_vlan123.vlan.fabric_id)
         self.assertEqual(eth0.vlan.fabric_id, eth0_vlan456.vlan.fabric_id)
 
@@ -221,13 +213,9 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.assertEqual(123, eth0_vlan123.vlan.vid)
         self.assertEqual(INTERFACE_TYPE.VLAN, eth0_vlan456.type)
         self.assertEqual(456, eth0_vlan456.vlan.vid)
-        self.assertEqual(
-            eth0_vlan123.vlan.fabric_id, eth0_vlan456.vlan.fabric_id
-        )
+        self.assertEqual(eth0_vlan123.vlan.fabric_id, eth0_vlan456.vlan.fabric_id)
         self.assertIsNotNone(eth0.vlan_id)
-        self.assertNotIn(
-            eth0.vlan_id, [eth0_vlan456.vlan_id, eth0_vlan123.vlan_id]
-        )
+        self.assertNotIn(eth0.vlan_id, [eth0_vlan456.vlan_id, eth0_vlan123.vlan_id])
         self.assertEqual(eth0.vlan.fabric_id, eth0_vlan123.vlan.fabric_id)
         self.assertEqual(eth0.vlan.fabric_id, eth0_vlan456.vlan.fabric_id)
 
@@ -261,13 +249,9 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.assertEqual(123, eth0_vlan123.vlan.vid)
         self.assertEqual(INTERFACE_TYPE.VLAN, eth0_vlan456.type)
         self.assertEqual(456, eth0_vlan456.vlan.vid)
-        self.assertEqual(
-            eth0_vlan123.vlan.fabric_id, eth0_vlan456.vlan.fabric_id
-        )
+        self.assertEqual(eth0_vlan123.vlan.fabric_id, eth0_vlan456.vlan.fabric_id)
         self.assertIsNotNone(eth0.vlan_id)
-        self.assertNotIn(
-            eth0.vlan_id, [eth0_vlan456.vlan_id, eth0_vlan123.vlan_id]
-        )
+        self.assertNotIn(eth0.vlan_id, [eth0_vlan456.vlan_id, eth0_vlan123.vlan_id])
         self.assertEqual(eth0.vlan.fabric_id, eth0_vlan123.vlan.fabric_id)
         self.assertEqual(eth0.vlan.fabric_id, eth0_vlan456.vlan.fabric_id)
 
@@ -384,9 +368,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         interface_names = VLANInterface.objects.filter(
             node_config=host.current_config
         ).values_list("name", flat=True)
-        self.assertCountEqual(
-            ["eth0.0102", "vlan0100", "vlan101"], interface_names
-        )
+        self.assertCountEqual(["eth0.0102", "vlan0100", "vlan101"], interface_names)
 
     def test_vlans_with_alternate_naming_conventions_host(self):
         host = factory.make_Machine()
@@ -401,9 +383,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         interface_names = VLANInterface.objects.filter(
             node_config=host.current_config
         ).values_list("name", flat=True)
-        self.assertCountEqual(
-            ["eth0.0102", "vlan0100", "vlan101"], interface_names
-        )
+        self.assertCountEqual(["eth0.0102", "vlan0100", "vlan101"], interface_names)
 
     def test_vlan_interface_moved_vlan(self):
         controller = self.create_empty_controller()
@@ -423,10 +403,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.assertEqual(eth0_fabric_id, eth0_100.vlan.fabric_id)
         self.assertCountEqual(
             [0, 100],
-            [
-                vlan.vid
-                for vlan in VLAN.objects.filter(fabric_id=eth0_fabric_id)
-            ],
+            [vlan.vid for vlan in VLAN.objects.filter(fabric_id=eth0_fabric_id)],
         )
 
         # Simulate someone moving the VLAN of the VLAN interface, but
@@ -452,11 +429,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.assertEqual(new_fabric.id, eth0_100.vlan.fabric_id)
         self.assertCountEqual(
             [0, 100],
-            list(
-                VLAN.objects.filter(fabric=new_fabric).values_list(
-                    "vid", flat=True
-                )
-            ),
+            list(VLAN.objects.filter(fabric=new_fabric).values_list("vid", flat=True)),
         )
         self.assertCountEqual(
             [0],
@@ -471,9 +444,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         controller = self.create_empty_controller()
         eth0_mac = factory.make_mac_address()
         data = FakeCommissioningData()
-        eth0_network = data.create_physical_network(
-            "eth0", mac_address=eth0_mac
-        )
+        eth0_network = data.create_physical_network("eth0", mac_address=eth0_mac)
         data.create_vlan_network(
             "eth0.100", vid=100, parent=eth0_network, mac_address=eth0_mac
         )
@@ -482,9 +453,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         self.assertTrue(eth0.neighbour_discovery_state)
         self.assertTrue(eth0.mdns_discovery_state)
         eth0_vlan = Interface.objects.get(
@@ -492,9 +461,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         )
         self.assertFalse(eth0_vlan.neighbour_discovery_state)
         self.assertTrue(eth0_vlan.mdns_discovery_state)
-        eth1 = Interface.objects.get(
-            name="eth1", node_config=controller.current_config
-        )
+        eth1 = Interface.objects.get(name="eth1", node_config=controller.current_config)
         self.assertFalse(eth1.neighbour_discovery_state)
         self.assertTrue(eth1.mdns_discovery_state)
 
@@ -502,9 +469,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         controller = self.create_empty_controller()
         eth0_mac = factory.make_mac_address()
         data = FakeCommissioningData()
-        eth0_network = data.create_physical_network(
-            "eth0", mac_address=eth0_mac
-        )
+        eth0_network = data.create_physical_network("eth0", mac_address=eth0_mac)
         vlan_network = data.create_vlan_network(
             "eth0.100", vid=100, parent=eth0_network, mac_address=eth0_mac
         )
@@ -517,9 +482,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         self.assertFalse(eth0.neighbour_discovery_state)
         self.assertTrue(eth0.mdns_discovery_state)
         eth0_vlan = Interface.objects.get(
@@ -543,9 +506,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             LXDAddress(str(ip2), network.prefixlen),
         ]
         self.update_interfaces(controller, data)
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         eth0_addresses = list(eth0.ip_addresses.all())
         subnet = Subnet.objects.get(cidr=str(network.cidr))
         self.assertCountEqual(
@@ -574,9 +535,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             LXDAddress(str(ip2), network.prefixlen),
         ]
         self.update_interfaces(machine, data)
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=machine.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=machine.current_config)
         eth0_addresses = list(eth0.ip_addresses.all())
         subnet = Subnet.objects.get(cidr=str(network.cidr))
         self.assertCountEqual(
@@ -611,9 +570,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             LXDAddress(str(ip6), 128),
         ]
         self.update_interfaces(controller, data)
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         eth0_addresses = list(eth0.ip_addresses.all())
         self.assertCountEqual(
             [
@@ -644,9 +601,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             LXDAddress(str(ip6), 128),
         ]
         self.update_interfaces(controller, data)
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         eth0_addresses = list(eth0.ip_addresses.all())
         # subnets with full netmask are created
         subnet4 = Subnet.objects.get(cidr=f"{ip4}/32")
@@ -675,9 +630,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         eth0.addresses = [LXDAddress(str(ip), network.prefixlen)]
         data.address_annotations[str(ip)] = {"gateway": str(gateway_ip)}
         self.update_interfaces(controller, data)
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         default_vlan = Fabric.objects.get_default_fabric().get_default_vlan()
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual("11:11:11:11:11:11", eth0.mac_address)
@@ -711,9 +664,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
 
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual("11:11:11:11:11:11", eth0.mac_address)
@@ -740,16 +691,12 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         default_vlan = Fabric.objects.get_default_fabric().get_default_vlan()
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(eth0_network.hwaddr, eth0.mac_address)
         self.assertEqual(default_vlan, eth0.vlan)
-        dhcp_addresses = list(
-            eth0.ip_addresses.filter(alloc_type=IPADDRESS_TYPE.DHCP)
-        )
+        dhcp_addresses = list(eth0.ip_addresses.filter(alloc_type=IPADDRESS_TYPE.DHCP))
         self.assertEqual([None], [address.ip for address in dhcp_addresses])
         subnet = Subnet.objects.get(cidr=str(network.cidr))
         self.assertEqual(str(network.cidr), subnet.name)
@@ -779,19 +726,13 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         default_vlan = Fabric.objects.get_default_fabric().get_default_vlan()
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(eth0_network.hwaddr, eth0.mac_address)
         self.assertEqual(default_vlan, eth0.vlan)
-        dhcp_addresses = list(
-            eth0.ip_addresses.filter(alloc_type=IPADDRESS_TYPE.DHCP)
-        )
-        self.assertEqual(
-            [None, None], [address.ip for address in dhcp_addresses]
-        )
+        dhcp_addresses = list(eth0.ip_addresses.filter(alloc_type=IPADDRESS_TYPE.DHCP))
+        self.assertEqual([None, None], [address.ip for address in dhcp_addresses])
         discovered_addresses = list(
             eth0.ip_addresses.filter(alloc_type=IPADDRESS_TYPE.DISCOVERED)
         )
@@ -810,9 +751,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         data.create_physical_network("eth0", card=card)
 
         self.update_interfaces(controller, data)
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         self.assertEqual(card.vendor, eth0.vendor)
         self.assertEqual(card.product, eth0.product)
         self.assertEqual(card.firmware_version, eth0.firmware_version)
@@ -835,9 +774,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(eth0_network.hwaddr, eth0.mac_address)
         self.assertEqual(subnet.vlan, eth0.vlan)
@@ -865,9 +802,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(eth0_network.hwaddr, eth0.mac_address)
         self.assertEqual(subnet.vlan, eth0.vlan)
@@ -897,9 +832,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(eth0_network.hwaddr, eth0.mac_address)
         self.assertEqual(vlan, eth0.vlan)
@@ -1057,9 +990,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             interface=interface,
         )
         other_node_interface = factory.make_Interface()
-        no_node_interface = factory.make_Interface(
-            iftype=INTERFACE_TYPE.UNKNOWN
-        )
+        no_node_interface = factory.make_Interface(iftype=INTERFACE_TYPE.UNKNOWN)
         static_ip.interface_set.add(other_node_interface)
         static_ip.interface_set.add(no_node_interface)
         data = FakeCommissioningData()
@@ -1107,9 +1038,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.update_interfaces(controller, data)
 
         self.assertEqual(2, controller.current_config.interface_set.count())
-        eth0 = Interface.objects.get(
-            node_config=controller.current_config, name="eth0"
-        )
+        eth0 = Interface.objects.get(node_config=controller.current_config, name="eth0")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(interface.mac_address, eth0.mac_address)
         self.assertEqual(vlan, eth0.vlan)
@@ -1167,9 +1096,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.update_interfaces(controller, data)
 
         self.assertEqual(2, controller.current_config.interface_set.count())
-        eth0 = Interface.objects.get(
-            node_config=controller.current_config, name="eth0"
-        )
+        eth0 = Interface.objects.get(node_config=controller.current_config, name="eth0")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(interface.mac_address, eth0.mac_address)
         self.assertEqual(vlan, eth0.vlan)
@@ -1241,9 +1168,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         passes = self.update_interfaces(controller, data)
 
         self.assertEqual(2, controller.current_config.interface_set.count())
-        eth0 = Interface.objects.get(
-            node_config=controller.current_config, name="eth0"
-        )
+        eth0 = Interface.objects.get(node_config=controller.current_config, name="eth0")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(interface.mac_address, eth0.mac_address)
         self.assertEqual(vlan, eth0.vlan)
@@ -1256,9 +1181,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             ],
         )
 
-        self.assertFalse(
-            VLAN.objects.filter(fabric=fabric, vid=vid_on_fabric).exists()
-        )
+        self.assertFalse(VLAN.objects.filter(fabric=fabric, vid=vid_on_fabric).exists())
         other_vlan = other_subnet.vlan
         vlan_interface = VLANInterface.objects.get(
             node_config=controller.current_config, vlan=other_vlan
@@ -1344,9 +1267,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         passes = self.update_interfaces(controller, data)
 
         self.assertEqual(2, controller.current_config.interface_set.count())
-        eth0 = Interface.objects.get(
-            node_config=controller.current_config, name="eth0"
-        )
+        eth0 = Interface.objects.get(node_config=controller.current_config, name="eth0")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(interface.mac_address, eth0.mac_address)
         self.assertEqual(fabric.get_default_vlan(), eth0.vlan)
@@ -1417,9 +1338,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         passes = self.update_interfaces(controller, data)
 
         self.assertEqual(2, controller.current_config.interface_set.count())
-        eth0 = Interface.objects.get(
-            node_config=controller.current_config, name="eth0"
-        )
+        eth0 = Interface.objects.get(node_config=controller.current_config, name="eth0")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(interface.mac_address, eth0.mac_address)
         self.assertEqual(vlan, eth0.vlan)
@@ -1490,9 +1409,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.update_interfaces(controller, data)
 
         self.assertEqual(2, controller.current_config.interface_set.count())
-        eth0 = Interface.objects.get(
-            node_config=controller.current_config, name="eth0"
-        )
+        eth0 = Interface.objects.get(node_config=controller.current_config, name="eth0")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(interface.mac_address, eth0.mac_address)
         self.assertEqual(vlan, eth0.vlan)
@@ -1626,9 +1543,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             "eth0", mac_address=str(eth0.mac_address)
         )
         data.create_physical_network("eth1", mac_address=str(eth1.mac_address))
-        bond_network = data.create_bond_network(
-            "bond0", parents=[eth0_network]
-        )
+        bond_network = data.create_bond_network("bond0", parents=[eth0_network])
 
         self.update_interfaces(controller, data)
 
@@ -1668,9 +1583,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             "eth0", mac_address=str(eth0.mac_address)
         )
         data.create_physical_network("eth1", mac_address=str(eth1.mac_address))
-        bridge_network = data.create_bridge_network(
-            "br0", parents=[eth0_network]
-        )
+        bridge_network = data.create_bridge_network("br0", parents=[eth0_network])
 
         self.update_interfaces(controller, data)
 
@@ -1721,16 +1634,12 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.update_interfaces(controller, data)
 
         self.assertEqual(3, controller.current_config.interface_set.count())
-        eth0 = Interface.objects.get(
-            node_config=controller.current_config, name="eth0"
-        )
+        eth0 = Interface.objects.get(node_config=controller.current_config, name="eth0")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(eth0_network.hwaddr, str(eth0.mac_address))
         self.assertEqual(bond0_vlan, eth0.vlan)
 
-        eth1 = Interface.objects.get(
-            node_config=controller.current_config, name="eth1"
-        )
+        eth1 = Interface.objects.get(node_config=controller.current_config, name="eth1")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth1.type)
         self.assertEqual(eth1_network.hwaddr, str(eth1.mac_address))
         self.assertEqual(bond0_vlan, eth1.vlan)
@@ -1780,16 +1689,12 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.update_interfaces(controller, data)
 
         self.assertEqual(3, controller.current_config.interface_set.count())
-        eth0 = Interface.objects.get(
-            node_config=controller.current_config, name="eth0"
-        )
+        eth0 = Interface.objects.get(node_config=controller.current_config, name="eth0")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth0.type)
         self.assertEqual(eth0_network.hwaddr, str(eth0.mac_address))
         self.assertEqual(br0_vlan, eth0.vlan)
 
-        eth1 = Interface.objects.get(
-            node_config=controller.current_config, name="eth1"
-        )
+        eth1 = Interface.objects.get(node_config=controller.current_config, name="eth1")
         self.assertEqual(INTERFACE_TYPE.PHYSICAL, eth1.type)
         self.assertEqual(eth1_network.hwaddr, str(eth1.mac_address))
         self.assertEqual(br0_vlan, eth1.vlan)
@@ -1830,21 +1735,15 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             mac_address=mac_address,
         )
 
-        lxd_script = (
-            controller.current_commissioning_script_set.find_script_result(
-                script_name=COMMISSIONING_OUTPUT_NAME
-            )
+        lxd_script = controller.current_commissioning_script_set.find_script_result(
+            script_name=COMMISSIONING_OUTPUT_NAME
         )
         lxd_script_output = data.render(include_extra=True)
-        lxd_script.store_result(
-            0, stdout=json.dumps(lxd_script_output).encode("utf-8")
-        )
+        lxd_script.store_result(0, stdout=json.dumps(lxd_script_output).encode("utf-8"))
 
         self.update_interfaces(controller, data)
 
-        br0 = Interface.objects.get(
-            name="br0", node_config=controller.current_config
-        )
+        br0 = Interface.objects.get(name="br0", node_config=controller.current_config)
         self.assertNotEqual(card.vendor, br0.vendor)
         self.assertNotEqual(card.product, br0.product)
         self.assertNotEqual(card.firmware_version, br0.firmware_version)
@@ -1951,9 +1850,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
 
         self.update_interfaces(controller, data)
 
-        eth1 = Interface.objects.get(
-            node_config=controller.current_config, name="eth1"
-        )
+        eth1 = Interface.objects.get(node_config=controller.current_config, name="eth1")
         self.assertIsNone(eth1.vlan)
         # Check that no extra fabrics were created, since we previously
         # had a bug where the fabric/vlan was created for the interface,
@@ -2035,9 +1932,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             f"bond0.{bond0_vlan.vid}", parent=bond_network, vid=bond0_vlan.vid
         )
         bond_vlan_network.addresses = [
-            LXDAddress(
-                bond0_vlan_ip, bond0_vlan_subnet.get_ipnetwork().prefixlen
-            ),
+            LXDAddress(bond0_vlan_ip, bond0_vlan_subnet.get_ipnetwork().prefixlen),
         ]
 
         self.update_interfaces(controller, data)
@@ -2192,9 +2087,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             "ens5", mac_address="52:54:00:70:8f:5b"
         )
         for vid in range(10, 17):
-            vlan_network = data1.create_vlan_network(
-                f"ens5.{vid}", parent=ens5_network
-            )
+            vlan_network = data1.create_vlan_network(f"ens5.{vid}", parent=ens5_network)
             vlan_network.addresses = [LXDAddress(f"10.{vid}.0.2", 20)]
 
         data2 = FakeCommissioningData()
@@ -2214,9 +2107,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             "ens5", mac_address="52:54:00:cf:f3:7f"
         )
         for vid in range(10, 17):
-            vlan_network = data2.create_vlan_network(
-                f"ens5.{vid}", parent=ens5_network
-            )
+            vlan_network = data2.create_vlan_network(f"ens5.{vid}", parent=ens5_network)
             vlan_network.addresses = [LXDAddress(f"10.{vid}.0.3", 20)]
 
         controller1 = self.create_empty_controller()
@@ -2246,9 +2137,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         br101_ip = str(factory.pick_ip_in_Subnet(br101_subnet))
 
         data = FakeCommissioningData()
-        eth0_network = data.create_physical_network(
-            "eth0", mac_address=eth0_mac
-        )
+        eth0_network = data.create_physical_network("eth0", mac_address=eth0_mac)
         eth0_100_network = data.create_vlan_network(
             "eth0.100", mac_address=eth0_mac, parent=eth0_network, vid=100
         )
@@ -2443,8 +2332,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
         self.assertTrue(eth0.enabled)
         self.assertEqual(data.networks["eth0"].hwaddr, eth0.mac_address)
         eth0_addresses = [
-            (address.alloc_type, address.ip)
-            for address in eth0.ip_addresses.all()
+            (address.alloc_type, address.ip) for address in eth0.ip_addresses.all()
         ]
         self.assertCountEqual(
             [(IPADDRESS_TYPE.STICKY, "10.0.0.2")],
@@ -2542,9 +2430,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
             LXDAddress("2001::aaaa:2", 128),
         ]
         self.update_interfaces(controller, data)
-        eth0 = Interface.objects.get(
-            name="eth0", node_config=controller.current_config
-        )
+        eth0 = Interface.objects.get(name="eth0", node_config=controller.current_config)
         self.assertCountEqual(
             eth0.ip_addresses.values_list("ip", "subnet__cidr"),
             [
@@ -2569,9 +2455,7 @@ class TestUpdateInterfaces(MAASServerTestCase, UpdateInterfacesMixin):
     def test_hardware_sync_added_physical_interface_is_not_marked_acquired(
         self,
     ):
-        node = factory.make_Node(
-            enable_hw_sync=True, status=NODE_STATUS.DEPLOYED
-        )
+        node = factory.make_Node(enable_hw_sync=True, status=NODE_STATUS.DEPLOYED)
         data = FakeCommissioningData()
         data.create_physical_network(name="eth0")
         self.update_interfaces(node, data)
@@ -2684,9 +2568,7 @@ class TestUpdateInterfacesWithHints(
         self.update_interfaces(alice, alice_data)
         self.update_interfaces(bob, bob_data)
         alice_br0 = get_one(
-            BridgeInterface.objects.filter(
-                node_config=alice.current_config, name="br0"
-            )
+            BridgeInterface.objects.filter(node_config=alice.current_config, name="br0")
         )
         bob_eth0 = get_one(
             PhysicalInterface.objects.filter(
@@ -2734,13 +2616,9 @@ class BaseUpdateInterfacesAcquire(UpdateInterfacesMixin):
 
         data = FakeCommissioningData()
         data.create_physical_network("eth0")
-        data.create_vlan_network(
-            "eth0.10", vid=10, parent=data.networks["eth0"]
-        )
+        data.create_vlan_network("eth0.10", vid=10, parent=data.networks["eth0"])
         data.create_physical_network("eth1")
-        data.create_vlan_network(
-            "eth1.11", vid=11, parent=data.networks["eth1"]
-        )
+        data.create_vlan_network("eth1.11", vid=11, parent=data.networks["eth1"])
         eth0 = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL,
             node=node,
@@ -2801,15 +2679,11 @@ class BaseUpdateInterfacesAcquire(UpdateInterfacesMixin):
         eth0 = PhysicalInterface.objects.get(
             node_config=node.current_config, name="eth0"
         )
-        br0 = BridgeInterface.objects.get(
-            node_config=node.current_config, name="br0"
-        )
+        br0 = BridgeInterface.objects.get(node_config=node.current_config, name="br0")
         eth1 = PhysicalInterface.objects.get(
             node_config=node.current_config, name="eth1"
         )
-        br1 = BridgeInterface.objects.get(
-            node_config=node.current_config, name="br1"
-        )
+        br1 = BridgeInterface.objects.get(node_config=node.current_config, name="br1")
 
         self.assert_physical_interfaces(eth0, eth1)
         self.assert_bridge_interfaces(br0, br1)
@@ -2856,18 +2730,14 @@ class BaseUpdateInterfacesAcquire(UpdateInterfacesMixin):
         eth1 = PhysicalInterface.objects.get(
             node_config=node.current_config, name="eth1"
         )
-        bond0 = BondInterface.objects.get(
-            node_config=node.current_config, name="bond0"
-        )
+        bond0 = BondInterface.objects.get(node_config=node.current_config, name="bond0")
         eth2 = PhysicalInterface.objects.get(
             node_config=node.current_config, name="eth2"
         )
         eth3 = PhysicalInterface.objects.get(
             node_config=node.current_config, name="eth3"
         )
-        bond1 = BondInterface.objects.get(
-            node_config=node.current_config, name="bond1"
-        )
+        bond1 = BondInterface.objects.get(node_config=node.current_config, name="bond1")
 
         self.assert_physical_interfaces(eth0, eth2)
         self.assert_physical_interfaces(eth1, eth3)
@@ -2925,9 +2795,7 @@ class TestUpdateInterfacesAcquiredDeployedNode(
         self.assertTrue(new_bond1.acquired)
 
 
-class TestUpdateInterfacesAcquiredController(
-    TestUpdateInterfacesAcquiredDeployedNode
-):
+class TestUpdateInterfacesAcquiredController(TestUpdateInterfacesAcquiredDeployedNode):
     def create_empty_node(self):
         return self.create_empty_controller()
 
@@ -2984,9 +2852,7 @@ class TestGetInterfaceDependencies(MAASTestCase):
         data = FakeCommissioningData()
         data.create_physical_network("eth0")
         data.create_physical_network("eth1")
-        data.create_vlan_network(
-            "eth0.10", vid=10, parent=data.networks["eth0"]
-        )
+        data.create_vlan_network("eth0.10", vid=10, parent=data.networks["eth0"])
         dependencies = get_interface_dependencies(data.render())
         self.assertEqual(
             {
@@ -3007,9 +2873,7 @@ class TestGetInterfaceDependencies(MAASTestCase):
         data.create_bond_network(
             "bond0", parents=[data.networks["eth1"], data.networks["eth2"]]
         )
-        data.create_vlan_network(
-            "bond0.10", vid=10, parent=data.networks["bond0"]
-        )
+        data.create_vlan_network("bond0.10", vid=10, parent=data.networks["bond0"])
         data.create_bridge_network(
             "br1", parents=[data.networks["bond0.10"], data.networks["eth3"]]
         )
@@ -3039,9 +2903,7 @@ class TestGetInterfaceDependencies(MAASTestCase):
             "bond0", parents=[data.networks["eth1"], data.networks["eth2"]]
         )
         data.networks["bond0"].bond.lower_devices.append("missing1")
-        data.create_vlan_network(
-            "bond0.10", vid=10, parent=data.networks["bond0"]
-        )
+        data.create_vlan_network("bond0.10", vid=10, parent=data.networks["bond0"])
         data.networks["bond0.10"].vlan.lower_device = "missing2"
         data.create_bridge_network(
             "br1", parents=[data.networks["bond0.10"], data.networks["eth3"]]
@@ -3071,28 +2933,20 @@ class TestUpdateInterface(MAASServerTestCase):
             "ibp4s0",
             mac_address="a0:00:02:20:fe:80:00:00:00:00:00:00:e4:1d:2d:03:00:4f:06:e1",
         )
-        result = update_interface(
-            node, "ibp4s0", data.render(), address_extra={}
-        )
+        result = update_interface(node, "ibp4s0", data.render(), address_extra={})
         self.assertIsNone(result)
 
 
 class TestHardwareSyncNetworkDeviceNotify(MAASServerTestCase):
     def setup(self):
         details = EVENT_DETAILS[EVENT_TYPES.NODE_HARDWARE_SYNC_INTERFACE]
-        EventType.objects.register(
-            details.name, details.description, details.level
-        )
+        EventType.objects.register(details.name, details.description, details.level)
 
     def test_hardware_sync_network_device_notify(self):
-        node = factory.make_Node(
-            enable_hw_sync=True, status=NODE_STATUS.DEPLOYED
-        )
+        node = factory.make_Node(enable_hw_sync=True, status=NODE_STATUS.DEPLOYED)
         interface = factory.make_Interface(node=node)
         _hardware_sync_network_device_notify(node, interface, "added")
-        event = Event.objects.get(
-            type__name=EVENT_TYPES.NODE_HARDWARE_SYNC_INTERFACE
-        )
+        event = Event.objects.get(type__name=EVENT_TYPES.NODE_HARDWARE_SYNC_INTERFACE)
         self.assertEqual(event.action, "added")
         self.assertEqual(
             event.description,

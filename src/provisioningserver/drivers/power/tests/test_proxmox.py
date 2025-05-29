@@ -24,9 +24,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
     def setUp(self):
         super().setUp()
         self.proxmox = proxmox_module.ProxmoxPowerDriver()
-        self.mock_webhook_request = self.patch(
-            self.proxmox, "_webhook_request"
-        )
+        self.mock_webhook_request = self.patch(self.proxmox, "_webhook_request")
 
     def test_get_url(self):
         power_address = factory.make_name("power_address")
@@ -40,17 +38,12 @@ class TestProxmoxPowerDriver(MAASTestCase):
         power_address = factory.make_name("power_address")
         endpoint = factory.make_name("endpoint")
         params = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
-        params_str = "&".join(
-            [f"{key}={value}" for key, value in params.items()]
-        )
+        params_str = "&".join([f"{key}={value}" for key, value in params.items()])
         self.assertEqual(
             f"https://{power_address}:8006/api2/json/{endpoint}?{params_str}".encode(),
-            self.proxmox._get_url(
-                {"power_address": power_address}, endpoint, params
-            ),
+            self.proxmox._get_url({"power_address": power_address}, endpoint, params),
         )
 
     def test_get_url_funky_params(self):
@@ -60,9 +53,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
         params_str = "test=%3F+%2F"
         self.assertEqual(
             f"https://{power_address}:8006/api2/json/{endpoint}?{params_str}".encode(),
-            self.proxmox._get_url(
-                {"power_address": power_address}, endpoint, params
-            ),
+            self.proxmox._get_url({"power_address": power_address}, endpoint, params),
         )
 
     def test_get_url_allows_custom_port(self):
@@ -175,25 +166,17 @@ class TestProxmoxPowerDriver(MAASTestCase):
         }
         vm = {random.choice(["vmid", "name"]): context["power_vm_name"]}
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
-        self.mock_webhook_request.return_value = succeed(
-            json.dumps({"data": [vm]})
-        )
+        self.mock_webhook_request.return_value = succeed(json.dumps({"data": [vm]}))
 
-        found_vm = yield self.proxmox._find_vm(
-            system_id, context, extra_headers
-        )
+        found_vm = yield self.proxmox._find_vm(system_id, context, extra_headers)
 
         self.assertEqual(vm, found_vm)
         self.mock_webhook_request.assert_called_once_with(
             b"GET",
-            self.proxmox._get_url(
-                context, "cluster/resources", {"type": "vm"}
-            ),
+            self.proxmox._get_url(context, "cluster/resources", {"type": "vm"}),
             self.proxmox._make_auth_headers(system_id, {}, extra_headers),
             False,
         )
@@ -206,14 +189,10 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "power_vm_name": factory.make_name("power_vm_name"),
         }
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
-        self.mock_webhook_request.return_value = succeed(
-            json.dumps({"data": []})
-        )
+        self.mock_webhook_request.return_value = succeed(json.dumps({"data": []}))
 
         with self.assertRaisesRegex(
             PowerActionError, "No VMs returned! Are permissions set correctly?"
@@ -221,9 +200,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             yield self.proxmox._find_vm(system_id, context, extra_headers)
         self.mock_webhook_request.assert_called_once_with(
             b"GET",
-            self.proxmox._get_url(
-                context, "cluster/resources", {"type": "vm"}
-            ),
+            self.proxmox._get_url(context, "cluster/resources", {"type": "vm"}),
             self.proxmox._make_auth_headers(system_id, {}, extra_headers),
             False,
         )
@@ -236,29 +213,19 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "power_vm_name": factory.make_name("power_vm_name"),
         }
         vm = {
-            random.choice(["vmid", "name"]): factory.make_name(
-                "another_power_vm_name"
-            )
+            random.choice(["vmid", "name"]): factory.make_name("another_power_vm_name")
         }
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
-        self.mock_webhook_request.return_value = succeed(
-            json.dumps({"data": [vm]})
-        )
+        self.mock_webhook_request.return_value = succeed(json.dumps({"data": [vm]}))
 
-        with self.assertRaisesRegex(
-            PowerActionError, "Unable to find virtual machine"
-        ):
+        with self.assertRaisesRegex(PowerActionError, "Unable to find virtual machine"):
             yield self.proxmox._find_vm(system_id, context, extra_headers)
         self.mock_webhook_request.assert_called_once_with(
             b"GET",
-            self.proxmox._get_url(
-                context, "cluster/resources", {"type": "vm"}
-            ),
+            self.proxmox._get_url(context, "cluster/resources", {"type": "vm"}),
             self.proxmox._make_auth_headers(system_id, {}, extra_headers),
             False,
         )
@@ -268,9 +235,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = {"power_address": factory.make_name("power_address")}
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
         vm = {
@@ -279,9 +244,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "vmid": factory.make_name("vmid"),
             "status": "stopped",
         }
-        self.patch(self.proxmox, "_login").return_value = succeed(
-            extra_headers
-        )
+        self.patch(self.proxmox, "_login").return_value = succeed(extra_headers)
         self.patch(self.proxmox, "_find_vm").return_value = succeed(vm)
 
         yield self.proxmox.power_on(system_id, context)
@@ -290,8 +253,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             b"POST",
             self.proxmox._get_url(
                 context,
-                f"nodes/{vm['node']}/{vm['type']}/{vm['vmid']}/"
-                "status/start",
+                f"nodes/{vm['node']}/{vm['type']}/{vm['vmid']}/" "status/start",
             ),
             self.proxmox._make_auth_headers(system_id, {}, extra_headers),
             False,
@@ -302,9 +264,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = {"power_address": factory.make_name("power_address")}
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
         vm = {
@@ -313,9 +273,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "vmid": factory.make_name("vmid"),
             "status": "running",
         }
-        self.patch(self.proxmox, "_login").return_value = succeed(
-            extra_headers
-        )
+        self.patch(self.proxmox, "_login").return_value = succeed(extra_headers)
         self.patch(self.proxmox, "_find_vm").return_value = succeed(vm)
 
         yield self.proxmox.power_on(system_id, context)
@@ -327,9 +285,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = {"power_address": factory.make_name("power_address")}
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
         vm = {
@@ -338,9 +294,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "vmid": factory.make_name("vmid"),
             "status": "running",
         }
-        self.patch(self.proxmox, "_login").return_value = succeed(
-            extra_headers
-        )
+        self.patch(self.proxmox, "_login").return_value = succeed(extra_headers)
         self.patch(self.proxmox, "_find_vm").return_value = succeed(vm)
 
         yield self.proxmox.power_off(system_id, context)
@@ -360,9 +314,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = {"power_address": factory.make_name("power_address")}
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
         vm = {
@@ -371,9 +323,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "vmid": factory.make_name("vmid"),
             "status": "stopped",
         }
-        self.patch(self.proxmox, "_login").return_value = succeed(
-            extra_headers
-        )
+        self.patch(self.proxmox, "_login").return_value = succeed(extra_headers)
         self.patch(self.proxmox, "_find_vm").return_value = succeed(vm)
 
         yield self.proxmox.power_off(system_id, context)
@@ -385,9 +335,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = {"power_address": factory.make_name("power_address")}
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
         vm = {
@@ -396,9 +344,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "vmid": factory.make_name("vmid"),
             "status": "running",
         }
-        self.patch(self.proxmox, "_login").return_value = succeed(
-            extra_headers
-        )
+        self.patch(self.proxmox, "_login").return_value = succeed(extra_headers)
         self.patch(self.proxmox, "_find_vm").return_value = succeed(vm)
 
         status = yield self.proxmox.power_query(system_id, context)
@@ -410,9 +356,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = {"power_address": factory.make_name("power_address")}
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
         vm = {
@@ -421,9 +365,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "vmid": factory.make_name("vmid"),
             "status": "stopped",
         }
-        self.patch(self.proxmox, "_login").return_value = succeed(
-            extra_headers
-        )
+        self.patch(self.proxmox, "_login").return_value = succeed(extra_headers)
         self.patch(self.proxmox, "_find_vm").return_value = succeed(vm)
 
         status = yield self.proxmox.power_query(system_id, context)
@@ -435,9 +377,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = {"power_address": factory.make_name("power_address")}
         extra_headers = {
-            factory.make_name("key").encode(): [
-                factory.make_name("value").encode()
-            ]
+            factory.make_name("key").encode(): [factory.make_name("value").encode()]
             for _ in range(3)
         }
         vm = {
@@ -446,9 +386,7 @@ class TestProxmoxPowerDriver(MAASTestCase):
             "vmid": factory.make_name("vmid"),
             "status": factory.make_name("status"),
         }
-        self.patch(self.proxmox, "_login").return_value = succeed(
-            extra_headers
-        )
+        self.patch(self.proxmox, "_login").return_value = succeed(extra_headers)
         self.patch(self.proxmox, "_find_vm").return_value = succeed(vm)
 
         status = yield self.proxmox.power_query(system_id, context)
@@ -461,16 +399,12 @@ class TestProxmoxProbeAndEnlist(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.mock_login = self.patch(
-            proxmox_module.ProxmoxPowerDriver, "_login"
-        )
+        self.mock_login = self.patch(proxmox_module.ProxmoxPowerDriver, "_login")
         self.mock_login.return_value = succeed({})
         self.system_id = factory.make_name("system_id")
         self.mock_create_node = self.patch(proxmox_module, "create_node")
         self.mock_create_node.return_value = succeed(self.system_id)
-        self.mock_commission_node = self.patch(
-            proxmox_module, "commission_node"
-        )
+        self.mock_commission_node = self.patch(proxmox_module, "commission_node")
         self.mock_commission_node.return_value = succeed(None)
 
     @inlineCallbacks

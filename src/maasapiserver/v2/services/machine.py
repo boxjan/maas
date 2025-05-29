@@ -148,9 +148,7 @@ class MachineService(Service):
             description=record["description"],
             pool=ModelRef(id=record["pool_id"], name=record["pool_name"]),
             pod=pod,
-            domain=ModelRef(
-                id=record["domain_id"], name=record["domain_name"]
-            ),
+            domain=ModelRef(id=record["domain_id"], name=record["domain_name"]),
             owner=record["owner"],
             parent=record["parent"],
             error_description=record["error_description"],
@@ -225,18 +223,15 @@ class MachineService(Service):
         storage_query = (
             select(
                 NodeTable.c.id,
-                func.count(
-                    PhysicalBlockDeviceTable.c.blockdevice_ptr_id
-                ).label("disk_count"),
-                func.sum(func.coalesce(BlockDeviceTable.c.size, 0)).label(
-                    "storage"
+                func.count(PhysicalBlockDeviceTable.c.blockdevice_ptr_id).label(
+                    "disk_count"
                 ),
+                func.sum(func.coalesce(BlockDeviceTable.c.size, 0)).label("storage"),
             )
             .select_from(PhysicalBlockDeviceTable)
             .join(
                 BlockDeviceTable,
-                BlockDeviceTable.c.id
-                == PhysicalBlockDeviceTable.c.blockdevice_ptr_id,
+                BlockDeviceTable.c.id == PhysicalBlockDeviceTable.c.blockdevice_ptr_id,
             )
             .join(
                 NodeConfigTable,
@@ -307,9 +302,7 @@ class MachineService(Service):
         fabrics_cte = (
             select(
                 vlans_cte.c.node_id,
-                postgresql.array_agg(func.distinct(FabricTable.c.name)).label(
-                    "names"
-                ),
+                postgresql.array_agg(func.distinct(FabricTable.c.name)).label("names"),
             )
             .select_from(FabricTable)
             .join(vlans_cte, vlans_cte.c.fabric_id == FabricTable.c.id)
@@ -319,9 +312,7 @@ class MachineService(Service):
         spaces_cte = (
             select(
                 vlans_cte.c.node_id,
-                postgresql.array_agg(func.distinct(SpaceTable.c.name)).label(
-                    "names"
-                ),
+                postgresql.array_agg(func.distinct(SpaceTable.c.name)).label("names"),
             )
             .select_from(SpaceTable)
             .join(vlans_cte, vlans_cte.c.space_id == SpaceTable.c.id)
@@ -368,9 +359,9 @@ class MachineService(Service):
         extra_macs_cte = (
             select(
                 NodeTable.c.id,
-                postgresql.array_agg(
-                    distinct(InterfaceTable.c.mac_address)
-                ).label("extra_macs"),
+                postgresql.array_agg(distinct(InterfaceTable.c.mac_address)).label(
+                    "extra_macs"
+                ),
             )
             .join(
                 NodeConfigTable,
@@ -385,8 +376,7 @@ class MachineService(Service):
                 boot_interface_ip_cte.c.id == NodeTable.c.id,
             )
             .where(
-                InterfaceTable.c.id
-                != boot_interface_ip_cte.c.boot_interface_id,
+                InterfaceTable.c.id != boot_interface_ip_cte.c.boot_interface_id,
                 InterfaceTable.c.type == INTERFACE_TYPE.PHYSICAL,
             )
             .group_by(NodeTable.c.id)
@@ -458,8 +448,7 @@ class MachineService(Service):
             )
             .join(
                 DiscoveredAddress,
-                DiscoveredAddress.c.id
-                == InterfaceIPAddressTable.c.staticipaddress_id,
+                DiscoveredAddress.c.id == InterfaceIPAddressTable.c.staticipaddress_id,
             )
             .where(
                 StaticIPAddressTable.c.alloc_type == IPADDRESS_TYPE.DHCP,
@@ -475,8 +464,7 @@ class MachineService(Service):
                 InterfaceTable.c.id,
                 case(
                     (
-                        StaticIPAddressTable.c.alloc_type
-                        == IPADDRESS_TYPE.DHCP,
+                        StaticIPAddressTable.c.alloc_type == IPADDRESS_TYPE.DHCP,
                         dhcp_address_cte.c.ip,
                     ),
                     else_=StaticIPAddressTable.c.ip,
@@ -513,9 +501,7 @@ class MachineService(Service):
         ip_addresses_cte = (
             select(
                 NodeTable.c.id,
-                postgresql.array_agg(interface_addresses_cte.c.ip).label(
-                    "ips"
-                ),
+                postgresql.array_agg(interface_addresses_cte.c.ip).label("ips"),
                 postgresql.array_agg(
                     interface_addresses_cte.c.id
                     == boot_interface_ip_cte.c.boot_interface_id
@@ -536,9 +522,7 @@ class MachineService(Service):
         discovered_machine_addresses_cte = (
             select(
                 NodeTable.c.id,
-                postgresql.array_agg(discovered_addresses_cte.c.ip).label(
-                    "ips"
-                ),
+                postgresql.array_agg(discovered_addresses_cte.c.ip).label("ips"),
                 postgresql.array_agg(
                     discovered_addresses_cte.c.id
                     == boot_interface_ip_cte.c.boot_interface_id
@@ -580,9 +564,7 @@ class MachineService(Service):
                 ScriptResultTable,
                 ScriptResultTable.c.script_set_id == ScriptSetTable.c.id,
             )
-            .join(
-                ScriptTable, ScriptTable.c.id == ScriptResultTable.c.script_id
-            )
+            .join(ScriptTable, ScriptTable.c.id == ScriptResultTable.c.script_id)
             .where(
                 ScriptSetTable.c.result_type == RESULT_TYPE.TESTING,
                 ScriptResultTable.c.suppressed == False,  # noqa: E712
@@ -617,23 +599,17 @@ class MachineService(Service):
                 func.bool_or(
                     case(
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.RUNNING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.APPLYING_NETCONF,
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.INSTALLING,
                             True,
                         ),
@@ -643,30 +619,22 @@ class MachineService(Service):
                 func.bool_or(
                     case(
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.TIMEDOUT,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_INSTALLING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_APPLYING_NETCONF,
                             True,
                         ),
@@ -676,9 +644,7 @@ class MachineService(Service):
                 func.bool_or(
                     case(
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PENDING,
                             True,
                         ),
@@ -688,9 +654,7 @@ class MachineService(Service):
                 func.bool_or(
                     case(
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.ABORTED,
                             True,
                         ),
@@ -700,9 +664,7 @@ class MachineService(Service):
                 func.bool_or(
                     case(
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.DEGRADED,
                             True,
                         ),
@@ -712,16 +674,12 @@ class MachineService(Service):
                 func.bool_or(
                     case(
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PASSED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.SKIPPED,
                             True,
                         ),
@@ -736,23 +694,17 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.RUNNING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.APPLYING_NETCONF,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.INSTALLING,
                             True,
                         ),
@@ -767,30 +719,22 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.TIMEDOUT,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_INSTALLING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_APPLYING_NETCONF,
                             True,
                         ),
@@ -805,9 +749,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PENDING,
                             True,
                         ),
@@ -822,9 +764,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.ABORTED,
                             True,
                         ),
@@ -839,9 +779,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.DEGRADED,
                             True,
                         ),
@@ -856,16 +794,12 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PASSED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.SKIPPED,
                             True,
                         ),
@@ -880,23 +814,17 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.RUNNING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.APPLYING_NETCONF,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.INSTALLING,
                             True,
                         ),
@@ -911,30 +839,22 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.TIMEDOUT,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_INSTALLING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_APPLYING_NETCONF,
                             True,
                         ),
@@ -949,9 +869,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PENDING,
                             True,
                         ),
@@ -966,9 +884,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.ABORTED,
                             True,
                         ),
@@ -983,9 +899,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.DEGRADED,
                             True,
                         ),
@@ -1000,16 +914,12 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PASSED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.SKIPPED,
                             True,
                         ),
@@ -1024,23 +934,17 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.RUNNING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.APPLYING_NETCONF,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.INSTALLING,
                             True,
                         ),
@@ -1055,30 +959,22 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.TIMEDOUT,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_INSTALLING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_APPLYING_NETCONF,
                             True,
                         ),
@@ -1093,9 +989,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PENDING,
                             True,
                         ),
@@ -1110,9 +1004,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.ABORTED,
                             True,
                         ),
@@ -1127,9 +1019,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.DEGRADED,
                             True,
                         ),
@@ -1144,16 +1034,12 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PASSED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.SKIPPED,
                             True,
                         ),
@@ -1168,23 +1054,17 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.RUNNING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.APPLYING_NETCONF,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.INSTALLING,
                             True,
                         ),
@@ -1199,30 +1079,22 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.TIMEDOUT,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_INSTALLING,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.FAILED_APPLYING_NETCONF,
                             True,
                         ),
@@ -1237,9 +1109,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PENDING,
                             True,
                         ),
@@ -1254,9 +1124,7 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.ABORTED,
                             True,
                         ),
@@ -1266,16 +1134,12 @@ class MachineService(Service):
                 func.bool_or(
                     case(
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == HARDWARE_TYPE.CPU,
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.DEGRADED,
                             True,
                         ),
@@ -1290,16 +1154,12 @@ class MachineService(Service):
                             False,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.PASSED,
                             True,
                         ),
                         (
-                            ColumnOperators.any_(
-                                summary_testing_status_cte.c.statuses
-                            )
+                            ColumnOperators.any_(summary_testing_status_cte.c.statuses)
                             == SCRIPT_STATUS.SKIPPED,
                             True,
                         ),
@@ -1382,9 +1242,9 @@ class MachineService(Service):
                 func.round((NodeTable.c.memory / 1024), 1).label("memory"),
                 NodeTable.c.power_state,
                 NodeTable.c.locked,
-                func.concat(
-                    NodeTable.c.hostname, ".", DomainTable.c.name
-                ).label("fqdn"),
+                func.concat(NodeTable.c.hostname, ".", DomainTable.c.name).label(
+                    "fqdn"
+                ),
                 func.coalesce(tags_cte.c.tag_ids, []).label("tags"),
                 func.coalesce(storage_query.c.disk_count, 0).label(
                     "physical_disk_count"
@@ -1399,9 +1259,7 @@ class MachineService(Service):
                 NodeTable.c.ephemeral_deploy,
                 func.coalesce(fabrics_cte.c.names, []).label("fabrics"),
                 func.coalesce(spaces_cte.c.names, []).label("spaces"),
-                func.coalesce(extra_macs_cte.c.extra_macs, []).label(
-                    "extra_macs"
-                ),
+                func.coalesce(extra_macs_cte.c.extra_macs, []).label("extra_macs"),
                 func.coalesce(pxe_mac_cte.c.pxe_mac, "").label("pxe_mac"),
                 BMCTable.c.power_type,
                 case(
@@ -1426,9 +1284,7 @@ class MachineService(Service):
                 case(
                     (
                         ip_addresses_cte.c.ips.is_(None),
-                        func.coalesce(
-                            discovered_machine_addresses_cte.c.ips, []
-                        ),
+                        func.coalesce(discovered_machine_addresses_cte.c.ips, []),
                     ),
                     else_=func.coalesce(ip_addresses_cte.c.ips, []),
                 ).label("ips"),
@@ -1443,33 +1299,23 @@ class MachineService(Service):
                 ).label("is_boot_ips"),
                 case(
                     (
-                        testing_status_cte.c.testing_status_combined_running.is_(
-                            True
-                        ),
+                        testing_status_cte.c.testing_status_combined_running.is_(True),
                         SCRIPT_STATUS.RUNNING,
                     ),
                     (
-                        testing_status_cte.c.testing_status_combined_pending.is_(
-                            True
-                        ),
+                        testing_status_cte.c.testing_status_combined_pending.is_(True),
                         SCRIPT_STATUS.PENDING,
                     ),
                     (
-                        testing_status_cte.c.testing_status_combined_failed.is_(
-                            True
-                        ),
+                        testing_status_cte.c.testing_status_combined_failed.is_(True),
                         SCRIPT_STATUS.FAILED,
                     ),
                     (
-                        testing_status_cte.c.testing_status_combined_degraded.is_(
-                            True
-                        ),
+                        testing_status_cte.c.testing_status_combined_degraded.is_(True),
                         SCRIPT_STATUS.DEGRADED,
                     ),
                     (
-                        testing_status_cte.c.testing_status_combined_passed.is_(
-                            True
-                        ),
+                        testing_status_cte.c.testing_status_combined_passed.is_(True),
                         SCRIPT_STATUS.PASSED,
                     ),
                     else_=-1,
@@ -1542,21 +1388,15 @@ class MachineService(Service):
                 ).label("network_test_status_combined"),
                 case(
                     (
-                        testing_status_cte.c.cpu_test_status_combined_running.is_(
-                            True
-                        ),
+                        testing_status_cte.c.cpu_test_status_combined_running.is_(True),
                         SCRIPT_STATUS.RUNNING,
                     ),
                     (
-                        testing_status_cte.c.cpu_test_status_combined_pending.is_(
-                            True
-                        ),
+                        testing_status_cte.c.cpu_test_status_combined_pending.is_(True),
                         SCRIPT_STATUS.PENDING,
                     ),
                     (
-                        testing_status_cte.c.cpu_test_status_combined_failed.is_(
-                            True
-                        ),
+                        testing_status_cte.c.cpu_test_status_combined_failed.is_(True),
                         SCRIPT_STATUS.FAILED,
                     ),
                     (
@@ -1566,9 +1406,7 @@ class MachineService(Service):
                         SCRIPT_STATUS.DEGRADED,
                     ),
                     (
-                        testing_status_cte.c.cpu_test_status_combined_passed.is_(
-                            True
-                        ),
+                        testing_status_cte.c.cpu_test_status_combined_passed.is_(True),
                         SCRIPT_STATUS.PASSED,
                     ),
                     else_=-1,
@@ -1613,17 +1451,13 @@ class MachineService(Service):
                 DomainTable.c.id == NodeTable.c.domain_id,
                 isouter=True,
             )
-            .join(
-                UserTable, UserTable.c.id == NodeTable.c.owner_id, isouter=True
-            )
+            .join(UserTable, UserTable.c.id == NodeTable.c.owner_id, isouter=True)
             .join(
                 ResourcePoolTable,
                 ResourcePoolTable.c.id == NodeTable.c.pool_id,
                 isouter=True,
             )
-            .join(
-                ZoneTable, ZoneTable.c.id == NodeTable.c.zone_id, isouter=True
-            )
+            .join(ZoneTable, ZoneTable.c.id == NodeTable.c.zone_id, isouter=True)
             .join(
                 storage_query,
                 storage_query.c.id == NodeTable.c.id,

@@ -24,9 +24,7 @@ from provisioningserver.drivers.osystem.windows import REQUIRE_LICENSE_KEY
 class TestLicenseKeyForm(MAASServerTestCase):
     """Tests for `LicenseKeyForm`."""
 
-    def make_os_with_license_key(
-        self, osystem=None, osystem_title=None, release=None
-    ):
+    def make_os_with_license_key(self, osystem=None, osystem_title=None, release=None):
         """Makes a fake operating system that has a release that requires a
         license key."""
         if osystem is None:
@@ -61,9 +59,7 @@ class TestLicenseKeyForm(MAASServerTestCase):
             "license_key": key,
         }
         data = definition.copy()
-        data["distro_series"] = "{}/{}".format(
-            osystem["name"], release["name"]
-        )
+        data["distro_series"] = "{}/{}".format(osystem["name"], release["name"])
         form = LicenseKeyForm(data=data)
         form.save()
         license_key_obj = LicenseKey.objects.get(
@@ -82,9 +78,7 @@ class TestLicenseKeyForm(MAASServerTestCase):
             license_key=factory.make_name("key"),
         )
         new_key = factory.make_name("key")
-        form = LicenseKeyForm(
-            data={"license_key": new_key}, instance=license_key
-        )
+        form = LicenseKeyForm(data={"license_key": new_key}, instance=license_key)
         form.save()
         license_key = reload_object(license_key)
         self.assertEqual(new_key, license_key.license_key)
@@ -98,9 +92,7 @@ class TestLicenseKeyForm(MAASServerTestCase):
             license_key=factory.make_name("key"),
         )
         new_key = factory.make_name("key")
-        form = LicenseKeyForm(
-            data={"license_key": new_key}, instance=license_key
-        )
+        form = LicenseKeyForm(data={"license_key": new_key}, instance=license_key)
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual({"__all__": ["Invalid license key."]}, form.errors)
 

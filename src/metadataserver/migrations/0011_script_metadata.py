@@ -4,9 +4,7 @@ import maasserver.migrations.fields
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("metadataserver", "0010_scriptresult_time_and_script_title")
-    ]
+    dependencies = [("metadataserver", "0010_scriptresult_time_and_script_title")]
 
     operations = [
         migrations.AddField(
@@ -25,9 +23,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="script",
             name="packages",
-            field=maasserver.migrations.fields.JSONObjectField(
-                blank=True, default={}
-            ),
+            field=maasserver.migrations.fields.JSONObjectField(blank=True, default={}),
         ),
         migrations.AddField(
             model_name="script",
@@ -44,22 +40,16 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="script",
             name="parameters",
-            field=maasserver.migrations.fields.JSONObjectField(
-                blank=True, default={}
-            ),
+            field=maasserver.migrations.fields.JSONObjectField(blank=True, default={}),
         ),
         migrations.AddField(
             model_name="script",
             name="results",
-            field=maasserver.migrations.fields.JSONObjectField(
-                blank=True, default={}
-            ),
+            field=maasserver.migrations.fields.JSONObjectField(blank=True, default={}),
         ),
         migrations.AddField(
             model_name="scriptresult",
             name="parameters",
-            field=maasserver.migrations.fields.JSONObjectField(
-                blank=True, default={}
-            ),
+            field=maasserver.migrations.fields.JSONObjectField(blank=True, default={}),
         ),
     ]

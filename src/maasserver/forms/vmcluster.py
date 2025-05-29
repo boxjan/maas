@@ -40,9 +40,7 @@ class UpdateVMClusterForm(MAASModelForm):
         to_field_name="name",
     )
 
-    def __init__(
-        self, data=None, instance=None, request=None, user=None, **kwargs
-    ):
+    def __init__(self, data=None, instance=None, request=None, user=None, **kwargs):
         self.is_new = instance is None
         self.request = request
         self.user = user

@@ -224,9 +224,7 @@ class TestMachineHandlerUtils:
             "current_commissioning_script_set": (
                 node.current_commissioning_script_set_id
             ),
-            "commissioning_start_time": dehydrate_datetime(
-                commissioning_start_time
-            ),
+            "commissioning_start_time": dehydrate_datetime(commissioning_start_time),
             "current_testing_script_set": node.current_testing_script_set_id,
             "current_installation_script_set": (
                 node.current_installation_script_set_id
@@ -237,9 +235,7 @@ class TestMachineHandlerUtils:
                 )
             ),
             "current_release_script_set": node.current_release_script_set_id,
-            "has_logs": (
-                log_results.difference(script_output_nsmap.keys()) == set()
-            ),
+            "has_logs": (log_results.difference(script_output_nsmap.keys()) == set()),
             "locked": node.locked,
             "cpu_count": node.cpu_count,
             "cpu_speed": node.cpu_speed,
@@ -268,13 +264,10 @@ class TestMachineHandlerUtils:
             "storage_layout_issues": node.storage_layout_issues(),
             "special_filesystems": [
                 handler.dehydrate_filesystem(filesystem)
-                for filesystem in node.current_config.special_filesystems.order_by(
-                    "id"
-                )
+                for filesystem in node.current_config.special_filesystems.order_by("id")
             ],
             "supported_filesystems": [
-                {"key": key, "ui": ui}
-                for key, ui in FILESYSTEM_FORMAT_TYPE_CHOICES
+                {"key": key, "ui": ui} for key, ui in FILESYSTEM_FORMAT_TYPE_CHOICES
             ],
             "distro_series": node.distro_series,
             "error": node.error,
@@ -322,9 +315,7 @@ class TestMachineHandlerUtils:
             "power_state": node.power_state,
             "power_type": node.power_type,
             "pxe_mac": (
-                ""
-                if boot_interface is None
-                else "%s" % boot_interface.mac_address
+                "" if boot_interface is None else "%s" % boot_interface.mac_address
             ),
             "show_os_info": handler.dehydrate_show_os_info(node),
             "status": node.display_status(),
@@ -429,23 +420,19 @@ class TestMachineHandlerUtils:
                     "dhcp_on": node.current_config.interface_set.filter(
                         vlan__dhcp_on=True
                     ).exists(),
-                    "grouped_storages": handler.get_grouped_storages(
-                        blockdevices
-                    ),
+                    "grouped_storages": handler.get_grouped_storages(blockdevices),
                     "detected_storage_layout": applied_layout,
                     "metadata": {},
                 }
             )
         if not for_list:
-            data["testing_status"] = handler.dehydrate_test_statuses(
-                testing_scripts
-            )
+            data["testing_status"] = handler.dehydrate_test_statuses(testing_scripts)
 
             cpu_script_results = [
                 script_result
-                for script_result in handler._script_results.get(
-                    node.id, {}
-                ).get(HARDWARE_TYPE.CPU, [])
+                for script_result in handler._script_results.get(node.id, {}).get(
+                    HARDWARE_TYPE.CPU, []
+                )
                 if script_result.script_set.result_type == RESULT_TYPE.TESTING
             ]
             data["cpu_test_status"] = handler.dehydrate_test_statuses(
@@ -454,9 +441,9 @@ class TestMachineHandlerUtils:
 
             memory_script_results = [
                 script_result
-                for script_result in handler._script_results.get(
-                    node.id, {}
-                ).get(HARDWARE_TYPE.MEMORY, [])
+                for script_result in handler._script_results.get(node.id, {}).get(
+                    HARDWARE_TYPE.MEMORY, []
+                )
                 if script_result.script_set.result_type == RESULT_TYPE.TESTING
             ]
             data["memory_test_status"] = handler.dehydrate_test_statuses(
@@ -465,9 +452,9 @@ class TestMachineHandlerUtils:
 
             network_script_results = [
                 script_result
-                for script_result in handler._script_results.get(
-                    node.id, {}
-                ).get(HARDWARE_TYPE.NETWORK, [])
+                for script_result in handler._script_results.get(node.id, {}).get(
+                    HARDWARE_TYPE.NETWORK, []
+                )
                 if script_result.script_set.result_type == RESULT_TYPE.TESTING
             ]
             data["network_test_status"] = handler.dehydrate_test_statuses(
@@ -476,9 +463,9 @@ class TestMachineHandlerUtils:
 
             storage_script_results = [
                 script_result
-                for script_result in handler._script_results.get(
-                    node.id, {}
-                ).get(HARDWARE_TYPE.STORAGE, [])
+                for script_result in handler._script_results.get(node.id, {}).get(
+                    HARDWARE_TYPE.STORAGE, []
+                )
                 if script_result.script_set.result_type == RESULT_TYPE.TESTING
             ]
             data["storage_test_status"] = handler.dehydrate_test_statuses(
@@ -487,9 +474,7 @@ class TestMachineHandlerUtils:
         else:
             all_test_results = []
             if node.id in handler._script_results_for_list:
-                for results in handler._script_results_for_list[
-                    node.id
-                ].values():
+                for results in handler._script_results_for_list[node.id].values():
                     all_test_results += results
 
             data["testing_status"] = handler.dehydrate_test_statuses_for_list(
@@ -501,23 +486,17 @@ class TestMachineHandlerUtils:
                     HARDWARE_TYPE.CPU, None
                 )
             )
-            data[
-                "memory_test_status"
-            ] = handler.dehydrate_test_statuses_for_list(
+            data["memory_test_status"] = handler.dehydrate_test_statuses_for_list(
                 handler._script_results_for_list.get(node.id, {}).get(
                     HARDWARE_TYPE.MEMORY, None
                 )
             )
-            data[
-                "network_test_status"
-            ] = handler.dehydrate_test_statuses_for_list(
+            data["network_test_status"] = handler.dehydrate_test_statuses_for_list(
                 handler._script_results_for_list.get(node.id, {}).get(
                     HARDWARE_TYPE.NETWORK, None
                 )
             )
-            data[
-                "storage_test_status"
-            ] = handler.dehydrate_test_statuses_for_list(
+            data["storage_test_status"] = handler.dehydrate_test_statuses_for_list(
                 handler._script_results_for_list.get(node.id, {}).get(
                     HARDWARE_TYPE.STORAGE
                 )
@@ -526,9 +505,9 @@ class TestMachineHandlerUtils:
         if not for_list:
             interface_script_results = [
                 script_result
-                for script_result in handler._script_results.get(
-                    node.id, {}
-                ).get(HARDWARE_TYPE.NETWORK, [])
+                for script_result in handler._script_results.get(node.id, {}).get(
+                    HARDWARE_TYPE.NETWORK, []
+                )
                 if script_result.script_set.result_type == RESULT_TYPE.TESTING
             ]
             data["interface_test_status"] = handler.dehydrate_test_statuses(
@@ -537,9 +516,9 @@ class TestMachineHandlerUtils:
 
             node_script_results = [
                 script_result
-                for script_result in handler._script_results.get(
-                    node.id, {}
-                ).get(HARDWARE_TYPE.NODE, [])
+                for script_result in handler._script_results.get(node.id, {}).get(
+                    HARDWARE_TYPE.NODE, []
+                )
                 if script_result.script_set.result_type == RESULT_TYPE.TESTING
             ]
             data["other_test_status"] = handler.dehydrate_test_statuses(
@@ -682,9 +661,7 @@ class TestMachineHandler(MAASServerTestCase):
 
         self.assertEqual(
             script_result.id,
-            handler._script_results[node.id][
-                script_result.script.hardware_type
-            ][0].id,
+            handler._script_results[node.id][script_result.script.hardware_type][0].id,
         )
         self.assertNotIn(
             aborted_script_result,
@@ -694,9 +671,7 @@ class TestMachineHandler(MAASServerTestCase):
                 for result in results
             ],
         )
-        self.assertEqual(
-            cached_content, handler._script_results[cached_node.id]
-        )
+        self.assertEqual(cached_content, handler._script_results[cached_node.id])
 
     def test_get_refresh_script_result_cache_clears_aborted(self):
         # Regression test for LP:1731350
@@ -718,9 +693,7 @@ class TestMachineHandler(MAASServerTestCase):
 
         self.assertEqual(
             [],
-            handler._script_results[node.id][
-                script_result.script.hardware_type
-            ],
+            handler._script_results[node.id][script_result.script.hardware_type],
         )
 
     def test_get_power_params_certificate(self):
@@ -740,18 +713,14 @@ class TestMachineHandler(MAASServerTestCase):
             {
                 "CN": sample_cert.cn(),
                 "fingerprint": sample_cert.cert_hash(),
-                "expiration": sample_cert.expiration().strftime(
-                    DATETIME_FORMAT
-                ),
+                "expiration": sample_cert.expiration().strftime(DATETIME_FORMAT),
             },
         )
 
     def test_get_num_queries_is_the_expected_number(self):
         owner = factory.make_User()
         vlan = factory.make_VLAN(space=factory.make_Space())
-        node = factory.make_Node_with_Interface_on_Subnet(
-            owner=owner, vlan=vlan
-        )
+        node = factory.make_Node_with_Interface_on_Subnet(owner=owner, vlan=vlan)
         commissioning_script_set = factory.make_ScriptSet(
             node=node, result_type=RESULT_TYPE.COMMISSIONING
         )
@@ -805,9 +774,7 @@ class TestMachineHandler(MAASServerTestCase):
         handler = MachineHandler(owner, {}, None)
         # Simulate a trigger pushing an update to the UI
         handler.cache = {"active_pk": node.system_id}
-        _, _, ret = handler.on_listen_for_active_pk(
-            "update", node.system_id, node
-        )
+        _, _, ret = handler.on_listen_for_active_pk("update", node.system_id, node)
         self.assertEqual(ret["commissioning_status"]["passed"], num_scripts)
         self.assertEqual(ret["testing_status"]["passed"], num_scripts)
 
@@ -846,9 +813,7 @@ class TestMachineHandler(MAASServerTestCase):
         owner = factory.make_User()
         handler = MachineHandler(owner, {}, None)
         pod = factory.make_Pod()
-        self.assertEqual(
-            handler.dehydrate_pod(pod), {"id": pod.id, "name": pod.name}
-        )
+        self.assertEqual(handler.dehydrate_pod(pod), {"id": pod.id, "name": pod.name})
 
     def test_dehydrate_node_with_pod(self):
         owner = factory.make_User()
@@ -950,8 +915,7 @@ class TestMachineHandler(MAASServerTestCase):
         owner = factory.make_User()
         handler = MachineHandler(owner, {}, None)
         params = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         self.assertEqual(params, handler.dehydrate_power_parameters(params))
 
@@ -972,9 +936,7 @@ class TestMachineHandler(MAASServerTestCase):
         node = factory.make_Node(owner=owner)
         handler = MachineHandler(owner, {}, None)
         device = factory.make_Node(node_type=NODE_TYPE.DEVICE, parent=node)
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=device
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=device)
         self.assertEqual(
             {
                 "fqdn": device.fqdn,
@@ -1252,9 +1214,7 @@ class TestMachineHandler(MAASServerTestCase):
         )
         partition_table = factory.make_PartitionTable(block_device=blockdevice)
         partitions = [
-            factory.make_Partition(
-                partition_table=partition_table, size=1 * 1024**3
-            )
+            factory.make_Partition(partition_table=partition_table, size=1 * 1024**3)
             for _ in range(3)
         ]
         expected = []
@@ -1273,9 +1233,7 @@ class TestMachineHandler(MAASServerTestCase):
                     "tags": partition.tags,
                 }
             )
-        self.assertCountEqual(
-            expected, handler.dehydrate_partitions(partition_table)
-        )
+        self.assertCountEqual(expected, handler.dehydrate_partitions(partition_table))
 
     def test_dehydrate_filesystem_returns_None(self):
         owner = factory.make_User()
@@ -1329,8 +1287,7 @@ class TestMachineHandler(MAASServerTestCase):
                 "params": interface.params,
                 "parents": [nic.id for nic in interface.parents.all()],
                 "children": [
-                    nic.child.id
-                    for nic in interface.children_relationships.all()
+                    nic.child.id for nic in interface.children_relationships.all()
                 ],
                 "links": expected_links,
                 "interface_speed": interface.interface_speed,
@@ -1358,8 +1315,7 @@ class TestMachineHandler(MAASServerTestCase):
                 "params": interface2.params,
                 "parents": [nic.id for nic in interface2.parents.all()],
                 "children": [
-                    nic.child.id
-                    for nic in interface2.children_relationships.all()
+                    nic.child.id for nic in interface2.children_relationships.all()
                 ],
                 "links": expected_links,
                 "interface_speed": interface2.interface_speed,
@@ -1401,8 +1357,7 @@ class TestMachineHandler(MAASServerTestCase):
                 "params": interface.params,
                 "parents": [nic.id for nic in interface.parents.all()],
                 "children": [
-                    nic.child.id
-                    for nic in interface.children_relationships.all()
+                    nic.child.id for nic in interface.children_relationships.all()
                 ],
                 "links": expected_links,
                 "interface_speed": interface.interface_speed,
@@ -1454,8 +1409,7 @@ class TestMachineHandler(MAASServerTestCase):
                 "params": interface.params,
                 "parents": [nic.id for nic in interface.parents.all()],
                 "children": [
-                    nic.child.id
-                    for nic in interface.children_relationships.all()
+                    nic.child.id for nic in interface.children_relationships.all()
                 ],
                 "links": expected_links,
                 "discovered": expected_discovered,
@@ -1556,8 +1510,7 @@ class TestMachineHandler(MAASServerTestCase):
                 "params": interface.params,
                 "parents": [nic.id for nic in interface.parents.all()],
                 "children": [
-                    nic.child.id
-                    for nic in interface.children_relationships.all()
+                    nic.child.id for nic in interface.children_relationships.all()
                 ],
                 "links": expected_links,
                 "discovered": expected_discovered,
@@ -1610,8 +1563,7 @@ class TestMachineHandler(MAASServerTestCase):
                 "params": interface.params,
                 "parents": [nic.id for nic in interface.parents.all()],
                 "children": [
-                    nic.child.id
-                    for nic in interface.children_relationships.all()
+                    nic.child.id for nic in interface.children_relationships.all()
                 ],
                 "links": expected_links,
                 "discovered": expected_discovered,
@@ -1668,8 +1620,7 @@ class TestMachineHandler(MAASServerTestCase):
                 "params": interface.params,
                 "parents": [nic.id for nic in interface.parents.all()],
                 "children": [
-                    nic.child.id
-                    for nic in interface.children_relationships.all()
+                    nic.child.id for nic in interface.children_relationships.all()
                 ],
                 "links": expected_links,
                 "discovered": expected_discovered,
@@ -1709,9 +1660,7 @@ class TestMachineHandler(MAASServerTestCase):
             interface=bond,
         )
         interface2_subnet = factory.make_Subnet()
-        interface2_ip = factory.pick_ip_in_network(
-            interface2_subnet.get_ipnetwork()
-        )
+        interface2_ip = factory.pick_ip_in_network(interface2_subnet.get_ipnetwork())
         factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.DISCOVERED,
             ip=interface2_ip,
@@ -1757,9 +1706,7 @@ class TestMachineHandler(MAASServerTestCase):
             interface=bond,
         )
         interface2_subnet = factory.make_Subnet()
-        interface2_ip = factory.pick_ip_in_network(
-            interface2_subnet.get_ipnetwork()
-        )
+        interface2_ip = factory.pick_ip_in_network(interface2_subnet.get_ipnetwork())
         factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.DISCOVERED,
             ip=interface2_ip,
@@ -1815,9 +1762,7 @@ class TestMachineHandler(MAASServerTestCase):
         handler = MachineHandler(owner, {}, None)
         lldp_data = b"<foo>bar</foo>"
         script_set = node.current_commissioning_script_set
-        script_result = script_set.find_script_result(
-            script_name=LLDP_OUTPUT_NAME
-        )
+        script_result = script_set.find_script_result(script_name=LLDP_OUTPUT_NAME)
         script_result.store_result(exit_status=0, stdout=lldp_data)
         observed = handler.get_summary_xml({"system_id": node.system_id})
         probed_details = merge_details_cleanly(get_single_probed_details(node))
@@ -1839,9 +1784,7 @@ class TestMachineHandler(MAASServerTestCase):
         handler = MachineHandler(owner, {}, None)
         lldp_data = b"<foo>bar</foo>"
         script_set = node.current_commissioning_script_set
-        script_result = script_set.find_script_result(
-            script_name=LLDP_OUTPUT_NAME
-        )
+        script_result = script_set.find_script_result(script_name=LLDP_OUTPUT_NAME)
         script_result.store_result(exit_status=0, stdout=lldp_data)
         observed = handler.get_summary_yaml({"system_id": node.system_id})
         probed_details = merge_details_cleanly(get_single_probed_details(node))
@@ -1857,9 +1800,7 @@ class TestMachineHandler(MAASServerTestCase):
         node = factory.make_Node(owner=owner)
         handler = MachineHandler(owner, {}, None)
         event_type = factory.make_EventType(level=logging.INFO)
-        events = [
-            factory.make_Event(node=node, type=event_type) for _ in range(51)
-        ]
+        events = [factory.make_Event(node=node, type=event_type) for _ in range(51)]
         expected = [
             {
                 "id": event.id,
@@ -1892,9 +1833,7 @@ class TestMachineHandler(MAASServerTestCase):
         fabric1 = factory.make_Fabric(name=factory.make_name("fabric"))
         vlan1 = factory.make_VLAN(fabric=fabric1)
         subnet1 = factory.make_Subnet(space=space1, vlan=vlan1)
-        node = factory.make_Node_with_Interface_on_Subnet(
-            subnet=subnet1, vlan=vlan1
-        )
+        node = factory.make_Node_with_Interface_on_Subnet(subnet=subnet1, vlan=vlan1)
         node.save()
 
         # Bond interface with a VLAN on top. With the bond set to STATIC
@@ -1904,12 +1843,8 @@ class TestMachineHandler(MAASServerTestCase):
         space2 = factory.make_Space()
         bond_subnet = factory.make_Subnet(space=space1, vlan=vlan1)
         vlan_subnet = factory.make_Subnet(space=space2, vlan=vlan2)
-        nic1 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=node, vlan=vlan1
-        )
-        nic2 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=node, vlan=vlan2
-        )
+        nic1 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node, vlan=vlan1)
+        nic2 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node, vlan=vlan2)
         bond = factory.make_Interface(
             INTERFACE_TYPE.BOND, parents=[nic1, nic2], vlan=vlan1
         )
@@ -1932,9 +1867,7 @@ class TestMachineHandler(MAASServerTestCase):
         # LINK_UP interface with no subnet.
         fabric3 = factory.make_Fabric(name=factory.make_name("fabric"))
         vlan3 = factory.make_VLAN(fabric=fabric3)
-        nic3 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan3, node=node
-        )
+        nic3 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan3, node=node)
         nic3_ip = factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.STICKY,
             ip="",
@@ -1969,16 +1902,12 @@ class TestMachineHandler(MAASServerTestCase):
         (handler, node, _, _, spaces) = self.make_node_with_subnets()
         space_names = [space.name for space in spaces]
         node_subnets = handler.get_all_subnets(node)
-        self.assertCountEqual(
-            space_names, handler.get_all_space_names(node_subnets)
-        )
+        self.assertCountEqual(space_names, handler.get_all_space_names(node_subnets))
 
     def test_get(self):
         user = factory.make_User()
         handler = MachineHandler(user, {}, None)
-        node = factory.make_Node_with_Interface_on_Subnet(
-            with_empty_script_sets=True
-        )
+        node = factory.make_Node_with_Interface_on_Subnet(with_empty_script_sets=True)
         factory.make_FilesystemGroup(node=node)
         node.owner = user
         node.save()
@@ -1986,14 +1915,10 @@ class TestMachineHandler(MAASServerTestCase):
             factory.make_Event(node=node)
         lldp_data = b"<foo>bar</foo>"
         script_set = node.current_commissioning_script_set
-        script_result = script_set.find_script_result(
-            script_name=LLDP_OUTPUT_NAME
-        )
+        script_result = script_set.find_script_result(script_name=LLDP_OUTPUT_NAME)
         script_result.store_result(exit_status=0, stdout=lldp_data)
         factory.make_PhysicalBlockDevice(node=node)
-        Config.objects.set_config(
-            name="enable_third_party_drivers", value=True
-        )
+        Config.objects.set_config(name="enable_third_party_drivers", value=True)
         data = "pci:v00001590d00000047sv00001590sd00000047bc*sc*i*"
         script_result = script_set.find_script_result(
             script_name=LIST_MODALIASES_OUTPUT_NAME
@@ -2006,9 +1931,7 @@ class TestMachineHandler(MAASServerTestCase):
         vlan_subnet = factory.make_Subnet()
         nic1 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node)
         nic2 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node)
-        bond = factory.make_Interface(
-            INTERFACE_TYPE.BOND, parents=[nic1, nic2]
-        )
+        bond = factory.make_Interface(INTERFACE_TYPE.BOND, parents=[nic1, nic2])
         vlan = factory.make_Interface(INTERFACE_TYPE.VLAN, parents=[bond])
         factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.STICKY,
@@ -2036,9 +1959,7 @@ class TestMachineHandler(MAASServerTestCase):
 
         # Make some devices.
         for _ in range(3):
-            factory.make_Node(
-                node_type=NODE_TYPE.DEVICE, parent=node, interface=True
-            )
+            factory.make_Node(node_type=NODE_TYPE.DEVICE, parent=node, interface=True)
 
         boot_interface = node.get_boot_interface()
         node.boot_interface = boot_interface
@@ -2056,9 +1977,7 @@ class TestMachineHandler(MAASServerTestCase):
         node.last_sync = datetime.now()
         node.save()
         observed = handler.get({"system_id": node.system_id})
-        self.assertEqual(
-            observed["last_sync"], dehydrate_datetime(node.last_sync)
-        )
+        self.assertEqual(observed["last_sync"], dehydrate_datetime(node.last_sync))
         self.assertEqual(
             observed["sync_interval"], timedelta(minutes=10).total_seconds()
         )
@@ -2071,17 +1990,11 @@ class TestMachineHandler(MAASServerTestCase):
     def test_get_driver_for_series(self):
         user = factory.make_User()
         handler = MachineHandler(user, {}, None)
-        node = factory.make_Node_with_Interface_on_Subnet(
-            with_empty_script_sets=True
-        )
+        node = factory.make_Node_with_Interface_on_Subnet(with_empty_script_sets=True)
         node.distro_series = "bionic"
         node.save()
-        Config.objects.set_config(
-            name="enable_third_party_drivers", value=True
-        )
-        mock_get_third_party_driver = self.patch(
-            node_module, "get_third_party_driver"
-        )
+        Config.objects.set_config(name="enable_third_party_drivers", value=True)
+        mock_get_third_party_driver = self.patch(node_module, "get_third_party_driver")
         handler.dehydrate(node, {})
         mock_get_third_party_driver.assert_called_with(
             node, detected_aliases=[], series="bionic"
@@ -2117,9 +2030,7 @@ class TestMachineHandler(MAASServerTestCase):
     def test_get_ephemeral_deployment(self):
         user = factory.make_User()
         handler = MachineHandler(user, {}, None)
-        node = factory.make_Node(
-            status=NODE_STATUS.READY, ephemeral_deploy=True
-        )
+        node = factory.make_Node(status=NODE_STATUS.READY, ephemeral_deploy=True)
         result = handler.get({"system_id": node.system_id})
         assert result["ephemeral_deploy"] is True
 
@@ -2136,9 +2047,7 @@ class TestMachineHandler(MAASServerTestCase):
             node_config=machine.current_config, label="acquired", acquired=True
         )
         self.assertEqual(
-            handler.get({"system_id": machine.system_id})[
-                "special_filesystems"
-            ],
+            handler.get({"system_id": machine.system_id})["special_filesystems"],
             [handler.dehydrate_filesystem(filesystem)],
         )
 
@@ -2155,9 +2064,7 @@ class TestMachineHandler(MAASServerTestCase):
             node_config=machine.current_config, label="acquired", acquired=True
         )
         self.assertEqual(
-            handler.get({"system_id": machine.system_id})[
-                "special_filesystems"
-            ],
+            handler.get({"system_id": machine.system_id})["special_filesystems"],
             [handler.dehydrate_filesystem(filesystem)],
         )
 
@@ -2172,9 +2079,7 @@ class TestMachineHandler(MAASServerTestCase):
         ip_address2 = factory.make_StaticIPAddress(interface=interface2)
         handler = MachineHandler(user, {}, None)
         dehydrated_machine = handler.get({"system_id": machine.system_id})
-        dehydrated_ips = [
-            info["ip"] for info in dehydrated_machine["ip_addresses"]
-        ]
+        dehydrated_ips = [info["ip"] for info in dehydrated_machine["ip_addresses"]]
         self.assertCountEqual(dehydrated_ips, [ip_address1.ip, ip_address2.ip])
 
     def test_get_numa_nodes_prefetched(self):
@@ -2186,12 +2091,8 @@ class TestMachineHandler(MAASServerTestCase):
         for __ in range(16):
             factory.make_NUMANode(node=machine2)
         handler = MachineHandler(user, {}, None)
-        count1, _ = count_queries(
-            handler.get, {"system_id": machine1.system_id}
-        )
-        count2, _ = count_queries(
-            handler.get, {"system_id": machine1.system_id}
-        )
+        count1, _ = count_queries(handler.get, {"system_id": machine1.system_id})
+        count2, _ = count_queries(handler.get, {"system_id": machine1.system_id})
         # there's a 1-query difference between counts because of caching
         self.assertEqual(count1, count2 + 1)
 
@@ -2204,9 +2105,7 @@ class TestMachineHandler(MAASServerTestCase):
             (2048, [4, 5], 0),
         )
         for memory, cores, hugepages in memory_cores_hugepages:
-            numa_node = factory.make_NUMANode(
-                node=machine, memory=memory, cores=cores
-            )
+            numa_node = factory.make_NUMANode(node=machine, memory=memory, cores=cores)
             factory.make_NUMANodeHugepages(
                 numa_node=numa_node, total=hugepages, page_size=1024
             )
@@ -2250,8 +2149,7 @@ class TestMachineHandler(MAASServerTestCase):
         user = factory.make_User()
         node = factory.make_Node(owner=user)
         [interface1, interface2] = [
-            factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node)
-            for _ in range(2)
+            factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node) for _ in range(2)
         ]
         ip_address1 = factory.make_StaticIPAddress(interface=interface1)
         ip_address2 = factory.make_StaticIPAddress(interface=interface2)
@@ -2261,9 +2159,9 @@ class TestMachineHandler(MAASServerTestCase):
                 {"ip": ip_address1.ip, "is_boot": True},
                 {"ip": ip_address2.ip, "is_boot": False},
             ],
-            TestMachineHandlerUtils.dehydrate_node(
-                node, handler, for_list=True
-            )["ip_addresses"],
+            TestMachineHandlerUtils.dehydrate_node(node, handler, for_list=True)[
+                "ip_addresses"
+            ],
         )
 
     def test_list_includes_dynamic_ip_if_no_static(self):
@@ -2276,9 +2174,9 @@ class TestMachineHandler(MAASServerTestCase):
         handler = MachineHandler(user, {}, None)
         self.assertEqual(
             [{"ip": ip_address.ip, "is_boot": True}],
-            TestMachineHandlerUtils.dehydrate_node(
-                node, handler, for_list=True
-            )["ip_addresses"],
+            TestMachineHandlerUtils.dehydrate_node(node, handler, for_list=True)[
+                "ip_addresses"
+            ],
         )
 
     def test_list_includes_vlan_with_boot_interface(self):
@@ -2297,9 +2195,9 @@ class TestMachineHandler(MAASServerTestCase):
                 "fabric_id": interface.vlan.fabric.id,
                 "fabric_name": "%s" % interface.vlan.fabric.name,
             },
-            TestMachineHandlerUtils.dehydrate_node(
-                node, handler, for_list=True
-            )["vlan"],
+            TestMachineHandlerUtils.dehydrate_node(node, handler, for_list=True)[
+                "vlan"
+            ],
         )
 
     def test_list_excludes_vlan_without_boot_interface(self):
@@ -2307,34 +2205,26 @@ class TestMachineHandler(MAASServerTestCase):
         node = factory.make_Node(owner=user)
         handler = MachineHandler(user, {}, None)
         self.assertIsNone(
-            TestMachineHandlerUtils.dehydrate_node(
-                node, handler, for_list=True
-            )["vlan"]
+            TestMachineHandlerUtils.dehydrate_node(node, handler, for_list=True)["vlan"]
         )
 
     def test_get_object_returns_node_if_super_user(self):
         user = factory.make_admin()
         node = factory.make_Node()
         handler = MachineHandler(user, {}, None)
-        self.assertEqual(
-            node, handler.get_object({"system_id": node.system_id})
-        )
+        self.assertEqual(node, handler.get_object({"system_id": node.system_id}))
 
     def test_get_object_returns_node_if_owner(self):
         user = factory.make_User()
         node = factory.make_Node(owner=user)
         handler = MachineHandler(user, {}, None)
-        self.assertEqual(
-            node, handler.get_object({"system_id": node.system_id})
-        )
+        self.assertEqual(node, handler.get_object({"system_id": node.system_id}))
 
     def test_get_object_returns_node_if_owner_empty(self):
         user = factory.make_User()
         node = factory.make_Node()
         handler = MachineHandler(user, {}, None)
-        self.assertEqual(
-            node, handler.get_object({"system_id": node.system_id})
-        )
+        self.assertEqual(node, handler.get_object({"system_id": node.system_id}))
 
     def test_get_object_raises_error_if_owner_by_another_user(self):
         user = factory.make_User()
@@ -2378,9 +2268,7 @@ class TestMachineHandler(MAASServerTestCase):
     def test_get_form_class_raises_error_for_unknown_action(self):
         user = factory.make_User()
         handler = MachineHandler(user, {}, None)
-        self.assertRaises(
-            HandlerError, handler.get_form_class, factory.make_name()
-        )
+        self.assertRaises(HandlerError, handler.get_form_class, factory.make_name())
 
     def test_create_raise_permissions_error_for_non_admin(self):
         user = factory.make_User()
@@ -2427,9 +2315,7 @@ class TestMachineHandler(MAASServerTestCase):
         hostname = factory.make_name("hostname")
         architecture = make_usable_architecture(self)
 
-        mock_start_commissioning = self.patch(
-            node_model, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch(node_model, "start_commissioning")
 
         handler.create(
             {
@@ -2450,9 +2336,7 @@ class TestMachineHandler(MAASServerTestCase):
         description = factory.make_name("description")
         zone = factory.make_Zone()
 
-        mock_start_commissioning = self.patch(
-            node_model, "start_commissioning"
-        )
+        mock_start_commissioning = self.patch(node_model, "start_commissioning")
 
         created_node = handler.create(
             {
@@ -2498,9 +2382,7 @@ class TestMachineHandler(MAASServerTestCase):
         node_data = TestMachineHandlerUtils.dehydrate_node(node, handler)
         arch = factory.make_name("arch")
         node_data["architecture"] = arch
-        error = self.assertRaises(
-            HandlerValidationError, handler.update, node_data
-        )
+        error = self.assertRaises(HandlerValidationError, handler.update, node_data)
         self.assertEqual(
             error.message_dict,
             {
@@ -2740,9 +2622,7 @@ class TestMachineHandler(MAASServerTestCase):
             status=NODE_STATUS.ALLOCATED,
         )
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        handler.delete_disk(
-            {"system_id": node.system_id, "block_id": block_device.id}
-        )
+        handler.delete_disk({"system_id": node.system_id, "block_id": block_device.id})
         self.assertIsNone(reload_object(block_device))
 
     def test_delete_disk_locked_raises_permission_error(self):
@@ -2778,9 +2658,7 @@ class TestMachineHandler(MAASServerTestCase):
         p2 = partition_table.add_partition(size=MIN_PARTITION_SIZE)
         p3 = partition_table.add_partition(size=MIN_PARTITION_SIZE)
 
-        handler.delete_partition(
-            {"system_id": node.system_id, "partition_id": p1.id}
-        )
+        handler.delete_partition({"system_id": node.system_id, "partition_id": p1.id})
         self.assertEqual(reload_object(p2).index, 1)
         self.assertEqual(reload_object(p3).index, 2)
 
@@ -2790,9 +2668,7 @@ class TestMachineHandler(MAASServerTestCase):
         node = factory.make_Node(locked=True)
         partition = factory.make_Partition(node=node)
         params = {"system_id": node.system_id, "partition_id": partition.id}
-        self.assertRaises(
-            HandlerPermissionError, handler.delete_partition, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete_partition, params)
 
     def test_delete_volume_group(self):
         user = factory.make_admin()
@@ -2822,9 +2698,7 @@ class TestMachineHandler(MAASServerTestCase):
             "system_id": node.system_id,
             "volume_group_id": volume_group.id,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.delete_volume_group, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete_volume_group, params)
 
     def test_delete_cache_set(self):
         user = factory.make_admin()
@@ -2847,9 +2721,7 @@ class TestMachineHandler(MAASServerTestCase):
         node = factory.make_Node(locked=True)
         cache_set = factory.make_CacheSet(node=node)
         params = {"system_id": node.system_id, "cache_set_id": cache_set.id}
-        self.assertRaises(
-            HandlerPermissionError, handler.delete_cache_set, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete_cache_set, params)
 
     def test_delete_filesystem_deletes_blockdevice_filesystem(self):
         user = factory.make_admin()
@@ -2910,9 +2782,7 @@ class TestMachineHandler(MAASServerTestCase):
             "partition_id": partition.id,
             "filesystem_id": filesystem.id,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.delete_filesystem, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete_filesystem, params)
 
     def test_delete_vmfs_datastore(self):
         user = factory.make_admin()
@@ -2943,9 +2813,7 @@ class TestMachineHandler(MAASServerTestCase):
         node = factory.make_Node()
         vmfs = factory.make_VMFS(node=node)
         block_device = factory.make_PhysicalBlockDevice(node=node)
-        partition_table = factory.make_PartitionTable(
-            block_device=block_device
-        )
+        partition_table = factory.make_PartitionTable(block_device=block_device)
         partition = factory.make_Partition(partition_table=partition_table)
         factory.make_Filesystem(
             fstype=FILESYSTEM_TYPE.LVM_PV,
@@ -3010,9 +2878,7 @@ class TestMachineHandler(MAASServerTestCase):
         self.assertEqual(2, Partition.objects.count())
         self.assertEqual(
             human_readable_bytes(
-                round_size_to_nearest_block(
-                    size, PARTITION_ALIGNMENT_SIZE, False
-                )
+                round_size_to_nearest_block(size, PARTITION_ALIGNMENT_SIZE, False)
             ),
             human_readable_bytes(partition.size),
         )
@@ -3050,9 +2916,7 @@ class TestMachineHandler(MAASServerTestCase):
         self.assertEqual(2, Partition.objects.count())
         self.assertEqual(
             human_readable_bytes(
-                round_size_to_nearest_block(
-                    size, PARTITION_ALIGNMENT_SIZE, False
-                )
+                round_size_to_nearest_block(size, PARTITION_ALIGNMENT_SIZE, False)
             ),
             human_readable_bytes(partition.size),
         )
@@ -3084,9 +2948,7 @@ class TestMachineHandler(MAASServerTestCase):
             "mount_point": mount_point,
             "mount_options": mount_options,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.create_partition, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.create_partition, params)
 
     def test_create_cache_set_for_partition(self):
         user = factory.make_admin()
@@ -3112,9 +2974,7 @@ class TestMachineHandler(MAASServerTestCase):
         )
         cache_set = CacheSet.objects.get_cache_sets_for_node(node).first()
         self.assertIsNotNone(cache_set)
-        self.assertEqual(
-            block_device.id, cache_set.get_filesystem().block_device.id
-        )
+        self.assertEqual(block_device.id, cache_set.get_filesystem().block_device.id)
 
     def test_create_cache_set_locked_raises_permission_error(self):
         user = factory.make_admin()
@@ -3122,9 +2982,7 @@ class TestMachineHandler(MAASServerTestCase):
         node = factory.make_Node(locked=True)
         partition = factory.make_Partition(node=node)
         params = {"system_id": node.system_id, "partition_id": partition.id}
-        self.assertRaises(
-            HandlerPermissionError, handler.create_cache_set, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.create_cache_set, params)
 
     def test_create_bcache_for_partition(self):
         user = factory.make_admin()
@@ -3152,9 +3010,7 @@ class TestMachineHandler(MAASServerTestCase):
         self.assertEqual(name, bcache.name)
         self.assertEqual(cache_set, bcache.cache_set)
         self.assertEqual(cache_mode, bcache.cache_mode)
-        self.assertEqual(
-            partition, bcache.get_bcache_backing_filesystem().partition
-        )
+        self.assertEqual(partition, bcache.get_bcache_backing_filesystem().partition)
         self.assertCountEqual(tags, bcache.virtual_device.tags)
 
     def test_create_bcache_for_partition_with_filesystem(self):
@@ -3187,9 +3043,7 @@ class TestMachineHandler(MAASServerTestCase):
         self.assertEqual(name, bcache.name)
         self.assertEqual(cache_set, bcache.cache_set)
         self.assertEqual(cache_mode, bcache.cache_mode)
-        self.assertEqual(
-            partition, bcache.get_bcache_backing_filesystem().partition
-        )
+        self.assertEqual(partition, bcache.get_bcache_backing_filesystem().partition)
         efs = bcache.virtual_device.get_effective_filesystem()
         self.assertEqual(efs.fstype, fstype)
         self.assertEqual(efs.mount_point, mount_point)
@@ -3285,9 +3139,7 @@ class TestMachineHandler(MAASServerTestCase):
             "mount_point": mount_point,
             "mount_options": mount_options,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.create_bcache, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.create_bcache, params)
 
     def test_create_raid(self):
         user = factory.make_admin()
@@ -3406,9 +3258,7 @@ class TestMachineHandler(MAASServerTestCase):
         )
         logical_volume = volume_group.virtual_devices.first()
         self.assertIsNotNone(logical_volume)
-        self.assertEqual(
-            f"{volume_group.name}-{name}", logical_volume.get_name()
-        )
+        self.assertEqual(f"{volume_group.name}-{name}", logical_volume.get_name())
         self.assertEqual(size, logical_volume.size)
         self.assertCountEqual(tags, logical_volume.tags)
 
@@ -3438,9 +3288,7 @@ class TestMachineHandler(MAASServerTestCase):
         )
         logical_volume = volume_group.virtual_devices.first()
         self.assertIsNotNone(logical_volume)
-        self.assertEqual(
-            f"{volume_group.name}-{name}", logical_volume.get_name()
-        )
+        self.assertEqual(f"{volume_group.name}-{name}", logical_volume.get_name())
         self.assertEqual(size, logical_volume.size)
         efs = logical_volume.get_effective_filesystem()
         self.assertEqual(efs.fstype, fstype)
@@ -3461,9 +3309,7 @@ class TestMachineHandler(MAASServerTestCase):
             "volume_group_id": volume_group.id,
             "size": size,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.create_logical_volume, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.create_logical_volume, params)
 
     def test_create_vmfs_datastore(self):
         user = factory.make_admin()
@@ -3474,9 +3320,7 @@ class TestMachineHandler(MAASServerTestCase):
         )
         layout = VMFS6StorageLayout(node)
         layout.configure()
-        bd_ids = [
-            factory.make_PhysicalBlockDevice(node=node).id for _ in range(3)
-        ]
+        bd_ids = [factory.make_PhysicalBlockDevice(node=node).id for _ in range(3)]
         params = {
             "system_id": node.system_id,
             "name": "datastore2",
@@ -3509,9 +3353,7 @@ class TestMachineHandler(MAASServerTestCase):
         architecture = make_usable_architecture(self)
         node = factory.make_Node(interface=True, architecture=architecture)
         boot_disk = factory.make_PhysicalBlockDevice(node=node)
-        handler.set_boot_disk(
-            {"system_id": node.system_id, "block_id": boot_disk.id}
-        )
+        handler.set_boot_disk({"system_id": node.system_id, "block_id": boot_disk.id})
         self.assertEqual(boot_disk.id, reload_object(node).get_boot_disk().id)
 
     def test_set_boot_disk_raises_error_for_none_physical(self):
@@ -3535,9 +3377,7 @@ class TestMachineHandler(MAASServerTestCase):
         node = factory.make_Node(locked=True)
         boot_disk = factory.make_PhysicalBlockDevice(node=node)
         params = {"system_id": node.system_id, "block_id": boot_disk.id}
-        self.assertRaises(
-            HandlerPermissionError, handler.set_boot_disk, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.set_boot_disk, params)
 
     def test_apply_storage_layout(self):
         user = factory.make_admin()
@@ -3718,22 +3558,16 @@ class TestMachineHandler(MAASServerTestCase):
         request = HttpRequest()
         request.user = user
         source = factory.make_Machine(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=source, size=8 * 1024**3, name="sda"
-        )
+        factory.make_PhysicalBlockDevice(node=source, size=8 * 1024**3, name="sda")
         destination1 = factory.make_Machine(
             status=NODE_STATUS.READY, with_boot_disk=False
         )
-        factory.make_PhysicalBlockDevice(
-            node=destination1, size=1024**3, name="sda"
-        )
+        factory.make_PhysicalBlockDevice(node=destination1, size=1024**3, name="sda")
         destination2 = factory.make_Machine(
             status=NODE_STATUS.FAILED_TESTING,
             with_boot_disk=False,
         )
-        factory.make_PhysicalBlockDevice(
-            node=destination2, size=1024**3, name="sda"
-        )
+        factory.make_PhysicalBlockDevice(node=destination2, size=1024**3, name="sda")
 
         handler = MachineHandler(user, {}, request)
         exc = self.assertRaises(
@@ -3800,9 +3634,7 @@ class TestMachineHandler(MAASServerTestCase):
         factory.make_PhysicalBlockDevice(
             node=destination, size=8 * 1024**3, name="sda"
         )
-        pt = (
-            destination.current_config.blockdevice_set.first().get_partitiontable()
-        )
+        pt = destination.current_config.blockdevice_set.first().get_partitiontable()
         self.assertIsNone(pt)  # Pre-condition check
         handler = MachineHandler(user, {}, request)
         handler.action(
@@ -3818,9 +3650,7 @@ class TestMachineHandler(MAASServerTestCase):
                 },
             },
         )
-        pt = (
-            destination.current_config.blockdevice_set.first().get_partitiontable()
-        )
+        pt = destination.current_config.blockdevice_set.first().get_partitiontable()
         self.assertIsNotNone(pt)
 
     def test_clone_with_filter(self):
@@ -3852,9 +3682,7 @@ class TestMachineHandler(MAASServerTestCase):
         factory.make_PhysicalBlockDevice(
             node=destination, size=8 * 1024**3, name="sda"
         )
-        pt = (
-            destination.current_config.blockdevice_set.first().get_partitiontable()
-        )
+        pt = destination.current_config.blockdevice_set.first().get_partitiontable()
         self.assertIsNone(pt)  # Pre-condition check
         handler = MachineHandler(user, {}, request)
         handler.action(
@@ -3868,9 +3696,7 @@ class TestMachineHandler(MAASServerTestCase):
                 "filter": {"id": destination.system_id},
             },
         )
-        pt = (
-            destination.current_config.blockdevice_set.first().get_partitiontable()
-        )
+        pt = destination.current_config.blockdevice_set.first().get_partitiontable()
         self.assertIsNotNone(pt)
 
     def test_clone_where_possible(self):
@@ -3899,9 +3725,7 @@ class TestMachineHandler(MAASServerTestCase):
         destination1 = factory.make_Machine(
             status=NODE_STATUS.READY, with_boot_disk=False
         )
-        factory.make_PhysicalBlockDevice(
-            node=destination1, size=1024**3, name="sda"
-        )
+        factory.make_PhysicalBlockDevice(node=destination1, size=1024**3, name="sda")
         destination2 = factory.make_Machine(
             status=NODE_STATUS.FAILED_TESTING,
             with_boot_disk=False,
@@ -4082,9 +3906,7 @@ class TestMachineHandler(MAASServerTestCase):
             "mac_address": factory.make_mac_address(),
             "vlan": vlan.id,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.create_physical, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.create_physical, params)
 
     def test_create_vlan_creates_link_auto(self):
         user = factory.make_admin()
@@ -4300,9 +4122,7 @@ class TestMachineHandler(MAASServerTestCase):
         handler = MachineHandler(user, {}, None)
         nic1 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node)
         with self.assertRaisesRegex(ValidationError, "This field is required"):
-            handler.create_bridge(
-                {"system_id": node.system_id, "parents": [nic1.id]}
-            )
+            handler.create_bridge({"system_id": node.system_id, "parents": [nic1.id]})
 
     def test_create_bridge_locked_raises_permission_error(self):
         user = factory.make_admin()
@@ -4319,9 +4139,7 @@ class TestMachineHandler(MAASServerTestCase):
             "bridge_stp": factory.pick_bool(),
             "bridge_fd": random.randint(0, 15),
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.create_bridge, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.create_bridge, params)
 
     def test_update_interface(self):
         user = factory.make_admin()
@@ -4411,9 +4229,7 @@ class TestMachineHandler(MAASServerTestCase):
             "interface_id": interface.id,
             "name": factory.make_name("name"),
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.update_interface, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.update_interface, params)
 
     def test_delete_interface(self):
         user = factory.make_admin()
@@ -4431,9 +4247,7 @@ class TestMachineHandler(MAASServerTestCase):
         handler = MachineHandler(user, {}, None)
         interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node)
         params = {"system_id": node.system_id, "interface_id": interface.id}
-        self.assertRaises(
-            HandlerPermissionError, handler.delete_interface, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.delete_interface, params)
 
     def test_link_subnet_calls_update_link_by_id_if_link_id(self):
         user = factory.make_admin()
@@ -4552,21 +4366,15 @@ class TestMachineHandler(MAASServerTestCase):
             "interface_id": interface.id,
             "link_id": link_ip.id,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.unlink_subnet, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.unlink_subnet, params)
 
     def test_get_grouped_storages_parses_blockdevices(self):
         user = factory.make_User()
         node = factory.make_Node(owner=user)
         size = random.randint(MIN_BLOCK_DEVICE_SIZE, 1000**3)
         ssd = factory.make_PhysicalBlockDevice(node=node, tags=["ssd"])
-        hdd = factory.make_PhysicalBlockDevice(
-            node=node, tags=["hdd"], size=size
-        )
-        rotary = factory.make_PhysicalBlockDevice(
-            node=node, tags=["rotary"], size=size
-        )
+        hdd = factory.make_PhysicalBlockDevice(node=node, tags=["hdd"], size=size)
+        rotary = factory.make_PhysicalBlockDevice(node=node, tags=["rotary"], size=size)
         handler = MachineHandler(user, {}, None)
         self.assertEqual(
             handler.get_grouped_storages([ssd, hdd, rotary]),
@@ -4589,8 +4397,7 @@ class TestMachineHandler(MAASServerTestCase):
         handler = MachineHandler(user, {}, None)
         node = factory.make_Node(with_boot_disk=False)
         bds = [
-            factory.make_PhysicalBlockDevice(node=node, bootable=True)
-            for _ in range(2)
+            factory.make_PhysicalBlockDevice(node=node, bootable=True) for _ in range(2)
         ]
         ifaces = [factory.make_Interface(node=node) for _ in range(2)]
         testing_script_set = factory.make_ScriptSet(
@@ -4676,9 +4483,7 @@ class TestMachineHandlerCheckPower(MAASTransactionServerTestCase):
         )
         mock_power_query = self.patch(Node, "power_query")
         mock_power_query.return_value = POWER_STATE.ON
-        power_state = yield machine_handler.check_power(
-            {"system_id": node.system_id}
-        )
+        power_state = yield machine_handler.check_power({"system_id": node.system_id})
         self.assertEqual(power_state, POWER_STATE.ON)
 
     @wait_for_reactor
@@ -4689,9 +4494,7 @@ class TestMachineHandlerCheckPower(MAASTransactionServerTestCase):
         node = yield deferToDatabase(transactional(factory.make_Node))
         mock_power_query = self.patch(Node, "power_query")
         mock_power_query.side_effect = UnknownPowerType()
-        power_state = yield machine_handler.check_power(
-            {"system_id": node.system_id}
-        )
+        power_state = yield machine_handler.check_power({"system_id": node.system_id})
         self.assertEqual(power_state, POWER_STATE.UNKNOWN)
 
     @wait_for_reactor
@@ -4702,9 +4505,7 @@ class TestMachineHandlerCheckPower(MAASTransactionServerTestCase):
         node = yield deferToDatabase(transactional(factory.make_Node))
         mock_power_query = self.patch(Node, "power_query")
         mock_power_query.side_effect = NotImplementedError()
-        power_state = yield machine_handler.check_power(
-            {"system_id": node.system_id}
-        )
+        power_state = yield machine_handler.check_power({"system_id": node.system_id})
         self.assertEqual(power_state, POWER_STATE.UNKNOWN)
 
     @wait_for_reactor
@@ -4716,9 +4517,7 @@ class TestMachineHandlerCheckPower(MAASTransactionServerTestCase):
         mock_power_query = self.patch(Node, "power_query")
         mock_power_query.side_effect = factory.make_exception("Error")
         mock_log_err = self.patch(machine_module.log, "err")
-        power_state = yield machine_handler.check_power(
-            {"system_id": node.system_id}
-        )
+        power_state = yield machine_handler.check_power({"system_id": node.system_id})
         self.assertEqual(power_state, POWER_STATE.ERROR)
         mock_log_err.assert_called_once_with(
             ANY, "Failed to update power state of machine."
@@ -4733,9 +4532,7 @@ class TestMachineHandlerMountSpecial(MAASServerTestCase):
         handler = MachineHandler(user, {}, None)
         machine = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=user)
         params = {"system_id": machine.system_id}
-        error = self.assertRaises(
-            HandlerValidationError, handler.mount_special, params
-        )
+        error = self.assertRaises(HandlerValidationError, handler.mount_special, params)
         self.assertEqual(
             dict(error),
             {
@@ -4774,9 +4571,7 @@ class TestMachineHandlerMountSpecial(MAASServerTestCase):
             "fstype": FILESYSTEM_TYPE.RAMFS,
             "mount_point": factory.make_name("path"),
         }
-        error = self.assertRaises(
-            HandlerValidationError, handler.mount_special, params
-        )
+        error = self.assertRaises(HandlerValidationError, handler.mount_special, params)
         self.assertEqual(
             dict(error)[
                 "mount_point"
@@ -4793,9 +4588,7 @@ class TestMachineHandlerMountSpecial(MAASServerTestCase):
             "fstype": FILESYSTEM_TYPE.RAMFS,
             "mount_point": factory.make_absolute_path(),
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.mount_special, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.mount_special, params)
 
 
 class TestMachineHandlerMountSpecialScenarios(MAASServerTestCase):
@@ -4885,9 +4678,7 @@ class TestMachineHandlerUnmountSpecial(MAASServerTestCase):
         error = self.assertRaises(
             HandlerValidationError, handler.unmount_special, params
         )
-        self.assertEqual(
-            {"mount_point": ["This field is required."]}, dict(error)
-        )
+        self.assertEqual({"mount_point": ["This field is required."]}, dict(error))
 
     def test_mount_point_must_be_absolute(self):
         user = factory.make_admin()
@@ -4990,9 +4781,7 @@ class TestMachineHandlerUnmountSpecialScenarios(MAASServerTestCase):
             "system_id": node.system_id,
             "mount_point": filesystem.mount_point,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.unmount_special, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.unmount_special, params)
 
 
 class TestMachineHandlerUpdateFilesystem(MAASServerTestCase):
@@ -5009,9 +4798,7 @@ class TestMachineHandlerUpdateFilesystem(MAASServerTestCase):
             "mount_point": None,
             "mount_options": None,
         }
-        self.assertRaises(
-            HandlerPermissionError, handler.update_filesystem, params
-        )
+        self.assertRaises(HandlerPermissionError, handler.update_filesystem, params)
 
     def test_unmount_blockdevice_filesystem(self):
         user = factory.make_admin()
@@ -5135,9 +4922,7 @@ class TestMachineHandlerUpdateFilesystem(MAASServerTestCase):
                 "mount_point": None,
             }
         )
-        self.assertEqual(
-            new_fstype, block_device.get_effective_filesystem().fstype
-        )
+        self.assertEqual(new_fstype, block_device.get_effective_filesystem().fstype)
 
     def test_change_partition_filesystem(self):
         user = factory.make_admin()
@@ -5160,9 +4945,7 @@ class TestMachineHandlerUpdateFilesystem(MAASServerTestCase):
                 "mount_point": None,
             }
         )
-        self.assertEqual(
-            new_fstype, partition.get_effective_filesystem().fstype
-        )
+        self.assertEqual(new_fstype, partition.get_effective_filesystem().fstype)
 
     def test_new_blockdevice_filesystem(self):
         user = factory.make_admin()
@@ -5183,9 +4966,7 @@ class TestMachineHandlerUpdateFilesystem(MAASServerTestCase):
                 "mount_point": None,
             }
         )
-        self.assertEqual(
-            fstype, block_device.get_effective_filesystem().fstype
-        )
+        self.assertEqual(fstype, block_device.get_effective_filesystem().fstype)
 
     def test_new_partition_filesystem(self):
         user = factory.make_admin()
@@ -5366,9 +5147,7 @@ class TestMachineHandlerSuppressScriptResult(MAASServerTestCase):
 
         script_results = []
         for _ in range(3):
-            script_results.append(
-                factory.make_ScriptResult(script_set=script_set)
-            )
+            script_results.append(factory.make_ScriptResult(script_set=script_set))
 
         handler.set_script_result_suppressed(
             {
@@ -5391,14 +5170,10 @@ class TestMachineHandlerSuppressScriptResult(MAASServerTestCase):
         script_set = factory.make_ScriptSet(node=node)
         script_results = []
         for _ in range(3):
-            script_results.append(
-                factory.make_ScriptResult(script_set=script_set)
-            )
+            script_results.append(factory.make_ScriptResult(script_set=script_set))
         params = {
             "system_id": node.system_id,
-            "script_result_ids": [
-                script_result.id for script_result in script_results
-            ],
+            "script_result_ids": [script_result.id for script_result in script_results],
         }
 
         self.assertRaises(
@@ -5420,9 +5195,7 @@ class TestMachineHandlerSuppressScriptResult(MAASServerTestCase):
 
         script_results = []
         for _ in range(3):
-            script_results.append(
-                factory.make_ScriptResult(script_set=script_set)
-            )
+            script_results.append(factory.make_ScriptResult(script_set=script_set))
 
         handler.set_script_result_unsuppressed(
             {
@@ -5445,14 +5218,10 @@ class TestMachineHandlerSuppressScriptResult(MAASServerTestCase):
         script_set = factory.make_ScriptSet(node=node)
         script_results = []
         for _ in range(3):
-            script_results.append(
-                factory.make_ScriptResult(script_set=script_set)
-            )
+            script_results.append(factory.make_ScriptResult(script_set=script_set))
         params = {
             "system_id": node.system_id,
-            "script_result_ids": [
-                script_result.id for script_result in script_results
-            ],
+            "script_result_ids": [script_result.id for script_result in script_results],
         }
 
         self.assertRaises(
@@ -5484,9 +5253,7 @@ class TestMachineHandlerSuppressScriptResult(MAASServerTestCase):
                     script_result, {}, for_list=True
                 )
                 mapping["id"] = script_result.id
-                expected[script_result.script_set.node.system_id].append(
-                    mapping
-                )
+                expected[script_result.script_set.node.system_id].append(mapping)
             self.assertEqual(actual, expected)
 
     def test_get_latest_failed_testing_script_results_num_queries(self):
@@ -5642,8 +5409,7 @@ class TestMachineHandlerNewSchema(MAASServerTestCase):
         zone1 = factory.make_Zone()
         zone2 = factory.make_Zone()
         zone1_machines = [
-            factory.make_Machine(status=NODE_STATUS.READY, zone=zone1)
-            for _ in range(2)
+            factory.make_Machine(status=NODE_STATUS.READY, zone=zone1) for _ in range(2)
         ]
         # You can't acquire a deployed machine, check it is reported as failed
         deployed_zone1_machine = factory.make_Machine(
@@ -5651,8 +5417,7 @@ class TestMachineHandlerNewSchema(MAASServerTestCase):
         )
         zone1_machines.append(deployed_zone1_machine)
         zone2_machines = [
-            factory.make_Machine(status=NODE_STATUS.READY, zone=zone2)
-            for _ in range(2)
+            factory.make_Machine(status=NODE_STATUS.READY, zone=zone2) for _ in range(2)
         ]
         handler = MachineHandler(user, {}, None)
         params = {
@@ -6188,10 +5953,7 @@ class TestMachineHandlerNewSchema(MAASServerTestCase):
             "ppc64el/generic",
             "s390x/generic",
         ]
-        [
-            factory.make_usable_boot_resource(architecture=arch)
-            for arch in architectures
-        ]
+        [factory.make_usable_boot_resource(architecture=arch) for arch in architectures]
         machines = [
             factory.make_Machine_with_Interface_on_Subnet(
                 architecture=architectures[i % len(architectures)],
@@ -6212,9 +5974,7 @@ class TestMachineHandlerNewSchema(MAASServerTestCase):
                 value,
                 [
                     option["key"]
-                    for option in handler.filter_options(
-                        {"group_key": field_name}
-                    )
+                    for option in handler.filter_options({"group_key": field_name})
                 ],
                 field_name,
             )
@@ -6224,9 +5984,7 @@ class TestMachineHandlerNewSchema(MAASServerTestCase):
                 subset,
                 {
                     option["key"]
-                    for option in handler.filter_options(
-                        {"group_key": field_name}
-                    )
+                    for option in handler.filter_options({"group_key": field_name})
                 },
                 field_name,
             )

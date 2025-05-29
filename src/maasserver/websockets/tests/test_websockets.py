@@ -204,9 +204,7 @@ class TestFrameHelpers(MAASTestCase):
         frame = [b"\x88\x00"]
         frames = list(_parseFrames(frame, needMask=False))
         self.assertEqual(len(frames), 1)
-        self.assertEqual(
-            frames[0], (CONTROLS.CLOSE, (STATUSES.NONE, b""), True)
-        )
+        self.assertEqual(frames[0], (CONTROLS.CLOSE, (STATUSES.NONE, b""), True))
         self.assertEqual(frame, [])
 
     def test_parseCloseReason(self):
@@ -368,9 +366,7 @@ class TestWebSocketsProtocol(MAASTestCase):
             _makeFrame(b"Hello", CONTROLS.TEXT, True, mask=b"abcd")
         )
         self.assertEqual(b"\x81\x05Hello", self.transport.value())
-        self.assertEqual(
-            [(CONTROLS.TEXT, b"Hello", True)], self.receiver.received
-        )
+        self.assertEqual([(CONTROLS.TEXT, b"Hello", True)], self.receiver.received)
 
     def test_ping(self):
         """
@@ -381,9 +377,7 @@ class TestWebSocketsProtocol(MAASTestCase):
             _makeFrame(b"Hello", CONTROLS.PING, True, mask=b"abcd")
         )
         self.assertEqual(b"\x8a\x05Hello", self.transport.value())
-        self.assertEqual(
-            [(CONTROLS.PING, b"Hello", True)], self.receiver.received
-        )
+        self.assertEqual([(CONTROLS.PING, b"Hello", True)], self.receiver.received)
 
     def test_close(self):
         """
@@ -395,9 +389,7 @@ class TestWebSocketsProtocol(MAASTestCase):
                 _makeFrame(b"", CONTROLS.CLOSE, True, mask=b"abcd")
             )
         self.assertFalse(self.transport.connected)
-        self.assertEqual(
-            ["Closing connection: <STATUSES=NONE>"], logger.messages
-        )
+        self.assertEqual(["Closing connection: <STATUSES=NONE>"], logger.messages)
 
     def test_invalidFrame(self):
         """
@@ -465,9 +457,7 @@ class TestWebSocketsProtocolWrapper(MAASTestCase):
         self.protocol.dataReceived(
             _makeFrame(b"Hello", CONTROLS.PONG, True, mask=b"abcd")
         )
-        self.protocol.dataReceived(
-            _makeFrame(b"", CONTROLS.CLOSE, True, mask=b"abcd")
-        )
+        self.protocol.dataReceived(_makeFrame(b"", CONTROLS.CLOSE, True, mask=b"abcd"))
         self.assertEqual(b"", self.accumulatingProtocol.data)
 
     def test_loseConnection(self):
@@ -547,10 +537,7 @@ class TestWebSocketsResource(MAASTestCase):
         self.assertEqual(b"", result)
         self.assertEqual(
             {},
-            {
-                name: value
-                for name, value in request.responseHeaders.getAllRawHeaders()
-            },
+            {name: value for name, value in request.responseHeaders.getAllRawHeaders()},
         )
         self.assertEqual([], request.written)
         self.assertEqual(400, request.responseCode)
@@ -575,9 +562,7 @@ class TestWebSocketsResource(MAASTestCase):
         """
         L{WebSocketsResource.putChild} raises C{RuntimeError} when called.
         """
-        self.assertRaises(
-            RuntimeError, self.resource.putChild, b"foo", Resource()
-        )
+        self.assertRaises(RuntimeError, self.resource.putChild, b"foo", Resource())
 
     def test_IResource(self):
         """
@@ -616,10 +601,7 @@ class TestWebSocketsResource(MAASTestCase):
                 b"Upgrade": [b"WebSocket"],
                 b"Sec-Websocket-Accept": [b"oYBv54i42V5dw6KnZqOFroecUTc="],
             },
-            {
-                name: value
-                for name, value in request.responseHeaders.getAllRawHeaders()
-            },
+            {name: value for name, value in request.responseHeaders.getAllRawHeaders()},
         )
         self.assertEqual([b""], request.written)
         self.assertEqual(101, request.responseCode)
@@ -671,10 +653,7 @@ class TestWebSocketsResource(MAASTestCase):
                 b"Sec-Websocket-Protocol": [b"bar"],
                 b"Sec-Websocket-Accept": [b"oYBv54i42V5dw6KnZqOFroecUTc="],
             },
-            {
-                name: value
-                for name, value in request.responseHeaders.getAllRawHeaders()
-            },
+            {name: value for name, value in request.responseHeaders.getAllRawHeaders()},
         )
         self.assertEqual([b""], request.written)
         self.assertEqual(101, request.responseCode)
@@ -828,10 +807,7 @@ class TestWebSocketsResource(MAASTestCase):
         self.assertEqual(b"", result)
         self.assertEqual(
             {},
-            {
-                name: value
-                for name, value in request.responseHeaders.getAllRawHeaders()
-            },
+            {name: value for name, value in request.responseHeaders.getAllRawHeaders()},
         )
         self.assertEqual([], request.written)
         self.assertEqual(502, request.responseCode)
@@ -866,17 +842,12 @@ class TestWebSocketsResource(MAASTestCase):
                 b"Upgrade": [b"WebSocket"],
                 b"Sec-Websocket-Accept": [b"oYBv54i42V5dw6KnZqOFroecUTc="],
             },
-            {
-                name: value
-                for name, value in request.responseHeaders.getAllRawHeaders()
-            },
+            {name: value for name, value in request.responseHeaders.getAllRawHeaders()},
         )
         self.assertEqual([b""], request.written)
         self.assertEqual(101, request.responseCode)
         self.assertIsNone(request.transport)
-        self.assertIsInstance(
-            transport.protocol.wrappedProtocol, WebSocketsProtocol
-        )
+        self.assertIsInstance(transport.protocol.wrappedProtocol, WebSocketsProtocol)
         self.assertIsInstance(
             transport.protocol.wrappedProtocol._receiver, SavingEchoReceiver
         )
@@ -954,6 +925,4 @@ class TestWebSocketsResource(MAASTestCase):
         result = self.resource.render(request)
         self.assertEqual(NOT_DONE_YET, result)
         self.assertIsInstance(transport.protocol, WebSocketsProtocolWrapper)
-        self.assertIsInstance(
-            transport.protocol.wrappedProtocol, AccumulatingProtocol
-        )
+        self.assertIsInstance(transport.protocol.wrappedProtocol, AccumulatingProtocol)

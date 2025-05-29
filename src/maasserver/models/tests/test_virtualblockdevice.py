@@ -29,9 +29,7 @@ class TestVirtualBlockDeviceManager(MAASServerTestCase):
         )
         self.assertCountEqual(
             [],
-            VirtualBlockDevice.objects.filter(
-                filesystem_group=filesystem_group
-            ),
+            VirtualBlockDevice.objects.filter(filesystem_group=filesystem_group),
         )
 
     def test_create_or_update_for_raid_creates_block_device(self):
@@ -104,9 +102,7 @@ class TestVirtualBlockDeviceManager(MAASServerTestCase):
         # This also tests the post_save signal on `BlockDevice`. Because the
         # filesystem_group.save() does not need to be called here. The
         # post_save performs that operation.
-        self.assertEqual(
-            new_size, reload_object(filesystem_group.virtual_device).size
-        )
+        self.assertEqual(new_size, reload_object(filesystem_group.virtual_device).size)
 
 
 class TestVirtualBlockDevice(MAASServerTestCase):
@@ -167,8 +163,7 @@ class TestVirtualBlockDevice(MAASServerTestCase):
             ValidationError,
             re.escape(
                 "{'__all__': ['There is not enough free space (%s) "
-                "on volume group %s.']}"
-                % (human_readable_size, filesystem_group.name)
+                "on volume group %s.']}" % (human_readable_size, filesystem_group.name)
             ),
         ):
             factory.make_VirtualBlockDevice(
@@ -194,9 +189,7 @@ class TestVirtualBlockDevice(MAASServerTestCase):
             if not block_device.is_boot_disk()
         ]
         virtualblockdevice = node.virtualblockdevice_set.first()
-        self.assertEqual(
-            len(fs_group_disks), len(virtualblockdevice.get_parents())
-        )
+        self.assertEqual(len(fs_group_disks), len(virtualblockdevice.get_parents()))
 
     def test_get_parents_handles_cache_set(self):
         # Regression test for lp1519397

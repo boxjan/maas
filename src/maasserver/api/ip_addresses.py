@@ -115,8 +115,7 @@ class IPAddressesHandler(OperationsHandler):
                 raise MAASAPIBadRequest(
                     "MAC address %s already belongs to %s. Use of the "
                     "interface API is required, for an interface that belongs "
-                    "to a node."
-                    % (nic.mac_address, nic.node_config.node.hostname)
+                    "to a node." % (nic.mac_address, nic.node_config.node.hostname)
                 )
 
             # Link the new interface on the same subnet as the
@@ -208,14 +207,10 @@ class IPAddressesHandler(OperationsHandler):
         if ip is not None:
             subnet = Subnet.objects.get_best_subnet_for_ip(ip)
             if subnet is None:
-                raise MAASAPIBadRequest(
-                    "No known subnet for IP address: %s." % ip
-                )
+                raise MAASAPIBadRequest("No known subnet for IP address: %s." % ip)
         elif subnet is not None:
             try:
-                subnet = Subnet.objects.get_object_by_specifiers_or_raise(
-                    subnet
-                )
+                subnet = Subnet.objects.get_object_by_specifiers_or_raise(subnet)
             except Http404:
                 raise MAASAPIBadRequest(
                     "Unable to identify subnet: %s." % subnet
@@ -225,9 +220,7 @@ class IPAddressesHandler(OperationsHandler):
                 "Must supply either the 'subnet' or the 'ip' parameter."
             )
 
-        return self._claim_ip(
-            request.user, subnet, ip, mac_address, hostname=hostname
-        )
+        return self._claim_ip(request.user, subnet, ip, mac_address, hostname=hostname)
 
     @operation(idempotent=False)
     def release(self, request):
@@ -265,8 +258,7 @@ class IPAddressesHandler(OperationsHandler):
         if force is True and not request.user.is_superuser:
             return HttpResponseForbidden(
                 content_type="text/plain",
-                content="Force-releasing an IP address requires admin "
-                "privileges.",
+                content="Force-releasing an IP address requires admin " "privileges.",
             )
 
         form = ReleaseIPForm(request.POST)
@@ -373,8 +365,7 @@ class IPAddressesHandler(OperationsHandler):
         if _all and not request.user.is_superuser:
             return HttpResponseForbidden(
                 content_type="text/plain",
-                content="Listing all IP addresses requires admin "
-                "privileges.",
+                content="Listing all IP addresses requires admin " "privileges.",
             )
         if owner is not None and not request.user.is_superuser:
             return HttpResponseForbidden(

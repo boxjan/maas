@@ -97,9 +97,7 @@ class AssertNetworkConfigMixin:
                     subnet["address"] = "*match*"
         return config
 
-    def assertNetworkConfig(
-        self, expected, output, strip_macs=False, strip_ips=False
-    ):
+    def assertNetworkConfig(self, expected, output, strip_macs=False, strip_ips=False):
         output = output[0]
         output = yaml.safe_load(output)
         self.assertEqual(
@@ -121,9 +119,9 @@ class AssertNetworkConfigMixin:
         self.assertEqual(output_network, expected_network)
 
     def collect_interface_config(self, node, filter="physical"):
-        interfaces = node.current_config.interface_set.filter(
-            enabled=True
-        ).order_by("name")
+        interfaces = node.current_config.interface_set.filter(enabled=True).order_by(
+            "name"
+        )
         if filter:
             interfaces = interfaces.filter(type=filter)
 
@@ -179,10 +177,7 @@ class AssertNetworkConfigMixin:
                 return True
             elif len(addresses) == 1:
                 address = addresses[0]
-                if (
-                    address.alloc_type == IPADDRESS_TYPE.STICKY
-                    and not address.ip
-                ):
+                if address.alloc_type == IPADDRESS_TYPE.STICKY and not address.ip:
                     return True
             return False
 
@@ -254,9 +249,7 @@ class AssertNetworkConfigMixin:
                             for dns_server in subnet.dns_servers:
                                 ret += "    - %s\n" % dns_server
                             ret += "    dns_search:\n"
-                            for domain in self.get_dns_search_list(
-                                node.domain.name
-                            ):
+                            for domain in self.get_dns_search_list(node.domain.name):
                                 ret += "    - %s\n" % domain
                 dhcp_types = set()
                 for dhcp_ip in iface.ip_addresses.filter(
@@ -302,9 +295,7 @@ class AssertNetworkConfigMixin:
 
     def get_dns_search_list(self, domain_name):
         return [domain_name] + [
-            name
-            for name in sorted(get_dns_search_paths())
-            if name != domain_name
+            name for name in sorted(get_dns_search_paths()) if name != domain_name
         ]
 
 
@@ -424,9 +415,7 @@ class TestVLANNetworkLayout(MAASServerTestCase, AssertNetworkConfigMixin):
         self.assertNetworkConfig(net_config, config)
 
 
-class TestVLANOnBondNetworkLayout(
-    MAASServerTestCase, AssertNetworkConfigMixin
-):
+class TestVLANOnBondNetworkLayout(MAASServerTestCase, AssertNetworkConfigMixin):
     def test_renders_expected_output(self):
         node = factory.make_Node_with_Interface_on_Subnet(interface_count=2)
         phys_ifaces = list(node.current_config.interface_set.all())
@@ -489,11 +478,7 @@ class TestDHCPNetworkLayout(MAASServerTestCase, AssertNetworkConfigMixin):
                         "name": iface.name,
                         "type": "physical",
                         "subnets": [
-                            {
-                                "type": "dhcp4"
-                                if self.ip_version == 4
-                                else "dhcp6"
-                            }
+                            {"type": "dhcp4" if self.ip_version == 4 else "dhcp6"}
                         ],
                     }
                 ],
@@ -599,9 +584,7 @@ class TestNetplan(MAASServerTestCase):
 
     def test_single_ethernet_interface(self):
         node = factory.make_Node()
-        factory.make_Interface(
-            node=node, name="eth0", mac_address="00:01:02:03:04:05"
-        )
+        factory.make_Interface(node=node, name="eth0", mac_address="00:01:02:03:04:05")
         netplan = self._render_netplan_dict(node)
         expected_netplan = {
             "network": OrderedDict(
@@ -624,9 +607,7 @@ class TestNetplan(MAASServerTestCase):
 
     def test_interface_with_accept_ra(self):
         node = factory.make_Node()
-        factory.make_Interface(
-            node=node, name="eth0", params={"accept-ra": True}
-        )
+        factory.make_Interface(node=node, name="eth0", params={"accept-ra": True})
         netplan = self._render_netplan_dict(node)
         v1_config = self._render_v1_dict(node)
         self.assertTrue(netplan["network"]["ethernets"]["eth0"]["accept-ra"])
@@ -634,12 +615,8 @@ class TestNetplan(MAASServerTestCase):
 
     def test_multiple_ethernet_interfaces(self):
         node = factory.make_Node()
-        factory.make_Interface(
-            node=node, name="eth0", mac_address="00:01:02:03:04:05"
-        )
-        factory.make_Interface(
-            node=node, name="eth1", mac_address="02:01:02:03:04:05"
-        )
+        factory.make_Interface(node=node, name="eth0", mac_address="00:01:02:03:04:05")
+        factory.make_Interface(node=node, name="eth1", mac_address="02:01:02:03:04:05")
         netplan = self._render_netplan_dict(node)
         expected_netplan = {
             "network": OrderedDict(
@@ -1270,9 +1247,7 @@ class TestNetplan(MAASServerTestCase):
             metric=43,
         )
         # Make sure we know when and where the default DNS server will be used.
-        get_default_dns_servers_mock = self.patch(
-            node, "get_default_dns_servers"
-        )
+        get_default_dns_servers_mock = self.patch(node, "get_default_dns_servers")
         nameserver_addresses = ["127.0.0.2"]
         get_default_dns_servers_mock.return_value = nameserver_addresses
         domain = Domain.objects.first()
@@ -1488,9 +1463,7 @@ class TestNetplan(MAASServerTestCase):
             alloc_type=IPADDRESS_TYPE.STICKY,
         )
         # Make sure we know when and where the default DNS server will be used.
-        get_default_dns_servers_mock = self.patch(
-            node, "get_default_dns_servers"
-        )
+        get_default_dns_servers_mock = self.patch(node, "get_default_dns_servers")
         get_default_dns_servers_mock.return_value = ["127.0.0.2"]
         domain = Domain.objects.first()
         domain2 = factory.make_Domain()
@@ -1745,9 +1718,7 @@ class TestNetplan(MAASServerTestCase):
             alloc_type=IPADDRESS_TYPE.AUTO,
         )
         # Make sure we know when and where the default DNS server will be used.
-        get_default_dns_servers_mock = self.patch(
-            node, "get_default_dns_servers"
-        )
+        get_default_dns_servers_mock = self.patch(node, "get_default_dns_servers")
         get_default_dns_servers_mock.return_value = ["10.0.0.1"]
         netplan = self._render_netplan_dict(node)
         expected_netplan = {
@@ -1870,9 +1841,7 @@ class TestNetplan(MAASServerTestCase):
             alloc_type=IPADDRESS_TYPE.AUTO,
         )
         # Make sure we know when and where the default DNS server will be used.
-        get_default_dns_servers_mock = self.patch(
-            node, "get_default_dns_servers"
-        )
+        get_default_dns_servers_mock = self.patch(node, "get_default_dns_servers")
         get_default_dns_servers_mock.return_value = ["10.0.0.1"]
         netplan = self._render_netplan_dict(node)
         expected_netplan = {
@@ -1945,9 +1914,7 @@ class TestNetplan(MAASServerTestCase):
         r1 = factory.make_RegionRackController(interface=False)
         self.patch(server_address.MAAS_ID, "get").return_value = r1.system_id
         r2 = factory.make_RegionRackController(interface=False)
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r2
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=vlan, node=r2)
         subnet = factory.make_Subnet(
             cidr="10.0.0.0/24", gateway_ip="10.0.0.1", dns_servers=[]
         )
@@ -1958,9 +1925,7 @@ class TestNetplan(MAASServerTestCase):
             alloc_type=IPADDRESS_TYPE.STICKY,
         )
         vlan = factory.make_VLAN()
-        factory.make_Subnet(
-            cidr="10.0.1.0/24", gateway_ip="10.0.1.1", dns_servers=[]
-        )
+        factory.make_Subnet(cidr="10.0.1.0/24", gateway_ip="10.0.1.1", dns_servers=[])
         node_eth0 = factory.make_Interface(
             node=node, name="eth0", mac_address="00:01:02:03:04:05", vlan=vlan
         )
@@ -2010,9 +1975,7 @@ class TestNetplan(MAASServerTestCase):
         subnet = factory.make_Subnet(dns_servers=[], vlan=vlan)
         rack = factory.make_RackController(subnet=subnet)
         rack_iface = rack.current_config.interface_set.first()
-        rack_ip = factory.make_StaticIPAddress(
-            subnet=subnet, interface=rack_iface
-        )
+        rack_ip = factory.make_StaticIPAddress(subnet=subnet, interface=rack_iface)
 
         # this will normally try to resolve localhost against the system,
         # this is a problem if the host has IPv6 but no localhost entry for v6
@@ -2063,9 +2026,7 @@ class TestNetplan(MAASServerTestCase):
         subnet2 = factory.make_Subnet(dns_servers=[], vlan=vlan, version=4)
         rack = factory.make_RackController(subnet=subnet1)
         rack_iface = rack.current_config.interface_set.first()
-        rack_ip1 = factory.make_StaticIPAddress(
-            subnet=subnet1, interface=rack_iface
-        )
+        rack_ip1 = factory.make_StaticIPAddress(subnet=subnet1, interface=rack_iface)
         factory.make_StaticIPAddress(subnet=subnet2, interface=rack_iface)
         vlan.primary_rack = rack
         vlan.save()
@@ -2113,9 +2074,7 @@ class TestNetplan(MAASServerTestCase):
                         node.boot_interface.name: {
                             "mtu": 1500,
                             "match": {
-                                "macaddress": str(
-                                    node.boot_interface.mac_address
-                                )
+                                "macaddress": str(node.boot_interface.mac_address)
                             },
                             "set-name": node.boot_interface.name,
                             "gateway%d" % subnet_ver: subnet.gateway_ip,

@@ -13,9 +13,7 @@ from provisioningserver.utils.env import (
     MAAS_UUID,
 )
 
-dev_root = Path(
-    Path(importlib.util.find_spec("maastesting").origin).parents[2]
-)
+dev_root = Path(Path(importlib.util.find_spec("maastesting").origin).parents[2])
 
 
 @pytest.fixture(autouse=True)

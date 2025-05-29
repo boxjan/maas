@@ -36,22 +36,16 @@ class TestFabricHandler(MAASServerTestCase):
             interface = node.get_boot_interface()
             interface.vlan = vlan
             interface.save()
-        self.assertEqual(
-            self.dehydrate_fabric(fabric), handler.get({"id": fabric.id})
-        )
+        self.assertEqual(self.dehydrate_fabric(fabric), handler.get({"id": fabric.id}))
 
     def test_get_default_vlan_is_first(self):
         user = factory.make_User()
         handler = FabricHandler(user, {}, None)
         fabric = factory.make_Fabric()
         default_vlan = fabric.get_default_vlan()
-        tagged_vlan_ids = [
-            factory.make_VLAN(fabric=fabric).id for _ in range(3)
-        ]
+        tagged_vlan_ids = [factory.make_VLAN(fabric=fabric).id for _ in range(3)]
         observed = handler.get({"id": fabric.id})
-        self.assertEqual(
-            [default_vlan.id] + tagged_vlan_ids, observed["vlan_ids"]
-        )
+        self.assertEqual([default_vlan.id] + tagged_vlan_ids, observed["vlan_ids"])
 
     def test_list(self):
         user = factory.make_User()

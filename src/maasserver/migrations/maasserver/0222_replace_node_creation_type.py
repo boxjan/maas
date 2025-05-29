@@ -7,9 +7,7 @@ CREATION_TYPE_DYNAMIC = 3
 
 def fill_node_dynamic(apps, schema_editor):
     Node = apps.get_model("maasserver", "Node")
-    Node.objects.filter(creation_type=CREATION_TYPE_DYNAMIC).update(
-        dynamic=True
-    )
+    Node.objects.filter(creation_type=CREATION_TYPE_DYNAMIC).update(dynamic=True)
 
 
 class Migration(migrations.Migration):

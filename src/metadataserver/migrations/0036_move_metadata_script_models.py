@@ -46,9 +46,7 @@ class Migration(migrations.Migration):
                 ),
             ],
             database_operations=[
-                migrations.AlterModelTable(
-                    name="Script", table="maasserver_script"
-                ),
+                migrations.AlterModelTable(name="Script", table="maasserver_script"),
                 migrations.AlterModelTable(
                     name="ScriptResult", table="maasserver_scriptresult"
                 ),

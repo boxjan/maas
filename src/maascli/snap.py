@@ -109,9 +109,7 @@ ARGUMENTS = OrderedDict(
             "enable-debug",
             {
                 "action": "store_true",
-                "help": (
-                    "Enable debug mode for detailed error and log reporting."
-                ),
+                "help": ("Enable debug mode for detailed error and log reporting."),
                 "for_mode": ["region+rack", "region"],
             },
         ),
@@ -251,9 +249,7 @@ def set_rpc_secret(secret):
             secret_path.unlink()
 
 
-def print_config(
-    parsable=False, show_database_password=False, show_secret=False
-):
+def print_config(parsable=False, show_database_password=False, show_secret=False):
     """Print the config output."""
     current_mode = get_current_mode()
     config = MAASConfiguration().get()
@@ -346,9 +342,7 @@ def migrate_db(capture=False):
 def clear_line():
     """Resets the current line when in a terminal."""
     if sys.stdout.isatty():
-        print_msg(
-            "\r" + " " * int(os.environ.get("COLUMNS", 0)), newline=False
-        )
+        print_msg("\r" + " " * int(os.environ.get("COLUMNS", 0)), newline=False)
 
 
 def perform_work(msg, cmd, *args, **kwargs):
@@ -465,9 +459,7 @@ def get_database_settings(options):
     # parse_dsn gives very confusing error messages if you pass in
     # an invalid URI, so let's make sure the URI is of the form
     # postgres://... before calling parse_dsn.
-    if database_uri != MAAS_TEST_DB_URI and not database_uri.startswith(
-        "postgres://"
-    ):
+    if database_uri != MAAS_TEST_DB_URI and not database_uri.startswith("postgres://"):
         raise DatabaseSettingsError(
             f"Database URI needs to be either '{MAAS_TEST_DB_URI}' or "
             "start with 'postgres://'"
@@ -477,9 +469,7 @@ def get_database_settings(options):
     try:
         parsed_dsn = parse_dsn(database_uri)
     except psycopg2.ProgrammingError as error:
-        raise DatabaseSettingsError(
-            "Error parsing database URI: " + str(error).strip()
-        )
+        raise DatabaseSettingsError("Error parsing database URI: " + str(error).strip())
     unsupported_params = set(parsed_dsn.keys()).difference(
         ["user", "password", "host", "dbname", "port"]
     )
@@ -588,9 +578,7 @@ class cmd_init(SnapCommand):
         subparsers_map["region+rack"] = subparsers.add_parser(
             "region+rack",
             help="Both region and rack controllers",
-            description=(
-                "Initialise MAAS to run both a region and rack controller."
-            ),
+            description=("Initialise MAAS to run both a region and rack controller."),
         )
         subparsers_map["region"] = subparsers.add_parser(
             "region",
@@ -606,9 +594,7 @@ class cmd_init(SnapCommand):
             kwargs = kwargs.copy()
             for_modes = kwargs.pop("for_mode")
             for for_mode in for_modes:
-                subparsers_map[for_mode].add_argument(
-                    "--%s" % argument, **kwargs
-                )
+                subparsers_map[for_mode].add_argument("--%s" % argument, **kwargs)
 
         for for_mode in ("region+rack", "region", "rack"):
             subparsers_map[for_mode].add_argument(
@@ -625,9 +611,7 @@ class cmd_init(SnapCommand):
             subparsers_map[for_mode].add_argument(
                 "--skip-admin", action="store_true", help=argparse.SUPPRESS
             )
-            add_create_admin_options(
-                subparsers_map[for_mode], suppress_help=True
-            )
+            add_create_admin_options(subparsers_map[for_mode], suppress_help=True)
 
     def handle(self, options):
         if os.getuid() != 0:
@@ -861,9 +845,7 @@ class cmd_config(SnapCommand):
                     and getattr(options, flag) is not False
                 )
                 for flag in (
-                    ("secret",)
-                    + self.setting_flags
-                    + tuple(self.optional_flags.keys())
+                    ("secret",) + self.setting_flags + tuple(self.optional_flags.keys())
                 )
             )
 
@@ -886,8 +868,7 @@ class cmd_config(SnapCommand):
             for flag in self.setting_flags:
                 flag_value = getattr(options, flag)
                 should_update = (
-                    flag_value is not None
-                    and current_config.get(flag) != flag_value
+                    flag_value is not None and current_config.get(flag) != flag_value
                 )
                 if should_update:
                     config_manager.update({flag: flag_value})
@@ -951,8 +932,7 @@ class cmd_status(SnapCommand):
                 print_msg(output, newline=False)
             else:
                 print_msg(
-                    f"Pebble exited with error code {ret} "
-                    "and the following output:"
+                    f"Pebble exited with error code {ret} " "and the following output:"
                 )
                 print_msg(output, newline=False)
                 sys.exit(ret)
@@ -965,9 +945,7 @@ class cmd_migrate(SnapCommand):
         super().__init__(parser)
         # '--configure' is hidden and only called from snap hooks to update the
         # database when running in "all" mode
-        parser.add_argument(
-            "--configure", action="store_true", help=argparse.SUPPRESS
-        )
+        parser.add_argument("--configure", action="store_true", help=argparse.SUPPRESS)
 
     def handle(self, options):
         if os.getuid() != 0:

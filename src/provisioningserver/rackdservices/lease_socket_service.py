@@ -40,9 +40,7 @@ class LeaseSocketService(Service, DatagramProtocol):
         self.reactor = reactor
         self.address = get_socket_path()
         self.notifications = deque()
-        self.processor = task.LoopingCall(
-            self.processNotifications, clock=self.reactor
-        )
+        self.processor = task.LoopingCall(self.processNotifications, clock=self.reactor)
 
     def startService(self):
         """Start the service."""
@@ -124,8 +122,7 @@ class LeaseSocketService(Service, DatagramProtocol):
                 yield pause(wait, clock)
         else:
             maaslog.error(
-                "Can't send DHCP lease information, no RPC "
-                "connection to region."
+                "Can't send DHCP lease information, no RPC " "connection to region."
             )
             return
 

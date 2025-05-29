@@ -482,9 +482,7 @@ class TestSimpleMBRLayout(MAASServerTestCase, AssertStorageConfigMixin):
     )
 
     def test_renders_expected_output(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, with_boot_disk=False
-        )
+        node = factory.make_Node(status=NODE_STATUS.ALLOCATED, with_boot_disk=False)
         boot_disk = factory.make_PhysicalBlockDevice(
             node=node,
             size=8 * 1024**3,
@@ -570,9 +568,7 @@ class TestSimpleMBRLayout(MAASServerTestCase, AssertStorageConfigMixin):
         self.assertStorageConfig(self.STORAGE_CONFIG, config)
 
 
-class TestSimpleWithEmptyDiskLayout(
-    MAASServerTestCase, AssertStorageConfigMixin
-):
+class TestSimpleWithEmptyDiskLayout(MAASServerTestCase, AssertStorageConfigMixin):
     STORAGE_CONFIG = dedent(
         """\
         config:
@@ -613,9 +609,7 @@ class TestSimpleWithEmptyDiskLayout(
     )
 
     def test_renders_expected_output(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, with_boot_disk=False
-        )
+        node = factory.make_Node(status=NODE_STATUS.ALLOCATED, with_boot_disk=False)
         boot_disk = factory.make_PhysicalBlockDevice(
             node=node,
             size=8 * 1024**3,
@@ -695,9 +689,7 @@ class TestMBRWithBootDiskWithoutPartitionsLayout(
     )
 
     def test_renders_expected_output(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.ALLOCATED, with_boot_disk=False
-        )
+        node = factory.make_Node(status=NODE_STATUS.ALLOCATED, with_boot_disk=False)
         first_disk = factory.make_PhysicalBlockDevice(
             node=node,
             size=8 * 1024**3,
@@ -829,9 +821,7 @@ class TestGPTWithBootDiskWithoutPartitionsLayout(
         self.assertStorageConfig(self.STORAGE_CONFIG, config)
 
 
-class TestGPTPXELargeBootDiskLayout(
-    MAASServerTestCase, AssertStorageConfigMixin
-):
+class TestGPTPXELargeBootDiskLayout(MAASServerTestCase, AssertStorageConfigMixin):
     STORAGE_CONFIG = dedent(
         """\
         config:
@@ -895,9 +885,7 @@ class TestGPTPXELargeBootDiskLayout(
             partition_table=partition_table,
             uuid="6efc2c3d-bc9d-4ee5-a7ed-c6e1574d5398",
             size=(
-                (8 * 1024**3)
-                - PARTITION_TABLE_EXTRA_SPACE
-                - BIOS_GRUB_PARTITION_SIZE
+                (8 * 1024**3) - PARTITION_TABLE_EXTRA_SPACE - BIOS_GRUB_PARTITION_SIZE
             ),
             bootable=False,
         )
@@ -1248,9 +1236,7 @@ class TestComplexDiskLayout(MAASServerTestCase, AssertStorageConfigMixin):
             uuid="f98e5b7b-cbb1-437e-b4e5-1769f81f969f",
             label="boot",
             mount_point="/boot",
-            mount_options=(
-                "rw,relatime,block_invalidity,barrier,user_xattr,acl"
-            ),
+            mount_options=("rw,relatime,block_invalidity,barrier,user_xattr,acl"),
         )
         ssd_partition_table = factory.make_PartitionTable(
             table_type=PARTITION_TABLE_TYPE.GPT, block_device=ssd_disk
@@ -1391,11 +1377,7 @@ class TestSimplePower8Layout(MAASServerTestCase, AssertStorageConfigMixin):
         root_partition = factory.make_Partition(
             partition_table=partition_table,
             uuid="f74ff260-2a5b-4a36-b1b8-37f746b946bf",
-            size=(
-                (8 * 1024**3)
-                - PARTITION_TABLE_EXTRA_SPACE
-                - PREP_PARTITION_SIZE
-            ),
+            size=((8 * 1024**3) - PARTITION_TABLE_EXTRA_SPACE - PREP_PARTITION_SIZE),
             bootable=False,
         )
         factory.make_Filesystem(
@@ -1489,9 +1471,7 @@ class TestPower8ExtraSpaceLayout(MAASServerTestCase, AssertStorageConfigMixin):
         self.assertStorageConfig(self.STORAGE_CONFIG, config)
 
 
-class TestPower8NoPartitionTableLayout(
-    MAASServerTestCase, AssertStorageConfigMixin
-):
+class TestPower8NoPartitionTableLayout(MAASServerTestCase, AssertStorageConfigMixin):
     STORAGE_CONFIG = dedent(
         """\
         config:
@@ -1572,11 +1552,7 @@ class TestPower8NoPartitionTableLayout(
         root_partition = factory.make_Partition(
             partition_table=partition_table,
             uuid="f74ff260-2a5b-4a36-b1b8-37f746b946bf",
-            size=(
-                (8 * 1024**3)
-                - PARTITION_TABLE_EXTRA_SPACE
-                - PREP_PARTITION_SIZE
-            ),
+            size=((8 * 1024**3) - PARTITION_TABLE_EXTRA_SPACE - PREP_PARTITION_SIZE),
             bootable=False,
         )
         factory.make_Filesystem(
@@ -1633,9 +1609,7 @@ class TestMountOrdering(MAASServerTestCase):
         # shuffle the lists of partitions and mount points to eliminate
         # implicit ordering.
         filesystems = [  # noqa
-            factory.make_Filesystem(
-                partition=partition, mount_point=mount_point
-            )
+            factory.make_Filesystem(partition=partition, mount_point=mount_point)
             for mount_point, partition in zip(
                 shuffled(mount_points), shuffled(partitions)
             )
@@ -1644,9 +1618,7 @@ class TestMountOrdering(MAASServerTestCase):
         [config] = compose_curtin_storage_config(node)
         devices = yaml.safe_load(config)["storage"]["config"]
         mounts = [element for element in devices if element["type"] == "mount"]
-        self.assertEqual(
-            ["/"] + mount_points, [mount["path"] for mount in mounts]
-        )
+        self.assertEqual(["/"] + mount_points, [mount["path"] for mount in mounts])
 
 
 class TestBootableRaidLayoutMBR(MAASServerTestCase, AssertStorageConfigMixin):
@@ -1759,9 +1731,7 @@ class TestBootableRaidLayoutMBR(MAASServerTestCase, AssertStorageConfigMixin):
                 name="sd" + letter,
             )
             table_type = (
-                PARTITION_TABLE_TYPE.MBR
-                if letter == "a"
-                else PARTITION_TABLE_TYPE.GPT
+                PARTITION_TABLE_TYPE.MBR if letter == "a" else PARTITION_TABLE_TYPE.GPT
             )
             part_table = factory.make_PartitionTable(
                 table_type=table_type, block_device=disk
@@ -2421,9 +2391,7 @@ class TestVMFS(MAASServerTestCase, AssertStorageConfigMixin):
             serial="serial-c",
         )
         extra_datastore_part = extra_datastore_disk.create_partition()
-        VMFS.objects.create_vmfs(
-            name="datastore2", partitions=[extra_datastore_part]
-        )
+        VMFS.objects.create_vmfs(name="datastore2", partitions=[extra_datastore_part])
 
         node._create_acquired_filesystems()
         config = compose_curtin_storage_config(node)

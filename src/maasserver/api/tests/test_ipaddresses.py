@@ -20,18 +20,14 @@ from maasserver.utils.orm import reload_object, transactional
 
 class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
     def test_handler_path(self):
-        self.assertEqual(
-            "/MAAS/api/2.0/ipaddresses/", reverse("ipaddresses_handler")
-        )
+        self.assertEqual("/MAAS/api/2.0/ipaddresses/", reverse("ipaddresses_handler"))
 
     def test_GET_returns_ipaddresses(self):
         original_ipaddress = factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.USER_RESERVED, user=self.user
         )
         response = self.client.get(reverse("ipaddresses_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(1, len(parsed_result), response.content)
@@ -58,9 +54,7 @@ class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
 
     def test_GET_returns_empty_if_no_ipaddresses(self):
         response = self.client.get(reverse("ipaddresses_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual([], json_load_bytes(response.content))
 
     def test_GET_only_returns_request_users_addresses(self):
@@ -71,9 +65,7 @@ class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
             alloc_type=IPADDRESS_TYPE.USER_RESERVED, user=factory.make_User()
         )
         response = self.client.get(reverse("ipaddresses_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         [returned_address] = parsed_result
         self.assertEqual(ipaddress.ip, returned_address["ip"])
@@ -85,13 +77,9 @@ class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
         factory.make_StaticIPAddress(
             alloc_type=IPADDRESS_TYPE.USER_RESERVED, user=factory.make_User()
         )
-        response = self.client.get(
-            reverse("ipaddresses_handler"), {"all": "1"}
-        )
+        response = self.client.get(reverse("ipaddresses_handler"), {"all": "1"})
         if self.user.is_superuser:
-            self.assertEqual(
-                http.client.OK, response.status_code, response.content
-            )
+            self.assertEqual(http.client.OK, response.status_code, response.content)
             parsed_result = json_load_bytes(response.content)
             self.assertEqual(len(parsed_result), 2)
         else:
@@ -117,9 +105,7 @@ class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
             reverse("ipaddresses_handler"), {"owner": user2.username}
         )
         if self.user.is_superuser:
-            self.assertEqual(
-                http.client.OK, response.status_code, response.content
-            )
+            self.assertEqual(http.client.OK, response.status_code, response.content)
             parsed_result = json_load_bytes(response.content)
             self.assertEqual(len(parsed_result), 1)
             self.assertEqual(ipaddress2.ip, parsed_result[0]["ip"])
@@ -147,9 +133,7 @@ class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
             {"ip": str(ipaddress2.ip), "all": "true"},
         )
         if self.user.is_superuser:
-            self.assertEqual(
-                http.client.OK, response.status_code, response.content
-            )
+            self.assertEqual(http.client.OK, response.status_code, response.content)
             parsed_result = json_load_bytes(response.content)
             self.assertEqual(len(parsed_result), 1)
             self.assertEqual(ipaddress2.ip, parsed_result[0]["ip"])
@@ -165,13 +149,9 @@ class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
     def test_GET_with_all_for_admin_returns_non_user_reserved_types(self):
         factory.make_StaticIPAddress(alloc_type=IPADDRESS_TYPE.STICKY)
         factory.make_StaticIPAddress(alloc_type=IPADDRESS_TYPE.USER_RESERVED)
-        response = self.client.get(
-            reverse("ipaddresses_handler"), {"all": "true"}
-        )
+        response = self.client.get(reverse("ipaddresses_handler"), {"all": "true"})
         if self.user.is_superuser:
-            self.assertEqual(
-                http.client.OK, response.status_code, response.content
-            )
+            self.assertEqual(http.client.OK, response.status_code, response.content)
             parsed_result = json_load_bytes(response.content)
             self.assertEqual(len(parsed_result), 2)
         else:
@@ -193,9 +173,7 @@ class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
         response = self.client.get(
             reverse("ipaddresses_handler"), {"ip": str(ipaddress2.ip)}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(len(parsed_result), 1)
         self.assertEqual(ipaddress2.ip, parsed_result[0]["ip"])
@@ -209,13 +187,10 @@ class TestIPAddressesAPI(APITestCase.ForUserAndAdmin):
                 )
             )
         response = self.client.get(reverse("ipaddresses_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         expected = [
-            addr.ip
-            for addr in sorted(addrs, key=lambda addr: getattr(addr, "id"))
+            addr.ip for addr in sorted(addrs, key=lambda addr: getattr(addr, "id"))
         ]
         observed = [result["ip"] for result in parsed_result]
         self.assertEqual(expected, observed)
@@ -324,12 +299,8 @@ class TestIPAddressesReleaseAPI(APITransactionTestCase.ForUserAndAdmin):
     @transactional
     def test_POST_release_allows_admin_to_release_discovered_ip(self):
         # Make an "orphaned" IP address, like the one in bug #1630034.
-        static_ip = factory.make_StaticIPAddress(
-            alloc_type=IPADDRESS_TYPE.DISCOVERED
-        )
-        response = self.post_release_request(
-            str(static_ip.ip), discovered=True
-        )
+        static_ip = factory.make_StaticIPAddress(alloc_type=IPADDRESS_TYPE.DISCOVERED)
+        response = self.post_release_request(str(static_ip.ip), discovered=True)
         if self.expect_forbidden:
             self.assertEqual(http.client.FORBIDDEN, response.status_code)
             self.assertEqual(
@@ -351,15 +322,11 @@ class TestIPAddressesReleaseAPI(APITransactionTestCase.ForUserAndAdmin):
         self,
     ):
         # Make an "orphaned" IP address, like the one in bug #1898122.
-        static_ip = factory.make_StaticIPAddress(
-            alloc_type=IPADDRESS_TYPE.DISCOVERED
-        )
+        static_ip = factory.make_StaticIPAddress(alloc_type=IPADDRESS_TYPE.DISCOVERED)
         interface = factory.make_Interface()
         interface.ip_addresses.add(static_ip)
 
-        response = self.post_release_request(
-            str(static_ip.ip), discovered=True
-        )
+        response = self.post_release_request(str(static_ip.ip), discovered=True)
         if self.expect_forbidden:
             self.assertEqual(http.client.FORBIDDEN, response.status_code)
             self.assertEqual(
@@ -473,9 +440,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
             http.client.BAD_REQUEST, response.status_code, response.content
         )
         expected = "Unable to identify subnet: %s." % str(net)
-        self.assertEqual(
-            expected.encode(settings.DEFAULT_CHARSET), response.content
-        )
+        self.assertEqual(expected.encode(settings.DEFAULT_CHARSET), response.content)
 
     def test_POST_reserve_creates_ipaddress(self):
         subnet = factory.make_Subnet()
@@ -495,9 +460,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
             resource_uri=reverse("ipaddresses_handler"),
         )
         self.assertEqual(expected, returned_address)
-        self.assertEqual(
-            IPADDRESS_TYPE.USER_RESERVED, staticipaddress.alloc_type
-        )
+        self.assertEqual(IPADDRESS_TYPE.USER_RESERVED, staticipaddress.alloc_type)
         self.assertEqual(self.user, staticipaddress.user)
 
     def test_POST_reserve_creates_dnsresource(self):
@@ -523,9 +486,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
             resource_uri=reverse("ipaddresses_handler"),
         )
         self.assertEqual(expected, returned_address)
-        self.assertEqual(
-            IPADDRESS_TYPE.USER_RESERVED, staticipaddress.alloc_type
-        )
+        self.assertEqual(IPADDRESS_TYPE.USER_RESERVED, staticipaddress.alloc_type)
         self.assertEqual(self.user, staticipaddress.user)
         dnsrr = DNSResource.objects.get(name=hostname, domain=domain)
         self.assertCountEqual(dnsrr.ip_addresses.all(), [staticipaddress])
@@ -537,17 +498,13 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
         response = self.post_reservation_request(subnet=subnet, mac=mac)
         self.assertEqual(http.client.OK, response.status_code)
         [staticipaddress] = StaticIPAddress.objects.all()
-        self.assertEqual(
-            staticipaddress.interface_set.first().mac_address, mac
-        )
+        self.assertEqual(staticipaddress.interface_set.first().mac_address, mac)
 
     def test_POST_returns_error_when_MAC_exists_on_node(self):
         subnet = factory.make_Subnet()
         nic = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, vlan=subnet.vlan)
 
-        response = self.post_reservation_request(
-            subnet=subnet, mac=nic.mac_address
-        )
+        response = self.post_reservation_request(subnet=subnet, mac=nic.mac_address)
         self.assertEqual(
             http.client.BAD_REQUEST, response.status_code, response.content
         )
@@ -556,9 +513,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
         subnet = factory.make_Subnet()
         nic = factory.make_Interface(INTERFACE_TYPE.UNKNOWN)
 
-        response = self.post_reservation_request(
-            subnet=subnet, mac=nic.mac_address
-        )
+        response = self.post_reservation_request(subnet=subnet, mac=nic.mac_address)
         self.assertEqual(response.status_code, http.client.OK)
         [staticipaddress] = nic.ip_addresses.all()
         self.assertEqual(
@@ -576,9 +531,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
         subnet = factory.make_Subnet()
         ip_in_network = factory.pick_ip_in_Subnet(subnet)
         response = self.post_reservation_request(ip_address=ip_in_network)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         returned_address = json_load_bytes(response.content)
         [staticipaddress] = StaticIPAddress.objects.all()
         self.assertEqual(
@@ -592,9 +545,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
         subnet = factory.make_Subnet()
         ip_in_network = factory.pick_ip_in_Subnet(subnet)
         response = self.post_reservation_request(subnet, ip_in_network)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         # Do same request again and check it is rejected.
         response = self.post_reservation_request(subnet, ip_in_network)
         self.assertEqual(response.status_code, http.client.NOT_FOUND)
@@ -607,9 +558,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
         subnet = factory.make_ipv4_Subnet_with_IPRanges()
         ip = str(IPAddress(subnet.get_dynamic_maasipset().first))
         response = self.post_reservation_request(subnet, ip)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_POST_reserve_without_hostname_creates_ip_without_hostname(self):
         subnet = factory.make_Subnet()
@@ -629,14 +578,10 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
     def test_POST_reserve_with_hostname_creates_ip_with_hostname(self):
         subnet = factory.make_Subnet()
         hostname = factory.make_hostname()
-        response = self.post_reservation_request(
-            subnet=subnet, hostname=hostname
-        )
+        response = self.post_reservation_request(subnet=subnet, hostname=hostname)
         self.assertEqual(http.client.OK, response.status_code)
         [staticipaddress] = StaticIPAddress.objects.all()
-        self.assertEqual(
-            staticipaddress.dnsresource_set.first().name, hostname
-        )
+        self.assertEqual(staticipaddress.dnsresource_set.first().name, hostname)
 
     def test_POST_reserve_with_hostname_and_ip_creates_ip_with_hostname(self):
         subnet = factory.make_Subnet()
@@ -645,19 +590,13 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
         response = self.post_reservation_request(
             subnet=subnet, ip_address=ip_in_network, hostname=hostname
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         returned_address = json_load_bytes(response.content)
         [staticipaddress] = StaticIPAddress.objects.all()
-        self.assertEqual(
-            returned_address["alloc_type"], IPADDRESS_TYPE.USER_RESERVED
-        )
+        self.assertEqual(returned_address["alloc_type"], IPADDRESS_TYPE.USER_RESERVED)
         self.assertEqual(returned_address["ip"], ip_in_network)
         self.assertEqual(staticipaddress.ip, ip_in_network)
-        self.assertEqual(
-            staticipaddress.dnsresource_set.first().name, hostname
-        )
+        self.assertEqual(staticipaddress.dnsresource_set.first().name, hostname)
 
     def test_POST_reserve_with_fqdn_creates_ip_with_hostname(self):
         subnet = factory.make_Subnet()
@@ -669,9 +608,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
         )
         self.assertEqual(http.client.OK, response.status_code)
         [staticipaddress] = StaticIPAddress.objects.all()
-        self.assertEqual(
-            staticipaddress.dnsresource_set.first().name, hostname
-        )
+        self.assertEqual(staticipaddress.dnsresource_set.first().name, hostname)
         self.assertEqual(staticipaddress.dnsresource_set.first().fqdn, fqdn)
 
     def test_POST_reserve_with_fqdn_and_ip_creates_ip_with_hostname(self):
@@ -685,9 +622,7 @@ class TestIPAddressesReserveAPI(APITransactionTestCase.ForUser):
             ip_address=ip_in_network,
             hostname=f"{hostname}.{domainname}",
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         returned_address = json_load_bytes(response.content)
         [staticipaddress] = StaticIPAddress.objects.all()
         self.assertEqual(

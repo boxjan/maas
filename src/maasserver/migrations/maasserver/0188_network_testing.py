@@ -4,9 +4,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0187_status_messages_change_event_logging_levels")
-    ]
+    dependencies = [("maasserver", "0187_status_messages_change_event_logging_levels")]
 
     operations = [
         migrations.AddField(

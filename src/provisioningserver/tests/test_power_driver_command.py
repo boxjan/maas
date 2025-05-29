@@ -38,9 +38,7 @@ class FakeDriver(PowerDriver):
 
 
 class TestPowerDriverCommand(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def test_create_subparser(self):
         parser = ArgumentParser()
@@ -91,9 +89,7 @@ class TestPowerDriverCommand(MAASTestCase):
 
         self.assertEqual(args.command, "on")
         self.assertEqual(args.driver, "virsh")
-        self.assertEqual(
-            args.power_address, "qemu+ssh://ubuntu@$KVM_HOST/system"
-        )
+        self.assertEqual(args.power_address, "qemu+ssh://ubuntu@$KVM_HOST/system")
         self.assertEqual(args.power_id, "power_id")
 
     def test_parse_args_ipmi(self):

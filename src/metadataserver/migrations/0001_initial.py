@@ -41,9 +41,7 @@ class Migration(migrations.Migration):
                 ),
                 (
                     "key",
-                    models.CharField(
-                        unique=True, max_length=18, editable=False
-                    ),
+                    models.CharField(unique=True, max_length=18, editable=False),
                 ),
                 (
                     "node",

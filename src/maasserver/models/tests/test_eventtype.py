@@ -90,10 +90,7 @@ class TestEventTypeConcurrency(MAASTransactionServerTestCase):
                 event_types.append(event_type)
 
         # Create a number of threads to simulate a race.
-        threads = [
-            threading.Thread(target=make_event_type_in_thread)
-            for _ in range(5)
-        ]
+        threads = [threading.Thread(target=make_event_type_in_thread) for _ in range(5)]
 
         # Start all the threads at the same time.
         for thread in threads:

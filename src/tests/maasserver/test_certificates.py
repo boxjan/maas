@@ -10,9 +10,7 @@ from provisioningserver.testing.certificates import (
 @pytest.mark.usefixtures("maasdb")
 class TestGetMAASCertificate:
     def test_no_secret(self):
-        assert (
-            SecretManager().get_composite_secret("tls", default=None) is None
-        )
+        assert SecretManager().get_composite_secret("tls", default=None) is None
         assert get_maas_certificate() is None
 
     def test_no_all_entries_secret(self):

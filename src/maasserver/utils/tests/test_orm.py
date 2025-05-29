@@ -149,9 +149,7 @@ class TestGetOne(MAASTestCase):
 
         # Raises MultipleObjectsReturned as spec'ed.  It does not
         # iterate to infinity first!
-        self.assertRaises(
-            MultipleObjectsReturned, get_one, infinite_sequence()
-        )
+        self.assertRaises(MultipleObjectsReturned, get_one, infinite_sequence())
 
     def test_get_one_raises_model_error_if_query_result_is_too_big(self):
         self.assertRaises(
@@ -191,9 +189,7 @@ class TestSerializationFailure(SerializationFailureTestCase):
     """Detecting SERIALIZABLE isolation failures."""
 
     def test_serialization_failure_detectable_via_error_cause(self):
-        error = self.assertRaises(
-            OperationalError, self.cause_serialization_failure
-        )
+        error = self.assertRaises(OperationalError, self.cause_serialization_failure)
         self.assertEqual(SERIALIZATION_FAILURE, error.__cause__.pgcode)
 
 
@@ -266,9 +262,7 @@ class TestGetPsycopg2DeadlockException(MAASTestCase):
     def test_returns_psycopg2_error_root_cause(self):
         exception = Exception()
         exception.__cause__ = orm.DeadlockFailure()
-        self.assertIs(
-            exception.__cause__, get_psycopg2_deadlock_exception(exception)
-        )
+        self.assertIs(exception.__cause__, get_psycopg2_deadlock_exception(exception))
 
 
 class TestGetPsycopg2UniqueViolationException(MAASTestCase):
@@ -296,15 +290,11 @@ class TestGetPsycopg2ForeignKeyException(MAASTestCase):
 
     def test_returns_None_for_plain_psycopg2_error(self):
         exception = psycopg2.Error()
-        self.assertIsNone(
-            get_psycopg2_foreign_key_violation_exception(exception)
-        )
+        self.assertIsNone(get_psycopg2_foreign_key_violation_exception(exception))
 
     def test_returns_None_for_other_error(self):
         exception = factory.make_exception()
-        self.assertIsNone(
-            get_psycopg2_foreign_key_violation_exception(exception)
-        )
+        self.assertIsNone(get_psycopg2_foreign_key_violation_exception(exception))
 
     def test_returns_psycopg2_error_root_cause(self):
         exception = Exception()
@@ -319,9 +309,7 @@ class TestIsSerializationFailure(SerializationFailureTestCase):
     """Tests relating to MAAS's use of SERIALIZABLE isolation."""
 
     def test_detects_operational_error_with_matching_cause(self):
-        error = self.assertRaises(
-            OperationalError, self.cause_serialization_failure
-        )
+        error = self.assertRaises(OperationalError, self.cause_serialization_failure)
         self.assertTrue(is_serialization_failure(error))
 
     def test_rejects_operational_error_without_matching_cause(self):
@@ -1128,9 +1116,7 @@ class TestWithConnection(MAASTransactionServerTestCase):
             return sentinel.result
 
         self.assertTrue(context.unused)
-        self.assertIs(
-            function(sentinel.arg, kwarg=sentinel.kwarg), sentinel.result
-        )
+        self.assertIs(function(sentinel.arg, kwarg=sentinel.kwarg), sentinel.result)
         self.assertTrue(context.used)
 
 
@@ -1331,9 +1317,7 @@ class TestPsqlArray(MAASTestCase):
         self.assertEqual(params, psql_array(params)[1])
 
     def test_returns_cast_to_type(self):
-        self.assertEqual(
-            ("ARRAY[]::integer[]", []), psql_array([], sql_type="integer")
-        )
+        self.assertEqual(("ARRAY[]::integer[]", []), psql_array([], sql_type="integer"))
 
 
 class TestDisablingDatabaseConnections(MAASTransactionServerTestCase):
@@ -1343,9 +1327,7 @@ class TestDisablingDatabaseConnections(MAASTransactionServerTestCase):
 
     def assertConnectionsDisabled(self):
         for alias in connections:
-            self.assertEqual(
-                DisabledDatabaseConnection, type(connections[alias])
-            )
+            self.assertEqual(DisabledDatabaseConnection, type(connections[alias]))
 
     def test_disable_and_enable_connections(self):
         self.addCleanup(enable_all_database_connections)
@@ -1468,9 +1450,7 @@ class TestCountQueries(MAASServerTestCase):
         wrapped = count_queries(mock_print)(query_func)
         wrapped()
 
-        query_time = sum(
-            float(query.get("time", 0)) for query in connection.queries
-        )
+        query_time = sum(float(query.get("time", 0)) for query in connection.queries)
         mock_print.assert_called_once_with(
             f"[QUERIES] query_func executed 1 queries in {query_time} seconds"
         )
@@ -1515,16 +1495,13 @@ class TestCountQueries(MAASServerTestCase):
         mock_print = Mock()
         wrapped = count_queries(mock_print)(query_func)
         wrapped()
-        query_time = sum(
-            float(query.get("time", 0)) for query in connection.queries
-        )
+        query_time = sum(float(query.get("time", 0)) for query in connection.queries)
 
         # Print called twice.
         mock_print.assert_has_calls(
             [
                 call(
-                    "[QUERIES] query_func executed 1 queries in %s seconds"
-                    % query_time
+                    "[QUERIES] query_func executed 1 queries in %s seconds" % query_time
                 ),
                 call("[QUERIES] === Start SQL Log: query_func ==="),
                 call("[QUERIES] %s" % connection.queries[0]["sql"]),

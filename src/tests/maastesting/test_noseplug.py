@@ -64,9 +64,7 @@ class TestCrochet(MAASTestCase):
         crochet = Crochet()
         parser = OptionParser()
         crochet.add_options(parser=parser, env={})
-        options, rest = parser.parse_args(
-            ["--with-crochet", "--crochet-no-setup"]
-        )
+        options, rest = parser.parse_args(["--with-crochet", "--crochet-no-setup"])
         crochet.configure(options, sentinel.conf)
 
         crochet_module.setup.assert_not_called()
@@ -278,9 +276,7 @@ class TestScenarios(MAASTestCase):
         self.assertEqual(len(tests), 1)
         for test in tests:
             self.assertIsInstance(test, SomeTests)
-        self.assertEqual(
-            {method.__name__}, {test._testMethodName for test in tests}
-        )
+        self.assertEqual({method.__name__}, {test._testMethodName for test in tests})
 
     def test_makeTest_makes_tests_from_test_function_with_scenarios(self):
         class SomeTests(MAASTestCase):
@@ -323,9 +319,7 @@ class TestSelect(MAASTestCase):
         self.assertEqual(select_dir.metavar, "DIR")
         self.assertEqual(select_dir.type, "string")
         self.assertEqual(select_dir._short_opts, [])
-        self.assertEqual(
-            select_dir._long_opts, ["--select-dir", "--select-directory"]
-        )
+        self.assertEqual(select_dir._long_opts, ["--select-dir", "--select-directory"])
 
     def test_configure_scans_directories(self):
         directory = self.make_dir()
@@ -335,9 +329,7 @@ class TestSelect(MAASTestCase):
         select = Select()
         parser = OptionParser()
         select.add_options(parser=parser, env={})
-        options, rest = parser.parse_args(
-            ["--with-select", "--select-dir", directory]
-        )
+        options, rest = parser.parse_args(["--with-select", "--select-dir", directory])
         select.configure(options, sentinel.conf)
 
         leaf = FilePath(directory).descendant(segments)
@@ -357,9 +349,7 @@ class TestSelect(MAASTestCase):
         self.assertTrue(select.wantDirectory(join(directory, *segments)))
         self.assertTrue(select.wantDirectory(dirname(directory)))
         self.assertFalse(
-            select.wantDirectory(
-                join(directory, factory.make_name("other-child"))
-            )
+            select.wantDirectory(join(directory, factory.make_name("other-child")))
         )
 
 
@@ -371,9 +361,7 @@ class TestSelectBucket(MAASTestCase):
         with_select_bucket, select_bucket = parser.option_list[-2:]
         self.assertEqual(with_select_bucket.action, "store_true")
         self.assertIsNone(with_select_bucket.default)
-        self.assertEqual(
-            with_select_bucket.dest, "enable_plugin_select_bucket"
-        )
+        self.assertEqual(with_select_bucket.dest, "enable_plugin_select_bucket")
         self.assertEqual(select_bucket.action, "callback")
         self.assertIsNone(select_bucket.default)
         self.assertEqual(select_bucket.dest, "select-bucket_selected_bucket")

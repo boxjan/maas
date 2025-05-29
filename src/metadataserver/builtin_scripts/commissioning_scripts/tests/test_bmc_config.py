@@ -227,9 +227,7 @@ EndSection
         self.mock_print.assert_called_once()
 
     def test_detected_true(self):
-        mock_get_ipmi_locate_output = self.patch(
-            bmc_config, "_get_ipmi_locate_output"
-        )
+        mock_get_ipmi_locate_output = self.patch(bmc_config, "_get_ipmi_locate_output")
         mock_get_ipmi_locate_output.return_value = random.choice(
             [
                 "IPMI Version: 1.0\n",
@@ -245,9 +243,7 @@ EndSection
         self.assertTrue(self.ipmi.detected())
 
     def test_detected_false(self):
-        mock_get_ipmi_locate_output = self.patch(
-            bmc_config, "_get_ipmi_locate_output"
-        )
+        mock_get_ipmi_locate_output = self.patch(bmc_config, "_get_ipmi_locate_output")
         mock_get_ipmi_locate_output.return_value = factory.make_string()
         self.assertFalse(self.ipmi.detected())
 
@@ -261,9 +257,7 @@ EndSection
 
     def test_generate_random_password_with_length(self):
         for attempt in range(0, 10):
-            password = self.ipmi._generate_random_password(
-                min_length=16, max_length=20
-            )
+            password = self.ipmi._generate_random_password(min_length=16, max_length=20)
             assert 16 <= len(password) <= 20
             assert (
                 re.match(r"^[\da-z]+$", password, re.IGNORECASE) is not None
@@ -273,13 +267,9 @@ EndSection
         # Huawei uses a non-standard IPMI password policy
         special_chars = set("!\"#$%&'()*+-./:;<=>?@[\\]^_`{|}~")
         for attempt in range(0, 100):
-            password = self.ipmi._generate_random_password(
-                with_special_chars=True
-            )
+            password = self.ipmi._generate_random_password(with_special_chars=True)
             self.assertTrue(10 <= len(password) <= 15)
-            self.assertTrue(
-                any((c in special_chars) for c in password), password
-            )
+            self.assertTrue(any((c in special_chars) for c in password), password)
             self.assertIsNotNone(re.match(r".*[a-z].*", password), password)
             self.assertIsNotNone(re.match(r".*[A-Z].*", password), password)
             self.assertIsNotNone(re.match(r".*[0-9].*", password), password)
@@ -598,9 +588,7 @@ EndSection
 
         self.ipmi._config_kg()
 
-        mock_bmc_set.assert_called_once_with(
-            "Lan_Conf_Security_Keys", "K_G", kg
-        )
+        mock_bmc_set.assert_called_once_with("Lan_Conf_Security_Keys", "K_G", kg)
         self.assertEqual(kg, self.ipmi._kg)
 
     def test_config_kg_set_does_nothing_if_already_set(self):
@@ -629,9 +617,7 @@ EndSection
 
         self.assertRaises(type(exception), self.ipmi._config_kg)
 
-        mock_bmc_set.assert_called_once_with(
-            "Lan_Conf_Security_Keys", "K_G", kg
-        )
+        mock_bmc_set.assert_called_once_with("Lan_Conf_Security_Keys", "K_G", kg)
         self.assertEqual("", self.ipmi._kg)
 
     def test_config_kg_detect(self):
@@ -658,14 +644,10 @@ EndSection
         mock_config_ipmi_lan_channel_settings = self.patch(
             self.ipmi, "_config_ipmi_lan_channel_settings"
         )
-        mock_config_lang_conf_auth = self.patch(
-            self.ipmi, "_config_lan_conf_auth"
-        )
+        mock_config_lang_conf_auth = self.patch(self.ipmi, "_config_lan_conf_auth")
         mock_config_kg = self.patch(self.ipmi, "_config_kg")
         mock_bmc_set_keys = self.patch(self.ipmi, "_bmc_set_keys")
-        mock_check_ciphers_enabled = self.patch(
-            self.ipmi, "_check_ciphers_enabled"
-        )
+        mock_check_ciphers_enabled = self.patch(self.ipmi, "_check_ciphers_enabled")
 
         self.ipmi.configure()
 
@@ -710,9 +692,7 @@ EndSection
                 "MAC_Address": mac_address,
             }
         }
-        self.assertEqual(
-            ("Lan_Conf", ip, mac_address), self.ipmi._get_bmc_ip()
-        )
+        self.assertEqual(("Lan_Conf", ip, mac_address), self.ipmi._get_bmc_ip())
 
     def test_get_bmc_ipv6_static(self):
         ip = factory.make_ipv6_address()
@@ -723,9 +703,7 @@ EndSection
                 "MAC_Address": mac_address,
             }
         }
-        self.assertEqual(
-            ("Lan6_Conf", f"[{ip}]", mac_address), self.ipmi._get_bmc_ip()
-        )
+        self.assertEqual(("Lan6_Conf", f"[{ip}]", mac_address), self.ipmi._get_bmc_ip())
 
     def test_get_bmc_ipv6_dynamic(self):
         ip = factory.make_ipv6_address()
@@ -736,9 +714,7 @@ EndSection
                 "MAC_Address": mac_address,
             }
         }
-        self.assertEqual(
-            ("Lan6_Conf", f"[{ip}]", mac_address), self.ipmi._get_bmc_ip()
-        )
+        self.assertEqual(("Lan6_Conf", f"[{ip}]", mac_address), self.ipmi._get_bmc_ip())
 
     def test_get_bmc_ipv6_gets_mac_From_ipv4(self):
         ip = factory.make_ipv6_address()
@@ -747,9 +723,7 @@ EndSection
             "Lan_Conf": {"MAC_Address": mac_address},
             "Lan6_Conf": {"IPv6_Dynamic_Addresses": ip},
         }
-        self.assertEqual(
-            ("Lan6_Conf", f"[{ip}]", mac_address), self.ipmi._get_bmc_ip()
-        )
+        self.assertEqual(("Lan6_Conf", f"[{ip}]", mac_address), self.ipmi._get_bmc_ip())
 
     def test_get_bmc_ip_finds_none(self):
         self.patch(self.ipmi, "_bmc_get").return_value = ""
@@ -778,9 +752,7 @@ EndSection
         )
 
         self.assertEqual((ip, mac_address), self.ipmi.get_bmc_ip())
-        mock_bmc_set.assert_called_once_with(
-            "Lan_Conf", "IP_Address_Source", "Static"
-        )
+        mock_bmc_set.assert_called_once_with("Lan_Conf", "IP_Address_Source", "Static")
         mock_get_bmc_ip.assert_has_calls([call(), call(True), call(True)])
 
     def test_get_bmc_ip_enables_dynamic(self):
@@ -801,9 +773,7 @@ EndSection
             ]
         )
 
-        mock_get_bmc_ip.assert_has_calls(
-            [call(), *[call(True) for _ in range(8)]]
-        )
+        mock_get_bmc_ip.assert_has_calls([call(), *[call(True) for _ in range(8)]])
 
     def test_get_bmc_ip_fails(self):
         mock_bmc_set = self.patch(self.ipmi, "_bmc_set")
@@ -945,10 +915,7 @@ class TestHPMoonshot(MAASTestCase):
         self.mock_print = self.patch(bmc_config, "print")
 
     def make_hex_array(self, size=11):
-        return [
-            str(hex(random.randint(0, 256))).split("x")[1]
-            for _ in range(1, size)
-        ]
+        return [str(hex(random.randint(0, 256))).split("x")[1] for _ in range(1, size)]
 
     def test_power_type(self):
         self.assertEqual("moonshot", self.hp_moonshot.power_type)
@@ -975,9 +942,7 @@ class TestHPMoonshot(MAASTestCase):
     def test_get_local_address(self):
         hex_array = self.make_hex_array()
         self.mock_check_output.return_value = " ".join(hex_array).encode()
-        self.assertEqual(
-            f"0x{hex_array[2]}", self.hp_moonshot._get_local_address()
-        )
+        self.assertEqual(f"0x{hex_array[2]}", self.hp_moonshot._get_local_address())
         self.mock_check_output.assert_called_once_with(
             ["ipmitool", "raw", "0x2c", "1", "0"],
             timeout=bmc_config.COMMAND_TIMEOUT,
@@ -1038,9 +1003,7 @@ class TestHPMoonshot(MAASTestCase):
         self.hp_moonshot.username = "Administrator"
         self.hp_moonshot.password = "password"
 
-        mock_get_local_address = self.patch(
-            self.hp_moonshot, "_get_local_address"
-        )
+        mock_get_local_address = self.patch(self.hp_moonshot, "_get_local_address")
         local_address = factory.make_name("local_address")
         mock_get_local_address.return_value = local_address
 
@@ -1053,9 +1016,7 @@ class TestHPMoonshot(MAASTestCase):
         node_address = factory.make_name("node_address")
         mock_get_cartridge_address.return_value = node_address
 
-        mock_get_channel_number = self.patch(
-            self.hp_moonshot, "_get_channel_number"
-        )
+        mock_get_channel_number = self.patch(self.hp_moonshot, "_get_channel_number")
         local_chan = factory.make_name("local_chan")
         cartridge_chan = factory.make_name("cartridge_chan")
         mock_get_channel_number.side_effect = (local_chan, cartridge_chan)
@@ -1280,9 +1241,7 @@ class TestRedfish(MAASTestCase):
 
         self.assertEqual(
             yaml.safe_dump((yaml.safe_load(expected_config))),
-            self.redfish._generate_netplan_config(
-                "enx7ed30a5460e7", True, None
-            ),
+            self.redfish._generate_netplan_config("enx7ed30a5460e7", True, None),
         )
 
     def test_generate_netplan_config_dhcp_off(self):
@@ -1380,9 +1339,7 @@ class TestRedfish(MAASTestCase):
         ).encode()
 
         sock_response_token = self.FakeSocket(token_data)
-        response_token = urllib.request.http.client.HTTPResponse(
-            sock_response_token
-        )
+        response_token = urllib.request.http.client.HTTPResponse(sock_response_token)
         response_token.begin()
 
         sock_response_address = self.FakeSocket(address_data)
@@ -1483,24 +1440,20 @@ class TestRedfish(MAASTestCase):
         )
 
     def test_detected_unknown_exception(self):
-        self.patch(
-            self.redfish, "_detect"
-        ).side_effect = factory.make_exception_type((ValueError,))
+        self.patch(self.redfish, "_detect").side_effect = factory.make_exception_type(
+            (ValueError,)
+        )
         self.assertRaises(ValueError, self.redfish.detected)
 
     def test_detected_known_exception(self):
-        self.patch(
-            self.redfish, "_detect"
-        ).side_effect = factory.make_exception_type(
+        self.patch(self.redfish, "_detect").side_effect = factory.make_exception_type(
             (bmc_config.ConfigurationError,)
         )
         self.assertFalse(self.redfish.detected())
 
     def test_missing_dmidecode_exception(self):
         self.patch(bmc_config, "which").return_value = None
-        self.assertRaises(
-            bmc_config.ConfigurationError, self.redfish._get_smbios_data
-        )
+        self.assertRaises(bmc_config.ConfigurationError, self.redfish._get_smbios_data)
 
 
 class TestGetIPMILocateOutput(MAASTestCase):
@@ -1579,13 +1532,9 @@ class TestWedge(MAASTestCase):
         self.assertFalse(self.wedge.detected())
 
     def test_detected_dmidecode_error(self):
-        self.patch(
-            self.wedge, "_detect_known_switch"
-        ).side_effect = random.choice(
+        self.patch(self.wedge, "_detect_known_switch").side_effect = random.choice(
             [
-                CalledProcessError(
-                    cmd="cmd", returncode=random.randint(1, 255)
-                ),
+                CalledProcessError(cmd="cmd", returncode=random.randint(1, 255)),
                 TimeoutExpired(cmd="cmd", timeout=random.randint(1, 100)),
                 FileNotFoundError(),
             ]
@@ -1595,16 +1544,12 @@ class TestWedge(MAASTestCase):
     def test_detected_rest_api(self):
         self.patch(self.wedge, "_detect_known_switch").return_value = "accton"
         mock_urlopen = self.patch(bmc_config.urllib.request, "urlopen")
-        mock_urlopen.return_value.read.return_value = (
-            b"Wedge RESTful API Entry"
-        )
+        mock_urlopen.return_value.read.return_value = b"Wedge RESTful API Entry"
         self.assertTrue(self.wedge.detected())
 
     def test_detected_ip(self):
         self.patch(self.wedge, "_detect_known_switch").return_value = "accton"
-        self.patch(
-            self.wedge, "get_bmc_ip"
-        ).return_value = factory.make_ip_address()
+        self.patch(self.wedge, "get_bmc_ip").return_value = factory.make_ip_address()
         self.assertTrue(self.wedge.detected())
 
     def test_detected_false(self):
@@ -1677,33 +1622,23 @@ class TestDetectAndConfigure(MAASTestCase):
         bmc_config_path = os.path.join(
             self.useFixture(TempDirectory()).path, "bmc-config.yaml"
         )
-        creds = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(6)
-        }
+        creds = {factory.make_name("key"): factory.make_name("value") for _ in range(6)}
         args = MagicMock()
         args.user = factory.make_name("user")
         args.password = factory.make_name("password")
         self.patch(bmc_config.HPMoonshot, "detected").return_value = True
-        self.patch(
-            bmc_config.HPMoonshot, "get_credentials"
-        ).return_value = creds
+        self.patch(bmc_config.HPMoonshot, "get_credentials").return_value = creds
 
         bmc_config.detect_and_configure(args, bmc_config_path)
 
         with open(bmc_config_path) as f:
-            self.assertEqual(
-                {"power_type": "moonshot", **creds}, yaml.safe_load(f)
-            )
+            self.assertEqual({"power_type": "moonshot", **creds}, yaml.safe_load(f))
 
     def test_finds_third(self):
         bmc_config_path = os.path.join(
             self.useFixture(TempDirectory()).path, "bmc-config.yaml"
         )
-        creds = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(6)
-        }
+        creds = {factory.make_name("key"): factory.make_name("value") for _ in range(6)}
         args = MagicMock()
         args.user = factory.make_name("user")
         args.password = factory.make_name("password")
@@ -1717,9 +1652,7 @@ class TestDetectAndConfigure(MAASTestCase):
         bmc_config.detect_and_configure(args, bmc_config_path)
 
         with open(bmc_config_path) as f:
-            self.assertEqual(
-                {"power_type": "ipmi", **creds}, yaml.safe_load(f)
-            )
+            self.assertEqual({"power_type": "ipmi", **creds}, yaml.safe_load(f))
 
     def test_finds_nothing(self):
         bmc_config_path = os.path.join(
@@ -1764,9 +1697,7 @@ class TestMain(MAASTestCase):
         self.assertRaises(SystemExit, bmc_config.main)
 
     def test_validates_ipmi_k_g_hex_isnt_too_long(self):
-        self.mock_parse_args.return_value.ipmi_k_g = (
-            "0x" + factory.make_string(41)
-        )
+        self.mock_parse_args.return_value.ipmi_k_g = "0x" + factory.make_string(41)
         self.assertRaises(SystemExit, bmc_config.main)
 
     def test_checks_bmc_config_path_env_var_set(self):
@@ -1788,9 +1719,7 @@ class TestMain(MAASTestCase):
             1, ["systemd-detect-virt", "-q"]
         )
         mock_run = self.patch(bmc_config, "run")
-        mock_detect_and_configure = self.patch(
-            bmc_config, "detect_and_configure"
-        )
+        mock_detect_and_configure = self.patch(bmc_config, "detect_and_configure")
 
         bmc_config.main()
 
@@ -1827,9 +1756,7 @@ class TestMain(MAASTestCase):
     def test_does_nothing_if_on_vm(self):
         self.patch(bmc_config.os.environ, "get")
         self.patch(bmc_config.os.path, "exists").return_value = False
-        mock_detect_and_configure = self.patch(
-            bmc_config, "detect_and_configure"
-        )
+        mock_detect_and_configure = self.patch(bmc_config, "detect_and_configure")
         mock_exit_skipped = self.patch(bmc_config, "exit_skipped")
 
         bmc_config.main()

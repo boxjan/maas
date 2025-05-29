@@ -60,9 +60,7 @@ class TestDomainForm(MAASServerTestCase):
         name = factory.make_name("domain")
         ttl = random.randint(1, 604800)
         authoritative = factory.pick_bool()
-        form = DomainForm(
-            {"name": name, "authoritative": authoritative, "ttl": ttl}
-        )
+        form = DomainForm({"name": name, "authoritative": authoritative, "ttl": ttl})
         self.assertTrue(form.is_valid(), form.errors)
         domain = form.save()
         self.assertEqual(name, domain.name)
@@ -73,9 +71,7 @@ class TestDomainForm(MAASServerTestCase):
         name = factory.make_name("domain")
         ttl = random.randint(1, 604800)
         authoritative = factory.pick_bool()
-        form = DomainForm(
-            {"name": name, "authoritative": authoritative, "ttl": ttl}
-        )
+        form = DomainForm({"name": name, "authoritative": authoritative, "ttl": ttl})
         self.assertTrue(form.is_valid(), form.errors)
         domain = form.save()
         form = DomainForm(instance=domain, data={"ttl": None})
@@ -99,10 +95,7 @@ class TestDomainForm(MAASServerTestCase):
         domain = form.save()
         self.assertEqual(
             forward_dns_servers,
-            [
-                fwd_dns_srvr.ip_address
-                for fwd_dns_srvr in domain.forward_dns_servers
-            ],
+            [fwd_dns_srvr.ip_address for fwd_dns_srvr in domain.forward_dns_servers],
         )
         for fwd_dns_srvr in domain.forward_dns_servers:
             self.assertEqual(fwd_dns_srvr.port, 53)
@@ -123,10 +116,7 @@ class TestDomainForm(MAASServerTestCase):
         domain = form.save()
         self.assertEqual(
             forward_dns_servers,
-            [
-                fwd_dns_srvr.ip_and_port
-                for fwd_dns_srvr in domain.forward_dns_servers
-            ],
+            [fwd_dns_srvr.ip_and_port for fwd_dns_srvr in domain.forward_dns_servers],
         )
 
     def test_validate_authority(self):

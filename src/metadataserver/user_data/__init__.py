@@ -64,9 +64,7 @@ def generate_user_data(
     userdata = userdata_template.substitute(snippets).encode(ENCODING)
 
     data_part = MIMEText(userdata, "x-shellscript", ENCODING)
-    data_part.add_header(
-        "Content-Disposition", 'attachment; filename="user_data.sh"'
-    )
+    data_part.add_header("Content-Disposition", 'attachment; filename="user_data.sh"')
     combined = MIMEMultipart()
     combined.attach(data_part)
     return combined.as_bytes()
@@ -84,9 +82,7 @@ def generate_user_data_for_status(
     else:
         template = "script_runner.template"
 
-    userdata_template_file = os.path.join(
-        get_userdata_template_dir(), template
-    )
+    userdata_template_file = os.path.join(get_userdata_template_dir(), template)
     return generate_user_data(
         node, userdata_template_file, extra_content, rack_controller, request
     )

@@ -18,17 +18,13 @@ class TestManualPowerDriver(MAASTestCase):
         driver = manual_module.ManualPowerDriver()
         mock_log_info = self.patch(manual_module.maaslog, "info")
         driver.power_on("fake_id", {})
-        mock_log_info.assert_called_once_with(
-            "You need to power on fake_id manually."
-        )
+        mock_log_info.assert_called_once_with("You need to power on fake_id manually.")
 
     def test_power_off(self):
         driver = manual_module.ManualPowerDriver()
         mock_log_info = self.patch(manual_module.maaslog, "info")
         driver.power_off("fake_id", {})
-        mock_log_info.assert_called_once_with(
-            "You need to power off fake_id manually."
-        )
+        mock_log_info.assert_called_once_with("You need to power off fake_id manually.")
 
     def test_power_query(self):
         driver = manual_module.ManualPowerDriver()

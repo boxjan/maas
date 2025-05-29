@@ -76,9 +76,7 @@ class TestBcd(MAASTestCase):
 
         response = bcd._get_loader(bootmgr_elems)
         bcd.hive.node_values.assert_called_once_with(mock_elem)
-        bcd.hive.value_multiple_strings.assert_called_once_with(
-            mock_node_value
-        )
+        bcd.hive.value_multiple_strings.assert_called_once_with(mock_node_value)
         self.assertEqual(mock_string, response)
 
     def test_get_loader_elems(self):
@@ -130,9 +128,7 @@ class TestBcd(MAASTestCase):
             "value": fake_value.decode("utf-8").encode("utf-16le"),
         }
         mock_get_load_options_key.assert_called_once_with()
-        bcd.hive.node_add_child.assert_called_once_with(
-            mock_uid_1, bcd.LOAD_OPTIONS
-        )
+        bcd.hive.node_add_child.assert_called_once_with(mock_uid_1, bcd.LOAD_OPTIONS)
         bcd.hive.node_set_value.assert_called_once_with(fake_child, compare)
         bcd.hive.commit.assert_called_once_with(None)
 
@@ -364,9 +360,7 @@ class TestWindowsPXEBootMethod(MAASTestCase):
         local_host = factory.make_ipv4_address()
         kernel_params = make_kernel_parameters(osystem="windows")
 
-        method.get_reader(
-            None, kernel_params, path="bcd", local_host=local_host
-        )
+        method.get_reader(None, kernel_params, path="bcd", local_host=local_host)
         mock_compose_bcd.assert_called_once_with(kernel_params, local_host)
 
     def test_get_reader_static_file(self):

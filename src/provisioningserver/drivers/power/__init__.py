@@ -242,9 +242,7 @@ class PowerDriverBase(metaclass=ABCMeta):
             fields=self.settings,
             queryable=self.queryable,
             missing_packages=(
-                self.detect_missing_packages()
-                if detect_missing_packages
-                else []
+                self.detect_missing_packages() if detect_missing_packages else []
             ),
         )
         if self.ip_extractor is not None:
@@ -345,9 +343,7 @@ class PowerDriver(PowerDriverBase):
                     # The @asynchronous decorator will DTRT.
                     state = yield self.power_query(system_id, context)
                 else:
-                    state = yield deferToThread(
-                        self.power_query, system_id, context
-                    )
+                    state = yield deferToThread(self.power_query, system_id, context)
             except PowerFatalError:
                 raise  # Don't retry.
             except PowerError:

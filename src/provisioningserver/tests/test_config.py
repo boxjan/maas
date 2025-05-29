@@ -84,17 +84,13 @@ class TestConfigurationMeta(MAASTestCase):
     def set_envvar(self, filepath=None):
         """Set the env. variable named by `ExampleConfiguration.envvar"."""
         self.useFixture(
-            EnvironmentVariableFixture(
-                self.example_configuration.envvar, filepath
-            )
+            EnvironmentVariableFixture(self.example_configuration.envvar, filepath)
         )
 
     def test_gets_filename_from_environment(self):
         dummy_filename = factory.make_name("config")
         self.set_envvar(dummy_filename)
-        self.assertEqual(
-            dummy_filename, self.example_configuration.DEFAULT_FILENAME
-        )
+        self.assertEqual(dummy_filename, self.example_configuration.DEFAULT_FILENAME)
 
     def test_falls_back_to_default(self):
         self.set_envvar(None)
@@ -106,9 +102,7 @@ class TestConfigurationMeta(MAASTestCase):
     def test_set(self):
         dummy_filename = factory.make_name("config")
         self.example_configuration.DEFAULT_FILENAME = dummy_filename
-        self.assertEqual(
-            dummy_filename, self.example_configuration.DEFAULT_FILENAME
-        )
+        self.assertEqual(dummy_filename, self.example_configuration.DEFAULT_FILENAME)
 
     def test_delete(self):
         self.set_envvar(None)
@@ -595,18 +589,14 @@ class TestClusterConfiguration(MAASTestCase):
 
     def test_set_maas_url_accepts_very_short_hostnames(self):
         config = ClusterConfiguration({})
-        example_url = factory.make_simple_http_url(
-            netloc=factory.make_string(size=1)
-        )
+        example_url = factory.make_simple_http_url(netloc=factory.make_string(size=1))
         config.maas_url = example_url
         self.assertEqual([example_url], config.maas_url)
         self.assertEqual({"maas_url": [example_url]}, config.store)
 
     def test_set_maas_url_rejects_bare_ipv6_addresses(self):
         config = ClusterConfiguration({})
-        example_url = factory.make_simple_http_url(
-            netloc=factory.make_ipv6_address()
-        )
+        example_url = factory.make_simple_http_url(netloc=factory.make_ipv6_address())
         with self.assertRaisesRegex(formencode.api.Invalid, "valid URL"):
             config.maas_url = example_url
 

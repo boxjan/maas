@@ -261,9 +261,7 @@ class TestAptProxyScenarios(MAASServerTestCase):
             self.rack if self.rack else self.default_region_ip
         )
         # Now setup the configuration and arguments, and see what we get back.
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         if self.boot_cluster_ip is not None:
             node.boot_cluster_ip = self.boot_cluster_ip
             node.save()
@@ -327,9 +325,7 @@ class TestAptProxy(MAASServerTestCase):
         Config.objects.set_config("use_peer_proxy", False)
         Config.objects.set_config("use_rack_proxy", True)
 
-        subnet1 = factory.make_Subnet(
-            cidr="10.10.0.0/24", dns_servers=["10.10.0.1"]
-        )
+        subnet1 = factory.make_Subnet(cidr="10.10.0.0/24", dns_servers=["10.10.0.1"])
         rack = factory.make_rack_with_interfaces(eth0=["10.10.0.2/24"])
         _enable_dhcp(subnet1, rack)
         machine_ip = "10.10.0.100"
@@ -436,9 +432,7 @@ class TestComposePreseed(MAASServerTestCase):
 
     def test_compose_preseed_for_commissioning_node_skips_apt_proxy(self):
         rack_controller = factory.make_RackController()
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -452,9 +446,7 @@ class TestComposePreseed(MAASServerTestCase):
 
     def test_compose_preseed_for_commissioning_node_produces_yaml(self):
         rack_controller = factory.make_RackController()
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -487,9 +479,7 @@ class TestComposePreseed(MAASServerTestCase):
 
     def test_compose_preseed_for_commissioning_node_has_header(self):
         rack_controller = factory.make_RackController()
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -526,9 +516,7 @@ class TestComposePreseed(MAASServerTestCase):
         self,
     ):
         rack_controller = factory.make_RackController(url="")
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -548,9 +536,7 @@ class TestComposePreseed(MAASServerTestCase):
 
     def test_compose_preseed_uses_request_build_absolute_uri(self):
         rack_controller = factory.make_RackController(url="")
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -572,9 +558,7 @@ class TestComposePreseed(MAASServerTestCase):
         remote_syslog = "192.168.1.1:514"
         Config.objects.set_config("remote_syslog", remote_syslog)
         rack_controller = factory.make_RackController(url="")
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -589,9 +573,7 @@ class TestComposePreseed(MAASServerTestCase):
         syslog_port = factory.pick_port()
         Config.objects.set_config("maas_syslog_port", syslog_port)
         rack_controller = factory.make_RackController(url="")
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -644,9 +626,7 @@ class TestComposePreseed(MAASServerTestCase):
     def test_compose_preseed_for_enable_ssh_does_not_include_poweroff(self):
         rack_controller = factory.make_RackController()
         for status in {NODE_STATUS.COMMISSIONING, NODE_STATUS.TESTING}:
-            node = factory.make_Node(
-                interface=True, status=status, enable_ssh=True
-            )
+            node = factory.make_Node(interface=True, status=status, enable_ssh=True)
             nic = node.get_boot_interface()
             nic.vlan.dhcp_on = True
             nic.vlan.primary_rack = rack_controller
@@ -666,9 +646,7 @@ class TestComposePreseed(MAASServerTestCase):
                 NODE_STATUS.ENTERING_RESCUE_MODE,
             }:
                 continue
-            node = factory.make_Node(
-                interface=True, status=status, enable_ssh=True
-            )
+            node = factory.make_Node(interface=True, status=status, enable_ssh=True)
             nic = node.get_boot_interface()
             nic.vlan.dhcp_on = True
             nic.vlan.primary_rack = rack_controller
@@ -746,9 +724,7 @@ class TestComposePreseed(MAASServerTestCase):
 
     def test_compose_preseed_for_commissioning_includes_auth_tokens(self):
         rack_controller = factory.make_RackController()
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -769,9 +745,7 @@ class TestComposePreseed(MAASServerTestCase):
 
     def test_compose_preseed_for_commissioning_includes_packages(self):
         rack_controller = factory.make_RackController()
-        node = factory.make_Node(
-            interface=True, status=NODE_STATUS.COMMISSIONING
-        )
+        node = factory.make_Node(interface=True, status=NODE_STATUS.COMMISSIONING)
         nic = node.get_boot_interface()
         nic.vlan.dhcp_on = True
         nic.vlan.primary_rack = rack_controller
@@ -797,12 +771,8 @@ class TestComposePreseed(MAASServerTestCase):
         nic.vlan.save()
         self.useFixture(RunningClusterRPCFixture())
         request = make_HttpRequest()
-        expected_apt_proxy = get_apt_proxy(
-            request, node.get_boot_rack_controller()
-        )
-        preseed = yaml.safe_load(
-            compose_preseed(request, PRESEED_TYPE.CURTIN, node)
-        )
+        expected_apt_proxy = get_apt_proxy(request, node.get_boot_rack_controller())
+        preseed = yaml.safe_load(compose_preseed(request, PRESEED_TYPE.CURTIN, node))
 
         self.assertIn("datasource", preseed)
         self.assertIn("MAAS", preseed["datasource"])
@@ -843,9 +813,7 @@ class TestComposePreseed(MAASServerTestCase):
         self.useFixture(RunningClusterRPCFixture())
         Config.objects.set_config("enable_http_proxy", False)
         request = make_HttpRequest()
-        preseed = yaml.safe_load(
-            compose_preseed(request, PRESEED_TYPE.CURTIN, node)
-        )
+        preseed = yaml.safe_load(compose_preseed(request, PRESEED_TYPE.CURTIN, node))
 
         self.assertNotIn("proxy", preseed["apt"])
         self.assertNotIn("snap", preseed)
@@ -866,9 +834,7 @@ class TestComposePreseed(MAASServerTestCase):
         self.useFixture(RunningClusterRPCFixture())
         request = make_HttpRequest()
         apt_proxy = get_apt_proxy(request, node.get_boot_rack_controller())
-        preseed = yaml.safe_load(
-            compose_preseed(request, PRESEED_TYPE.CURTIN, node)
-        )
+        preseed = yaml.safe_load(compose_preseed(request, PRESEED_TYPE.CURTIN, node))
 
         self.assertIn("apt_sources", preseed)
         self.assertEqual(apt_proxy, preseed["apt_proxy"])
@@ -891,9 +857,7 @@ class TestComposePreseed(MAASServerTestCase):
         nic.vlan.save()
         self.useFixture(RunningClusterRPCFixture())
         request = make_HttpRequest()
-        preseed = yaml.safe_load(
-            compose_preseed(request, PRESEED_TYPE.CURTIN, node)
-        )
+        preseed = yaml.safe_load(compose_preseed(request, PRESEED_TYPE.CURTIN, node))
 
         self.assertNotIn("apt_sources", preseed)
 
@@ -911,9 +875,7 @@ class TestComposePreseed(MAASServerTestCase):
         nic.vlan.save()
         self.useFixture(RunningClusterRPCFixture())
         request = make_HttpRequest()
-        preseed = yaml.safe_load(
-            compose_preseed(request, PRESEED_TYPE.CURTIN, node)
-        )
+        preseed = yaml.safe_load(compose_preseed(request, PRESEED_TYPE.CURTIN, node))
 
         self.assertNotIn("packages", preseed)
 
@@ -1201,9 +1163,7 @@ class TestBuildMetadataURL(MAASServerTestCase):
         )
 
     def test_uses_rack_ipv6_enlist_without_external_dns(self):
-        subnet = factory.make_Subnet(
-            cidr="fd12:3456:789a::/64", dns_servers=[]
-        )
+        subnet = factory.make_Subnet(cidr="fd12:3456:789a::/64", dns_servers=[])
         rack = factory.make_rack_with_interfaces(eth0=["fd12:3456:789a::2/64"])
         _enable_dhcp(subnet, rack)
         machine_ip = "fd12:3456:789a::100"
@@ -1217,9 +1177,7 @@ class TestBuildMetadataURL(MAASServerTestCase):
         )
 
     def test_uses_rack_ipv4_enlist_if_external_dns(self):
-        subnet = factory.make_Subnet(
-            cidr="10.10.0.0/24", dns_servers=["10.10.0.1"]
-        )
+        subnet = factory.make_Subnet(cidr="10.10.0.0/24", dns_servers=["10.10.0.1"])
         rack = factory.make_rack_with_interfaces(eth0=["10.10.0.2/24"])
         _enable_dhcp(subnet, rack)
         machine_ip = "10.10.0.100"
@@ -1250,9 +1208,7 @@ class TestBuildMetadataURL(MAASServerTestCase):
 
     def test_uses_rack_enlist_relay_without_external_dns(self):
         # It's the DNS of the relayed subnet that is important.
-        subnet1 = factory.make_Subnet(
-            cidr="10.10.0.0/24", dns_servers=["10.10.0.1"]
-        )
+        subnet1 = factory.make_Subnet(cidr="10.10.0.0/24", dns_servers=["10.10.0.1"])
         subnet2 = factory.make_Subnet(cidr="10.20.0.0/24", dns_servers=[])
         rack = factory.make_rack_with_interfaces(eth0=["10.10.0.2/24"])
         _enable_dhcp(subnet2, rack, relay_vlan=subnet1.vlan)
@@ -1269,9 +1225,7 @@ class TestBuildMetadataURL(MAASServerTestCase):
     def test_uses_rack_enlist_relay_if_external_dns(self):
         # It's the DNS of the relayed subnet that is important.
         subnet1 = factory.make_Subnet(cidr="10.10.0.0/24", dns_servers=[])
-        subnet2 = factory.make_Subnet(
-            cidr="10.20.0.0/24", dns_servers=["10.20.0.1"]
-        )
+        subnet2 = factory.make_Subnet(cidr="10.20.0.0/24", dns_servers=["10.20.0.1"])
         rack = factory.make_rack_with_interfaces(eth0=["10.10.0.2/24"])
         _enable_dhcp(subnet2, rack, relay_vlan=subnet1.vlan)
         machine_ip = "10.20.0.100"

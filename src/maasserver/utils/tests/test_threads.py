@@ -54,9 +54,7 @@ class TestMakeFunctions(MAASTestCase):
         self.assertIsInstance(pool, ThreadUnpool)
         self.assertIs(pool.contextFactory, orm.ExclusivelyConnected)
         self.assertIsInstance(pool.lock, DeferredSemaphore)
-        self.assertEqual(
-            threads.max_threads_for_database_pool, pool.lock.limit
-        )
+        self.assertEqual(threads.max_threads_for_database_pool, pool.lock.limit)
 
     def test_make_database_unpool_accepts_max_threads_setting(self):
         maxthreads = random.randint(1, 1000)
@@ -78,9 +76,7 @@ class TestInstallFunctions(MAASTestCase):
         self.assertEqual(0, pool.min)
 
     def test_install_database_pool_will_not_work_now(self):
-        error = self.assertRaises(
-            AssertionError, threads.install_database_pool
-        )
+        error = self.assertRaises(AssertionError, threads.install_database_pool)
         self.assertIn("Too late; ", str(error))
 
     def test_database_pool_is_connected_unpool(self):

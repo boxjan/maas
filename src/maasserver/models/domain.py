@@ -43,18 +43,14 @@ def validate_domain_name(value):
     """Django validator: `value` must be a valid DNS Zone name."""
     namespec = re.compile(f"^{NAMESPEC}$")
     if len(value) > 255:
-        raise ValidationError(
-            "Domain name length cannot exceed 255 characters."
-        )
+        raise ValidationError("Domain name length cannot exceed 255 characters.")
     if not namespec.match(value):
         disallowed_chars = re.sub("[a-zA-Z0-9-.]*", "", value)
         if disallowed_chars:
             raise ValidationError("Domain name contains invalid characters.")
         raise ValidationError(f"Invalid domain name: {value}.")
     if value == Config.objects.get_config("maas_internal_domain"):
-        raise ValidationError(
-            "Domain name cannot duplicate maas internal domain name."
-        )
+        raise ValidationError("Domain name cannot duplicate maas internal domain name.")
 
 
 def validate_internal_domain_name(value):
@@ -407,8 +403,7 @@ class Domain(CleanSave, TimestampedModel):
     def validate_authority(self):
         if self.authoritative and len(self.forward_dns_servers) > 0:
             raise ValidationError(
-                "A Domain cannot be both authoritative and have"
-                "forward DNS servers"
+                "A Domain cannot be both authoritative and have" "forward DNS servers"
             )
 
     def clean(self, *args, **kwargs):
@@ -436,9 +431,7 @@ class Domain(CleanSave, TimestampedModel):
             rr_mapping = defaultdict(HostnameRRsetMapping)
         # Smash the IP Addresses in the rrset mapping, so that the far end
         # only needs to worry about one thing.
-        ip_mapping = StaticIPAddress.objects.get_hostname_ip_mapping(
-            self, raw_ttl=True
-        )
+        ip_mapping = StaticIPAddress.objects.get_hostname_ip_mapping(self, raw_ttl=True)
         for hostname, info in ip_mapping.items():
             if (
                 user is not None

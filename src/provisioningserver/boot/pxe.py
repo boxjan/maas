@@ -27,8 +27,7 @@ re_mac_address_octet = r"[0-9a-f]{2}"
 re_mac_address = re.compile("-".join(repeat(re_mac_address_octet, 6)))
 
 re_hardware_uuid = re.compile(
-    "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-"
-    "[a-fA-F0-9]{12}"
+    "[a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-" "[a-fA-F0-9]{12}"
 )
 
 # We assume that the ARP HTYPE (hardware type) that PXELINUX sends is

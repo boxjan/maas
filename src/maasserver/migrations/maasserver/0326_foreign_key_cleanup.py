@@ -86,9 +86,7 @@ def clean_up_missing_fk_virtualmachinedisk(apps, schema_editor):
 
 def clean_up_missing_fk_virtualmachineinterface(apps, schema_editor):
     VirtualMachine = apps.get_model("maasserver", "VirtualMachine")
-    VirtualMachineInterface = apps.get_model(
-        "maasserver", "VirtualMachineInterface"
-    )
+    VirtualMachineInterface = apps.get_model("maasserver", "VirtualMachineInterface")
 
     VirtualMachineInterface.objects.exclude(
         vm__isnull=False,
@@ -114,9 +112,7 @@ def clean_up_missing_fk_vlan(apps, schema_editor):
 def clean_up_missing_fk_node(apps, schema_editor):
     Interface = apps.get_model("maasserver", "Interface")
     NodeConfig = apps.get_model("maasserver", "NodeConfig")
-    RegionControllerProcess = apps.get_model(
-        "maasserver", "RegionControllerProcess"
-    )
+    RegionControllerProcess = apps.get_model("maasserver", "RegionControllerProcess")
     StaticIPAddress = apps.get_model("maasserver", "StaticIPAddress")
     Node = apps.get_model("maasserver", "Node")
 
@@ -163,15 +159,9 @@ class Migration(migrations.Migration):
         migrations.RunPython(clean_up_missing_fk_virtualmachineinterface),
         migrations.RunPython(clean_up_missing_fk_vlan),
         migrations.RunPython(clean_up_missing_fk_node),
-        migrations.RunSQL(
-            clean_up_missing_fk_maasserver_dnsresource_ip_addresses
-        ),
-        migrations.RunSQL(
-            clean_up_missing_fk_maasserver_forwarddnsserver_domains
-        ),
-        migrations.RunSQL(
-            clean_up_missing_fk_maasserver_interface_ip_addresses
-        ),
+        migrations.RunSQL(clean_up_missing_fk_maasserver_dnsresource_ip_addresses),
+        migrations.RunSQL(clean_up_missing_fk_maasserver_forwarddnsserver_domains),
+        migrations.RunSQL(clean_up_missing_fk_maasserver_interface_ip_addresses),
         migrations.RunSQL(clean_up_missing_fk_maasserver_podhints_nodes),
         migrations.RunSQL(clean_up_missing_fk_maasserver_node_tags),
     ]

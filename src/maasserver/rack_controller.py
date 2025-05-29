@@ -108,9 +108,7 @@ class RackControllerService(Service):
         def cb_handlerMissedMessages(rack_ids):
             # Call the handler as if it came from the postgres listener.
             for rack_id in rack_ids:
-                self.coreHandler(
-                    "sys_core_%d" % self.processId, "watch_%d" % rack_id
-                )
+                self.coreHandler("sys_core_%d" % self.processId, "watch_%d" % rack_id)
 
         def cb_clearStarting(_):
             # Clear starting as its now started.
@@ -123,9 +121,7 @@ class RackControllerService(Service):
 
         self.starting = self.ipcWorker.processId.get()
         self.starting.addCallback(cb_registerWithPostgres)
-        self.starting.addCallback(
-            partial(deferToDatabase, cb_getManagingProcesses)
-        )
+        self.starting.addCallback(partial(deferToDatabase, cb_getManagingProcesses))
         self.starting.addCallback(cb_handlerMissedMessages)
         self.starting.addCallback(cb_clearStarting)
         self.starting.addErrback(eb_cancelled)
@@ -219,16 +215,12 @@ class RackControllerService(Service):
         log.debug(
             "[pid:{pid()}] currently watching racks: {racks()}",
             pid=os.getpid,
-            racks=lambda: ", ".join(
-                [str(rack_id) for rack_id in self.watching]
-            ),
+            racks=lambda: ", ".join([str(rack_id) for rack_id in self.watching]),
         )
         log.debug(
             "[pid:{pid()}] racks requiring DHCP push: {racks()}",
             pid=os.getpid,
-            racks=lambda: ", ".join(
-                [str(rack_id) for rack_id in self.needsDHCPUpdate]
-            ),
+            racks=lambda: ", ".join([str(rack_id) for rack_id in self.needsDHCPUpdate]),
         )
 
     def dhcpHandler(self, channel, message):
@@ -281,8 +273,7 @@ class RackControllerService(Service):
             d.addErrback(lambda f: f.trap(NoConnectionsAvailable))
             d.addErrback(
                 log.err,
-                "Failed configuring DHCP on rack controller 'id:%d'."
-                % rack_id,
+                "Failed configuring DHCP on rack controller 'id:%d'." % rack_id,
             )
             return d
 
@@ -311,9 +302,7 @@ class RackControllerService(Service):
                     f"[pid:{os.getpid()}] DHCP configuration push failed as rack is not in the DB: {rack_id}"
                 )
 
-        d = deferToDatabase(
-            transactional(RackController.objects.get), id=rack_id
-        )
+        d = deferToDatabase(transactional(RackController.objects.get), id=rack_id)
         d.addCallback(dhcp.configure_dhcp)
         d.addErrback(unwatch_if_does_not_exist)
         return d

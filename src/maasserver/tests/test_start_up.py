@@ -98,9 +98,7 @@ class TestStartUp(MAASTransactionServerTestCase):
         start_up.start_up()
         # However, it did call inner_start_up() twice; the first call resulted
         # in the "Boom!" exception so it tried again.
-        inner_start_up.assert_has_calls(
-            [call(master=False), call(master=False)]
-        )
+        inner_start_up.assert_has_calls([call(master=False), call(master=False)])
         # It also slept once, for 3 seconds, between those attempts.
         start_up.pause.assert_called_once_with(3.0)
 
@@ -142,9 +140,7 @@ class TestInnerStartUp(MAASServerTestCase):
         self.versions_info = DebVersionsInfo(
             current={"version": "1:3.1.0-1234-g.deadbeef"}
         )
-        self.patch(
-            start_up, "get_versions_info"
-        ).return_value = self.versions_info
+        self.patch(start_up, "get_versions_info").return_value = self.versions_info
         temp_dir = Path(self.make_dir())
         self.patch(MAAS_SHARED_SECRET, "_path", lambda: temp_dir / "secret")
         MAAS_SECRET.set(factory.make_bytes())
@@ -223,9 +219,7 @@ class TestInnerStartUp(MAASServerTestCase):
 
     def test_sets_maas_url_not_master(self):
         Config.objects.set_config("maas_url", "http://default.example.com/")
-        self.useFixture(
-            RegionConfigurationFixture(maas_url="http://my.example.com/")
-        )
+        self.useFixture(RegionConfigurationFixture(maas_url="http://my.example.com/"))
         with post_commit_hooks:
             start_up.inner_start_up(master=False)
 
@@ -270,17 +264,13 @@ class TestInnerStartUp(MAASServerTestCase):
             start_up.inner_start_up(master=True)
         # existing deprecations are removed since none is active
         self.assertEqual(
-            Notification.objects.filter(
-                ident__startswith="deprecation_"
-            ).count(),
+            Notification.objects.filter(ident__startswith="deprecation_").count(),
             0,
         )
 
     def test_logs_deprecation_notifications(self):
         self.patch(deprecations, "postgresql_major_version").return_value = 12
-        self.patch(
-            deprecations, "get_database_owner"
-        ).return_value = "postgres"
+        self.patch(deprecations, "get_database_owner").return_value = "postgres"
         mock_log = self.patch(start_up, "log")
         with post_commit_hooks:
             start_up.inner_start_up(master=True)
@@ -315,9 +305,7 @@ class TestInnerStartUp(MAASServerTestCase):
 
     def test_migrates_db_credentials_when_configured(self):
         self.patch(start_up, "get_region_vault_client").return_value = object()
-        migrate_mock = self.patch(
-            start_up, "migrate_db_credentials_if_necessary"
-        )
+        migrate_mock = self.patch(start_up, "migrate_db_credentials_if_necessary")
 
         with post_commit_hooks:
             start_up.inner_start_up(master=True)
@@ -326,9 +314,7 @@ class TestInnerStartUp(MAASServerTestCase):
 
     def test_does_not_migrate_db_credentials_when_not_configured(self):
         self.patch(start_up, "get_region_vault_client").return_value = None
-        migrate_mock = self.patch(
-            start_up, "migrate_db_credentials_if_necessary"
-        )
+        migrate_mock = self.patch(start_up, "migrate_db_credentials_if_necessary")
 
         with post_commit_hooks:
             start_up.inner_start_up(master=True)
@@ -417,9 +403,7 @@ class TestVaultMigrateDbCredentials(MAASServerTestCase):
     def setUp(self):
         super().setUp()
         self.creds_path = factory.make_name("uuid")
-        self.patch(
-            start_up, "get_db_creds_vault_path"
-        ).return_value = self.creds_path
+        self.patch(start_up, "get_db_creds_vault_path").return_value = self.creds_path
 
     def test_does_nothing_when_on_disk_and_vault_disabled(self):
         db_name = factory.make_name("uuid")
@@ -483,9 +467,7 @@ class TestVaultMigrateDbCredentials(MAASServerTestCase):
         client = MagicMock()
         client.set.side_effect = [VaultError()]
         Config.objects.set_config("vault_enabled", True)
-        self.assertRaises(
-            VaultError, migrate_db_credentials_if_necessary, client
-        )
+        self.assertRaises(VaultError, migrate_db_credentials_if_necessary, client)
         Config.objects.set_config("vault_enabled", False)
         with RegionConfiguration.open() as config:
             self.assertEqual(db_name, config.database_name)
@@ -541,9 +523,7 @@ class TestVaultMigrateDbCredentials(MAASServerTestCase):
         Config.objects.set_config("vault_enabled", False)
         exc = factory.make_exception()
         self.patch(ConfigurationFile, "save").side_effect = exc
-        self.assertRaises(
-            type(exc), migrate_db_credentials_if_necessary, client
-        )
+        self.assertRaises(type(exc), migrate_db_credentials_if_necessary, client)
         with RegionConfiguration.open() as config:
             self.assertEqual("", config.database_name)
             self.assertEqual("", config.database_user)
@@ -573,9 +553,7 @@ class TestCreateClusterCertificate(MAASServerTestCase):
 
         _create_cluster_certificate_if_necessary()
 
-        maasca_secret = secret_manager.get_composite_secret(
-            "maas-ca-certificate"
-        )
+        maasca_secret = secret_manager.get_composite_secret("maas-ca-certificate")
         maasca = Certificate.from_pem(
             maasca_secret["key"],
             maasca_secret["cert"],
@@ -584,9 +562,7 @@ class TestCreateClusterCertificate(MAASServerTestCase):
         self.assertIsNotNone(maasca.private_key_pem())
         self.assertIsNotNone(maasca.certificate_pem())
 
-        certificate_secret = secret_manager.get_composite_secret(
-            "cluster-certificate"
-        )
+        certificate_secret = secret_manager.get_composite_secret("cluster-certificate")
         certificate = Certificate.from_pem(
             certificate_secret["key"],
             certificate_secret["cert"],

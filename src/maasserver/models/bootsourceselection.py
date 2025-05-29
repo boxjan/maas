@@ -25,9 +25,7 @@ class BootSourceSelection(CleanSave, TimestampedModel):
 
     objects = BootSourceSelectionManager()
 
-    boot_source = ForeignKey(
-        "maasserver.BootSource", blank=False, on_delete=CASCADE
-    )
+    boot_source = ForeignKey("maasserver.BootSource", blank=False, on_delete=CASCADE)
 
     os = CharField(
         max_length=20,
@@ -60,16 +58,11 @@ class BootSourceSelection(CleanSave, TimestampedModel):
         }
 
     def delete(self, *args, **kwargs):
-        commissioning_osystem = Config.objects.get_config(
-            name="commissioning_osystem"
-        )
+        commissioning_osystem = Config.objects.get_config(name="commissioning_osystem")
         commissioning_series = Config.objects.get_config(
             name="commissioning_distro_series"
         )
-        if (
-            commissioning_osystem == self.os
-            and commissioning_series == self.release
-        ):
+        if commissioning_osystem == self.os and commissioning_series == self.release:
             raise ValidationError(
                 "Unable to delete %s %s. "
                 "It is the operating system used in ephemeral environments."

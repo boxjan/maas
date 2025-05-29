@@ -38,9 +38,7 @@ class Migration(migrations.Migration):
                         max_length=256,
                         unique=True,
                         validators=[
-                            django.core.validators.RegexValidator(
-                                "^\\w[ \\w-]*$"
-                            )
+                            django.core.validators.RegexValidator("^\\w[ \\w-]*$")
                         ],
                     ),
                 ),

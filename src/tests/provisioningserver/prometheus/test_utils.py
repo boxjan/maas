@@ -26,9 +26,7 @@ class TestPrometheusMetricsNew:
         assert prometheus_metrics.generate_latest() is None
 
     def test_update(self):
-        definitions = [
-            MetricDefinition("Gauge", "a_gauge", "A Gauge", ["foo", "bar"])
-        ]
+        definitions = [MetricDefinition("Gauge", "a_gauge", "A Gauge", ["foo", "bar"])]
         prometheus_metrics = PrometheusMetrics(
             definitions=definitions,
             registry=prometheus_client.CollectorRegistry(),
@@ -48,15 +46,12 @@ class TestPrometheusMetricsNew:
             registry=prometheus_client.CollectorRegistry(),
         )
         prometheus_metrics.update("a_counter", "set", value=22)
-        assert (
-            "a_counter_total 22.0"
-            in prometheus_metrics.generate_latest().decode("ascii")
+        assert "a_counter_total 22.0" in prometheus_metrics.generate_latest().decode(
+            "ascii"
         )
 
     def test_update_with_extra_labels(self):
-        definitions = [
-            MetricDefinition("Gauge", "a_gauge", "A Gauge", ["foo", "bar"])
-        ]
+        definitions = [MetricDefinition("Gauge", "a_gauge", "A Gauge", ["foo", "bar"])]
         prometheus_metrics = PrometheusMetrics(
             definitions=definitions,
             extra_labels={"baz": "BAZ", "bza": "BZA"},
@@ -79,16 +74,12 @@ class TestPrometheusMetricsNew:
             update_handlers=[update_gauge],
             registry=prometheus_client.CollectorRegistry(),
         )
-        assert "a_gauge 33.0" in prometheus_metrics.generate_latest().decode(
-            "ascii"
-        )
+        assert "a_gauge 33.0" in prometheus_metrics.generate_latest().decode("ascii")
 
     @pytest.mark.asyncio
     async def test_record_call_latency_deferred(self):
         definitions = [
-            MetricDefinition(
-                "Histogram", "histo", "An histogram", ["foo", "bar"]
-            )
+            MetricDefinition("Histogram", "histo", "An histogram", ["foo", "bar"])
         ]
         prometheus_metrics = PrometheusMetrics(
             definitions=definitions,
@@ -121,9 +112,7 @@ class TestPrometheusMetricsNew:
     @pytest.mark.asyncio
     async def test_record_call_latency_asyncio(self):
         definitions = [
-            MetricDefinition(
-                "Histogram", "histo", "An histogram", ["foo", "bar"]
-            )
+            MetricDefinition("Histogram", "histo", "An histogram", ["foo", "bar"])
         ]
         prometheus_metrics = PrometheusMetrics(
             definitions=definitions,
@@ -154,9 +143,7 @@ class TestPrometheusMetricsNew:
 
     def test_record_call_latency_sync(self):
         definitions = [
-            MetricDefinition(
-                "Histogram", "histo", "An histogram", ["foo", "bar"]
-            )
+            MetricDefinition("Histogram", "histo", "An histogram", ["foo", "bar"])
         ]
         prometheus_metrics = PrometheusMetrics(
             definitions=definitions,
@@ -186,9 +173,7 @@ class TestPrometheusMetricsNew:
 
     def test_failure_counter_increments_counter_on_exception(self):
         definitions = [
-            MetricDefinition(
-                "Counter", "test_failure", "A counter", ["foo", "bar"]
-            )
+            MetricDefinition("Counter", "test_failure", "A counter", ["foo", "bar"])
         ]
         prometheus_metrics = PrometheusMetrics(
             definitions=definitions,
@@ -200,9 +185,7 @@ class TestPrometheusMetricsNew:
             label_call_args.append((args, kwargs))
             return {"foo": "FOO", "bar": "BAR"}
 
-        @prometheus_metrics.failure_counter(
-            "test_failure", get_labels=get_labels
-        )
+        @prometheus_metrics.failure_counter("test_failure", get_labels=get_labels)
         def func(param1, param2=None):
             raise Exception()
 
@@ -220,9 +203,7 @@ class TestPrometheusMetricsNew:
             ...
 
         definitions = [
-            MetricDefinition(
-                "Counter", "test_failure", "A counter", ["foo", "bar"]
-            )
+            MetricDefinition("Counter", "test_failure", "A counter", ["foo", "bar"])
         ]
         prometheus_metrics = PrometheusMetrics(
             definitions=definitions,
@@ -270,9 +251,7 @@ class TestPrometheusMetricsNew:
 
     def test_failure_counter_does_not_increment_on_success(self):
         definitions = [
-            MetricDefinition(
-                "Counter", "test_failure", "A counter", ["foo", "bar"]
-            )
+            MetricDefinition("Counter", "test_failure", "A counter", ["foo", "bar"])
         ]
         prometheus_metrics = PrometheusMetrics(
             definitions=definitions,
@@ -284,9 +263,7 @@ class TestPrometheusMetricsNew:
             label_call_args.append((args, kwargs))
             return {"foo": "FOO", "bar": "BAR"}
 
-        @prometheus_metrics.failure_counter(
-            "test_failure", get_labels=get_labels
-        )
+        @prometheus_metrics.failure_counter("test_failure", get_labels=get_labels)
         def func(param1, param2=None):
             return param1
 
@@ -298,9 +275,7 @@ class TestPrometheusMetricsNew:
 
 class TestCreateMetrics:
     METRICS_DEFINITIONS = [
-        MetricDefinition(
-            "Histogram", "sample_histogram", "Sample histogram", []
-        ),
+        MetricDefinition("Histogram", "sample_histogram", "Sample histogram", []),
         MetricDefinition("Counter", "sample_counter", "Sample counter", []),
     ]
 

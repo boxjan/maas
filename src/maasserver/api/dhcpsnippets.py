@@ -189,9 +189,7 @@ class DHCPSnippetHandler(OperationsHandler):
         try:
             revert_to = int(revert_to)
         except ValueError:
-            raise MAASAPIValidationError(
-                "%s is an invalid 'to' value" % revert_to
-            )
+            raise MAASAPIValidationError("%s is an invalid 'to' value" % revert_to)
 
         dhcp_snippet = DHCPSnippet.objects.get_dhcp_snippet_or_404(id)
         try:
@@ -236,9 +234,7 @@ class DHCPSnippetsHandler(OperationsHandler):
         @success-example "success-json" [exkey=dhcp-snippets-read] placeholder
         text
         """
-        return DHCPSnippet.objects.all().select_related(
-            "value", "subnet", "node"
-        )
+        return DHCPSnippet.objects.all().select_related("value", "subnet", "node")
 
     @admin_method
     def create(self, request):

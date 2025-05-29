@@ -98,9 +98,7 @@ class TestSeaMicroPowerDriver(MAASTestCase):
         power_change = choice(["on", "off"])
         seamicro_power_driver = SeaMicroPowerDriver()
         call_and_check_mock = self.patch(seamicro_module, "call_and_check")
-        call_and_check_mock.side_effect = ExternalProcessError(
-            1, "ipmitool something"
-        )
+        call_and_check_mock.side_effect = ExternalProcessError(1, "ipmitool something")
 
         self.assertRaises(
             PowerActionError,
@@ -180,9 +178,7 @@ class TestSeaMicroPowerDriver(MAASTestCase):
             seamicro_module, "power_query_seamicro15k_v2"
         )
         power_query_seamicro15k_v2_mock.return_value = "on"
-        power_state = seamicro_power_driver.power_query(
-            context["system_id"], context
-        )
+        power_state = seamicro_power_driver.power_query(context["system_id"], context)
 
         power_query_seamicro15k_v2_mock.assert_called_once_with(
             ip,
@@ -196,8 +192,6 @@ class TestSeaMicroPowerDriver(MAASTestCase):
         ip, username, password, server_id, context = self.make_context()
         context["power_control"] = factory.make_name("power_control")
         seamicro_power_driver = SeaMicroPowerDriver()
-        power_state = seamicro_power_driver.power_query(
-            context["system_id"], context
-        )
+        power_state = seamicro_power_driver.power_query(context["system_id"], context)
 
         self.assertEqual("unknown", power_state)

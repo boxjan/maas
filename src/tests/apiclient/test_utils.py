@@ -11,15 +11,11 @@ from apiclient.utils import ascii_url, urlencode
 
 class TestHelpers(TestCase):
     def test_ascii_url_leaves_ascii_bytes_unchanged(self):
-        self.assertEqual(
-            b"http://example.com/", ascii_url(b"http://example.com/")
-        )
+        self.assertEqual(b"http://example.com/", ascii_url(b"http://example.com/"))
         self.assertIsInstance(ascii_url(b"http://example.com"), bytes)
 
     def test_ascii_url_asciifies_unicode(self):
-        self.assertEqual(
-            b"http://example.com/", ascii_url("http://example.com/")
-        )
+        self.assertEqual(b"http://example.com/", ascii_url("http://example.com/"))
         self.assertIsInstance(ascii_url("http://example.com"), bytes)
 
     def test_urlencode_encodes_utf8_and_quotes(self):

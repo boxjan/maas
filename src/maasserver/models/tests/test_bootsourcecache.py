@@ -56,7 +56,5 @@ class TestBootSourceCache(MAASServerTestCase):
         cache = factory.make_BootSourceCache(release_codename=release_codename)
         self.assertEqual(
             release_codename,
-            BootSourceCache.objects.get_release_codename(
-                cache.os, cache.release
-            ),
+            BootSourceCache.objects.get_release_codename(cache.os, cache.release),
         )

@@ -18,9 +18,7 @@ class TestGetSigningPolicy(MAASTestCase):
         path = "streams/v1/index.json"
         policy = helpers.get_signing_policy(path)
         content = factory.make_string()
-        self.assertEqual(
-            content, policy(content, path, factory.make_name("keyring"))
-        )
+        self.assertEqual(content, policy(content, path, factory.make_name("keyring")))
 
     def test_picks_checking_policy_for_sjson_index(self):
         path = "streams/v1/index.sjson"

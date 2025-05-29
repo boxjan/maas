@@ -66,16 +66,12 @@ class TestAccessMiddleware(MAASServerTestCase):
 
     def test_return_request_on_public_path(self):
         request = factory.make_fake_request("/MAAS/accounts/login/")
-        self.assertEqual(
-            http.client.OK, self.process_request(request).status_code
-        )
+        self.assertEqual(http.client.OK, self.process_request(request).status_code)
 
     def test_return_redirect_index(self):
         request = factory.make_fake_request("/MAAS/")
         request.user = AnonymousUser()
-        self.assertEqual(
-            "/MAAS/", extract_redirect(self.process_request(request))
-        )
+        self.assertEqual("/MAAS/", extract_redirect(self.process_request(request)))
 
 
 class TestExceptionMiddleware(MAASServerTestCase):
@@ -96,16 +92,12 @@ class TestExceptionMiddleware(MAASServerTestCase):
     def test_ignores_serialization_failures(self):
         request = self.make_fake_request()
         exception = make_serialization_failure()
-        self.assertRaises(
-            type(exception), self.process_exception, request, exception
-        )
+        self.assertRaises(type(exception), self.process_exception, request, exception)
 
     def test_ignores_deadlock_failures(self):
         request = self.make_fake_request()
         exception = make_deadlock_failure()
-        self.assertRaises(
-            type(exception), self.process_exception, request, exception
-        )
+        self.assertRaises(type(exception), self.process_exception, request, exception)
 
     def test_unknown_exception_generates_internal_server_error(self):
         # An unknown exception generates an internal server error with the
@@ -215,9 +207,7 @@ class TestExceptionMiddleware(MAASServerTestCase):
         error_text = factory.make_string()
         exception = ExternalProcessError(1, ["cmd"], error_text)
         retry_after = random.randint(0, 10)
-        self.patch(
-            middleware_module, "RETRY_AFTER_SERVICE_UNAVAILABLE", retry_after
-        )
+        self.patch(middleware_module, "RETRY_AFTER_SERVICE_UNAVAILABLE", retry_after)
         request = self.make_fake_request()
         response = self.process_exception(request, exception)
         self.assertEqual(response.status_code, http.client.SERVICE_UNAVAILABLE)
@@ -344,9 +334,8 @@ class TestRPCErrorsMiddleware(MAASServerTestCase):
 
     def test_handles_NoConnectionsAvailable(self):
         request = factory.make_fake_request(factory.make_string(), "POST")
-        error_message = (
-            "No connections available for cluster %s"
-            % factory.make_name("cluster")
+        error_message = "No connections available for cluster %s" % factory.make_name(
+            "cluster"
         )
         error = NoConnectionsAvailable(error_message)
         response = self.process_request(request, error)
@@ -369,9 +358,7 @@ class TestRPCErrorsMiddleware(MAASServerTestCase):
             "You may think it's a long walk down the street to the chemist "
             "but that's just peanuts to space!"
         )
-        self.assertRaises(
-            ZeroDivisionError, self.process_request, request, exception
-        )
+        self.assertRaises(ZeroDivisionError, self.process_request, request, exception)
 
     def test_ignores_error_on_API(self):
         non_api_request = factory.make_fake_request("/MAAS/api/2.0/ohai")
@@ -425,9 +412,7 @@ class TestAPIRPCErrorsMiddleware(MAASServerTestCase):
         )
 
     def test_ignores_error_outside_API(self):
-        non_api_request = factory.make_fake_request(
-            "/MAAS/middleware/api/hello"
-        )
+        non_api_request = factory.make_fake_request("/MAAS/middleware/api/hello")
         exception_class = random.choice(
             (NoConnectionsAvailable, PowerActionAlreadyInProgress)
         )
@@ -513,9 +498,7 @@ class TestAPIRPCErrorsMiddleware(MAASServerTestCase):
             "You may think it's a long walk down the street to the chemist "
             "but that's just peanuts to space!"
         )
-        self.assertRaises(
-            ZeroDivisionError, self.process_request, request, exception
-        )
+        self.assertRaises(ZeroDivisionError, self.process_request, request, exception)
 
 
 class TestCSRFHelperMiddleware(MAASServerTestCase):

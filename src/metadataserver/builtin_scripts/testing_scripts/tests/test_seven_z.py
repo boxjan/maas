@@ -71,9 +71,7 @@ class TestSevenZTest(MAASTestCase):
 
         mock_popen.assert_called_once_with(cmd, stdout=PIPE, stderr=PIPE)
         mock_open.assert_called_once_with(ANY, "w")
-        mock_yaml_safe_dump.assert_called_once_with(
-            results, mock_open.return_value
-        )
+        mock_yaml_safe_dump.assert_called_once_with(results, mock_open.return_value)
         self.assertEqual(returncode, 0)
 
     def test_run_7z_exits_if_returncode_non_zero(self):

@@ -130,10 +130,7 @@ def get_simplestreams_env():
             # directly instead of through the proxy.
             if Config.objects.get_config("boot_images_no_proxy"):
                 no_proxy_hosts.extend(
-                    [
-                        urlparse(source["url"]).hostname
-                        for source in get_boot_sources()
-                    ]
+                    [urlparse(source["url"]).hostname for source in get_boot_sources()]
                 )
             for host in no_proxy_hosts:
                 _upsert_no_proxy_env(env, host)
@@ -177,9 +174,7 @@ def get_os_info_from_boot_sources(os):
     releases = set()
     arches = set()
     for source in BootSource.objects.all():
-        for cache_item in BootSourceCache.objects.filter(
-            boot_source=source, os=os
-        ):
+        for cache_item in BootSourceCache.objects.filter(boot_source=source, os=os):
             if source not in os_sources:
                 os_sources.append(source)
             releases.add(cache_item.release)
@@ -229,9 +224,7 @@ def _update_cache(source, descriptions):
                 # Get current images for the source.
                 current_images = {
                     make_image_tuple(image): image
-                    for image in BootSourceCache.objects.filter(
-                        boot_source=bootsource
-                    )
+                    for image in BootSourceCache.objects.filter(boot_source=bootsource)
                 }
                 bulk_create = []
                 for spec, item in descriptions.mapping.items():
@@ -284,9 +277,7 @@ def _update_cache(source, descriptions):
                     # Insert all cache items in 1 query.
                     BootSourceCache.objects.bulk_create(bulk_create)
                 if current_images:
-                    image_ids = {
-                        image.id for _, image in current_images.items()
-                    }
+                    image_ids = {image.id for _, image in current_images.items()}
                     BootSourceCache.objects.filter(id__in=image_ids).delete()
             log.debug(
                 "Image descriptions for {url} have been updated.",
@@ -335,9 +326,7 @@ def cache_boot_sources():
 
     @transactional
     def check_commissioning_series_selected():
-        commissioning_osystem = Config.objects.get_config(
-            name="commissioning_osystem"
-        )
+        commissioning_osystem = Config.objects.get_config(name="commissioning_osystem")
         commissioning_series = Config.objects.get_config(
             name="commissioning_distro_series"
         )
@@ -404,15 +393,13 @@ def cache_boot_sources():
                 if not proxy:
                     msg = (
                         "Failed to import images from %s (%s). Verify "
-                        "network connectivity and try again."
-                        % (source["url"], error)
+                        "network connectivity and try again." % (source["url"], error)
                     )
                 else:
                     msg = (
                         "Failed to import images from %s (%s). Verify "
                         "network connectivity via your external "
-                        "proxy (%s) and try again."
-                        % (source["url"], error, proxy)
+                        "proxy (%s) and try again." % (source["url"], error, proxy)
                     )
                 errors.append(msg)
             else:

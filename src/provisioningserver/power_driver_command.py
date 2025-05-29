@@ -107,6 +107,4 @@ def run(argv=None):
 
     args = _parse_args(argv)
 
-    react(
-        lambda *args, **kwargs: ensureDeferred(_run(*args, **kwargs)), [args]
-    )
+    react(lambda *args, **kwargs: ensureDeferred(_run(*args, **kwargs)), [args])

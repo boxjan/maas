@@ -212,8 +212,7 @@ class TFTPBackend(FilesystemSynchronousBackend):
             mac = network.find_mac_via_arp(remote_ip)
             log.info(
                 "Device %s with MAC address %s is PXE booting; "
-                "instructing the device to boot locally."
-                % (params["hostname"], mac)
+                "instructing the device to boot locally." % (params["hostname"], mac)
             )
             # Set purpose back to local now that we have the message logged.
             params["purpose"] = "local"
@@ -273,9 +272,7 @@ class TFTPBackend(FilesystemSynchronousBackend):
         # Extract from params only those arguments that GetBootConfig cares
         # about; params is a context-like object and other stuff (too much?)
         # gets in there.
-        arguments = (
-            name.decode("ascii") for name, _ in GetBootConfig.arguments
-        )
+        arguments = (name.decode("ascii") for name, _ in GetBootConfig.arguments)
         params = {name: params[name] for name in arguments if name in params}
 
         def fetch(client: Client, params):
@@ -299,9 +296,7 @@ class TFTPBackend(FilesystemSynchronousBackend):
         """
 
         def generate(kernel_params: KernelParameters):
-            return boot_method.get_reader(
-                self, kernel_params=kernel_params, **params
-            )
+            return boot_method.get_reader(self, kernel_params=kernel_params, **params)
 
         return self.get_kernel_params(params).addCallback(generate)
 
@@ -310,9 +305,7 @@ class TFTPBackend(FilesystemSynchronousBackend):
     def get_cache_reader(self, file_name: str | bytes):
         if type(file_name) == str:
             file_name = file_name.encode("utf-8")
-        url = b"/".join(
-            [b"http://localhost:5248/images", file_name.strip(b"/")]
-        )
+        url = b"/".join([b"http://localhost:5248/images", file_name.strip(b"/")])
         resp = yield self._cache_proxy.request(b"GET", url)
         if resp.code != 200:
             # legacy BIOS mode is expecting to get `TFTP file not found error`

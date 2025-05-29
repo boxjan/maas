@@ -91,9 +91,7 @@ def generate(
 
     LOGGER.info(f"creating {machine_count} machines")
     make_storage_setup(machine_infos)
-    machines = make_machines(
-        machine_infos, vmhosts, tags, users, redfish_address
-    )
+    machines = make_machines(machine_infos, vmhosts, tags, users, redfish_address)
 
     LOGGER.info(f"creating {OWNERDATA_PER_MACHINE_COUNT} owner data")
     make_ownerdata(OWNERDATA_PER_MACHINE_COUNT, ownerdata_prefix, machines)

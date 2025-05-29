@@ -61,9 +61,7 @@ async def authenticated_user(
     yield user
 
 
-async def _create_user_session(
-    fixture: Fixture, user: User, session_id: str
-) -> None:
+async def _create_user_session(fixture: Fixture, user: User, session_id: str) -> None:
     key = "<UNUSED>"
     salt = "django.contrib.sessions.SessionStore"
     algorithm = "sha256"

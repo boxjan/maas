@@ -43,9 +43,7 @@ class TestGetLabeledConstraintsMap(MAASTestCase):
 
     def test_missing_key_value_pair_raises(self):
         with self.assertRaises(ConstraintTestException):
-            parse_labeled_constraint_map(
-                "a:bc", exception_type=ConstraintTestException
-            )
+            parse_labeled_constraint_map("a:bc", exception_type=ConstraintTestException)
 
     def test_duplicate_label_raises(self):
         with self.assertRaises(ConstraintTestException):
@@ -61,9 +59,7 @@ class TestGetLabeledConstraintsMap(MAASTestCase):
 
     def test_label_with_no_constraints_raises(self):
         with self.assertRaises(ConstraintTestException):
-            parse_labeled_constraint_map(
-                "a:", exception_type=ConstraintTestException
-            )
+            parse_labeled_constraint_map("a:", exception_type=ConstraintTestException)
 
     def test_single_value_map(self):
         result = parse_labeled_constraint_map("a:b=c")

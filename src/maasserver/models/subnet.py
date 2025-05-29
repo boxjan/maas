@@ -139,9 +139,7 @@ class SubnetQueriesMixin(MAASQueriesMixin):
         ip = IPAddress(ip)
         if ip.is_ipv4_mapped():
             ip = ip.ipv4()
-        subnets = self.raw(
-            self.find_best_subnet_for_ip_query, params=[str(ip)]
-        )
+        subnets = self.raw(self.find_best_subnet_for_ip_query, params=[str(ip)])
 
         for subnet in subnets:
             return subnet  # This is stable because the query is ordered.
@@ -300,9 +298,7 @@ class SubnetManager(Manager, SubnetQueriesMixin):
         :return: list of `netaddr.IPNetwork` objects.
         """
         query = self.filter(active_discovery=True)
-        return [
-            IPNetwork(cidr) for cidr in query.values_list("cidr", flat=True)
-        ]
+        return [IPNetwork(cidr) for cidr in query.values_list("cidr", flat=True)]
 
     def get_subnet_or_404(self, specifiers, user, perm):
         """Fetch a `Subnet` by its id.  Raise exceptions if no `Subnet` with
@@ -346,9 +342,7 @@ class Subnet(CleanSave, TimestampedModel):
 
     description = TextField(null=False, blank=True)
 
-    vlan = ForeignKey(
-        "VLAN", editable=True, blank=False, null=False, on_delete=PROTECT
-    )
+    vlan = ForeignKey("VLAN", editable=True, blank=False, null=False, on_delete=PROTECT)
 
     # XXX:fabric: unique constraint should be relaxed once proper support for
     # fabrics is implemented. The CIDR must be unique within a Fabric, not
@@ -365,21 +359,15 @@ class Subnet(CleanSave, TimestampedModel):
         TextField(), blank=True, editable=True, null=True, default=list
     )
 
-    allow_dns = BooleanField(
-        editable=True, blank=False, null=False, default=True
-    )
+    allow_dns = BooleanField(editable=True, blank=False, null=False, default=True)
 
-    allow_proxy = BooleanField(
-        editable=True, blank=False, null=False, default=True
-    )
+    allow_proxy = BooleanField(editable=True, blank=False, null=False, default=True)
 
     active_discovery = BooleanField(
         editable=True, blank=False, null=False, default=False
     )
 
-    managed = BooleanField(
-        editable=True, blank=False, null=False, default=True
-    )
+    managed = BooleanField(editable=True, blank=False, null=False, default=True)
 
     # MAAS models VLANs by VID, all physical networks which use the same VID
     # share the same VLAN model. Many systems only support network booting on
@@ -514,8 +502,7 @@ class Subnet(CleanSave, TimestampedModel):
         ips = self.get_allocated_ips()
         for ip, alloc_type in ips:
             if ip and not (
-                ignore_discovered_ips
-                and (alloc_type == IPADDRESS_TYPE.DISCOVERED)
+                ignore_discovered_ips and (alloc_type == IPADDRESS_TYPE.DISCOVERED)
             ):
                 ip = IPAddress(ip)
                 if ip in ipnetwork:
@@ -560,15 +547,11 @@ class Subnet(CleanSave, TimestampedModel):
             first_plus_one = str(IPAddress(network.first + 1))
             second = str(IPAddress(network.first + 0xFFFFFFFF))
             if network.prefixlen == 64:
-                ranges |= {
-                    make_iprange(first_plus_one, second, purpose="reserved")
-                }
+                ranges |= {make_iprange(first_plus_one, second, purpose="reserved")}
             # Reserve the subnet router anycast address, except for /127 and
             # /128 networks. (See RFC 6164, and RFC 4291 section 2.6.1.)
             if network.prefixlen < 127:
-                ranges |= {
-                    make_iprange(first, first, purpose="rfc-4291-2.6.1")
-                }
+                ranges |= {make_iprange(first, first, purpose="rfc-4291-2.6.1")}
         if not ranges_only:
             if (
                 self.gateway_ip is not None
@@ -591,38 +574,26 @@ class Subnet(CleanSave, TimestampedModel):
             else:
                 static_routes = StaticRoute.objects.filter(source=self)
             for static_route in static_routes:
-                ranges |= {
-                    make_iprange(static_route.gateway_ip, purpose="gateway-ip")
-                }
-            ranges |= self._get_ranges_for_allocated_ips(
-                network, ignore_discovered_ips
-            )
+                ranges |= {make_iprange(static_route.gateway_ip, purpose="gateway-ip")}
+            ranges |= self._get_ranges_for_allocated_ips(network, ignore_discovered_ips)
             ranges |= {
                 make_iprange(address, purpose="excluded")
                 for address in exclude_addresses
                 if address in network
             }
         if include_reserved:
-            ranges |= self.get_reserved_maasipset(
-                exclude_ip_ranges=exclude_ip_ranges
-            )
-        ranges |= self.get_dynamic_maasipset(
-            exclude_ip_ranges=exclude_ip_ranges
-        )
+            ranges |= self.get_reserved_maasipset(exclude_ip_ranges=exclude_ip_ranges)
+        ranges |= self.get_dynamic_maasipset(exclude_ip_ranges=exclude_ip_ranges)
         if with_neighbours:
             ranges |= self.get_maasipset_for_neighbours()
         return MAASIPSet(ranges)
 
-    def get_ipranges_available_for_reserved_range(
-        self, exclude_ip_ranges: list = None
-    ):
+    def get_ipranges_available_for_reserved_range(self, exclude_ip_ranges: list = None):
         return self.get_ipranges_not_in_use(
             ranges_only=True, exclude_ip_ranges=exclude_ip_ranges
         )
 
-    def get_ipranges_available_for_dynamic_range(
-        self, exclude_ip_ranges: list = None
-    ):
+    def get_ipranges_available_for_dynamic_range(self, exclude_ip_ranges: list = None):
         return self.get_ipranges_not_in_use(
             ranges_only=False,
             ignore_discovered_ips=True,
@@ -724,8 +695,7 @@ class Subnet(CleanSave, TimestampedModel):
         # IP addresses should already be covered by get_ipranges_in_use().
         neighbours = Discovery.objects.filter(subnet=self).by_unknown_ip()
         neighbour_set = {
-            make_iprange(neighbour.ip, purpose="neighbour")
-            for neighbour in neighbours
+            make_iprange(neighbour.ip, purpose="neighbour") for neighbour in neighbours
         }
         return MAASIPSet(neighbour_set)
 
@@ -747,9 +717,7 @@ class Subnet(CleanSave, TimestampedModel):
         # on network infrastructure, reserved ranges, etc.
         unused = self.get_ipranges_not_in_use(ignore_discovered_ips=True)
         least_recent_neighbours = (
-            Discovery.objects.filter(subnet=self)
-            .by_unknown_ip()
-            .order_by("last_seen")
+            Discovery.objects.filter(subnet=self).by_unknown_ip().order_by("last_seen")
         )
         for neighbor in least_recent_neighbours:
             if neighbor.ip in unused:
@@ -832,9 +800,7 @@ class Subnet(CleanSave, TimestampedModel):
         # lowest one.
         free_ips = []
         while count > 0 and len(free_ranges) > 0:
-            free_range = min(
-                free_ranges, key=attrgetter("num_addresses", "first")
-            )
+            free_range = min(free_ranges, key=attrgetter("num_addresses", "first"))
             avail = min(count, free_range.num_addresses)
             for i in range(avail):
                 free_ips.append(str(IPAddress(free_range.first + i)))
@@ -842,9 +808,7 @@ class Subnet(CleanSave, TimestampedModel):
             count -= avail
         return free_ips
 
-    def render_json_for_related_ips(
-        self, with_username=True, with_summary=True
-    ):
+    def render_json_for_related_ips(self, with_username=True, with_summary=True):
         """Render a representation of this subnet's related IP addresses,
         suitable for converting to JSON. Optionally exclude user and node
         information."""
@@ -860,9 +824,7 @@ class Subnet(CleanSave, TimestampedModel):
             )
         return sorted(
             (
-                ip.render_json(
-                    with_username=with_username, with_summary=with_summary
-                )
+                ip.render_json(with_username=with_username, with_summary=with_summary)
                 for ip in ip_addresses
                 if ip.ip
             ),
@@ -938,8 +900,7 @@ class Subnet(CleanSave, TimestampedModel):
         dynamic_ranges = MAASIPSet(
             iprange.get_MAASIPRange()
             for iprange in self.iprange_set.all()
-            if iprange.type == IPRANGE_TYPE.DYNAMIC
-            and iprange not in exclude_ip_ranges
+            if iprange.type == IPRANGE_TYPE.DYNAMIC and iprange not in exclude_ip_ranges
         )
         return dynamic_ranges
 
@@ -987,9 +948,7 @@ class Subnet(CleanSave, TimestampedModel):
         # Circular imports.
         from maasserver.models import Config, Notification
 
-        threshold = Config.objects.get_config(
-            "subnet_ip_exhaustion_threshold_count"
-        )
+        threshold = Config.objects.get_config("subnet_ip_exhaustion_threshold_count")
         notification = Notification.objects.filter(ident=ident).first()
         delete_notification = False
         if threshold > 0:
@@ -1056,9 +1015,7 @@ def get_allocated_ips(subnets):
     ips = StaticIPAddress.objects.filter(
         subnet__id__in=mapping.keys(), ip__isnull=False
     )
-    for subnet_id, ip, alloc_type in ips.values_list(
-        "subnet_id", "ip", "alloc_type"
-    ):
+    for subnet_id, ip, alloc_type in ips.values_list("subnet_id", "ip", "alloc_type"):
         mapping[subnet_id].append((ip, alloc_type))
     for subnet in subnets:
         yield subnet, mapping[subnet.id]

@@ -177,9 +177,7 @@ class TestMSCMPowerDriver(MAASTestCase):
         SSHClient = self.patch(mscm_module, "SSHClient")
         ssh_client = SSHClient.return_value
         ssh_client.connect.side_effect = error
-        self.assertRaises(
-            PowerConnError, driver.run_mscm_command, command, **context
-        )
+        self.assertRaises(PowerConnError, driver.run_mscm_command, command, **context)
 
     def test_power_on_calls_run_mscm_command(self):
         driver = MSCMPowerDriver()
@@ -208,9 +206,7 @@ class TestMSCMPowerDriver(MAASTestCase):
         self.patch(driver, "configure_node_bootonce_pxe")
         run_mscm_command = self.patch(driver, "run_mscm_command")
         run_mscm_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_on, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_on, system_id, context)
 
     def test_power_off_calls_run_mscm_command(self):
         driver = MSCMPowerDriver()
@@ -229,9 +225,7 @@ class TestMSCMPowerDriver(MAASTestCase):
         context = make_context()
         run_mscm_command = self.patch(driver, "run_mscm_command")
         run_mscm_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_off, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_off, system_id, context)
 
     def test_power_query_returns_power_state_on(self):
         driver = MSCMPowerDriver()
@@ -266,9 +260,7 @@ class TestMSCMPowerDriver(MAASTestCase):
         context = make_context()
         run_mscm_command = self.patch(driver, "run_mscm_command")
         run_mscm_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_query, system_id, context)
 
     def test_power_query_crashes_when_unable_to_find_match(self):
         driver = MSCMPowerDriver()
@@ -276,15 +268,11 @@ class TestMSCMPowerDriver(MAASTestCase):
         context = make_context()
         run_mscm_command = self.patch(driver, "run_mscm_command")
         run_mscm_command.return_value = "Rubbish"
-        self.assertRaises(
-            PowerFatalError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerFatalError, driver.power_query, system_id, context)
 
 
 class TestMSCMProbeAndEnlist(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     scenarios = [
         (key, dict(product_name=key, arch=value))
@@ -332,9 +320,7 @@ class TestMSCMProbeAndEnlist(MAASTestCase):
             probe_and_enlist_mscm, user, host, username, password, True, domain
         )
 
-        create_node.assert_called_once_with(
-            macs, self.arch, "mscm", params, domain
-        )
+        create_node.assert_called_once_with(macs, self.arch, "mscm", params, domain)
         commission_node.assert_called_once_with(system_id, user)
 
     @inlineCallbacks
@@ -377,9 +363,7 @@ class TestMSCMProbeAndEnlist(MAASTestCase):
             probe_and_enlist_mscm, user, host, username, password, True, domain
         )
 
-        create_node.assert_called_once_with(
-            macs, self.arch, "mscm", params, domain
-        )
+        create_node.assert_called_once_with(macs, self.arch, "mscm", params, domain)
         commission_node.assert_called_once_with(system_id, user)
 
 
@@ -407,9 +391,7 @@ class TestMSCMProbeAndEnlistCrashesNoMatch(MAASTestCase):
             PowerFatalError,
             "^MSCM Power Driver unable to extract node architecture from: Error$",
         ):
-            yield deferToThread(
-                probe_and_enlist_mscm, user, host, username, password
-            )
+            yield deferToThread(probe_and_enlist_mscm, user, host, username, password)
 
     @inlineCallbacks
     def test_probe_and_enlist_mscm_2_crashes_for_no_match(self):
@@ -432,6 +414,4 @@ class TestMSCMProbeAndEnlistCrashesNoMatch(MAASTestCase):
             PowerFatalError,
             "^MSCM Power Driver unable to extract node architecture from: Error$",
         ):
-            yield deferToThread(
-                probe_and_enlist_mscm, user, host, username, password
-            )
+            yield deferToThread(probe_and_enlist_mscm, user, host, username, password)

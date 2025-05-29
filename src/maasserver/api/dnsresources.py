@@ -354,9 +354,7 @@ class DNSResourceHandler(OperationsHandler):
         dnsresource = DNSResource.objects.get_dnsresource_or_404(
             id, request.user, NodePermission.admin
         )
-        form = DNSResourceForm(
-            instance=dnsresource, data=data, request=request
-        )
+        form = DNSResourceForm(instance=dnsresource, data=data, request=request)
         if form.is_valid():
             return form.save()
         else:

@@ -174,9 +174,7 @@ def make_shared_network(
     return data
 
 
-def make_failover_peer_config(
-    name=None, mode=None, address=None, peer_address=None
-):
+def make_failover_peer_config(name=None, mode=None, address=None, peer_address=None):
     """Return complete DHCP configuration dict for a failover peer."""
     if name is None:
         name = factory.make_name("failover")

@@ -465,9 +465,7 @@ class VirshRunFake:
     def cmd_pool_list(self, _, pool_types):
         filter_types = pool_types.split(",")
         template = " {name: <21}{state: <11}{autostart}"
-        lines = [
-            template.format(name="Name", state="State", autostart="Autostart")
-        ]
+        lines = [template.format(name="Name", state="State", autostart="Autostart")]
         lines.append("-------------------------------------------")
         lines.extend(
             template.format(
@@ -491,9 +489,7 @@ class VirshRunFake:
 
 def make_requested_machine():
     block_devices = [
-        RequestedMachineBlockDevice(
-            size=random.randint(1024**3, 4 * 1024**3)
-        )
+        RequestedMachineBlockDevice(size=random.randint(1024**3, 4 * 1024**3))
         for _ in range(3)
     ]
     interfaces = [RequestedMachineInterface() for _ in range(3)]
@@ -552,21 +548,15 @@ class TestVirshSSH(MAASTestCase):
         mock_sendline.assert_called_once_with("yes")
 
     def test_login_with_password(self):
-        virsh_outputs = [
-            "ubuntu@%s's password: " % factory.make_ipv4_address()
-        ]
+        virsh_outputs = ["ubuntu@%s's password: " % factory.make_ipv4_address()]
         conn = self.configure_virshssh_pexpect(virsh_outputs)
         fake_password = factory.make_name("password")
         mock_sendline = self.patch(conn, "sendline")
-        conn.login(
-            poweraddr=factory.make_name("poweraddr"), password=fake_password
-        )
+        conn.login(poweraddr=factory.make_name("poweraddr"), password=fake_password)
         mock_sendline.assert_called_once_with(fake_password)
 
     def test_login_missing_password(self):
-        virsh_outputs = [
-            "ubuntu@%s's password: " % factory.make_ipv4_address()
-        ]
+        virsh_outputs = ["ubuntu@%s's password: " % factory.make_ipv4_address()]
         conn = self.configure_virshssh_pexpect(virsh_outputs)
         mock_close = self.patch(conn, "close")
         self.assertFalse(conn.login(poweraddr=factory.make_name("poweraddr")))
@@ -669,14 +659,14 @@ class TestVirshSSH(MAASTestCase):
         cmd = ["list", "--all", "--name"]
         message = "something failed"
         conn = self.configure_virshssh_pexpect()
-        conn.before = "\n".join([" ".join(cmd), f"error: {message}"]).encode(
-            "utf-8"
-        )
+        conn.before = "\n".join([" ".join(cmd), f"error: {message}"]).encode("utf-8")
         self.patch(conn, "sendline")
         self.patch(conn, "prompt")
         mock_maaslog = self.patch(virsh, "maaslog")
         error = self.assertRaises(virsh.VirshError, conn.run, cmd)
-        expected_message = "Virsh command ['list', '--all', '--name'] failed: something failed"
+        expected_message = (
+            "Virsh command ['list', '--all', '--name'] failed: something failed"
+        )
         self.assertEqual(str(error), expected_message)
         mock_maaslog.error.assert_called_once_with(expected_message)
 
@@ -739,9 +729,7 @@ class TestVirshSSH(MAASTestCase):
             ("vdb", "/var/lib/libvirt/images/example2.qcow2"),
         ]
         conn = self.configure_virshssh(SAMPLE_DOMBLKLIST)
-        expected = conn.list_machine_block_devices(
-            factory.make_name("machine")
-        )
+        expected = conn.list_machine_block_devices(factory.make_name("machine"))
         self.assertEqual(block_devices, expected)
 
     def test_get_machine_state(self):
@@ -938,19 +926,11 @@ class TestVirshSSH(MAASTestCase):
         local_storage = sum(pool.storage for pool in storage_pools)
         mock_get_pod_nodeinfo = self.patch(virsh.VirshSSH, "get_pod_nodeinfo")
         mock_get_pod_arch = self.patch(virsh.VirshSSH, "get_pod_arch")
-        mock_get_pod_cpu_count = self.patch(
-            virsh.VirshSSH, "get_pod_cpu_count"
-        )
-        mock_get_pod_cpu_speed = self.patch(
-            virsh.VirshSSH, "get_pod_cpu_speed"
-        )
+        mock_get_pod_cpu_count = self.patch(virsh.VirshSSH, "get_pod_cpu_count")
+        mock_get_pod_cpu_speed = self.patch(virsh.VirshSSH, "get_pod_cpu_speed")
         mock_get_pod_memory = self.patch(virsh.VirshSSH, "get_pod_memory")
-        mock_get_pod_storage_pools = self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        )
-        mock_get_pod_server_version = self.patch(
-            virsh.VirshSSH, "get_server_version"
-        )
+        mock_get_pod_storage_pools = self.patch(virsh.VirshSSH, "get_pod_storage_pools")
+        mock_get_pod_server_version = self.patch(virsh.VirshSSH, "get_server_version")
         mock_get_pod_nodeinfo.return_value = SAMPLE_NODEINFO
         mock_get_pod_arch.return_value = architecture
         mock_get_pod_cpu_count.return_value = cores
@@ -1006,9 +986,7 @@ class TestVirshSSH(MAASTestCase):
         mock_get_pod_memory = self.patch(virsh.VirshSSH, "get_pod_memory")
         mock_get_pod_nodeinfo.return_value = SAMPLE_NODEINFO
         mock_get_pod_memory.return_value = memory
-        mock_get_pod_cpu_speed = self.patch(
-            virsh.VirshSSH, "get_pod_cpu_speed"
-        )
+        mock_get_pod_cpu_speed = self.patch(virsh.VirshSSH, "get_pod_cpu_speed")
         mock_get_pod_cpu_speed.return_value = cpu_speed
         mock_get_pod_available_local_storage = self.patch(
             virsh.VirshSSH, "get_pod_available_local_storage"
@@ -1044,24 +1022,14 @@ class TestVirshSSH(MAASTestCase):
             pool = random.choice(storage_pools)
             name = factory.make_name("device")
             devices.append((name, pool.path + "/" + name))
-        device_tags = [
-            [factory.make_name("tag") for _ in range(3)] for _ in range(3)
-        ]
+        device_tags = [[factory.make_name("tag") for _ in range(3)] for _ in range(3)]
         local_storage = [random.randint(4096, 8192) for _ in range(3)]
         mac_addresses = [factory.make_mac_address() for _ in range(3)]
-        mock_get_pod_storage_pools = self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        )
+        mock_get_pod_storage_pools = self.patch(virsh.VirshSSH, "get_pod_storage_pools")
         mock_get_machine_arch = self.patch(virsh.VirshSSH, "get_machine_arch")
-        mock_get_machine_cpu_count = self.patch(
-            virsh.VirshSSH, "get_machine_cpu_count"
-        )
-        mock_get_machine_memory = self.patch(
-            virsh.VirshSSH, "get_machine_memory"
-        )
-        mock_get_machine_state = self.patch(
-            virsh.VirshSSH, "get_machine_state"
-        )
+        mock_get_machine_cpu_count = self.patch(virsh.VirshSSH, "get_machine_cpu_count")
+        mock_get_machine_memory = self.patch(virsh.VirshSSH, "get_machine_memory")
+        mock_get_machine_state = self.patch(virsh.VirshSSH, "get_machine_state")
         mock_list_machine_block_devices = self.patch(
             virsh.VirshSSH, "list_machine_block_devices"
         )
@@ -1079,14 +1047,11 @@ class TestVirshSSH(MAASTestCase):
         mock_list_machine_block_devices.return_value = devices
         mock_get_machine_local_storage.side_effect = local_storage
         mock_get_machine_interface_info.return_value = [
-            InterfaceInfo("bridge", "br0", "virtio", mac)
-            for mac in mac_addresses
+            InterfaceInfo("bridge", "br0", "virtio", mac) for mac in mac_addresses
         ]
 
         block_devices = [
-            RequestedMachineBlockDevice(
-                size=local_storage[idx], tags=device_tags[idx]
-            )
+            RequestedMachineBlockDevice(size=local_storage[idx], tags=device_tags[idx])
             for idx in range(3)
         ]
         # None of the parameters matter in the RequestedMachine except for
@@ -1099,9 +1064,7 @@ class TestVirshSSH(MAASTestCase):
             interfaces=[],
             block_devices=block_devices,
         )
-        discovered_machine = conn.get_discovered_machine(
-            hostname, request=request
-        )
+        discovered_machine = conn.get_discovered_machine(hostname, request=request)
         self.assertEqual(hostname, discovered_machine.hostname)
         self.assertEqual(architecture, discovered_machine.architecture)
         self.assertEqual(cores, discovered_machine.cores)
@@ -1148,27 +1111,15 @@ class TestVirshSSH(MAASTestCase):
             pool = random.choice(storage_pools)
             name = factory.make_name("device")
             devices.append((name, pool.path + "/" + name))
-        device_tags = [
-            [factory.make_name("tag") for _ in range(3)] for _ in range(3)
-        ]
+        device_tags = [[factory.make_name("tag") for _ in range(3)] for _ in range(3)]
         local_storage = [random.randint(4096, 8192) for _ in range(3)]
         mac_addresses = [factory.make_mac_address() for _ in range(3)]
-        mock_get_pod_storage_pools = self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        )
-        mock_find_storage_pool = self.patch(
-            virsh.VirshSSH, "find_storage_pool"
-        )
+        mock_get_pod_storage_pools = self.patch(virsh.VirshSSH, "get_pod_storage_pools")
+        mock_find_storage_pool = self.patch(virsh.VirshSSH, "find_storage_pool")
         mock_get_machine_arch = self.patch(virsh.VirshSSH, "get_machine_arch")
-        mock_get_machine_cpu_count = self.patch(
-            virsh.VirshSSH, "get_machine_cpu_count"
-        )
-        mock_get_machine_memory = self.patch(
-            virsh.VirshSSH, "get_machine_memory"
-        )
-        mock_get_machine_state = self.patch(
-            virsh.VirshSSH, "get_machine_state"
-        )
+        mock_get_machine_cpu_count = self.patch(virsh.VirshSSH, "get_machine_cpu_count")
+        mock_get_machine_memory = self.patch(virsh.VirshSSH, "get_machine_memory")
+        mock_get_machine_state = self.patch(virsh.VirshSSH, "get_machine_state")
         mock_list_machine_block_devices = self.patch(
             virsh.VirshSSH, "list_machine_block_devices"
         )
@@ -1187,14 +1138,11 @@ class TestVirshSSH(MAASTestCase):
         mock_list_machine_block_devices.return_value = devices
         mock_get_machine_local_storage.side_effect = local_storage
         mock_get_machine_interface_info.return_value = [
-            InterfaceInfo("bridge", "br0", "virtio", mac)
-            for mac in mac_addresses
+            InterfaceInfo("bridge", "br0", "virtio", mac) for mac in mac_addresses
         ]
 
         block_devices = [
-            RequestedMachineBlockDevice(
-                size=local_storage[idx], tags=device_tags[idx]
-            )
+            RequestedMachineBlockDevice(size=local_storage[idx], tags=device_tags[idx])
             for idx in range(3)
         ]
         # None of the parameters matter in the RequestedMachine except for
@@ -1207,9 +1155,7 @@ class TestVirshSSH(MAASTestCase):
             interfaces=[],
             block_devices=block_devices,
         )
-        discovered_machine = conn.get_discovered_machine(
-            hostname, request=request
-        )
+        discovered_machine = conn.get_discovered_machine(hostname, request=request)
         self.assertEqual(hostname, discovered_machine.hostname)
         self.assertEqual(architecture, discovered_machine.architecture)
         self.assertEqual(cores, discovered_machine.cores)
@@ -1255,19 +1201,11 @@ class TestVirshSSH(MAASTestCase):
             None
         ]  # Last storage device is bad.
         mac_addresses = [factory.make_mac_address() for _ in range(3)]
-        mock_get_pod_storage_pools = self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        )
+        mock_get_pod_storage_pools = self.patch(virsh.VirshSSH, "get_pod_storage_pools")
         mock_get_machine_arch = self.patch(virsh.VirshSSH, "get_machine_arch")
-        mock_get_machine_cpu_count = self.patch(
-            virsh.VirshSSH, "get_machine_cpu_count"
-        )
-        mock_get_machine_memory = self.patch(
-            virsh.VirshSSH, "get_machine_memory"
-        )
-        mock_get_machine_state = self.patch(
-            virsh.VirshSSH, "get_machine_state"
-        )
+        mock_get_machine_cpu_count = self.patch(virsh.VirshSSH, "get_machine_cpu_count")
+        mock_get_machine_memory = self.patch(virsh.VirshSSH, "get_machine_memory")
+        mock_get_machine_state = self.patch(virsh.VirshSSH, "get_machine_state")
         mock_list_machine_block_devices = self.patch(
             virsh.VirshSSH, "list_machine_block_devices"
         )
@@ -1304,9 +1242,7 @@ class TestVirshSSH(MAASTestCase):
         machine = factory.make_name("machine")
         conn = self.configure_virshssh([virsh.VirshError("some error"), ""])
         mock_delete_domain = self.patch(virsh.VirshSSH, "delete_domain")
-        self.assertRaises(
-            virsh.VirshError, conn.check_machine_can_startup, machine
-        )
+        self.assertRaises(virsh.VirshError, conn.check_machine_can_startup, machine)
         mock_delete_domain.assert_called_once_with(machine)
         conn.run.assert_called_once_with(["start", "--paused", machine])
 
@@ -1398,17 +1334,11 @@ class TestVirshSSH(MAASTestCase):
             setattr(pool, "available", pool.storage)
             pools.append(pool)
         disk = RequestedMachineBlockDevice(
-            size=random.randint(
-                pools[0].available + 1, pools[1].available - 1
-            ),
+            size=random.randint(pools[0].available + 1, pools[1].available - 1),
             tags=[],
         )
-        self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        ).return_value = pools
-        self.assertEqual(
-            (pools[1].type, pools[1].name), conn.get_usable_pool(disk)
-        )
+        self.patch(virsh.VirshSSH, "get_pod_storage_pools").return_value = pools
+        self.assertEqual((pools[1].type, pools[1].name), conn.get_usable_pool(disk))
 
     def test_get_usable_pool_filters_on_disk_tags(self):
         conn = self.configure_virshssh("")
@@ -1427,9 +1357,7 @@ class TestVirshSSH(MAASTestCase):
         disk = RequestedMachineBlockDevice(
             size=selected_pool.available, tags=[selected_pool.name]
         )
-        self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        ).return_value = pools
+        self.patch(virsh.VirshSSH, "get_pod_storage_pools").return_value = pools
         self.assertEqual(
             (selected_pool.type, selected_pool.name),
             conn.get_usable_pool(disk),
@@ -1452,9 +1380,7 @@ class TestVirshSSH(MAASTestCase):
         disk = RequestedMachineBlockDevice(
             size=selected_pool.available + 1, tags=[selected_pool.name]
         )
-        self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        ).return_value = pools
+        self.patch(virsh.VirshSSH, "get_pod_storage_pools").return_value = pools
         self.assertRaises(PodInvalidResources, conn.get_usable_pool, disk)
 
     def test_get_usable_pool_filters_on_default_pool_id(self):
@@ -1471,12 +1397,8 @@ class TestVirshSSH(MAASTestCase):
             setattr(pool, "available", pool.storage)
             pools.append(pool)
         selected_pool = random.choice(pools)
-        disk = RequestedMachineBlockDevice(
-            size=selected_pool.available, tags=[]
-        )
-        self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        ).return_value = pools
+        disk = RequestedMachineBlockDevice(size=selected_pool.available, tags=[])
+        self.patch(virsh.VirshSSH, "get_pod_storage_pools").return_value = pools
         self.assertEqual(
             (selected_pool.type, selected_pool.name),
             conn.get_usable_pool(disk, selected_pool.id),
@@ -1496,12 +1418,8 @@ class TestVirshSSH(MAASTestCase):
             setattr(pool, "available", pool.storage)
             pools.append(pool)
         selected_pool = random.choice(pools)
-        disk = RequestedMachineBlockDevice(
-            size=selected_pool.available + 1, tags=[]
-        )
-        self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        ).return_value = pools
+        disk = RequestedMachineBlockDevice(size=selected_pool.available + 1, tags=[])
+        self.patch(virsh.VirshSSH, "get_pod_storage_pools").return_value = pools
         self.assertRaises(
             PodInvalidResources, conn.get_usable_pool, disk, selected_pool.id
         )
@@ -1520,12 +1438,8 @@ class TestVirshSSH(MAASTestCase):
             setattr(pool, "available", pool.storage)
             pools.append(pool)
         selected_pool = random.choice(pools)
-        disk = RequestedMachineBlockDevice(
-            size=selected_pool.available, tags=[]
-        )
-        self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        ).return_value = pools
+        disk = RequestedMachineBlockDevice(size=selected_pool.available, tags=[])
+        self.patch(virsh.VirshSSH, "get_pod_storage_pools").return_value = pools
         self.assertEqual(
             (selected_pool.type, selected_pool.name),
             conn.get_usable_pool(disk, selected_pool.name),
@@ -1545,12 +1459,8 @@ class TestVirshSSH(MAASTestCase):
             setattr(pool, "available", pool.storage)
             pools.append(pool)
         selected_pool = random.choice(pools)
-        disk = RequestedMachineBlockDevice(
-            size=selected_pool.available + 1, tags=[]
-        )
-        self.patch(
-            virsh.VirshSSH, "get_pod_storage_pools"
-        ).return_value = pools
+        disk = RequestedMachineBlockDevice(size=selected_pool.available + 1, tags=[])
+        self.patch(virsh.VirshSSH, "get_pod_storage_pools").return_value = pools
         self.assertRaises(
             PodInvalidResources, conn.get_usable_pool, disk, selected_pool.name
         )
@@ -1561,15 +1471,11 @@ class TestVirshSSH(MAASTestCase):
             None,
             None,
         )
-        self.assertIsNone(
-            conn._create_local_volume(random.randint(1000, 2000))
-        )
+        self.assertIsNone(conn._create_local_volume(random.randint(1000, 2000)))
 
     def test_create_local_volume_returns_tagged_pool_and_volume(self):
         tagged_pools = ["pool1", "pool2"]
-        conn = self.configure_virshssh(
-            (SAMPLE_POOLINFO_FULL, SAMPLE_POOLINFO, None)
-        )
+        conn = self.configure_virshssh((SAMPLE_POOLINFO_FULL, SAMPLE_POOLINFO, None))
         self.patch(conn, "list_pools").return_value = tagged_pools
         disk = RequestedMachineBlockDevice(size=4096, tags=tagged_pools)
         used_pool, _ = conn._create_local_volume(disk)
@@ -1582,9 +1488,7 @@ class TestVirshSSH(MAASTestCase):
             "dir",
             pool,
         )
-        disk = RequestedMachineBlockDevice(
-            size=random.randint(1000, 2000), tags=[]
-        )
+        disk = RequestedMachineBlockDevice(size=random.randint(1000, 2000), tags=[])
         used_pool, volume_name = conn._create_local_volume(disk)
         conn.run.assert_called_once_with(
             [
@@ -1608,9 +1512,7 @@ class TestVirshSSH(MAASTestCase):
             "logical",
             pool,
         )
-        disk = RequestedMachineBlockDevice(
-            size=random.randint(1000, 2000), tags=[]
-        )
+        disk = RequestedMachineBlockDevice(size=random.randint(1000, 2000), tags=[])
         used_pool, volume_name = conn._create_local_volume(disk)
         conn.run.assert_called_once_with(
             [
@@ -1630,9 +1532,7 @@ class TestVirshSSH(MAASTestCase):
             "zfs",
             pool,
         )
-        disk = RequestedMachineBlockDevice(
-            size=random.randint(1000, 2000), tags=[]
-        )
+        disk = RequestedMachineBlockDevice(size=random.randint(1000, 2000), tags=[])
         used_pool, volume_name = conn._create_local_volume(disk)
         size = int(floor(disk.size / 2**20)) * 2**20
         conn.run.assert_called_once_with(
@@ -1653,9 +1553,7 @@ class TestVirshSSH(MAASTestCase):
         pool = factory.make_name("pool")
         volume_name = factory.make_name("volume")
         conn.delete_local_volume(pool, volume_name)
-        conn.run.assert_called_once_with(
-            ["vol-delete", volume_name, "--pool", pool]
-        )
+        conn.run.assert_called_once_with(["vol-delete", volume_name, "--pool", pool])
 
     def test_get_volume_path(self):
         pool = factory.make_name("pool")
@@ -1663,9 +1561,7 @@ class TestVirshSSH(MAASTestCase):
         volume_path = factory.make_name("path")
         conn = self.configure_virshssh(volume_path)
         self.assertEqual(volume_path, conn.get_volume_path(pool, volume_name))
-        conn.run.assert_called_once_with(
-            ["vol-path", volume_name, "--pool", pool]
-        )
+        conn.run.assert_called_once_with(["vol-path", volume_name, "--pool", pool])
 
     def test_attach_local_volume(self):
         conn = self.configure_virshssh("")
@@ -1675,9 +1571,7 @@ class TestVirshSSH(MAASTestCase):
         volume_path = factory.make_name("/some/path/to_vol_serial")
         serial = os.path.basename(volume_path)
         device_name = factory.make_name("device")
-        self.patch(
-            virsh.VirshSSH, "get_volume_path"
-        ).return_value = volume_path
+        self.patch(virsh.VirshSSH, "get_volume_path").return_value = volume_path
         conn.attach_local_volume(domain, pool, volume_name, device_name)
         conn.run.assert_called_once_with(
             [
@@ -1706,9 +1600,7 @@ class TestVirshSSH(MAASTestCase):
         host_interfaces = {factory.make_name("ifname"): False, bridge: True}
         mock_get_network_xml = self.patch(virsh.VirshSSH, "get_network_xml")
         mock_get_network_xml.return_value = SAMPLE_NETWORK_DUMPXML
-        expected = conn.check_network_maas_dhcp_enabled(
-            bridge, host_interfaces
-        )
+        expected = conn.check_network_maas_dhcp_enabled(bridge, host_interfaces)
         self.assertIsNone(expected)
 
     def test_check_network_maas_dhcp_enabled_returns_network(self):
@@ -1717,9 +1609,7 @@ class TestVirshSSH(MAASTestCase):
         host_interfaces = {factory.make_name("ifname"): False, bridge: True}
         mock_get_network_xml = self.patch(virsh.VirshSSH, "get_network_xml")
         mock_get_network_xml.return_value = SAMPLE_NETWORK_DUMPXML_2
-        bridge_name = conn.check_network_maas_dhcp_enabled(
-            bridge, host_interfaces
-        )
+        bridge_name = conn.check_network_maas_dhcp_enabled(bridge, host_interfaces)
         self.assertEqual(bridge_name, bridge)
 
     def test_get_default_interface_attachment_no_host_interfaces_maas(self):
@@ -1767,9 +1657,7 @@ class TestVirshSSH(MAASTestCase):
                 dhcp_enabled=True,
             )
         ]
-        network, attach_type = conn.get_default_interface_attachment(
-            host_interfaces
-        )
+        network, attach_type = conn.get_default_interface_attachment(host_interfaces)
         # This shows us that the method returned with these values.
         self.assertEqual(LIBVIRT_NETWORK.MAAS, network)
         self.assertEqual(InterfaceAttachType.NETWORK, attach_type)
@@ -1790,9 +1678,7 @@ class TestVirshSSH(MAASTestCase):
                 dhcp_enabled=True,
             )
         ]
-        network, attach_type = conn.get_default_interface_attachment(
-            host_interfaces
-        )
+        network, attach_type = conn.get_default_interface_attachment(host_interfaces)
         # This shows us that the method returned with these values.
         self.assertEqual(LIBVIRT_NETWORK.DEFAULT, network)
         self.assertEqual(InterfaceAttachType.NETWORK, attach_type)
@@ -1804,9 +1690,11 @@ class TestVirshSSH(MAASTestCase):
             LIBVIRT_NETWORK.DEFAULT,
             "other",
         ]
-        self.patch(
-            virsh.VirshSSH, "check_network_maas_dhcp_enabled"
-        ).side_effect = (None, None, "br0")
+        self.patch(virsh.VirshSSH, "check_network_maas_dhcp_enabled").side_effect = (
+            None,
+            None,
+            "br0",
+        )
         host_interfaces = [
             KnownHostInterface(
                 ifname="br0",
@@ -1814,9 +1702,7 @@ class TestVirshSSH(MAASTestCase):
                 dhcp_enabled=True,
             )
         ]
-        ifname, attach_type = conn.get_default_interface_attachment(
-            host_interfaces
-        )
+        ifname, attach_type = conn.get_default_interface_attachment(host_interfaces)
         # This shows us that the method returned with these values.
         self.assertEqual("br0", ifname)
         self.assertEqual(InterfaceAttachType.BRIDGE, attach_type)
@@ -1828,9 +1714,11 @@ class TestVirshSSH(MAASTestCase):
             LIBVIRT_NETWORK.DEFAULT,
             "other",
         ]
-        self.patch(
-            virsh.VirshSSH, "check_network_maas_dhcp_enabled"
-        ).side_effect = (None, None, "br0")
+        self.patch(virsh.VirshSSH, "check_network_maas_dhcp_enabled").side_effect = (
+            None,
+            None,
+            "br0",
+        )
         host_interfaces = [
             KnownHostInterface(
                 ifname="eth0",
@@ -1838,9 +1726,7 @@ class TestVirshSSH(MAASTestCase):
                 dhcp_enabled=True,
             )
         ]
-        ifname, attach_type = conn.get_default_interface_attachment(
-            host_interfaces
-        )
+        ifname, attach_type = conn.get_default_interface_attachment(host_interfaces)
         # This shows us that the method returned with these values.
         self.assertEqual("eth0", ifname)
         self.assertEqual(InterfaceAttachType.MACVLAN, attach_type)
@@ -1848,9 +1734,11 @@ class TestVirshSSH(MAASTestCase):
     def test_get_default_interface_attachment_errors_no_match(self):
         conn = self.configure_virshssh("")
         self.patch(virsh.VirshSSH, "get_network_list").return_value = []
-        self.patch(
-            virsh.VirshSSH, "check_network_maas_dhcp_enabled"
-        ).side_effect = (None, None, "br0")
+        self.patch(virsh.VirshSSH, "check_network_maas_dhcp_enabled").side_effect = (
+            None,
+            None,
+            "br0",
+        )
         host_interfaces = [
             KnownHostInterface(
                 ifname=factory.make_name("error"),
@@ -1950,15 +1838,13 @@ class TestVirshSSH(MAASTestCase):
             "attach_name": interface.attach_name,
             "attach_options": interface.attach_options,
         }
-        conn.run.assert_called_once_with(
-            ["attach-device", domain, ANY, "--config"]
-        )
+        conn.run.assert_called_once_with(["attach-device", domain, ANY, "--config"])
         tmpfile.write.assert_has_calls(
             [
                 call(
-                    DOM_TEMPLATE_MACVLAN_INTERFACE.format(
-                        **device_params
-                    ).encode("utf-8")
+                    DOM_TEMPLATE_MACVLAN_INTERFACE.format(**device_params).encode(
+                        "utf-8"
+                    )
                 ),
                 call(b"\n"),
             ]
@@ -1985,15 +1871,13 @@ class TestVirshSSH(MAASTestCase):
             "mac_address": fake_mac,
             "attach_name": interface.attach_name,
         }
-        conn.run.assert_called_once_with(
-            ["attach-device", domain, ANY, "--config"]
-        )
+        conn.run.assert_called_once_with(["attach-device", domain, ANY, "--config"])
         tmpfile.write.assert_has_calls(
             [
                 call(
-                    DOM_TEMPLATE_BRIDGE_INTERFACE.format(
-                        **device_params
-                    ).encode("utf-8")
+                    DOM_TEMPLATE_BRIDGE_INTERFACE.format(**device_params).encode(
+                        "utf-8"
+                    )
                 ),
                 call(b"\n"),
             ]
@@ -2025,20 +1909,16 @@ class TestVirshSSH(MAASTestCase):
     def test_cleanup_disks_deletes_all(self):
         conn = self.configure_virshssh("")
         volumes = [
-            (factory.make_name("pool"), factory.make_name("vol"))
-            for _ in range(3)
+            (factory.make_name("pool"), factory.make_name("vol")) for _ in range(3)
         ]
         mock_delete = self.patch(virsh.VirshSSH, "delete_local_volume")
         conn.cleanup_disks(volumes)
-        mock_delete.assert_has_calls(
-            [call(pool, vol) for pool, vol in volumes]
-        )
+        mock_delete.assert_has_calls([call(pool, vol) for pool, vol in volumes])
 
     def test_cleanup_disks_catches_all_exceptions(self):
         conn = self.configure_virshssh("")
         volumes = [
-            (factory.make_name("pool"), factory.make_name("vol"))
-            for _ in range(3)
+            (factory.make_name("pool"), factory.make_name("vol")) for _ in range(3)
         ]
         mock_delete = self.patch(virsh.VirshSSH, "delete_local_volume")
         mock_delete.side_effect = factory.make_exception()
@@ -2085,9 +1965,7 @@ class TestVirshSSH(MAASTestCase):
         conn = self.configure_virshssh("")
         request = make_requested_machine()
         self.patch(virsh.VirshSSH, "_create_local_volume").return_value = None
-        error = self.assertRaises(
-            PodInvalidResources, conn.create_domain, request
-        )
+        error = self.assertRaises(PodInvalidResources, conn.create_domain, request)
         self.assertEqual("not enough space for disk 0.", str(error))
 
     def test_create_domain_calls_correct_methods_with_amd64_arch(self):
@@ -2100,9 +1978,7 @@ class TestVirshSSH(MAASTestCase):
             "type": "kvm",
             "emulator": "/usr/bin/qemu-system-x86_64",
         }
-        self.patch(
-            virsh.VirshSSH, "_create_local_volume"
-        ).return_value = disk_info
+        self.patch(virsh.VirshSSH, "_create_local_volume").return_value = disk_info
         self.patch(
             virsh.VirshSSH, "get_domain_capabilities"
         ).return_value = domain_params
@@ -2110,9 +1986,7 @@ class TestVirshSSH(MAASTestCase):
         mock_uuid.return_value = str(uuid4())
         domain_params["name"] = request.hostname
         domain_params["uuid"] = mock_uuid.return_value
-        domain_params["arch"] = debian_to_kernel_architecture(
-            request.architecture
-        )
+        domain_params["arch"] = debian_to_kernel_architecture(request.architecture)
         domain_params["cores"] = str(request.cores)
         domain_params["memory"] = str(request.memory)
         NamedTemporaryFile = self.patch(virsh, "NamedTemporaryFile")
@@ -2124,9 +1998,7 @@ class TestVirshSSH(MAASTestCase):
         mock_check_machine_can_startup = self.patch(
             virsh.VirshSSH, "check_machine_can_startup"
         )
-        mock_set_machine_autostart = self.patch(
-            virsh.VirshSSH, "set_machine_autostart"
-        )
+        mock_set_machine_autostart = self.patch(virsh.VirshSSH, "set_machine_autostart")
         mock_configure_pxe = self.patch(virsh.VirshSSH, "configure_pxe_boot")
         mock_discovered = self.patch(virsh.VirshSSH, "get_discovered_machine")
         mock_discovered.return_value = sentinel.discovered
@@ -2134,20 +2006,14 @@ class TestVirshSSH(MAASTestCase):
 
         tmpfile.write.assert_has_calls(
             [
-                call(
-                    DOM_TEMPLATE_AMD64.format(**domain_params).encode("utf-8")
-                ),
+                call(DOM_TEMPLATE_AMD64.format(**domain_params).encode("utf-8")),
                 call(b"\n"),
             ]
         )
         conn.run.assert_called_once_with(["define", ANY])
-        mock_attach_disk.assert_called_once_with(
-            ANY, disk_info[0], disk_info[1], "vda"
-        )
+        mock_attach_disk.assert_called_once_with(ANY, disk_info[0], disk_info[1], "vda")
         mock_attach_nic.assesrt_called_once_with(request, ANY, ANY)
-        mock_check_machine_can_startup.assert_called_once_with(
-            request.hostname
-        )
+        mock_check_machine_can_startup.assert_called_once_with(request.hostname)
         mock_set_machine_autostart.assert_called_once_with(request.hostname)
         mock_configure_pxe.assert_called_once_with(request.hostname)
         mock_discovered.assert_called_once_with(ANY, request=request)
@@ -2164,9 +2030,7 @@ class TestVirshSSH(MAASTestCase):
             "type": "kvm",
             "emulator": "/usr/bin/qemu-system-x86_64",
         }
-        self.patch(
-            virsh.VirshSSH, "_create_local_volume"
-        ).return_value = disk_info
+        self.patch(virsh.VirshSSH, "_create_local_volume").return_value = disk_info
         self.patch(
             virsh.VirshSSH, "get_domain_capabilities"
         ).return_value = domain_params
@@ -2174,9 +2038,7 @@ class TestVirshSSH(MAASTestCase):
         mock_uuid.return_value = str(uuid4())
         domain_params["name"] = request.hostname
         domain_params["uuid"] = mock_uuid.return_value
-        domain_params["arch"] = debian_to_kernel_architecture(
-            request.architecture
-        )
+        domain_params["arch"] = debian_to_kernel_architecture(request.architecture)
         domain_params["cores"] = str(request.cores)
         domain_params["memory"] = str(request.memory)
         NamedTemporaryFile = self.patch(virsh, "NamedTemporaryFile")
@@ -2188,9 +2050,7 @@ class TestVirshSSH(MAASTestCase):
         mock_check_machine_can_startup = self.patch(
             virsh.VirshSSH, "check_machine_can_startup"
         )
-        mock_set_machine_autostart = self.patch(
-            virsh.VirshSSH, "set_machine_autostart"
-        )
+        mock_set_machine_autostart = self.patch(virsh.VirshSSH, "set_machine_autostart")
         mock_configure_pxe = self.patch(virsh.VirshSSH, "configure_pxe_boot")
         mock_discovered = self.patch(virsh.VirshSSH, "get_discovered_machine")
         mock_discovered.return_value = sentinel.discovered
@@ -2198,20 +2058,14 @@ class TestVirshSSH(MAASTestCase):
 
         tmpfile.write.assert_has_calls(
             [
-                call(
-                    DOM_TEMPLATE_ARM64.format(**domain_params).encode("utf-8")
-                ),
+                call(DOM_TEMPLATE_ARM64.format(**domain_params).encode("utf-8")),
                 call(b"\n"),
             ]
         )
         conn.run.assert_called_once_with(["define", ANY])
-        mock_attach_disk.assert_called_once_with(
-            ANY, disk_info[0], disk_info[1], "vda"
-        )
+        mock_attach_disk.assert_called_once_with(ANY, disk_info[0], disk_info[1], "vda")
         mock_attach_nic.assert_called_once_with(request, ANY, ANY)
-        mock_check_machine_can_startup.assert_called_once_with(
-            request.hostname
-        )
+        mock_check_machine_can_startup.assert_called_once_with(request.hostname)
         mock_set_machine_autostart.assert_called_once_with(request.hostname)
         mock_configure_pxe.assert_called_once_with(request.hostname)
         mock_discovered.assert_called_once_with(ANY, request=request)
@@ -2228,9 +2082,7 @@ class TestVirshSSH(MAASTestCase):
             "type": "kvm",
             "emulator": "/usr/bin/qemu-system-x86_64",
         }
-        self.patch(
-            virsh.VirshSSH, "_create_local_volume"
-        ).return_value = disk_info
+        self.patch(virsh.VirshSSH, "_create_local_volume").return_value = disk_info
         self.patch(
             virsh.VirshSSH, "get_domain_capabilities"
         ).return_value = domain_params
@@ -2238,9 +2090,7 @@ class TestVirshSSH(MAASTestCase):
         mock_uuid.return_value = str(uuid4())
         domain_params["name"] = request.hostname
         domain_params["uuid"] = mock_uuid.return_value
-        domain_params["arch"] = debian_to_kernel_architecture(
-            request.architecture
-        )
+        domain_params["arch"] = debian_to_kernel_architecture(request.architecture)
         domain_params["cores"] = str(request.cores)
         domain_params["memory"] = str(request.memory)
         NamedTemporaryFile = self.patch(virsh, "NamedTemporaryFile")
@@ -2252,9 +2102,7 @@ class TestVirshSSH(MAASTestCase):
         mock_check_machine_can_startup = self.patch(
             virsh.VirshSSH, "check_machine_can_startup"
         )
-        mock_set_machine_autostart = self.patch(
-            virsh.VirshSSH, "set_machine_autostart"
-        )
+        mock_set_machine_autostart = self.patch(virsh.VirshSSH, "set_machine_autostart")
         mock_configure_pxe = self.patch(virsh.VirshSSH, "configure_pxe_boot")
         mock_discovered = self.patch(virsh.VirshSSH, "get_discovered_machine")
         mock_discovered.return_value = sentinel.discovered
@@ -2262,20 +2110,14 @@ class TestVirshSSH(MAASTestCase):
 
         tmpfile.write.assert_has_calls(
             [
-                call(
-                    DOM_TEMPLATE_PPC64.format(**domain_params).encode("utf-8")
-                ),
+                call(DOM_TEMPLATE_PPC64.format(**domain_params).encode("utf-8")),
                 call(b"\n"),
             ],
         )
         conn.run.assert_called_once_with(["define", ANY])
-        mock_attach_disk.assert_called_once_with(
-            ANY, disk_info[0], disk_info[1], "vda"
-        )
+        mock_attach_disk.assert_called_once_with(ANY, disk_info[0], disk_info[1], "vda")
         mock_attach_nic.assert_called_once_with(request, ANY, ANY)
-        mock_check_machine_can_startup.assert_called_once_with(
-            request.hostname
-        )
+        mock_check_machine_can_startup.assert_called_once_with(request.hostname)
         mock_set_machine_autostart.assert_called_once_with(request.hostname)
         mock_configure_pxe.assert_called_once_with(request.hostname)
         mock_discovered.assert_called_once_with(ANY, request=request)
@@ -2292,9 +2134,7 @@ class TestVirshSSH(MAASTestCase):
             "type": "kvm",
             "emulator": "/usr/bin/qemu-system-x86_64",
         }
-        self.patch(
-            virsh.VirshSSH, "_create_local_volume"
-        ).return_value = disk_info
+        self.patch(virsh.VirshSSH, "_create_local_volume").return_value = disk_info
         self.patch(
             virsh.VirshSSH, "get_domain_capabilities"
         ).return_value = domain_params
@@ -2302,9 +2142,7 @@ class TestVirshSSH(MAASTestCase):
         mock_uuid.return_value = str(uuid4())
         domain_params["name"] = request.hostname
         domain_params["uuid"] = mock_uuid.return_value
-        domain_params["arch"] = debian_to_kernel_architecture(
-            request.architecture
-        )
+        domain_params["arch"] = debian_to_kernel_architecture(request.architecture)
         domain_params["cores"] = str(request.cores)
         domain_params["memory"] = str(request.memory)
         NamedTemporaryFile = self.patch(virsh, "NamedTemporaryFile")
@@ -2316,9 +2154,7 @@ class TestVirshSSH(MAASTestCase):
         mock_check_machine_can_startup = self.patch(
             virsh.VirshSSH, "check_machine_can_startup"
         )
-        mock_set_machine_autostart = self.patch(
-            virsh.VirshSSH, "set_machine_autostart"
-        )
+        mock_set_machine_autostart = self.patch(virsh.VirshSSH, "set_machine_autostart")
         mock_configure_pxe = self.patch(virsh.VirshSSH, "configure_pxe_boot")
         mock_discovered = self.patch(virsh.VirshSSH, "get_discovered_machine")
         mock_discovered.return_value = sentinel.discovered
@@ -2326,20 +2162,14 @@ class TestVirshSSH(MAASTestCase):
 
         tmpfile.write.assert_has_calls(
             [
-                call(
-                    DOM_TEMPLATE_S390X.format(**domain_params).encode("utf-8")
-                ),
+                call(DOM_TEMPLATE_S390X.format(**domain_params).encode("utf-8")),
                 call(b"\n"),
             ]
         )
         conn.run.assert_called_once_with(["define", ANY])
-        mock_attach_disk.assert_called_once_with(
-            ANY, disk_info[0], disk_info[1], "vda"
-        )
+        mock_attach_disk.assert_called_once_with(ANY, disk_info[0], disk_info[1], "vda")
         mock_attach_nic.assert_called_once_with(request, ANY, ANY)
-        mock_check_machine_can_startup.assert_called_once_with(
-            request.hostname
-        )
+        mock_check_machine_can_startup.assert_called_once_with(request.hostname)
         mock_set_machine_autostart.assert_called_once_with(request.hostname)
         mock_configure_pxe.assert_called_once_with(request.hostname)
         mock_discovered.assert_called_once_with(ANY, request=request)
@@ -2422,9 +2252,7 @@ class TestVirsh(MAASTestCase):
         fake_ifinfo = []
         for machine in machines:
             macs = [factory.make_mac_address() for _ in range(4)]
-            ifinfo = [
-                InterfaceInfo("bridge", "br0", "virtio", mac) for mac in macs
-            ]
+            ifinfo = [InterfaceInfo("bridge", "br0", "virtio", mac) for mac in macs]
             fake_ifinfo.append(ifinfo)
             fake_macs.append(macs)
             called_params.append(
@@ -2771,9 +2599,7 @@ class TestVirshPodDriver(MAASTestCase):
 
         power_address = factory.make_name("power_address")
         power_id = factory.make_name("power_id")
-        with self.assertRaisesRegex(
-            virsh.VirshError, "^Unknown state: unknown$"
-        ):
+        with self.assertRaisesRegex(virsh.VirshError, "^Unknown state: unknown$"):
             yield driver.power_state_virsh(power_address, power_id)
 
     @inlineCallbacks
@@ -2806,12 +2632,8 @@ class TestVirshPodDriver(MAASTestCase):
         mock_login.return_value = True
         mock_list_pools = self.patch(virsh.VirshSSH, "list_pools")
         mock_list_pools.side_effect = ([], ["default"], ["default"])
-        mock_create_storage_pool = self.patch(
-            virsh.VirshSSH, "create_storage_pool"
-        )
-        mock_get_pod_resources = self.patch(
-            virsh.VirshSSH, "get_pod_resources"
-        )
+        mock_create_storage_pool = self.patch(virsh.VirshSSH, "create_storage_pool")
+        mock_get_pod_resources = self.patch(virsh.VirshSSH, "get_pod_resources")
         mock_get_pod_resources.return_value = mock_pod
         mock_get_pod_hints = self.patch(virsh.VirshSSH, "get_pod_hints")
         mock_list_machines = self.patch(virsh.VirshSSH, "list_machines")

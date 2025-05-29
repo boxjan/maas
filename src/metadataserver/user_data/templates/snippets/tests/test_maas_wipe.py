@@ -167,9 +167,7 @@ class TestMAASWipe(MAASTestCase):
 
     def test_get_disk_security_info_all_true_hdparm(self):
         hdparm_output = (
-            HDPARM_BEFORE_SECURITY
-            + HDPARM_SECURITY_ALL_TRUE
-            + HDPARM_AFTER_SECURITY
+            HDPARM_BEFORE_SECURITY + HDPARM_SECURITY_ALL_TRUE + HDPARM_AFTER_SECURITY
         )
         mock_check_output = self.patch(subprocess, "check_output")
         mock_check_output.return_value = hdparm_output
@@ -189,9 +187,7 @@ class TestMAASWipe(MAASTestCase):
         )
 
     def test_get_disk_info_hdparm(self):
-        disk_names = [
-            factory.make_name("disk").encode("ascii") for _ in range(3)
-        ]
+        disk_names = [factory.make_name("disk").encode("ascii") for _ in range(3)]
         self.patch(maas_wipe, "list_disks").return_value = disk_names
         security_info = [
             {
@@ -202,13 +198,9 @@ class TestMAASWipe(MAASTestCase):
             }
             for _ in range(3)
         ]
-        self.patch(
-            maas_wipe, "get_hdparm_security_info"
-        ).side_effect = security_info
+        self.patch(maas_wipe, "get_hdparm_security_info").side_effect = security_info
         observed = get_disk_info()
-        self.assertEqual(
-            {disk_names[i]: security_info[i] for i in range(3)}, observed
-        )
+        self.assertEqual({disk_names[i]: security_info[i] for i in range(3)}, observed)
 
     def test_get_disk_security_info_crypt_format_writez_nvme(self):
         nvme_cli_output = (
@@ -362,9 +354,7 @@ class TestMAASWipe(MAASTestCase):
 
     def test_get_disk_security_info_failed_cmd_nvme(self):
         mock_check_output = self.patch(subprocess, "check_output")
-        mock_check_output.side_effect = subprocess.CalledProcessError(
-            1, "nvme id-ctrl"
-        )
+        mock_check_output.side_effect = subprocess.CalledProcessError(1, "nvme id-ctrl")
         disk_name = factory.make_name("nvme").encode("ascii")
         observed = get_disk_security_info(disk_name)
 
@@ -383,9 +373,7 @@ class TestMAASWipe(MAASTestCase):
 
     def test_get_disk_security_info_failed_os_nvme(self):
         mock_check_output = self.patch(subprocess, "check_output")
-        mock_check_output.side_effect = OSError(
-            -2, "No such file or directory"
-        )
+        mock_check_output.side_effect = OSError(-2, "No such file or directory")
         disk_name = factory.make_name("nvme").encode("ascii")
         observed = get_disk_security_info(disk_name)
 
@@ -405,9 +393,7 @@ class TestMAASWipe(MAASTestCase):
         )
 
     def test_get_disk_info_nvme(self):
-        disk_names = [
-            factory.make_name("nvme").encode("ascii") for _ in range(3)
-        ]
+        disk_names = [factory.make_name("nvme").encode("ascii") for _ in range(3)]
         self.patch(maas_wipe, "list_disks").return_value = disk_names
         security_info = [
             {
@@ -420,13 +406,9 @@ class TestMAASWipe(MAASTestCase):
             }
             for _ in range(3)
         ]
-        self.patch(
-            maas_wipe, "get_nvme_security_info"
-        ).side_effect = security_info
+        self.patch(maas_wipe, "get_nvme_security_info").side_effect = security_info
         observed = get_disk_info()
-        self.assertEqual(
-            {disk_names[i]: security_info[i] for i in range(3)}, observed
-        )
+        self.assertEqual({disk_names[i]: security_info[i] for i in range(3)}, observed)
 
     def test_try_secure_erase_not_supported_hdparm(self):
         disk_name = factory.make_name("disk").encode("ascii")
@@ -593,14 +575,10 @@ class TestMAASWipe(MAASTestCase):
             "ms": 0,
         }
         mock_check_output = self.patch(subprocess, "check_output")
-        mock_check_output.side_effect = subprocess.CalledProcessError(
-            1, "nvme format"
-        )
+        mock_check_output.side_effect = subprocess.CalledProcessError(1, "nvme format")
 
         self.assertFalse(try_secure_erase(disk_name, sec_info))
-        self.print_flush.assert_called_once_with(
-            "Error with format command (1)"
-        )
+        self.print_flush.assert_called_once_with("Error with format command (1)")
 
     def test_try_write_zeroes_not_supported_nvme(self):
         disk_name = factory.make_name("nvme").encode("ascii")
@@ -684,9 +662,7 @@ class TestMAASWipe(MAASTestCase):
         )
 
         self.assertFalse(nvme_write_zeroes(disk_name, sec_info))
-        self.print_flush.assert_called_once_with(
-            "Error with write-zeroes command (1)"
-        )
+        self.print_flush.assert_called_once_with("Error with write-zeroes command (1)")
 
     def test_secure_erase_writes_known_data_hdparm(self):
         tmp_dir = self.make_dir()
@@ -704,9 +680,7 @@ class TestMAASWipe(MAASTestCase):
         expected_buf = b"M" * 1024 * 1024
         with open(file_path, "rb") as fp:
             read_buf = fp.read(len(expected_buf))
-        self.assertEqual(
-            expected_buf, read_buf, "First 1 MiB of file was not written."
-        )
+        self.assertEqual(expected_buf, read_buf, "First 1 MiB of file was not written.")
 
     def test_secure_erase_sets_security_password_hdparm(self):
         tmp_dir = self.make_dir()
@@ -720,9 +694,7 @@ class TestMAASWipe(MAASTestCase):
 
         # Fail to get disk info just to exit early.
         exception_type = factory.make_exception_type()
-        self.patch(
-            maas_wipe, "get_hdparm_security_info"
-        ).side_effect = exception_type()
+        self.patch(maas_wipe, "get_hdparm_security_info").side_effect = exception_type()
 
         self.assertRaises(exception_type, secure_erase_hdparm, dev_name)
         mock_check_output.assert_called_once_with(
@@ -883,9 +855,7 @@ class TestMAASWipe(MAASTestCase):
         self.print_flush.assert_has_calls(
             [
                 call(f"{dev_name.decode('ascii')}: starting quick wipe."),
-                call(
-                    f"{dev_name.decode('ascii')}: successfully quickly wiped."
-                ),
+                call(f"{dev_name.decode('ascii')}: successfully quickly wiped."),
             ]
         )
 
@@ -898,9 +868,7 @@ class TestMAASWipe(MAASTestCase):
         self.make_empty_file(file_path, content=b"T")
 
         mock_check_output = self.patch(subprocess, "check_output")
-        mock_check_output.side_effect = subprocess.CalledProcessError(
-            1, "wipefs"
-        )
+        mock_check_output.side_effect = subprocess.CalledProcessError(1, "wipefs")
         wipe_quickly(dev_name)
 
         buf_size = 1024 * 1024
@@ -916,9 +884,7 @@ class TestMAASWipe(MAASTestCase):
             [
                 call(f"{dev_name.decode('ascii')}: starting quick wipe."),
                 call(f"{dev_name.decode('ascii')}: wipefs failed (1)"),
-                call(
-                    f"{dev_name.decode('ascii')}: successfully quickly wiped."
-                ),
+                call(f"{dev_name.decode('ascii')}: successfully quickly wiped."),
             ]
         )
 
@@ -926,9 +892,7 @@ class TestMAASWipe(MAASTestCase):
         dev_name = factory.make_name("disk").encode("ascii")
 
         mock_check_output = self.patch(subprocess, "check_output")
-        mock_check_output.side_effect = subprocess.CalledProcessError(
-            1, "wipefs"
-        )
+        mock_check_output.side_effect = subprocess.CalledProcessError(1, "wipefs")
 
         mock_os_open = self.patch(builtins, "open")
         mock_os_open.side_effect = OSError(-2, "No such file or directory")
@@ -942,9 +906,7 @@ class TestMAASWipe(MAASTestCase):
                 call(
                     f"{dev_name.decode('ascii')}: OS error while wiping beginning/end of disk (No such file or directory)"
                 ),
-                call(
-                    f"{dev_name.decode('ascii')}: failed to be quickly wiped."
-                ),
+                call(f"{dev_name.decode('ascii')}: failed to be quickly wiped."),
             ]
         )
 
@@ -982,9 +944,7 @@ class TestMAASWipe(MAASTestCase):
                 self.assertEqual(zero_buf, buf, "%d block was not wiped." % i)
 
             extra_buf = fp.read(extra_end)
-            self.assertEqual(
-                b"\0" * extra_end, extra_buf, "End was not wiped."
-            )
+            self.assertEqual(b"\0" * extra_end, extra_buf, "End was not wiped.")
 
     def patch_args(self, secure_erase, quick_erase):
         args = MagicMock()
@@ -996,9 +956,7 @@ class TestMAASWipe(MAASTestCase):
 
     def test_main_calls_try_secure_erase_for_all_hdd(self):
         self.patch_args(True, False)
-        disks = {
-            factory.make_name("disk").encode("ascii"): {} for _ in range(3)
-        }
+        disks = {factory.make_name("disk").encode("ascii"): {} for _ in range(3)}
         self.patch(maas_wipe, "get_disk_info").return_value = disks
 
         mock_zero = self.patch(maas_wipe, "zero_disk")
@@ -1012,9 +970,7 @@ class TestMAASWipe(MAASTestCase):
 
     def test_main_calls_zero_disk_if_no_secure_erase_hdd(self):
         self.patch_args(True, False)
-        disks = {
-            factory.make_name("disk").encode("ascii"): {} for _ in range(3)
-        }
+        disks = {factory.make_name("disk").encode("ascii"): {} for _ in range(3)}
         self.patch(maas_wipe, "get_disk_info").return_value = disks
 
         mock_zero = self.patch(maas_wipe, "zero_disk")
@@ -1028,9 +984,7 @@ class TestMAASWipe(MAASTestCase):
 
     def test_main_calls_wipe_quickly_if_no_secure_erase_hdd(self):
         self.patch_args(True, True)
-        disks = {
-            factory.make_name("disk").encode("ascii"): {} for _ in range(3)
-        }
+        disks = {factory.make_name("disk").encode("ascii"): {} for _ in range(3)}
         self.patch(maas_wipe, "get_disk_info").return_value = disks
 
         wipe_quickly = self.patch(maas_wipe, "wipe_quickly")
@@ -1045,9 +999,7 @@ class TestMAASWipe(MAASTestCase):
 
     def test_main_calls_wipe_quickly(self):
         self.patch_args(False, True)
-        disks = {
-            factory.make_name("disk").encode("ascii"): {} for _ in range(3)
-        }
+        disks = {factory.make_name("disk").encode("ascii"): {} for _ in range(3)}
         self.patch(maas_wipe, "get_disk_info").return_value = disks
 
         wipe_quickly = self.patch(maas_wipe, "wipe_quickly")
@@ -1061,9 +1013,7 @@ class TestMAASWipe(MAASTestCase):
 
     def test_main_calls_zero_disk(self):
         self.patch_args(False, False)
-        disks = {
-            factory.make_name("disk").encode("ascii"): {} for _ in range(3)
-        }
+        disks = {factory.make_name("disk").encode("ascii"): {} for _ in range(3)}
         self.patch(maas_wipe, "get_disk_info").return_value = disks
 
         zero_disk = self.patch(maas_wipe, "zero_disk")

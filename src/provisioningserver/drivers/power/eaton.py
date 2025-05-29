@@ -115,8 +115,7 @@ class EatonPowerDriver(PowerDriver):
             return "on"
         else:
             raise PowerActionError(
-                "Eaton Power Driver retrieved unknown power state: %r"
-                % power_state
+                "Eaton Power Driver retrieved unknown power state: %r" % power_state
             )
 
 

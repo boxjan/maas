@@ -89,17 +89,13 @@ class TestNetwork(APITestCase.ForUser):
     def test_POST_connect_macs_returns_410(self):
         self.become_admin()
         subnet = factory.make_Subnet()
-        response = self.client.post(
-            self.get_url(subnet), {"op": "connect_macs"}
-        )
+        response = self.client.post(self.get_url(subnet), {"op": "connect_macs"})
         self.assertEqual(http.client.GONE, response.status_code)
 
     def test_POST_disconnect_macs_returns_410(self):
         self.become_admin()
         subnet = factory.make_Subnet()
-        response = self.client.post(
-            self.get_url(subnet), {"op": "disconnect_macs"}
-        )
+        response = self.client.post(self.get_url(subnet), {"op": "disconnect_macs"})
         self.assertEqual(http.client.GONE, response.status_code)
 
 
@@ -137,9 +133,7 @@ class TestListConnectedMACs(APITestCase.ForUser):
 
     def request_connected_macs(self, subnet):
         """Request and return the MAC addresses attached to `subnet`."""
-        url = reverse(
-            "network_handler", args=[convert_to_network_name(subnet)]
-        )
+        url = reverse("network_handler", args=[convert_to_network_name(subnet)])
         response = self.client.get(url, {"op": "list_connected_macs"})
         self.assertEqual(http.client.OK, response.status_code)
         return json_load_bytes(response.content)
@@ -151,8 +145,7 @@ class TestListConnectedMACs(APITestCase.ForUser):
     def test_returns_connected_macs(self):
         subnet = factory.make_Subnet()
         interfaces = [
-            self.make_interface(subnets=[subnet], owner=self.user)
-            for _ in range(3)
+            self.make_interface(subnets=[subnet], owner=self.user) for _ in range(3)
         ]
         self.assertEqual(
             {interface.mac_address for interface in interfaces},
@@ -162,9 +155,7 @@ class TestListConnectedMACs(APITestCase.ForUser):
     def test_ignores_unconnected_macs(self):
         self.make_interface(subnets=[factory.make_Subnet()], owner=self.user)
         self.make_interface(subnets=[], owner=self.user)
-        self.assertEqual(
-            [], self.request_connected_macs(factory.make_Subnet())
-        )
+        self.assertEqual([], self.request_connected_macs(factory.make_Subnet()))
 
     def test_includes_MACs_for_nodes_visible_to_user(self):
         subnet = factory.make_Subnet()

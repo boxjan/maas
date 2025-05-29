@@ -180,9 +180,7 @@ class LicenseKeyHandler(OperationsHandler):
             Unknown API endpoint: /MAAS/api/2.0/license-key/windows/win2012/.
         """
         license_key = get_one(
-            LicenseKey.objects.filter(
-                osystem=osystem, distro_series=distro_series
-            )
+            LicenseKey.objects.filter(osystem=osystem, distro_series=distro_series)
         )
         if license_key is not None:
             license_key.delete()

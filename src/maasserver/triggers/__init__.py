@@ -84,9 +84,7 @@ def register_triggers(
     for pg_event, maas_event_type, pg_obj in events:
         event_params = None
         if params is not None:
-            event_params = {
-                f"{pg_obj}.{key}": value for key, value in params.items()
-            }
+            event_params = {f"{pg_obj}.{key}": value for key, value in params.items()}
 
         register_trigger(
             table,
@@ -131,9 +129,7 @@ def _make_when_clause(is_update, params, fields):
     return f"WHEN ({and_clauses})"
 
 
-def register_trigger(
-    table, procedure, event, params=None, fields=None, when="after"
-):
+def register_trigger(table, procedure, event, params=None, fields=None, when="after"):
     """(Re-)create `trigger` on `table`."""
     table_name = table
     if table.startswith("maasserver_"):

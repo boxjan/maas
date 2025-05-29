@@ -48,7 +48,5 @@ class ManualPowerDriver(PowerDriver):
 
     def power_query(self, system_id, context):
         """Power query machine manually."""
-        maaslog.info(
-            "You need to check power state of %s manually." % system_id
-        )
+        maaslog.info("You need to check power state of %s manually." % system_id)
         return "unknown"

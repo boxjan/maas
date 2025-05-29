@@ -16,24 +16,19 @@ from metadataserver import address
 def parse_locale_lines(output):
     """Parse lines of output from /bin/locale into a dict."""
     return {
-        key: value.strip('"')
-        for key, value in [line.split("=") for line in output]
+        key: value.strip('"') for key, value in [line.split("=") for line in output]
     }
 
 
 class TestAddress(MAASTestCase):
     def test_get_command_output_executes_command(self):
-        self.assertEqual(
-            ["Hello"], address.get_command_output("echo", "Hello")
-        )
+        self.assertEqual(["Hello"], address.get_command_output("echo", "Hello"))
 
     def test_get_command_output_does_not_expand_arguments(self):
         self.assertEqual(["$*"], address.get_command_output("echo", "$*"))
 
     def test_get_command_output_returns_sequence_of_lines(self):
-        self.assertEqual(
-            ["1", "2"], address.get_command_output("echo", "1\n2")
-        )
+        self.assertEqual(["1", "2"], address.get_command_output("echo", "1\n2"))
 
     def test_get_command_output_uses_C_locale(self):
         locale = parse_locale_lines(address.get_command_output("locale"))
@@ -50,9 +45,7 @@ class TestAddress(MAASTestCase):
             "10.1.0.0/24 dev virbr0  proto kernel  scope link  src 10.1.0.1",
             "10.1.1.0/24 dev virbr1  proto kernel  scope link  src 10.1.1.1",
         ]
-        self.assertEqual(
-            "eth1", address.find_default_interface(sample_ip_route)
-        )
+        self.assertEqual("eth1", address.find_default_interface(sample_ip_route))
 
     def test_find_default_interface_finds_default_tagged_interface(self):
         sample_ip_route = [
@@ -61,9 +54,7 @@ class TestAddress(MAASTestCase):
             "10.90.90.0/24 dev br0  proto kernel  scope link  src 10.90.90.1",
             "169.254.0.0/16 dev br0  scope link  metric 1000",
         ]
-        self.assertEqual(
-            "eth0.2", address.find_default_interface(sample_ip_route)
-        )
+        self.assertEqual("eth0.2", address.find_default_interface(sample_ip_route))
 
     def test_find_default_interface_finds_default_aliased_interface(self):
         sample_ip_route = [
@@ -72,9 +63,7 @@ class TestAddress(MAASTestCase):
             "10.90.90.0/24 dev br0  proto kernel  scope link  src 10.90.90.1",
             "169.254.0.0/16 dev br0  scope link  metric 1000",
         ]
-        self.assertEqual(
-            "eth0:2", address.find_default_interface(sample_ip_route)
-        )
+        self.assertEqual("eth0:2", address.find_default_interface(sample_ip_route))
 
     def test_find_default_interface_makes_a_guess_if_no_default(self):
         sample_ip_route = [
@@ -83,9 +72,7 @@ class TestAddress(MAASTestCase):
             "10.1.0.0/24 dev virbr0  proto kernel  scope link  src 10.1.0.1",
             "10.1.1.0/24 dev virbr1  proto kernel  scope link  src 10.1.1.1",
         ]
-        self.assertEqual(
-            "eth2", address.find_default_interface(sample_ip_route)
-        )
+        self.assertEqual("eth2", address.find_default_interface(sample_ip_route))
 
     def test_find_default_tagged_interface_makes_a_guess_if_no_default(self):
         sample_ip_route = [
@@ -94,9 +81,7 @@ class TestAddress(MAASTestCase):
             "10.1.0.0/24 dev virbr0  proto kernel  scope link  src 10.1.0.1",
             "10.1.1.0/24 dev virbr1  proto kernel  scope link  src 10.1.1.1",
         ]
-        self.assertEqual(
-            "eth2.4", address.find_default_interface(sample_ip_route)
-        )
+        self.assertEqual("eth2.4", address.find_default_interface(sample_ip_route))
 
     def test_find_default_aliased_interface_makes_a_guess_if_no_default(self):
         sample_ip_route = [
@@ -105,9 +90,7 @@ class TestAddress(MAASTestCase):
             "10.1.0.0/24 dev virbr0  proto kernel  scope link  src 10.1.0.1",
             "10.1.1.0/24 dev virbr1  proto kernel  scope link  src 10.1.1.1",
         ]
-        self.assertEqual(
-            "eth2:4", address.find_default_interface(sample_ip_route)
-        )
+        self.assertEqual("eth2:4", address.find_default_interface(sample_ip_route))
 
     def test_find_default_interface_returns_None_on_failure(self):
         self.assertIsNone(address.find_default_interface([]))
@@ -124,9 +107,7 @@ class TestAddress(MAASTestCase):
         ipv4_address = factory.make_ipv4_address()
         addresses.append(ipv6_address)
         addresses.append(ipv4_address)
-        self.patch(
-            address, "get_all_addresses_for_interface"
-        ).return_value = addresses
+        self.patch(address, "get_all_addresses_for_interface").return_value = addresses
         self.assertEqual(ipv4_address, address.get_ip_address(b"lo"))
 
     def test_get_ip_address_returns_v6_address_if_no_v4_available(self):

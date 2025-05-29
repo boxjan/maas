@@ -132,9 +132,7 @@ class ParametersForm(Form):
                     "parameters",
                     "%s: title must be a string" % param_title,
                 )
-            if param_description is not None and not isinstance(
-                param_description, str
-            ):
+            if param_description is not None and not isinstance(param_description, str):
                 set_form_error(
                     self,
                     "parameters",
@@ -146,20 +144,15 @@ class ParametersForm(Form):
                 set_form_error(
                     self,
                     "parameters",
-                    "%s: argument_format must be a string"
-                    % param_argument_format,
+                    "%s: argument_format must be a string" % param_argument_format,
                 )
-            if param_default is not None and not isinstance(
-                param_default, str
-            ):
+            if param_default is not None and not isinstance(param_default, str):
                 set_form_error(
                     self,
                     "parameters",
                     "%s: default must be a string" % param_default,
                 )
-            if param_required is not None and not isinstance(
-                param_required, bool
-            ):
+            if param_required is not None and not isinstance(param_required, bool):
                 set_form_error(
                     self,
                     "parameters",
@@ -186,9 +179,7 @@ class ParametersForm(Form):
                     )
                 else:
                     for choice in choices:
-                        if isinstance(choice, list) and not isinstance(
-                            choice, str
-                        ):
+                        if isinstance(choice, list) and not isinstance(choice, str):
                             if (
                                 len(choice) != 2
                                 or (not isinstance(choice[0], str))
@@ -222,9 +213,7 @@ class ParametersForm(Form):
             if param_type in ("storage", "interface", "url", "choice") and (
                 param_min is not None or param_max is not None
             ):
-                set_form_error(
-                    self, "parameters", "Type doesn't support min or max"
-                )
+                set_form_error(self, "parameters", "Type doesn't support min or max")
             if param_type == "runtime" and isinstance(param_min, int):
                 if param_min < 0:
                     set_form_error(
@@ -234,9 +223,7 @@ class ParametersForm(Form):
                     )
             if isinstance(param_min, int) and isinstance(param_max, int):
                 if param_min > param_max:
-                    set_form_error(
-                        self, "parameters", "min must be less than max"
-                    )
+                    set_form_error(self, "parameters", "min must be less than max")
             if isinstance(param_argument_format, str):
                 if param_type == "storage":
                     if not any(
@@ -299,9 +286,7 @@ class ParametersForm(Form):
         # Paramaters which may require multiple ScriptResults(storage)
         multi_result_params = {}
 
-        default_from_maas_config = DEFAULTS_FROM_MAAS_CONFIG.union(
-            input.keys()
-        )
+        default_from_maas_config = DEFAULTS_FROM_MAAS_CONFIG.union(input.keys())
         default_defaults = (
             Config.objects.get_configs(default_from_maas_config)
             if default_from_maas_config
@@ -315,19 +300,14 @@ class ParametersForm(Form):
                 set_form_error(
                     self,
                     "input",
-                    "Unknown parameter '%s' for %s"
-                    % (param_name, self._script.name),
+                    "Unknown parameter '%s' for %s" % (param_name, self._script.name),
                 )
                 continue
             if parameters[param_name]["type"] in ("storage", "interface"):
-                multi_result_params[param_name] = copy.deepcopy(
-                    parameters[param_name]
-                )
+                multi_result_params[param_name] = copy.deepcopy(parameters[param_name])
                 multi_result_params[param_name]["value"] = value
             else:
-                result_params[param_name] = copy.deepcopy(
-                    parameters[param_name]
-                )
+                result_params[param_name] = copy.deepcopy(parameters[param_name])
                 result_params[param_name]["value"] = value
 
         # Check for any paramaters not given which have defaults.
@@ -344,20 +324,14 @@ class ParametersForm(Form):
                     multi_result_params[param_name]["value"] = default
             elif param_name not in result_params:
                 if param["type"] == "runtime":
-                    default = param.get(
-                        "default", self._script.timeout.seconds
-                    )
-                    if not isinstance(default, int) and param.get(
-                        "required", True
-                    ):
+                    default = param.get("default", self._script.timeout.seconds)
+                    if not isinstance(default, int) and param.get("required", True):
                         set_form_error(self, param_name, "Field is required")
                     elif isinstance(default, int):
                         result_params[param_name] = copy.deepcopy(param)
                         result_params[param_name]["value"] = default
                 else:
-                    default = param.get(
-                        "default", default_defaults.get(param_name, "")
-                    )
+                    default = param.get("default", default_defaults.get(param_name, ""))
                     if not default and param.get("required", False):
                         set_form_error(self, param_name, "Field is required")
                     elif default:
@@ -377,13 +351,9 @@ class ParametersForm(Form):
             set_form_error(self, param_name, "Must be an int")
             return
         if value < min_value:
-            set_form_error(
-                self, param_name, "Must be greater than %s" % min_value
-            )
+            set_form_error(self, param_name, "Must be greater than %s" % min_value)
         if max_value is not None and value > max_value:
-            set_form_error(
-                self, param_name, "Must be less than %s" % max_value
-            )
+            set_form_error(self, param_name, "Must be less than %s" % max_value)
 
     def _blockdevice_to_dict(self, block_device):
         """Convert a block device to a dictionary with limited fields."""
@@ -392,9 +362,7 @@ class ParametersForm(Form):
             "physical_blockdevice": block_device,
         }
 
-    def _validate_and_clean_storage_all(
-        self, param_name, param, result_params, ret
-    ):
+    def _validate_and_clean_storage_all(self, param_name, param, result_params, ret):
         """Validate and clean storage input when set to all."""
         if len(self._node.physicalblockdevice_set) == 0:
             # Use 'all' as a place holder until the disks get added during
@@ -406,30 +374,22 @@ class ParametersForm(Form):
             for bd in self._node.physicalblockdevice_set:
                 clean_param = copy.deepcopy(result_params)
                 clean_param[param_name] = copy.deepcopy(param)
-                clean_param[param_name]["value"] = self._blockdevice_to_dict(
-                    bd
-                )
+                clean_param[param_name]["value"] = self._blockdevice_to_dict(bd)
                 ret.append(clean_param)
 
-    def _validate_and_clean_storage_id(
-        self, param_name, param, result_params, ret
-    ):
+    def _validate_and_clean_storage_id(self, param_name, param, result_params, ret):
         """Validate and clean storage input when id."""
         try:
             bd = self._node.physicalblockdevice_set.get(id=int(param["value"]))
         except ObjectDoesNotExist:
-            set_form_error(
-                self, param_name, "Physical block id does not exist"
-            )
+            set_form_error(self, param_name, "Physical block id does not exist")
         else:
             clean_param = copy.deepcopy(result_params)
             clean_param[param_name] = copy.deepcopy(param)
             clean_param[param_name]["value"] = self._blockdevice_to_dict(bd)
             ret.append(clean_param)
 
-    def _validate_and_clean_storage(
-        self, param_name, param, result_params, ret
-    ):
+    def _validate_and_clean_storage(self, param_name, param, result_params, ret):
         """Validate and clean storage input."""
         value = param["value"]
         for i in value.split(","):
@@ -445,9 +405,7 @@ class ParametersForm(Form):
                 else:
                     clean_param = copy.deepcopy(result_params)
                     clean_param[param_name] = copy.deepcopy(param)
-                    clean_param[param_name][
-                        "value"
-                    ] = self._blockdevice_to_dict(bd)
+                    clean_param[param_name]["value"] = self._blockdevice_to_dict(bd)
                     ret.append(clean_param)
                     continue
 
@@ -469,9 +427,7 @@ class ParametersForm(Form):
             for bd in qs:
                 clean_param = copy.deepcopy(result_params)
                 clean_param[param_name] = copy.deepcopy(param)
-                clean_param[param_name]["value"] = self._blockdevice_to_dict(
-                    bd
-                )
+                clean_param[param_name]["value"] = self._blockdevice_to_dict(bd)
                 ret.append(clean_param)
 
     def _interface_to_dict(self, interface):
@@ -481,9 +437,7 @@ class ParametersForm(Form):
             "interface": interface,
         }
 
-    def _validate_and_clean_interface_all(
-        self, param_name, param, result_params, ret
-    ):
+    def _validate_and_clean_interface_all(self, param_name, param, result_params, ret):
         """Validate and clean interface input when set to all."""
         interfaces = self._get_interfaces()
         if len(interfaces) == 0:
@@ -496,14 +450,10 @@ class ParametersForm(Form):
             for interface in interfaces:
                 clean_param = copy.deepcopy(result_params)
                 clean_param[param_name] = copy.deepcopy(param)
-                clean_param[param_name]["value"] = self._interface_to_dict(
-                    interface
-                )
+                clean_param[param_name]["value"] = self._interface_to_dict(interface)
                 ret.append(clean_param)
 
-    def _validate_and_clean_interface_id(
-        self, param_name, param, result_params, ret
-    ):
+    def _validate_and_clean_interface_id(self, param_name, param, result_params, ret):
         """Validate and clean interface input when id."""
         interfaces = self._get_interfaces(id=int(param["value"]))
         if len(interfaces) != 1:
@@ -511,14 +461,10 @@ class ParametersForm(Form):
         else:
             clean_param = copy.deepcopy(result_params)
             clean_param[param_name] = copy.deepcopy(param)
-            clean_param[param_name]["value"] = self._interface_to_dict(
-                interfaces[0]
-            )
+            clean_param[param_name]["value"] = self._interface_to_dict(interfaces[0])
             ret.append(clean_param)
 
-    def _validate_and_clean_interface(
-        self, param_name, param, result_params, ret
-    ):
+    def _validate_and_clean_interface(self, param_name, param, result_params, ret):
         """Validate and clean interface input."""
         value = param["value"]
         for i in value.split(","):
@@ -526,16 +472,14 @@ class ParametersForm(Form):
                 # Allow users to specify an Interface using the vendor and
                 # product.
                 vendor, product = i.split(":")
-                interfaces = self._get_interfaces(
-                    vendor=vendor, product=product
-                )
+                interfaces = self._get_interfaces(vendor=vendor, product=product)
                 if len(interfaces) != 0:
                     for interface in interfaces:
                         clean_param = copy.deepcopy(result_params)
                         clean_param[param_name] = copy.deepcopy(param)
-                        clean_param[param_name][
-                            "value"
-                        ] = self._interface_to_dict(interface)
+                        clean_param[param_name]["value"] = self._interface_to_dict(
+                            interface
+                        )
                         ret.append(clean_param)
                     continue
 
@@ -543,10 +487,7 @@ class ParametersForm(Form):
                 interfaces = self._get_interfaces(mac_address=i)
             else:
                 interfaces = self._get_interfaces(
-                    Q(name=i)
-                    | Q(vendor=i)
-                    | Q(product=i)
-                    | Q(tags__overlap=[i])
+                    Q(name=i) | Q(vendor=i) | Q(product=i) | Q(tags__overlap=[i])
                 )
             if len(interfaces) == 0:
                 set_form_error(
@@ -559,9 +500,7 @@ class ParametersForm(Form):
             for interface in interfaces:
                 clean_param = copy.deepcopy(result_params)
                 clean_param[param_name] = copy.deepcopy(param)
-                clean_param[param_name]["value"] = self._interface_to_dict(
-                    interface
-                )
+                clean_param[param_name]["value"] = self._interface_to_dict(interface)
                 ret.append(clean_param)
 
     def _validate_and_clean_url(self, param_name, param):
@@ -632,9 +571,7 @@ class ParametersForm(Form):
             for choice in param["choices"]
         ]
         if param["value"] not in choices:
-            set_form_error(
-                self, param_name, f"Invalid choice \"{param['value']}\""
-            )
+            set_form_error(self, param_name, f"Invalid choice \"{param['value']}\"")
 
     def clean_input(self):
         """Validate and clean parameter input.

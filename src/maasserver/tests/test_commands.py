@@ -199,9 +199,7 @@ class TestCommands(MAASServerTestCase):
             random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]),
             factory.make_name("user-id"),
         )
-        self.patch(
-            createadmin, "prompt_for_ssh_import"
-        ).return_value = ssh_import
+        self.patch(createadmin, "prompt_for_ssh_import").return_value = ssh_import
         self.patch(keysource_module.KeySource, "import_keys")
 
         call_command(
@@ -225,15 +223,11 @@ class TestCommands(MAASServerTestCase):
         username = factory.make_string()
         password = factory.make_string()
         email = "%s@example.com" % factory.make_string()
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         user_id = factory.make_name("user-id")
         ssh_import = f"{protocol}:{user_id}"
         key_string = get_data("data/test_rsa0.pub")
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.return_value = [key_string]
         call_command(
             "createadmin",
@@ -330,9 +324,7 @@ class TestCommands(MAASServerTestCase):
     def test_prompt_for_username_checks_for_empty_username(self):
         self.patch(createadmin, "read_input", lambda x: "")
 
-        self.assertRaises(
-            createadmin.EmptyUsername, createadmin.prompt_for_username
-        )
+        self.assertRaises(createadmin.EmptyUsername, createadmin.prompt_for_username)
 
     def test_prompt_for_email_returns_selected_email(self):
         email = factory.make_email_address()
@@ -359,9 +351,7 @@ class TestCommands(MAASServerTestCase):
         self.assertEqual("", createadmin.prompt_for_ssh_import())
 
     def test_validate_ssh_import_validates_protocol_and_user_id(self):
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         user_id = factory.make_name("user-id")
         ssh_import = f"{protocol}:{user_id}"
         self.assertEqual(
@@ -396,8 +386,7 @@ class TestChangePasswords(MAASServerTestCase):
         self.patch(changepasswords, "fileinput").return_value = stdin
         error_text = assertCommandErrors(self, "changepasswords")
         self.assertIn(
-            "Invalid input provided. "
-            "Format is 'username:password', one per line.",
+            "Invalid input provided. " "Format is 'username:password', one per line.",
             error_text,
         )
 
@@ -437,17 +426,13 @@ class TestChangePasswords(MAASServerTestCase):
 class TestApikeyCommand(MAASServerTestCase):
     def test_apikey_requires_username(self):
         error_text = assertCommandErrors(self, "apikey")
-        self.assertIn(
-            "You must provide a username with --username.", error_text
-        )
+        self.assertIn("You must provide a username with --username.", error_text)
 
     def test_apikey_gets_keys(self):
         stderr = StringIO()
         stdout = StringIO()
         user = factory.make_User()
-        call_command(
-            "apikey", username=user.username, stderr=stderr, stdout=stdout
-        )
+        call_command("apikey", username=user.username, stderr=stderr, stdout=stdout)
         self.assertEqual(stderr.getvalue().strip(), "")
 
         expected_token = get_one(user.userprofile.get_authorisation_tokens())

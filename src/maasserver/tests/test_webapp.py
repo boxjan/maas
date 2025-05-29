@@ -24,36 +24,24 @@ from provisioningserver.utils.twisted import reducedWebLogFormatter
 
 class TestCleanPathRequest(MAASTestCase):
     def test_requestReceived_converts_extra_slashes_to_single(self):
-        mock_super_requestReceived = self.patch(
-            webapp.Request, "requestReceived"
-        )
+        mock_super_requestReceived = self.patch(webapp.Request, "requestReceived")
         request = webapp.CleanPathRequest(DummyChannel(), sentinel.queued)
-        path_pieces = [
-            factory.make_name("path").encode("utf-8") for _ in range(3)
-        ]
+        path_pieces = [factory.make_name("path").encode("utf-8") for _ in range(3)]
         double_path = (b"/" * random.randint(2, 8)).join(path_pieces)
         single_path = b"/".join(path_pieces)
-        request.requestReceived(
-            sentinel.command, double_path, sentinel.version
-        )
+        request.requestReceived(sentinel.command, double_path, sentinel.version)
         mock_super_requestReceived.assert_called_once_with(
             sentinel.command, single_path, sentinel.version
         )
 
     def test_requestReceived_converts_extra_slashes_ignores_args(self):
-        mock_super_requestReceived = self.patch(
-            webapp.Request, "requestReceived"
-        )
+        mock_super_requestReceived = self.patch(webapp.Request, "requestReceived")
         request = webapp.CleanPathRequest(DummyChannel(), sentinel.queued)
-        path_pieces = [
-            factory.make_name("path").encode("utf-8") for _ in range(3)
-        ]
+        path_pieces = [factory.make_name("path").encode("utf-8") for _ in range(3)]
         args = b"?op=extra//data"
         double_path = (b"/" * random.randint(2, 8)).join(path_pieces) + args
         single_path = b"/".join(path_pieces) + args
-        request.requestReceived(
-            sentinel.command, double_path, sentinel.version
-        )
+        request.requestReceived(sentinel.command, double_path, sentinel.version)
         mock_super_requestReceived.assert_called_once_with(
             sentinel.command, single_path, sentinel.version
         )
@@ -171,9 +159,7 @@ class TestWebApplicationService(MAASTestCase):
 
     def make_webapp(self):
         listener = FakePostgresListenerService()
-        service = webapp.WebApplicationService(
-            listener, sentinel.status_worker
-        )
+        service = webapp.WebApplicationService(listener, sentinel.status_worker)
         mock_makeEndpoint = self.patch(service, "_makeEndpoint")
         mock_makeEndpoint.return_value = TCP4ServerEndpoint(
             reactor, 0, interface="localhost"
@@ -227,9 +213,5 @@ class TestWebApplicationService(MAASTestCase):
         )
         self.assertIsInstance(underlay_maas_resource, webapp.ResourceOverlay)
         self.assertIs(underlay_maas_resource.basis._reactor, reactor)
-        self.assertIs(
-            underlay_maas_resource.basis._threadpool, service.threadpool
-        )
-        self.assertIsInstance(
-            underlay_maas_resource.basis._application, WSGIHandler
-        )
+        self.assertIs(underlay_maas_resource.basis._threadpool, service.threadpool)
+        self.assertIsInstance(underlay_maas_resource.basis._application, WSGIHandler)

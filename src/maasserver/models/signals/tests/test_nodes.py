@@ -73,9 +73,7 @@ class TestNodePreviousStatus(MAASServerTestCase):
         previous_status = factory.pick_choice(
             NODE_STATUS_CHOICES, but_not=black_listed_statuses
         )
-        node = factory.make_Node(
-            previous_status=previous_status, status=status
-        )
+        node = factory.make_Node(previous_status=previous_status, status=status)
         node.update_status(random.choice(NODE_TRANSITIONS[node.status]))
         node.save()
         self.assertEqual(previous_status, node.previous_status)
@@ -179,9 +177,7 @@ class TestNodeCreateServices(MAASServerTestCase):
     def test_creates_services_for_region_controller(self):
         region_controller = factory.make_RegionController()
         services = Service.objects.filter(node=region_controller)
-        self.assertEqual(
-            REGION_SERVICES, {service.name for service in services}
-        )
+        self.assertEqual(REGION_SERVICES, {service.name for service in services})
 
     def test_creates_services_when_region_converts_to_region_rack(self):
         controller = factory.make_RegionController()
@@ -198,9 +194,7 @@ class TestNodeCreateServices(MAASServerTestCase):
         controller.node_type = NODE_TYPE.REGION_CONTROLLER
         controller.save()
         services = Service.objects.filter(node=controller)
-        self.assertEqual(
-            REGION_SERVICES, {service.name for service in services}
-        )
+        self.assertEqual(REGION_SERVICES, {service.name for service in services})
 
 
 class TestNodeDefaultNUMANode(MAASServerTestCase):

@@ -23,9 +23,7 @@ class TestDiscoveryModel(MAASServerTestCase):
         # Simulate a single device being observed from two different rack
         # interfaces.
         d1 = factory.make_Discovery(interface=iface1)
-        factory.make_Discovery(
-            interface=iface2, mac_address=d1.mac_address, ip=d1.ip
-        )
+        factory.make_Discovery(interface=iface2, mac_address=d1.mac_address, ip=d1.ip)
         # ... the Discovery view should only display one entry.
         self.assertEqual(1, Discovery.objects.count())
 
@@ -164,9 +162,7 @@ class TestDiscoveryManagerClear(MAASServerTestCase):
         Discovery.objects.clear(all=True)
         self.assertEqual(0, MDNS.objects.count())
         self.assertEqual(0, Neighbour.objects.count())
-        maaslog.assert_called_once_with(
-            "Cleared all mDNS and neighbour entries."
-        )
+        maaslog.assert_called_once_with("Cleared all mDNS and neighbour entries.")
 
     def test_clear_mdns_entries_is_noop_if_what_to_clear_is_unspecified(self):
         maaslog = self.patch(discovery_module.maaslog, "info")
@@ -200,9 +196,7 @@ class TestDiscoveryManagerDeleteByMacAndIP(MAASServerTestCase):
         neigh = factory.make_Neighbour()
         factory.make_Neighbour(ip=neigh.ip, mac_address=neigh.mac_address)
         self.assertEqual(2, Neighbour.objects.count())
-        Discovery.objects.delete_by_mac_and_ip(
-            ip=neigh.ip, mac=neigh.mac_address
-        )
+        Discovery.objects.delete_by_mac_and_ip(ip=neigh.ip, mac=neigh.mac_address)
         self.assertEqual(0, Neighbour.objects.count())
 
     def test_unrelated_neighbours_remain(self):
@@ -211,9 +205,7 @@ class TestDiscoveryManagerDeleteByMacAndIP(MAASServerTestCase):
         # Make an extra neighbour; this one shouldn't go away.
         factory.make_Neighbour()
         self.assertEqual(3, Neighbour.objects.count())
-        Discovery.objects.delete_by_mac_and_ip(
-            ip=neigh.ip, mac=neigh.mac_address
-        )
+        Discovery.objects.delete_by_mac_and_ip(ip=neigh.ip, mac=neigh.mac_address)
         self.assertEqual(1, Neighbour.objects.count())
 
     def test_deletes_related_mdns_entries(self):
@@ -222,9 +214,7 @@ class TestDiscoveryManagerDeleteByMacAndIP(MAASServerTestCase):
         factory.make_MDNS(ip=neigh.ip)
         self.assertEqual(2, Neighbour.objects.count())
         self.assertEqual(1, MDNS.objects.count())
-        Discovery.objects.delete_by_mac_and_ip(
-            ip=neigh.ip, mac=neigh.mac_address
-        )
+        Discovery.objects.delete_by_mac_and_ip(ip=neigh.ip, mac=neigh.mac_address)
         self.assertEqual(0, Neighbour.objects.count())
         self.assertEqual(0, MDNS.objects.count())
 
@@ -234,31 +224,23 @@ class TestDiscoveryManagerDeleteByMacAndIP(MAASServerTestCase):
         factory.make_RDNS(ip=neigh.ip)
         self.assertEqual(2, Neighbour.objects.count())
         self.assertEqual(1, RDNS.objects.count())
-        Discovery.objects.delete_by_mac_and_ip(
-            ip=neigh.ip, mac=neigh.mac_address
-        )
+        Discovery.objects.delete_by_mac_and_ip(ip=neigh.ip, mac=neigh.mac_address)
         self.assertEqual(0, Neighbour.objects.count())
         self.assertEqual(0, MDNS.objects.count())
 
     def test_log_entries(self):
         maaslog = self.patch(discovery_module.maaslog, "info")
         user = factory.make_admin()
-        neigh = factory.make_Neighbour(
-            ip="1.1.1.1", mac_address="00:01:02:03:04:05"
-        )
+        neigh = factory.make_Neighbour(ip="1.1.1.1", mac_address="00:01:02:03:04:05")
         Discovery.objects.delete_by_mac_and_ip(
             ip=neigh.ip, mac=neigh.mac_address, user=user
         )
         maaslog.assert_called_once_with(
             f"User '{user.username}' cleared neighbour entry: 1.1.1.1 (00:01:02:03:04:05)."
         )
-        neigh = factory.make_Neighbour(
-            ip="1.1.1.1", mac_address="00:01:02:03:04:05"
-        )
+        neigh = factory.make_Neighbour(ip="1.1.1.1", mac_address="00:01:02:03:04:05")
         maaslog = self.patch(discovery_module.maaslog, "info")
-        Discovery.objects.delete_by_mac_and_ip(
-            ip=neigh.ip, mac=neigh.mac_address
-        )
+        Discovery.objects.delete_by_mac_and_ip(ip=neigh.ip, mac=neigh.mac_address)
         maaslog.assert_called_once_with(
             "Cleared neighbour entry: 1.1.1.1 (00:01:02:03:04:05)."
         )

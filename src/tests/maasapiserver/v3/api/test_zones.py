@@ -68,24 +68,18 @@ class TestZonesApi:
             await create_test_zone(fixture, name=str(i), description=str(i))
 
         for page in range(1, 6):
-            response = await api_client.get(
-                f"/api/v3/zones?page={page}&size=2"
-            )
+            response = await api_client.get(f"/api/v3/zones?page={page}&size=2")
             assert response.status_code == 200
             zones_response = ZonesListResponse(**response.json())
             assert zones_response.kind == "ZonesList"
             assert zones_response.total == 10
             assert len(zones_response.items) == 2
 
-    @pytest.mark.parametrize(
-        "page,size", [(1, 0), (0, 1), (-1, -1), (1, 1001)]
-    )
+    @pytest.mark.parametrize("page,size", [(1, 0), (0, 1), (-1, -1), (1, 1001)])
     async def test_list_422(
         self, page: int, size: int, api_client: AsyncClient
     ) -> None:
-        response = await api_client.get(
-            f"/api/v3/zones?page={page}&size={size}"
-        )
+        response = await api_client.get(f"/api/v3/zones?page={page}&size={size}")
         assert response.status_code == 422
 
         error_response = ErrorBodyResponse(**response.json())
@@ -93,9 +87,7 @@ class TestZonesApi:
         assert error_response.code == 422
 
     # GET /zones/{zone_id}
-    async def test_get_default(
-        self, api_client: AsyncClient, fixture: Fixture
-    ) -> None:
+    async def test_get_default(self, api_client: AsyncClient, fixture: Fixture) -> None:
         # A "default" zone should be created at startup by the migration scripts.
         response = await api_client.get("/api/v3/zones/1")
         assert response.status_code == 200
@@ -105,9 +97,7 @@ class TestZonesApi:
         assert zone_response.name == "default"
 
     # GET /zone/{ID}
-    async def test_get_200(
-        self, api_client: AsyncClient, fixture: Fixture
-    ) -> None:
+    async def test_get_200(self, api_client: AsyncClient, fixture: Fixture) -> None:
         created_zone = await create_test_zone(fixture)
         response = await api_client.get(f"/api/v3/zones/{created_zone.id}")
         assert response.status_code == 200
@@ -120,15 +110,11 @@ class TestZonesApi:
             # TODO: FastAPI response_model_exclude_none not working. We need to fix this before making the api public
             "_embedded": None,
             "_links": {
-                "self": {
-                    "href": f"{EXTERNAL_V3_API_PREFIX}/zones/{created_zone.id}"
-                }
+                "self": {"href": f"{EXTERNAL_V3_API_PREFIX}/zones/{created_zone.id}"}
             },
         }
 
-    async def test_get_400(
-        self, api_client: AsyncClient, fixture: Fixture
-    ) -> None:
+    async def test_get_400(self, api_client: AsyncClient, fixture: Fixture) -> None:
         response = await api_client.get("/api/v3/zones/100")
         assert response.status_code == 404
         assert "ETag" not in response.headers
@@ -137,9 +123,7 @@ class TestZonesApi:
         assert error_response.kind == "Error"
         assert error_response.code == 404
 
-    async def test_get_422(
-        self, api_client: AsyncClient, fixture: Fixture
-    ) -> None:
+    async def test_get_422(self, api_client: AsyncClient, fixture: Fixture) -> None:
         response = await api_client.get("/api/v3/zones/xyz")
         assert response.status_code == 422
         assert "ETag" not in response.headers
@@ -165,9 +149,7 @@ class TestZonesApi:
             == f"{EXTERNAL_V3_API_PREFIX}/zones/{zone_response.id}"
         )
 
-    async def test_post_default_parameters(
-        self, api_client: AsyncClient
-    ) -> None:
+    async def test_post_default_parameters(self, api_client: AsyncClient) -> None:
         zone_request = ZoneRequest(name="myzone", description=None)
         response = await api_client.post(
             "/api/v3/zones", json=jsonable_encoder(zone_request)
@@ -214,9 +196,7 @@ class TestZonesApi:
         assert error_response.code == 422
 
     # DELETE /zones/{id}
-    async def test_delete_unexisting_resource(
-        self, api_client: AsyncClient
-    ) -> None:
+    async def test_delete_unexisting_resource(self, api_client: AsyncClient) -> None:
         response = await api_client.delete("/api/v3/zones/100")
         assert response.status_code == 204
 
@@ -227,9 +207,7 @@ class TestZonesApi:
         response = await api_client.delete(f"/api/v3/zones/{created_zone.id}")
         assert response.status_code == 204
 
-        zones = await fixture.get(
-            ZoneTable.name, eq(ZoneTable.c.id, created_zone.id)
-        )
+        zones = await fixture.get(ZoneTable.name, eq(ZoneTable.c.id, created_zone.id))
         assert zones == []
 
     async def test_delete_default_zone(
@@ -241,8 +219,7 @@ class TestZonesApi:
         assert error_response.code == 400
         assert error_response.message == "Bad request."
         assert (
-            error_response.details[0].type
-            == CANNOT_DELETE_DEFAULT_ZONE_VIOLATION_TYPE
+            error_response.details[0].type == CANNOT_DELETE_DEFAULT_ZONE_VIOLATION_TYPE
         )
 
     async def test_delete_with_etag(
@@ -256,16 +233,12 @@ class TestZonesApi:
         error_response = ErrorBodyResponse(**failed_response.json())
         assert error_response.code == 412
         assert error_response.message == "A precondition has failed."
-        assert (
-            error_response.details[0].type == ETAG_PRECONDITION_VIOLATION_TYPE
-        )
+        assert error_response.details[0].type == ETAG_PRECONDITION_VIOLATION_TYPE
 
         response = await api_client.delete(
             f"/api/v3/zones/{created_zone.id}",
             headers={"if-match": created_zone.etag()},
         )
         assert response.status_code == 204
-        zones = await fixture.get(
-            ZoneTable.name, eq(ZoneTable.c.id, created_zone.id)
-        )
+        zones = await fixture.get(ZoneTable.name, eq(ZoneTable.c.id, created_zone.id))
         assert zones == []

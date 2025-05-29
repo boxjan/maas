@@ -31,9 +31,7 @@ def pytest_configure(config):
 @pytest.hookimpl(tryfirst=True)
 def pytest_load_initial_conftests(early_config, parser, args):
     if os.environ.get("DJANGO_SETTINGS_MODULE") is None:
-        os.environ[
-            "DJANGO_SETTINGS_MODULE"
-        ] = "maasserver.djangosettings.development"
+        os.environ["DJANGO_SETTINGS_MODULE"] = "maasserver.djangosettings.development"
 
     import django
     from django.conf import settings
@@ -139,9 +137,7 @@ def api_client(maas_user):
     from maasserver.models.user import get_auth_tokens
     from maasserver.testing.testclient import MAASSensibleOAuthClient
 
-    return MAASSensibleOAuthClient(
-        user=maas_user, token=get_auth_tokens(maas_user)[0]
-    )
+    return MAASSensibleOAuthClient(user=maas_user, token=get_auth_tokens(maas_user)[0])
 
 
 @pytest.fixture

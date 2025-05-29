@@ -15,9 +15,7 @@ class SignalsDisabled(Fixture):
     have a ``signals`` attribute which is an instance of `SignalsManager`.
     """
 
-    managers = {
-        name: getattr(signals, name).signals for name in signals.__all__
-    }
+    managers = {name: getattr(signals, name).signals for name in signals.__all__}
 
     def __init__(self, *disable):
         """Initialise a new `SignalsDisabled` fixture.

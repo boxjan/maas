@@ -46,9 +46,7 @@ class CommissioningScriptsHandler(OperationsHandler):
         """List commissioning scripts."""
         return sorted(
             script.name
-            for script in Script.objects.filter(
-                script_type=SCRIPT_TYPE.COMMISSIONING
-            )
+            for script in Script.objects.filter(script_type=SCRIPT_TYPE.COMMISSIONING)
         )
 
     def create(self, request):
@@ -125,9 +123,7 @@ class CommissioningScriptHandler(OperationsHandler):
     def read(self, request, name):
         """Read a commissioning script."""
         script = get_object_or_404(Script, name=name)
-        return HttpResponse(
-            script.script.data, content_type="application/binary"
-        )
+        return HttpResponse(script.script.data, content_type="application/binary")
 
     def delete(self, request, name):
         """Delete a commissioning script."""

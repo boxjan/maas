@@ -160,9 +160,7 @@ class SpaceHandler(OperationsHandler):
         # if the user requested to read the undefined space.
         if id == "-1" or id == Space.UNDEFINED and _has_undefined_space():
             return UNDEFINED_SPACE
-        return Space.objects.get_space_or_404(
-            id, request.user, NodePermission.view
-        )
+        return Space.objects.get_space_or_404(id, request.user, NodePermission.view)
 
     def update(self, request, id):
         """@description-title Update space
@@ -184,12 +182,8 @@ class SpaceHandler(OperationsHandler):
             No Space matches the given query.
         """
         if id == "-1" or id == Space.UNDEFINED:
-            raise MAASAPIBadRequest(
-                "Space cannot be modified: %s" % Space.UNDEFINED
-            )
-        space = Space.objects.get_space_or_404(
-            id, request.user, NodePermission.admin
-        )
+            raise MAASAPIBadRequest("Space cannot be modified: %s" % Space.UNDEFINED)
+        space = Space.objects.get_space_or_404(id, request.user, NodePermission.admin)
         form = SpaceForm(instance=space, data=request.data)
         if form.is_valid():
             return form.save()
@@ -210,11 +204,7 @@ class SpaceHandler(OperationsHandler):
             No Space matches the given query.
         """
         if id == "-1" or id == Space.UNDEFINED:
-            raise MAASAPIBadRequest(
-                "Space cannot be deleted: %s" % Space.UNDEFINED
-            )
-        space = Space.objects.get_space_or_404(
-            id, request.user, NodePermission.admin
-        )
+            raise MAASAPIBadRequest("Space cannot be deleted: %s" % Space.UNDEFINED)
+        space = Space.objects.get_space_or_404(id, request.user, NodePermission.admin)
         space.delete()
         return rc.DELETED

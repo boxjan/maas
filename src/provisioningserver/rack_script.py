@@ -49,9 +49,7 @@ def run():
                 {
                     "MAAS_PATH": os.environ["SNAP"],
                     "MAAS_ROOT": os.environ["SNAP_DATA"],
-                    "MAAS_DATA": os.path.join(
-                        os.environ["SNAP_COMMON"], "maas"
-                    ),
+                    "MAAS_DATA": os.path.join(os.environ["SNAP_COMMON"], "maas"),
                     "MAAS_CACHE": os.path.join(
                         os.environ["SNAP_COMMON"], "maas", "cache"
                     ),

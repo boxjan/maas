@@ -42,9 +42,7 @@ class InvalidURLError(CommandError):
 def prompt_for_external_auth_url(existing_url):
     if existing_url == "":
         existing_url = "none"
-    new_url = read_input(
-        f"URL to external Candid server [default={existing_url}]: "
-    )
+    new_url = read_input(f"URL to external Candid server [default={existing_url}]: ")
     if new_url == "":
         new_url = existing_url
     return new_url
@@ -71,8 +69,7 @@ def update_auth_details_from_rbac_registration(auth_details, service_name):
     print("Please authenticate with the RBAC service to register this MAAS")
     client = RBACUserClient(auth_details.rbac_url)
     services = {
-        service["name"]: service
-        for service in client.get_registerable_services()
+        service["name"]: service for service in client.get_registerable_services()
     }
     if service_name is None:
         if not services:
@@ -95,9 +92,7 @@ def update_auth_details_from_rbac_registration(auth_details, service_name):
                 service = client.create_service(service_name)
             except APIError as error:
                 if error.status_code == 409:
-                    raise CommandError(
-                        "User not allowed to register this service"
-                    )
+                    raise CommandError("User not allowed to register this service")
                 raise CommandError(str(error))
     _register_service(client, service, auth_details)
     print('Service "{}" registered'.format(service["name"]))
@@ -117,9 +112,7 @@ def _pick_service(services):
         (service["name"], service["pending"]) for service in services.values()
     )
     for idx, (name, pending) in enumerate(services_list, 1):
-        print(
-            " {:3} - {} {}".format(idx, name, "(pending)" if pending else "")
-        )
+        print(" {:3} - {} {}".format(idx, name, "(pending)" if pending else ""))
     print()
     idx = read_input("Select service index: ")
     try:
@@ -217,9 +210,7 @@ class Command(BaseCommand):
         )
         if auth_details.rbac_url:
             if not is_valid_url(auth_details.rbac_url):
-                raise InvalidURLError(
-                    "Please enter a valid http or https URL."
-                )
+                raise InvalidURLError("Please enter a valid http or https URL.")
             update_auth_details_from_rbac_registration(
                 auth_details, options.get("rbac_service_name")
             )
@@ -232,9 +223,7 @@ class Command(BaseCommand):
                 replace_none=True,
             )
             if auth_details.rbac_url and not agent_file:
-                raise CommandError(
-                    "Candid authentication must be set when using RBAC"
-                )
+                raise CommandError("Candid authentication must be set when using RBAC")
             if agent_file:
                 update_auth_details_from_agent_file(agent_file, auth_details)
                 if not auth_details.rbac_url:

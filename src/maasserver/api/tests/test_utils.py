@@ -93,9 +93,7 @@ class TestGetOverridedQueryDict(MAASTestCase):
 
     def test_expands_dict_fields(self):
         field_name = factory.make_name("field_name")
-        sub_fields = {
-            factory.make_name("sub_field"): CharField() for _ in range(3)
-        }
+        sub_fields = {factory.make_name("sub_field"): CharField() for _ in range(3)}
         fields = {field_name: DictCharField(sub_fields)}
         defaults = {
             f"{field_name}_{field}": factory.make_name("subfield")
@@ -129,22 +127,16 @@ class TestOAuthHelpers(MAASTestCase):
         token = factory.make_string(18)
         auth_header = factory.make_oauth_header(oauth_token=token)
         auth_header = auth_header.replace(", ", ",")
-        self.assertEqual(
-            token, extract_oauth_key_from_auth_header(auth_header)
-        )
+        self.assertEqual(token, extract_oauth_key_from_auth_header(auth_header))
 
     def test_extract_oauth_key_from_auth_header_returns_None_if_missing(self):
         self.assertIsNone(extract_oauth_key_from_auth_header(""))
 
     def test_extract_oauth_key_raises_Unauthorized_if_no_auth_header(self):
-        self.assertRaises(
-            Unauthorized, extract_oauth_key, make_fake_request(None)
-        )
+        self.assertRaises(Unauthorized, extract_oauth_key, make_fake_request(None))
 
     def test_extract_oauth_key_raises_Unauthorized_if_no_key(self):
-        self.assertRaises(
-            Unauthorized, extract_oauth_key, make_fake_request("")
-        )
+        self.assertRaises(Unauthorized, extract_oauth_key, make_fake_request(""))
 
     def test_extract_oauth_key_returns_key(self):
         token = factory.make_string(18)
@@ -163,15 +155,11 @@ class TestOAuthHelpersWithDatabase(MAASServerTestCase):
         self.assertEqual(
             token,
             get_oauth_token(
-                make_fake_request(
-                    factory.make_oauth_header(oauth_token=token.key)
-                )
+                make_fake_request(factory.make_oauth_header(oauth_token=token.key))
             ),
         )
 
     def test_get_oauth_token_raises_Unauthorized_for_unknown_token(self):
         fake_token = factory.make_string(18)
         header = factory.make_oauth_header(oauth_token=fake_token)
-        self.assertRaises(
-            Unauthorized, get_oauth_token, make_fake_request(header)
-        )
+        self.assertRaises(Unauthorized, get_oauth_token, make_fake_request(header))

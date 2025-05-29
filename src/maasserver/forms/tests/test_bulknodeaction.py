@@ -85,9 +85,7 @@ class TestBulkNodeActionForm(MAASServerTestCase):
     def test_zone_field_rejects_empty_zone(self):
         # If the field is present, the zone name has to be valid
         # and the empty string is not a valid zone name.
-        form = BulkNodeSetZoneForm(
-            user=factory.make_admin(), data={"zone": ""}
-        )
+        form = BulkNodeSetZoneForm(user=factory.make_admin(), data={"zone": ""})
         self.assertFalse(form.is_valid(), form._errors)
         self.assertEqual(["This field is required."], form._errors["zone"])
 

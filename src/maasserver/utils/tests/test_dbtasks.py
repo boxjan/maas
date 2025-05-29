@@ -85,9 +85,9 @@ class TestDatabaseTaskService(MAASTestCase):
         service = DatabaseTasksService()
         service.startService()
         try:
-            result = service.deferTask(
-                return_args, sentinel.arg, kw=sentinel.kw
-            ).wait(TIMEOUT)
+            result = service.deferTask(return_args, sentinel.arg, kw=sentinel.kw).wait(
+                TIMEOUT
+            )
             self.assertEqual(
                 (sentinel.here, (sentinel.arg,), {"kw": sentinel.kw}),
                 result,
@@ -105,9 +105,7 @@ class TestDatabaseTaskService(MAASTestCase):
         service = DatabaseTasksService()
         service.startService()
         try:
-            service.deferTaskWithCallbacks(
-                simple_function, [callback], "Hello"
-            )
+            service.deferTaskWithCallbacks(simple_function, [callback], "Hello")
             service.syncTask().wait(TIMEOUT)
             self.assertEqual(
                 "Hello world",
@@ -206,9 +204,7 @@ class TestDatabaseTaskService(MAASTestCase):
         service.startService()
         try:
             service.deferTask(things.append, 1).wait(TIMEOUT)
-            self.assertRaises(
-                exception_type, service.deferTask(be_bad).wait, TIMEOUT
-            )
+            self.assertRaises(exception_type, service.deferTask(be_bad).wait, TIMEOUT)
             service.deferTask(things.append, 2).wait(TIMEOUT)
         finally:
             service.stopService()

@@ -29,9 +29,7 @@ class TestScriptsPaths(MAASTestCase):
         self.assertEqual(scripts_paths.scripts, base_path / "scripts")
         self.assertEqual(scripts_paths.out, base_path / "out")
         self.assertEqual(scripts_paths.downloads, base_path / "downloads")
-        self.assertEqual(
-            scripts_paths.resources_file, base_path / "resources.json"
-        )
+        self.assertEqual(scripts_paths.resources_file, base_path / "resources.json")
 
     def test_ensure(self):
         base_path = Path(self.useFixture(TempDirectory()).path)
@@ -79,12 +77,8 @@ class TestScript(MAASTestCase):
         }
         paths = ScriptsPaths(base_path=Path("/base"))
         script = Script(info, "http://maas.example.com", paths)
-        self.assertEqual(
-            script.environ["MAAS_BASE_URL"], "http://maas.example.com"
-        )
-        self.assertEqual(
-            script.environ["MAAS_RESOURCES_FILE"], "/base/resources.json"
-        )
+        self.assertEqual(script.environ["MAAS_BASE_URL"], "http://maas.example.com")
+        self.assertEqual(script.environ["MAAS_RESOURCES_FILE"], "/base/resources.json")
         self.assertEqual(script.environ["RUNTIME"], "100")
         self.assertEqual(script.environ["BMC_CONFIG_PATH"], "/bmc-config")
         self.assertEqual(script.environ["HAS_STARTED"], "False")
@@ -119,15 +113,12 @@ class TestScript(MAASTestCase):
             },
         ]
         should_run = [
-            Script(info, "http://maas.example.com", None).should_run()
-            for info in infos
+            Script(info, "http://maas.example.com", None).should_run() for info in infos
         ]
         self.assertEqual([True, False, False, False], should_run)
 
     def test_run(self):
-        fake_process = self.patch(
-            maas_run_scripts.subprocess, "Popen"
-        ).return_value
+        fake_process = self.patch(maas_run_scripts.subprocess, "Popen").return_value
         mock_capture_script_output = self.patch(
             maas_run_scripts, "capture_script_output"
         )
@@ -156,9 +147,7 @@ class TestScript(MAASTestCase):
         self.patch(maas_run_scripts.subprocess, "Popen")
         error = OSError("Fail!")
         error.errno = 10
-        self.patch(
-            maas_run_scripts, "capture_script_output"
-        ).side_effect = error
+        self.patch(maas_run_scripts, "capture_script_output").side_effect = error
         info = {
             "name": "myscript",
             "path": "commissioning-scripts/myscript",
@@ -175,9 +164,7 @@ class TestScript(MAASTestCase):
         self.patch(maas_run_scripts.subprocess, "Popen")
         error = OSError("Timeout!")
         error.errno = 124
-        self.patch(
-            maas_run_scripts, "capture_script_output"
-        ).side_effect = error
+        self.patch(maas_run_scripts, "capture_script_output").side_effect = error
         info = {
             "name": "myscript",
             "path": "commissioning-scripts/myscript",
@@ -247,9 +234,7 @@ class TestGetConfig(MAASTestCase):
         self.assertEqual(config.credentials.token_key, "new-token-key")
         self.assertEqual(config.credentials.token_secret, "new-token-secret")
         self.assertEqual(config.credentials.consumer_key, "new-consumer-key")
-        self.assertEqual(
-            config.credentials.consumer_secret, "new-consumer-secret"
-        )
+        self.assertEqual(config.credentials.consumer_secret, "new-consumer-secret")
         self.assertEqual(config.metadata_url, "http://new.example.com")
 
 
@@ -382,9 +367,7 @@ class TestMain(MAASTestCase):
             any_order=True,
         )
         mock_node.assert_called_once()
-        creds_yaml = yaml.safe_load(
-            (Path(tempdir) / "myhost-creds.yaml").read_text()
-        )
+        creds_yaml = yaml.safe_load((Path(tempdir) / "myhost-creds.yaml").read_text())
         info = creds_yaml["reporting"]["maas"]
         self.assertEqual("tk", info["token_key"])
         self.assertEqual("ts", info["token_secret"])
@@ -435,9 +418,7 @@ class TestMain(MAASTestCase):
             "endpoint": "http://mymaas.example.com:5240/MAAS/metadata/status/abcde",
             **token_info,
         }
-        mock_write_token.assert_called_once_with(
-            token, path=Path("myhost-creds.yaml")
-        )
+        mock_write_token.assert_called_once_with(token, path=Path("myhost-creds.yaml"))
 
     def test_get_machine_token(self):
         tempdir = self.useFixture(TempDirectory()).path
@@ -473,9 +454,7 @@ class TestMain(MAASTestCase):
     def test_get_machine_token_machine_not_found(self):
         tempdir = self.useFixture(TempDirectory()).path
         mock_exit = self.patch(maas_run_scripts.sys, "exit")
-        self.patch(
-            maas_run_scripts, "geturl"
-        ).side_effect = self.make_http_error(
+        self.patch(maas_run_scripts, "geturl").side_effect = self.make_http_error(
             404,
             "Not found",
             "Machine not found",

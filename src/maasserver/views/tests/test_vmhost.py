@@ -42,7 +42,5 @@ class TestVMHostCertificateHandler(MAASServerTestCase):
         self.assertEqual(response.status_code, http.client.NOT_FOUND)
 
     def test_no_vmhost(self):
-        response = self.client.get(
-            reverse("vmhost-certificate", args=["not-here"])
-        )
+        response = self.client.get(reverse("vmhost-certificate", args=["not-here"]))
         self.assertEqual(response.status_code, http.client.NOT_FOUND)

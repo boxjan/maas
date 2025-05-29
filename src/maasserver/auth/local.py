@@ -127,9 +127,7 @@ class MAASAuthorizationBackend(ModelBackend):
 
         # ResourcePool permissions are handled specifically.
         if isinstance(perm, ResourcePoolPermission):
-            return self._perm_resource_pool(
-                user, perm, rbac, visible_pools, obj
-            )
+            return self._perm_resource_pool(user, perm, rbac, visible_pools, obj)
 
         # Pod permissions are handled specifically.
         if isinstance(perm, PodPermission):
@@ -189,8 +187,7 @@ class MAASAuthorizationBackend(ModelBackend):
                 )
             else:
                 raise NotImplementedError(
-                    "Invalid permission check (invalid permission name: %s)."
-                    % perm
+                    "Invalid permission check (invalid permission name: %s)." % perm
                 )
         elif isinstance(obj, Interface):
             node = obj.get_node()
@@ -214,9 +211,7 @@ class MAASAuthorizationBackend(ModelBackend):
                 # the interfaces on that machine, unless they have
                 # administrator rights.
                 if node.node_type == NODE_TYPE.MACHINE:
-                    return self._can_admin(
-                        rbac_enabled, user, node, admin_pools
-                    )
+                    return self._can_admin(rbac_enabled, user, node, admin_pools)
                 # Other node types must be editable by the user.
                 return self._can_edit(
                     rbac_enabled, user, node, deploy_pools, admin_pools
@@ -226,8 +221,7 @@ class MAASAuthorizationBackend(ModelBackend):
                 return self._can_admin(rbac_enabled, user, node, admin_pools)
             else:
                 raise NotImplementedError(
-                    "Invalid permission check (invalid permission name: %s)."
-                    % perm
+                    "Invalid permission check (invalid permission name: %s)." % perm
                 )
         elif is_instance_or_subclass(obj, UNRESTRICTED_READ_MODELS):
             # This model is classified under 'unrestricted read' for any
@@ -240,8 +234,7 @@ class MAASAuthorizationBackend(ModelBackend):
                 return user.is_superuser
             else:
                 raise NotImplementedError(
-                    "Invalid permission check (invalid permission name: %s)."
-                    % perm
+                    "Invalid permission check (invalid permission name: %s)." % perm
                 )
         elif is_instance_or_subclass(obj, ADMIN_RESTRICTED_MODELS):
             # Only administrators are allowed to read/write these objects.
@@ -249,13 +242,10 @@ class MAASAuthorizationBackend(ModelBackend):
                 return user.is_superuser
             else:
                 raise NotImplementedError(
-                    "Invalid permission check (invalid permission name: %s)."
-                    % perm
+                    "Invalid permission check (invalid permission name: %s)." % perm
                 )
         else:
-            raise NotImplementedError(
-                "Invalid permission check (invalid object type)."
-            )
+            raise NotImplementedError("Invalid permission check (invalid object type).")
 
     def _sanity_checks(self, perm, obj=None):
         """Perform sanity checks to ensure that the perm matches the object."""
@@ -299,8 +289,7 @@ class MAASAuthorizationBackend(ModelBackend):
             # admin_pools for the user to be able to view the machine.
             if machine.owner_id is not None and machine.owner_id != user.id:
                 return (
-                    machine.pool_id in view_all_pools
-                    or machine.pool_id in admin_pools
+                    machine.pool_id in view_all_pools or machine.pool_id in admin_pools
                 )
             # Machine is not owned or owned by the user so must be in either
             # pool for the user to view it.
@@ -311,19 +300,13 @@ class MAASAuthorizationBackend(ModelBackend):
                 or machine.pool_id in admin_pools
             )
         return (
-            machine.owner_id is None
-            or machine.owner_id == user.id
-            or user.is_superuser
+            machine.owner_id is None or machine.owner_id == user.id or user.is_superuser
         )
 
-    def _can_edit(
-        self, rbac_enabled, user, machine, deploy_pools, admin_pools
-    ):
+    def _can_edit(self, rbac_enabled, user, machine, deploy_pools, admin_pools):
         editable = machine.owner_id is None or machine.owner_id == user.id
         if rbac_enabled:
-            can_admin = self._can_admin(
-                rbac_enabled, user, machine, admin_pools
-            )
+            can_admin = self._can_admin(rbac_enabled, user, machine, admin_pools)
             can_edit = (
                 machine.pool_id in deploy_pools
                 or (machine.pool_id is None and machine.owner == user)
@@ -362,10 +345,7 @@ class MAASAuthorizationBackend(ModelBackend):
         if perm == ResourcePoolPermission.edit:
             if rbac_enabled:
                 return (
-                    obj.id
-                    in rbac.get_resource_pool_ids(user.username, "edit")[
-                        "edit"
-                    ]
+                    obj.id in rbac.get_resource_pool_ids(user.username, "edit")["edit"]
                 )
             return user.is_superuser
         elif perm == ResourcePoolPermission.view:
@@ -407,16 +387,11 @@ class MAASAuthorizationBackend(ModelBackend):
             return user.is_superuser
         elif perm == PodPermission.dynamic_compose:
             if rbac_enabled:
-                return (
-                    obj.pool_id in deploy_pools or obj.pool_id in admin_pools
-                )
+                return obj.pool_id in deploy_pools or obj.pool_id in admin_pools
             return True
         elif perm == PodPermission.view:
             if rbac_enabled:
-                return (
-                    obj.pool_id in visible_pools
-                    or obj.pool_id in view_all_pools
-                )
+                return obj.pool_id in visible_pools or obj.pool_id in view_all_pools
             return True
 
         raise ValueError("unknown PodPermission value: %s" % perm)
@@ -439,10 +414,7 @@ class MAASAuthorizationBackend(ModelBackend):
 
         if perm == VMClusterPermission.view:
             if rbac_enabled:
-                return (
-                    obj.pool_id in visible_pools
-                    or obj.pool_id in view_all_pools
-                )
+                return obj.pool_id in visible_pools or obj.pool_id in view_all_pools
             return True
 
         if perm == VMClusterPermission.edit:

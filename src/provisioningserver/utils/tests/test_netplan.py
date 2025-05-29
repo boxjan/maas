@@ -59,17 +59,13 @@ class TestGetNetplanBondParameters(MAASTestCase):
         netplan_params = get_netplan_bond_parameters(
             {"bond-arp-ip-target": "192.168.0.1 fe80::1"}
         )
-        self.assertEqual(
-            netplan_params, {"arp-ip-targets": ["192.168.0.1", "fe80::1"]}
-        )
+        self.assertEqual(netplan_params, {"arp-ip-targets": ["192.168.0.1", "fe80::1"]})
 
     def test_converts_arp_ip_target_to_list_with_weird_whitespace(self):
         netplan_params = get_netplan_bond_parameters(
             {"bond-arp-ip-target": "  192.168.0.1    fe80::1    "}
         )
-        self.assertEqual(
-            netplan_params, {"arp-ip-targets": ["192.168.0.1", "fe80::1"]}
-        )
+        self.assertEqual(netplan_params, {"arp-ip-targets": ["192.168.0.1", "fe80::1"]})
 
 
 class TestGetNetplanBridgeParameters(MAASTestCase):
@@ -77,9 +73,7 @@ class TestGetNetplanBridgeParameters(MAASTestCase):
         netplan_params = get_netplan_bridge_parameters(
             {"bridge_ageing": 5, "bridge_maxage": 10, "bridge_stp": True}
         )
-        self.assertEqual(
-            netplan_params, {"ageing-time": 5, "max-age": 10, "stp": True}
-        )
+        self.assertEqual(netplan_params, {"ageing-time": 5, "max-age": 10, "stp": True})
 
     def test_skips_and_logs_unknown_parameters(self):
         with TwistedLoggerFixture() as logger:

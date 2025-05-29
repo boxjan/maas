@@ -129,9 +129,7 @@ class TestAtomicWrite(MAASTestCase):
         # temporary file.
         self.patch(fs_module, "rename", Mock(side_effect=OSError()))
         filename = self.make_file()
-        self.assertRaises(
-            OSError, atomic_write, factory.make_bytes(), filename
-        )
+        self.assertRaises(OSError, atomic_write, factory.make_bytes(), filename)
         self.assertEqual(
             [os.path.basename(filename)], os.listdir(os.path.dirname(filename))
         )
@@ -141,9 +139,7 @@ class TestAtomicWrite(MAASTestCase):
         # was removed.
         self.patch(fs_module, "chown", Mock(side_effect=PermissionError()))
         filename = self.make_file()
-        self.assertRaises(
-            PermissionError, atomic_write, factory.make_bytes(), filename
-        )
+        self.assertRaises(PermissionError, atomic_write, factory.make_bytes(), filename)
 
         pattern = os.path.join(
             os.path.dirname(filename), ".%s.*" % os.path.basename(filename)
@@ -191,9 +187,7 @@ class TestAtomicWrite(MAASTestCase):
         atomic_write(factory.make_bytes(), atomic_file)
 
         fs_module.stat.assert_called_once_with(atomic_file)
-        fs_module.chown.assert_called_once_with(
-            ANY, sentinel.uid, sentinel.gid
-        )
+        fs_module.chown.assert_called_once_with(ANY, sentinel.uid, sentinel.gid)
 
     def test_atomic_write_sets_OSError_filename_if_undefined(self):
         # When the filename attribute of an OSError is undefined when
@@ -270,9 +264,7 @@ class TestAtomicCopy(MAASTestCase):
         loader = self.make_file(contents=contents)
         dest = self.make_file(contents="Old contents")
         temp_file = "%s.new" % dest
-        factory.make_file(
-            os.path.dirname(temp_file), name=os.path.basename(temp_file)
-        )
+        factory.make_file(os.path.dirname(temp_file), name=os.path.basename(temp_file))
         atomic_copy(loader, dest)
         self.assert_file_contains(dest, contents)
 
@@ -410,17 +402,13 @@ class TestGetMAASProvisionCommand(MAASTestCase):
     def test_returns_just_command_for_production(self):
         self.patch(provisioningserver.config, "is_dev_environment")
         provisioningserver.config.is_dev_environment.return_value = False
-        self.assertEqual(
-            "/usr/lib/maas/maas-common", get_maas_common_command()
-        )
+        self.assertEqual("/usr/lib/maas/maas-common", get_maas_common_command())
 
     def test_returns_maas_rack_for_snap(self):
         self.patch(provisioningserver.config, "is_dev_environment")
         provisioningserver.config.is_dev_environment.return_value = False
         self.patch(os, "environ", {"SNAP": "/snap/maas/10"})
-        self.assertEqual(
-            get_maas_common_command(), "/snap/maas/10/bin/maas-rack"
-        )
+        self.assertEqual(get_maas_common_command(), "/snap/maas/10/bin/maas-rack")
 
     def test_returns_full_path_for_development(self):
         self.patch(provisioningserver.config, "is_dev_environment")
@@ -562,9 +550,7 @@ class TestSudoDeleteFile(MAASTestCase):
 
     def test_catches_failures(self):
         patch_popen(self, 1)
-        self.assertRaises(
-            CalledProcessError, sudo_delete_file, self.make_file()
-        )
+        self.assertRaises(CalledProcessError, sudo_delete_file, self.make_file())
 
     def test_can_delete_file_in_development(self):
         filename = get_maas_data_path("dhcpd.conf")
@@ -608,9 +594,7 @@ class TestSudoWriteFileScript(MAASTestCase):
             mode = random.randint(0o000, 0o777)  # Inclusive of endpoints.
             args = self.script.arg_parser.parse_args([filename, oct(mode)])
             self.script.main(args, io.BytesIO(content))
-            calls_expected.append(
-                call(content, filename, overwrite=True, mode=mode)
-            )
+            calls_expected.append(call(content, filename, overwrite=True, mode=mode))
         self.script.atomic_write.assert_has_calls(calls_expected)
 
     def test_rejects_file_name_not_on_allowed_list(self):
@@ -618,9 +602,7 @@ class TestSudoWriteFileScript(MAASTestCase):
         mode = random.randint(0o000, 0o777)  # Inclusive of endpoints.
         args = self.script.arg_parser.parse_args([filename, oct(mode)])
         with CaptureStandardIO() as stdio:
-            error = self.assertRaises(
-                SystemExit, self.script.main, args, io.BytesIO()
-            )
+            error = self.assertRaises(SystemExit, self.script.main, args, io.BytesIO())
         self.assertGreater(error.code, 0)
         self.script.atomic_write.assert_not_called()
         self.assertEqual("", stdio.getOutput())
@@ -634,9 +616,7 @@ class TestSudoWriteFileScript(MAASTestCase):
         mode = random.randint(0o1000, 0o7777)  # Inclusive of endpoints.
         args = self.script.arg_parser.parse_args([filename, oct(mode)])
         with CaptureStandardIO() as stdio:
-            error = self.assertRaises(
-                SystemExit, self.script.main, args, io.BytesIO()
-            )
+            error = self.assertRaises(SystemExit, self.script.main, args, io.BytesIO())
         self.assertGreater(error.code, 0)
         self.script.atomic_write.assert_not_called()
         self.assertEqual("", stdio.getOutput())
@@ -721,9 +701,7 @@ class TestTempDir(MAASTestCase):
         class DeliberateFailure(Exception):
             pass
 
-        with self.assertRaisesRegex(
-            DeliberateFailure, "Exiting context by exception"
-        ):
+        with self.assertRaisesRegex(DeliberateFailure, "Exiting context by exception"):
             with tempdir() as directory:
                 file_path = factory.make_file(directory)
                 raise DeliberateFailure("Exiting context by exception")
@@ -783,9 +761,7 @@ class TestTempDir(MAASTestCase):
     def test_restricts_access(self):
         with tempdir() as directory:
             mode = os.stat(directory).st_mode
-        self.assertEqual(
-            stat.S_IMODE(mode), stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR
-        )
+        self.assertEqual(stat.S_IMODE(mode), stat.S_IRUSR | stat.S_IWUSR | stat.S_IXUSR)
 
 
 class TestReadTextFile(MAASTestCase):
@@ -879,9 +855,7 @@ class TestSystemLocks(MAASTestCase):
 
     def test_path_is_read_only(self):
         lock = self.make_lock()
-        self.assertRaises(
-            AttributeError, setattr, lock, "path", factory.make_name()
-        )
+        self.assertRaises(AttributeError, setattr, lock, "path", factory.make_name())
 
     def test_holds_file_system_lock(self):
         lock = self.make_lock()
@@ -1036,17 +1010,13 @@ class TestRunLock(MAASTestCase):
 
     def test_string_path(self):
         filename = "/foo/bar/123:456.txt"
-        expected = get_tentative_data_path(
-            "/run/lock/maas@foo:bar:123::456.txt"
-        )
+        expected = get_tentative_data_path("/run/lock/maas@foo:bar:123::456.txt")
         observed = RunLock(filename).path
         self.assertEqual(expected, observed)
 
     def test_byte_path(self):
         filename = b"/foo/bar/123:456.txt"
-        expected = get_tentative_data_path(
-            "/run/lock/maas@foo:bar:123::456.txt"
-        )
+        expected = get_tentative_data_path("/run/lock/maas@foo:bar:123::456.txt")
         observed = RunLock(filename).path
         self.assertEqual(expected, observed)
 
@@ -1076,6 +1046,4 @@ class TestNamedLock(MAASTestCase):
         self.assertRaises(ValueError, NamedLock, "foo=bar")
         # The error message contains all of the unacceptable characters.
         error = self.assertRaises(ValueError, NamedLock, "[foo;bar]")
-        self.assertEqual(
-            "Lock name contains illegal characters: ;[]", str(error)
-        )
+        self.assertEqual("Lock name contains illegal characters: ;[]", str(error))

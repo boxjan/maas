@@ -29,9 +29,7 @@ class TestCloneForm(MAASServerTestCase):
     def test_source_destination_match_error(self):
         user = factory.make_admin()
         source = factory.make_Machine(
-            status=random.choice(
-                [NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]
-            )
+            status=random.choice([NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING])
         )
         form = CloneForm(
             user,
@@ -54,13 +52,9 @@ class TestCloneForm(MAASServerTestCase):
     def test_destination_smaller_storage(self):
         user = factory.make_admin()
         source = factory.make_Machine(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=source, size=8 * 1024**3, name="sda"
-        )
+        factory.make_PhysicalBlockDevice(node=source, size=8 * 1024**3, name="sda")
         destination = factory.make_Machine(
-            status=random.choice(
-                [NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]
-            ),
+            status=random.choice([NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]),
             with_boot_disk=False,
         )
         factory.make_PhysicalBlockDevice(
@@ -88,12 +82,8 @@ class TestCloneForm(MAASServerTestCase):
 
     def test_multiple_errors(self):
         user = factory.make_admin()
-        source = factory.make_Machine(
-            status=NODE_STATUS.READY, with_boot_disk=False
-        )
-        factory.make_PhysicalBlockDevice(
-            node=source, size=8 * 1024**3, name="sda"
-        )
+        source = factory.make_Machine(status=NODE_STATUS.READY, with_boot_disk=False)
+        factory.make_PhysicalBlockDevice(node=source, size=8 * 1024**3, name="sda")
         destination = factory.make_Machine(
             status=NODE_STATUS.READY, with_boot_disk=False
         )
@@ -126,9 +116,7 @@ class TestCloneForm(MAASServerTestCase):
         source = factory.make_Machine(with_boot_disk=False)
         factory.make_Interface(node=source, name="eth0")
         destination = factory.make_Machine(
-            status=random.choice(
-                [NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]
-            ),
+            status=random.choice([NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]),
             with_boot_disk=False,
         )
         factory.make_Interface(node=destination, name="eth1")
@@ -155,14 +143,10 @@ class TestCloneForm(MAASServerTestCase):
     def test_permission_errors(self):
         user = factory.make_User()
         source = factory.make_Machine(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=source, size=8 * 1024**3, name="sda"
-        )
+        factory.make_PhysicalBlockDevice(node=source, size=8 * 1024**3, name="sda")
         factory.make_Interface(node=source, name="eth0")
         destination = factory.make_Machine(
-            status=random.choice(
-                [NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]
-            ),
+            status=random.choice([NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]),
             with_boot_disk=False,
         )
         factory.make_PhysicalBlockDevice(
@@ -191,14 +175,10 @@ class TestCloneForm(MAASServerTestCase):
     def test_performs_clone(self):
         user = factory.make_admin()
         source = factory.make_Machine(with_boot_disk=False)
-        factory.make_PhysicalBlockDevice(
-            node=source, size=8 * 1024**3, name="sda"
-        )
+        factory.make_PhysicalBlockDevice(node=source, size=8 * 1024**3, name="sda")
         factory.make_Interface(node=source, name="eth0")
         destination1 = factory.make_Machine(
-            status=random.choice(
-                [NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]
-            ),
+            status=random.choice([NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]),
             with_boot_disk=False,
         )
         factory.make_PhysicalBlockDevice(
@@ -206,9 +186,7 @@ class TestCloneForm(MAASServerTestCase):
         )
         factory.make_Interface(node=destination1, name="eth0")
         destination2 = factory.make_Machine(
-            status=random.choice(
-                [NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]
-            ),
+            status=random.choice([NODE_STATUS.READY, NODE_STATUS.FAILED_TESTING]),
             with_boot_disk=False,
         )
         factory.make_PhysicalBlockDevice(

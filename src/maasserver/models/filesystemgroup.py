@@ -291,8 +291,7 @@ class BcacheManager(BaseFilesystemGroupManager):
 
         if not backing_device and not backing_partition:
             raise ValidationError(
-                "Either backing_device or backing_partition must be "
-                "specified."
+                "Either backing_device or backing_partition must be " "specified."
             )
 
     def create_bcache(
@@ -321,9 +320,7 @@ class BcacheManager(BaseFilesystemGroupManager):
                 fstype=FILESYSTEM_TYPE.BCACHE_BACKING,
             )
         elif backing_partition is not None:
-            node_config = (
-                backing_partition.partition_table.block_device.node_config
-            )
+            node_config = backing_partition.partition_table.block_device.node_config
             backing_filesystem = Filesystem(
                 node_config=node_config,
                 partition=backing_partition,
@@ -416,8 +413,7 @@ class FilesystemGroup(CleanSave, TimestampedModel):
         """
         if self.is_lvm():
             raise AttributeError(
-                "virtual_device should not be called when "
-                "group_type = LVM_VG."
+                "virtual_device should not be called when " "group_type = LVM_VG."
             )
         else:
             # Return the first `VirtualBlockDevice` since it is the only one.
@@ -481,9 +477,7 @@ class FilesystemGroup(CleanSave, TimestampedModel):
         if len(filesystems) == 0:
             return 0
         else:
-            pv_total_size = sum(
-                filesystem.get_size() for filesystem in filesystems
-            )
+            pv_total_size = sum(filesystem.get_size() for filesystem in filesystems)
             number_of_extents, _ = divmod(pv_total_size, LVM_PE_SIZE)
             # Reserve one extent per filesystem for LVM headers - lp:1517129.
             return (number_of_extents - len(filesystems)) * LVM_PE_SIZE
@@ -606,16 +600,12 @@ class FilesystemGroup(CleanSave, TimestampedModel):
 
         # Must at least have a filesystem added to the group.
         if len(filesystems) == 0:
-            raise ValidationError(
-                "At least one filesystem must have been added."
-            )
+            raise ValidationError("At least one filesystem must have been added.")
 
         # All filesystems must belong all to the same node.
         nodes = {filesystem.get_node() for filesystem in filesystems}
         if len(nodes) > 1:
-            raise ValidationError(
-                "All added filesystems must belong to the same node."
-            )
+            raise ValidationError("All added filesystems must belong to the same node.")
 
         # Validate all the different group types.
         if self.is_lvm():
@@ -655,32 +645,23 @@ class FilesystemGroup(CleanSave, TimestampedModel):
             return
         unique_fstypes = set(self._get_all_fstypes(filesystems=filesystems))
         if unique_fstypes != {FILESYSTEM_TYPE.LVM_PV}:
-            raise ValidationError(
-                "Volume group can only contain lvm physical volumes."
-            )
+            raise ValidationError("Volume group can only contain lvm physical volumes.")
 
     def _validate_raid(self, filesystems=None):
         """Validate attached filesystems are correct count and type for RAID."""
         if not self.is_raid():
             return
         fstypes = self._get_all_fstypes(filesystems=filesystems)
-        num_raid = len(
-            [fstype for fstype in fstypes if fstype == FILESYSTEM_TYPE.RAID]
-        )
+        num_raid = len([fstype for fstype in fstypes if fstype == FILESYSTEM_TYPE.RAID])
         num_raid_spare = len(
-            [
-                fstype
-                for fstype in fstypes
-                if fstype == FILESYSTEM_TYPE.RAID_SPARE
-            ]
+            [fstype for fstype in fstypes if fstype == FILESYSTEM_TYPE.RAID_SPARE]
         )
         if self.group_type == FILESYSTEM_GROUP_TYPE.RAID_0:
             # RAID 0 can contain 2 or more RAID filesystems and no spares are
             # allowed.
             if num_raid < 2 or num_raid_spare != 0:
                 raise ValidationError(
-                    "RAID level 0 must have at least 2 raid devices and "
-                    "no spares."
+                    "RAID level 0 must have at least 2 raid devices and " "no spares."
                 )
         elif self.group_type == FILESYSTEM_GROUP_TYPE.RAID_1:
             # RAID 1 must have at least 2 RAID filesystems.
@@ -724,9 +705,7 @@ class FilesystemGroup(CleanSave, TimestampedModel):
             ]
         )
         if num_raid_invalid > 0:
-            raise ValidationError(
-                "RAID can only contain raid device and raid spares."
-            )
+            raise ValidationError("RAID can only contain raid device and raid spares.")
 
     def _validate_bcache(self, filesystems=None):
         """Validate attached filesystems are correct type for BCACHE."""
@@ -735,13 +714,9 @@ class FilesystemGroup(CleanSave, TimestampedModel):
         # Circular imports.
         from maasserver.models.virtualblockdevice import VirtualBlockDevice
 
-        filesystems = [
-            filesystem.fstype for filesystem in self.filesystems.all()
-        ]
+        filesystems = [filesystem.fstype for filesystem in self.filesystems.all()]
         if filesystems != [FILESYSTEM_TYPE.BCACHE_BACKING]:
-            raise ValidationError(
-                "Bcache can only contain one backing device."
-            )
+            raise ValidationError("Bcache can only contain one backing device.")
         backing_block_device = self.get_bcache_backing_block_device()
         backing_block_device = backing_block_device.actual_instance
         if isinstance(backing_block_device, VirtualBlockDevice):
@@ -864,9 +839,7 @@ class VolumeGroup(FilesystemGroup):
         proxy = True
 
     def __init__(self, *args, **kwargs):
-        super().__init__(
-            group_type=FILESYSTEM_GROUP_TYPE.LVM_VG, *args, **kwargs
-        )
+        super().__init__(group_type=FILESYSTEM_GROUP_TYPE.LVM_VG, *args, **kwargs)
 
     def update_block_devices_and_partitions(self, block_devices, partitions):
         """Update the block devices and partitions that are in this
@@ -903,9 +876,7 @@ class VolumeGroup(FilesystemGroup):
         from maasserver.models.filesystem import Filesystem
 
         partitions = list(partitions)
-        current_filesystems = self.filesystems.filter(
-            block_device__isnull=True
-        )
+        current_filesystems = self.filesystems.filter(block_device__isnull=True)
         for filesystem in current_filesystems:
             partition = filesystem.partition
             if partition in partitions:
@@ -913,9 +884,7 @@ class VolumeGroup(FilesystemGroup):
             else:
                 filesystem.delete()
         for new_partition in partitions:
-            node_config = (
-                new_partition.partition_table.block_device.node_config
-            )
+            node_config = new_partition.partition_table.block_device.node_config
             Filesystem.objects.create(
                 node_config=node_config,
                 fstype=FILESYSTEM_TYPE.LVM_PV,
@@ -960,9 +929,7 @@ class RAID(FilesystemGroup):
                 "as the rest of the array."
             )
         elif device.get_effective_filesystem() is not None:
-            raise ValidationError(
-                "There is another filesystem on this device."
-            )
+            raise ValidationError("There is another filesystem on this device.")
         else:
             Filesystem.objects.create(
                 node_config=device.node_config,
@@ -984,9 +951,7 @@ class RAID(FilesystemGroup):
                 "of the array."
             )
         elif partition.get_effective_filesystem() is not None:
-            raise ValidationError(
-                "There is another filesystem on this partition."
-            )
+            raise ValidationError("There is another filesystem on this partition.")
         else:
             Filesystem.objects.create(
                 node_config=node.current_config,
@@ -1057,9 +1022,7 @@ class Bcache(FilesystemGroup):
         proxy = True
 
     def __init__(self, *args, **kwargs):
-        super().__init__(
-            group_type=FILESYSTEM_GROUP_TYPE.BCACHE, *args, **kwargs
-        )
+        super().__init__(group_type=FILESYSTEM_GROUP_TYPE.BCACHE, *args, **kwargs)
 
 
 class VMFS(FilesystemGroup):
@@ -1071,6 +1034,4 @@ class VMFS(FilesystemGroup):
         proxy = True
 
     def __init__(self, *args, **kwargs):
-        super().__init__(
-            group_type=FILESYSTEM_GROUP_TYPE.VMFS6, *args, **kwargs
-        )
+        super().__init__(group_type=FILESYSTEM_GROUP_TYPE.VMFS6, *args, **kwargs)

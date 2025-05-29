@@ -50,9 +50,7 @@ class TestAddRBACOptions(MAASTestCase):
         self.assertIsNone(options.rbac_url)
 
     def test_rbac_url(self):
-        options = self.parser.parse_args(
-            ["--rbac-url", "http://rbac.example.com/"]
-        )
+        options = self.parser.parse_args(["--rbac-url", "http://rbac.example.com/"])
         self.assertEqual("http://rbac.example.com/", options.rbac_url)
 
     def test_rbac_service_name(self):
@@ -103,9 +101,7 @@ class TestCreateAdminAccount(MAASTestCase):
         options = self.parser.parse_args([])
         init.create_admin_account(options)
         self.mock_print_msg.assert_called_with("Create first admin account")
-        self.mock_call.assert_called_with(
-            [self.maas_region_path, "createadmin"]
-        )
+        self.mock_call.assert_called_with([self.maas_region_path, "createadmin"])
 
     def test_username(self):
         options = self.parser.parse_args(["--admin-username", "my-user"])
@@ -188,9 +184,7 @@ class TestConfigureAuthentication(MAASTestCase):
         [config_call] = self.mock_subprocess.mock_calls
         method, args, kwargs = config_call
         self.assertEqual("call", method)
-        self.assertEqual(
-            ([self.maas_bin_path, "configauth"] + config_auth_args,), args
-        )
+        self.assertEqual(([self.maas_bin_path, "configauth"] + config_auth_args,), args)
         self.assertEqual({}, kwargs)
 
     def test_rbac_service_name(self):
@@ -200,9 +194,7 @@ class TestConfigureAuthentication(MAASTestCase):
         [config_call] = self.mock_subprocess.mock_calls
         method, args, kwargs = config_call
         self.assertEqual("call", method)
-        self.assertEqual(
-            ([self.maas_bin_path, "configauth"] + config_auth_args,), args
-        )
+        self.assertEqual(([self.maas_bin_path, "configauth"] + config_auth_args,), args)
         self.assertEqual({}, kwargs)
 
     def test_candid_agent_file(self):
@@ -214,9 +206,7 @@ class TestConfigureAuthentication(MAASTestCase):
         [config_call] = self.mock_subprocess.mock_calls
         method, args, kwargs = config_call
         self.assertEqual("call", method)
-        self.assertEqual(
-            ([self.maas_bin_path, "configauth"] + config_auth_args,), args
-        )
+        self.assertEqual(([self.maas_bin_path, "configauth"] + config_auth_args,), args)
         self.assertEqual({}, kwargs)
 
 
@@ -248,9 +238,7 @@ class TestCreateAccountExternalAuth(MAASTestCase):
             self.auth_config, self.maas_config, bakery_client=mock_client
         )
         mock_client.request.assert_called()
-        self.mock_print_msg.assert_called_with(
-            "Administrator user 'user' created"
-        )
+        self.mock_print_msg.assert_called_with("Administrator user 'user' created")
 
     def test_create_no_rbac_not_admin(self):
         mock_client = self.mock_bakery_client(user_is_admin=False)
@@ -316,6 +304,4 @@ class TestPrintMsg(MAASTestCase):
 
     def test_print_msg_empty_message(self):
         init.print_msg()
-        self.mock_print.assert_called_with(
-            "", end="\n", file=sys.stdout, flush=True
-        )
+        self.mock_print.assert_called_with("", end="\n", file=sys.stdout, flush=True)

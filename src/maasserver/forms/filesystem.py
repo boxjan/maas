@@ -41,8 +41,7 @@ class MountFilesystemForm(Form):
         elif self.filesystem.filesystem_group is not None:
             self.add_error(
                 None,
-                "Filesystem is part of a filesystem group, "
-                "and cannot be mounted.",
+                "Filesystem is part of a filesystem group, " "and cannot be mounted.",
             )
         return cleaned_data
 

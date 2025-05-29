@@ -33,17 +33,11 @@ class TestBmcRepository:
         bmc_repository = BmcRepository(db_connection)
         await bmc_repository.move_to_zone(zone_b.id, zone_a.id)
 
-        [updated_bmc_b] = await fixture.get(
-            BMCTable.name, eq(BMCTable.c.id, bmc_b.id)
-        )
+        [updated_bmc_b] = await fixture.get(BMCTable.name, eq(BMCTable.c.id, bmc_b.id))
         assert updated_bmc_b["zone_id"] == zone_a.id
 
         await bmc_repository.move_to_zone(zone_a.id, default_zone.id)
-        [updated_bmc_a] = await fixture.get(
-            BMCTable.name, eq(BMCTable.c.id, bmc_a.id)
-        )
-        [updated_bmc_b] = await fixture.get(
-            BMCTable.name, eq(BMCTable.c.id, bmc_b.id)
-        )
+        [updated_bmc_a] = await fixture.get(BMCTable.name, eq(BMCTable.c.id, bmc_a.id))
+        [updated_bmc_b] = await fixture.get(BMCTable.name, eq(BMCTable.c.id, bmc_b.id))
         assert updated_bmc_a["zone_id"] == default_zone.id
         assert updated_bmc_b["zone_id"] == default_zone.id

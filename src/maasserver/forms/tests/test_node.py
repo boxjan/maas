@@ -63,9 +63,7 @@ class TestNodeForm(MAASServerTestCase):
         machine = factory.make_Node()
         patch_usable_architectures(self, [machine.architecture])
 
-        form = NodeForm(
-            data={"domain": factory.make_name("domain")}, instance=machine
-        )
+        form = NodeForm(data={"domain": factory.make_name("domain")}, instance=machine)
 
         self.assertFalse(form.is_valid())
 

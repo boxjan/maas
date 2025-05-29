@@ -24,15 +24,10 @@ class TestMountFilesystemFormWithoutSubstrate(MAASServerTestCase):
         form = MountFilesystemForm(None, data=data)
         self.assertFalse(
             form.is_valid(),
-            "Should be invalid because block device does "
-            "not have a filesystem.",
+            "Should be invalid because block device does " "not have a filesystem.",
         )
         self.assertEqual(
-            {
-                "__all__": [
-                    "Cannot mount an unformatted partition or block device."
-                ]
-            },
+            {"__all__": ["Cannot mount an unformatted partition or block device."]},
             form._errors,
         )
 
@@ -41,11 +36,7 @@ class TestMountFilesystemForm(MAASServerTestCase):
     scenarios = (
         (
             "partition",
-            {
-                "make_substrate": lambda: {
-                    "partition": factory.make_Partition()
-                }
-            },
+            {"make_substrate": lambda: {"partition": factory.make_Partition()}},
         ),
         (
             "block-device",
@@ -59,9 +50,7 @@ class TestMountFilesystemForm(MAASServerTestCase):
 
     def test_requires_mount_point_when_fs_uses_mount_point(self):
         substrate = self.make_substrate()
-        filesystem = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.EXT4, **substrate
-        )
+        filesystem = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.EXT4, **substrate)
         form = MountFilesystemForm(filesystem, data={})
         self.assertTrue(filesystem.uses_mount_point)
         self.assertFalse(form.is_valid(), form.errors)
@@ -69,48 +58,36 @@ class TestMountFilesystemForm(MAASServerTestCase):
 
     def test_ignores_mount_point_when_fs_does_not_use_mount_point(self):
         substrate = self.make_substrate()
-        filesystem = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.SWAP, **substrate
-        )
+        filesystem = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.SWAP, **substrate)
         form = MountFilesystemForm(filesystem, data={})
         self.assertFalse(filesystem.uses_mount_point)
         self.assertTrue(form.is_valid(), form.errors)
 
     def test_is_not_valid_if_invalid_absolute_path(self):
         substrate = self.make_substrate()
-        filesystem = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.EXT4, **substrate
-        )
+        filesystem = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.EXT4, **substrate)
         data = {"mount_point": factory.make_absolute_path()[1:]}
         form = MountFilesystemForm(filesystem, data=data)
         self.assertFalse(
             form.is_valid(),
             "Should be invalid because it's not an absolute path.",
         )
-        self.assertEqual(
-            {"mount_point": ["Enter a valid value."]}, form._errors
-        )
+        self.assertEqual({"mount_point": ["Enter a valid value."]}, form._errors)
 
     def test_is_not_valid_if_absolute_path_empty(self):
         substrate = self.make_substrate()
-        filesystem = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.EXT4, **substrate
-        )
+        filesystem = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.EXT4, **substrate)
         data = {"mount_point": ""}
         form = MountFilesystemForm(filesystem, data=data)
         self.assertFalse(
             form.is_valid(),
             "Should be invalid because its not an absolute path.",
         )
-        self.assertEqual(
-            {"mount_point": ["This field is required."]}, form._errors
-        )
+        self.assertEqual({"mount_point": ["This field is required."]}, form._errors)
 
     def test_is_not_valid_if_invalid_absolute_path_too_long(self):
         substrate = self.make_substrate()
-        filesystem = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.EXT4, **substrate
-        )
+        filesystem = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.EXT4, **substrate)
         mount_point = factory.make_absolute_path(directory_length=4096)
         data = {"mount_point": mount_point}
         form = MountFilesystemForm(filesystem, data=data)
@@ -130,9 +107,7 @@ class TestMountFilesystemForm(MAASServerTestCase):
 
     def test_is_not_valid_if_substrate_in_filesystem_group(self):
         substrate = self.make_substrate()
-        filesystem = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.LVM_PV, **substrate
-        )
+        filesystem = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.LVM_PV, **substrate)
         factory.make_FilesystemGroup(
             group_type=FILESYSTEM_GROUP_TYPE.LVM_VG, filesystems=[filesystem]
         )
@@ -154,9 +129,7 @@ class TestMountFilesystemForm(MAASServerTestCase):
 
     def test_sets_mount_point_and_options_on_filesystem(self):
         substrate = self.make_substrate()
-        filesystem = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.EXT4, **substrate
-        )
+        filesystem = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.EXT4, **substrate)
         self.assertFalse(filesystem.is_mounted)
         mount_point = factory.make_absolute_path()
         mount_options = factory.make_name("options")
@@ -174,9 +147,7 @@ class TestMountFilesystemForm(MAASServerTestCase):
 
     def test_sets_mount_point_to_none_and_options_on_swap(self):
         substrate = self.make_substrate()
-        filesystem = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.SWAP, **substrate
-        )
+        filesystem = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.SWAP, **substrate)
         self.assertFalse(filesystem.is_mounted)
         mount_options = factory.make_name("options")
         data = {"mount_options": mount_options}
@@ -241,9 +212,7 @@ class TestUnmountNonStorageFilesystemForm(MAASServerTestCase):
         node = factory.make_Node()
         form = UnmountNonStorageFilesystemForm(node, data={})
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            {"mount_point": ["This field is required."]}, form.errors
-        )
+        self.assertEqual({"mount_point": ["This field is required."]}, form.errors)
 
     def test_will_not_unmount_filesystem_on_partition(self):
         node = factory.make_Node()
@@ -257,11 +226,7 @@ class TestUnmountNonStorageFilesystemForm(MAASServerTestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors,
-            {
-                "mount_point": [
-                    "No special filesystem is mounted at this path."
-                ]
-            },
+            {"mount_point": ["No special filesystem is mounted at this path."]},
         )
 
     def test_will_not_unmount_filesystem_on_block_device(self):
@@ -276,11 +241,7 @@ class TestUnmountNonStorageFilesystemForm(MAASServerTestCase):
         self.assertFalse(form.is_valid())
         self.assertEqual(
             form.errors,
-            {
-                "mount_point": [
-                    "No special filesystem is mounted at this path."
-                ]
-            },
+            {"mount_point": ["No special filesystem is mounted at this path."]},
         )
 
 
@@ -300,9 +261,7 @@ class TestUnmountNonStorageFilesystemFormScenarios(MAASServerTestCase):
             mount_point=mount_point,
             mount_options=mount_options,
         )
-        form = UnmountNonStorageFilesystemForm(
-            node, data={"mount_point": mount_point}
-        )
+        form = UnmountNonStorageFilesystemForm(node, data={"mount_point": mount_point})
         self.assertTrue(form.is_valid(), form.errors)
         form.save()
         self.assertIsNone(reload_object(filesystem))

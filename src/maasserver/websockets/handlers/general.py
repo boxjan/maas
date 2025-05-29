@@ -114,9 +114,7 @@ class GeneralHandler(Handler):
             "releases": list_release_choices(osystems, include_default=False),
             "kernels": kernels,
             "default_osystem": Config.objects.get_config("default_osystem"),
-            "default_release": Config.objects.get_config(
-                "default_distro_series"
-            ),
+            "default_release": Config.objects.get_config("default_distro_series"),
         }
 
     def dehydrate_actions(self, actions):
@@ -211,15 +209,9 @@ class GeneralHandler(Handler):
     def release_options(self, params):
         """Return global release options."""
         return {
-            "erase": Config.objects.get_config(
-                "enable_disk_erasing_on_release"
-            ),
-            "secure_erase": Config.objects.get_config(
-                "disk_erase_with_secure_erase"
-            ),
-            "quick_erase": Config.objects.get_config(
-                "disk_erase_with_quick_erase"
-            ),
+            "erase": Config.objects.get_config("enable_disk_erasing_on_release"),
+            "secure_erase": Config.objects.get_config("disk_erase_with_secure_erase"),
+            "quick_erase": Config.objects.get_config("disk_erase_with_quick_erase"),
         }
 
     def known_boot_architectures(self, params):
@@ -231,9 +223,7 @@ class GeneralHandler(Handler):
                 "bootloader_arches": "/".join(boot_method.bootloader_arches),
                 "arch_octet": boot_method.arch_octet,
                 "protocol": (
-                    "http"
-                    if boot_method.http_url or boot_method.user_class
-                    else "tftp"
+                    "http" if boot_method.http_url or boot_method.user_class else "tftp"
                 ),
             }
             for _, boot_method in BootMethodRegistry
@@ -250,9 +240,7 @@ class GeneralHandler(Handler):
         If object_name is passed, the certificate's CN will be
         $objectname@$maas_name. If not, the CN will be $maas_name.
         """
-        cert = generate_certificate(
-            get_maas_client_cn(params.get("object_name"))
-        )
+        cert = generate_certificate(get_maas_client_cn(params.get("object_name")))
         return {
             "CN": cert.cn(),
             "certificate": cert.certificate_pem(),

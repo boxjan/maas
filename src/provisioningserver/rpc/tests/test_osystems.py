@@ -31,10 +31,6 @@ class TestValidateLicenseKey(MAASTestCase):
         purposes = [BOOT_IMAGE_PURPOSE.XINSTALL]
         osystem = make_osystem(self, os_name, purposes)
         release = random.choice(osystem.get_supported_releases())
-        os_specific_validate_license_key = self.patch(
-            osystem, "validate_license_key"
-        )
+        os_specific_validate_license_key = self.patch(osystem, "validate_license_key")
         osystems.validate_license_key(osystem.name, release, sentinel.key)
-        os_specific_validate_license_key.assert_called_once_with(
-            release, sentinel.key
-        )
+        os_specific_validate_license_key.assert_called_once_with(release, sentinel.key)

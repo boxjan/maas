@@ -44,8 +44,7 @@ class DynamicDNSUpdateNotification:
         # Check if it's valid and store the decoded message
         if not self.is_valid():
             raise NotValidDNSNotificationPayload(
-                "Message '%s' is not a valid dynamic dns update."
-                % self.payload
+                "Message '%s' is not a valid dynamic dns update." % self.payload
             )
 
         return self.decoded_message

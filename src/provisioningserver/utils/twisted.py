@@ -799,9 +799,7 @@ class ThreadPool(threadpool.ThreadPool):
 
     log = Logger()
 
-    def __init__(
-        self, minthreads=5, maxthreads=20, name=None, contextFactory=None
-    ):
+    def __init__(self, minthreads=5, maxthreads=20, name=None, contextFactory=None):
         super().__init__(minthreads, maxthreads, name)
         self.context = ThreadWorkerContext(
             NullContext if contextFactory is None else contextFactory
@@ -1133,9 +1131,7 @@ class SiteNoLog(Site):
         pass
 
 
-def getProcessOutputAndValue(
-    executable, args=(), env={}, path=None, reactor=None
-):
+def getProcessOutputAndValue(executable, args=(), env={}, path=None, reactor=None):
     """Utility to create a process in the reactor and get all the output and
     return code of that process.
 

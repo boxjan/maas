@@ -27,9 +27,5 @@ def get_tls_parameters(private_cert_name, trust_cert_name):
     }
 
 
-get_tls_parameters_for_cluster = partial(
-    get_tls_parameters, "cluster.crt", "trust.crt"
-)
-get_tls_parameters_for_region = partial(
-    get_tls_parameters, "region.crt", "trust.crt"
-)
+get_tls_parameters_for_cluster = partial(get_tls_parameters, "cluster.crt", "trust.crt")
+get_tls_parameters_for_region = partial(get_tls_parameters, "region.crt", "trust.crt")

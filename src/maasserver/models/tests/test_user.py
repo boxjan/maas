@@ -24,9 +24,7 @@ class TestUser(MAASServerTestCase):
         self.assertIsNone(user.email)
 
     def test_user_email_blank(self):
-        user = User.objects.create_user(
-            username=factory.make_string(), email=""
-        )
+        user = User.objects.create_user(username=factory.make_string(), email="")
         self.assertIsNone(user.email)
 
     def test_user_email_unique(self):
@@ -43,9 +41,7 @@ class TestUser(MAASServerTestCase):
         mock_has_perm = self.patch(models, "_user_has_perm")
         user = factory.make_User()
         user.has_perm(sentinel.perm, sentinel.obj)
-        mock_has_perm.assert_called_once_with(
-            user, sentinel.perm, sentinel.obj
-        )
+        mock_has_perm.assert_called_once_with(user, sentinel.perm, sentinel.obj)
 
 
 class TestAuthTokens(MAASServerTestCase):

@@ -105,9 +105,7 @@ class UserHandler(Handler):
         """Create an audit event for this user"""
         request = HttpRequest()
         request.user = self.user
-        return create_audit_event(
-            event_type, ENDPOINT.UI, request, None, description
-        )
+        return create_audit_event(event_type, ENDPOINT.UI, request, None, description)
 
     def create(self, params):
         """Create a new user, and log an event for it."""
@@ -143,9 +141,7 @@ class UserHandler(Handler):
     def delete(self, params):
         """Delete a user, and log an event for it."""
         try:
-            user = self.get_object(
-                params, permission=self._meta.delete_permission
-            )
+            user = self.get_object(params, permission=self._meta.delete_permission)
             self.create_audit_event(
                 EVENT_TYPES.AUTHORISATION,
                 "Deleted {} '{}'.".format(
@@ -190,9 +186,7 @@ class UserHandler(Handler):
 
     def auth_user(self, params):
         """Return the authenticated user."""
-        return self.full_dehydrate(
-            self.get_object(params={"id": self.user.id})
-        )
+        return self.full_dehydrate(self.get_object(params={"id": self.user.id}))
 
     def mark_intro_complete(self, params):
         """Mark the user as completed the intro.

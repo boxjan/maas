@@ -197,9 +197,7 @@ class CompressedAmpList(AmpList):
             objects[nk] = self.fromStringProto(buffer.getvalue(), proto)
 
     def toBox(self, name, strings, objects, proto):
-        obj = self.retrieve(
-            objects, amp._wireNameToPythonIdentifier(name), proto
-        )
+        obj = self.retrieve(objects, amp._wireNameToPythonIdentifier(name), proto)
         if self.optional and obj is None:
             return
 
@@ -256,8 +254,6 @@ class IPNetwork(amp.Argument):
             address_length = 16
         address = int.from_bytes(inString[:address_length], "big")
         prefixlen = int.from_bytes(inString[address_length:], "big")
-        network = netaddr.IPNetwork(
-            netaddr.IPAddress(address, version=version)
-        )
+        network = netaddr.IPNetwork(netaddr.IPAddress(address, version=version))
         network.prefixlen = prefixlen
         return network

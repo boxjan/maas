@@ -80,9 +80,7 @@ class TestServiceMaker(MAASTestCase):
 
     def assertConnectionsDisabled(self):
         for alias in connections:
-            self.assertEqual(
-                DisabledDatabaseConnection, type(connections[alias])
-            )
+            self.assertEqual(DisabledDatabaseConnection, type(connections[alias]))
 
 
 class TestRegionWorkerServiceMaker(TestServiceMaker):
@@ -139,9 +137,7 @@ class TestRegionWorkerServiceMaker(TestServiceMaker):
         self.patch_autospec(service_maker, "_configureThreads")
         # Set the environment variable to create the import services.
         self.useFixture(
-            EnvironmentVariableFixture(
-                "MAAS_REGIOND_RUN_IMPORTER_SERVICE", "true"
-            )
+            EnvironmentVariableFixture("MAAS_REGIOND_RUN_IMPORTER_SERVICE", "true")
         )
         service = service_maker.makeService(options)
         self.assertIsInstance(service, MultiService)

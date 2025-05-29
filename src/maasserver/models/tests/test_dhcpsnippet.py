@@ -17,9 +17,7 @@ class TestDHCPSnippet(MAASServerTestCase):
         value = VersionedTextFile.objects.create(data=factory.make_string())
         description = factory.make_string()
         enabled = factory.pick_bool()
-        dhcp_snippet = factory.make_DHCPSnippet(
-            name, value, description, enabled
-        )
+        dhcp_snippet = factory.make_DHCPSnippet(name, value, description, enabled)
         self.assertEqual(name, dhcp_snippet.name)
         self.assertEqual(value.data, dhcp_snippet.value.data)
         self.assertEqual(description, dhcp_snippet.description)
@@ -31,9 +29,7 @@ class TestDHCPSnippet(MAASServerTestCase):
         description = factory.make_string()
         enabled = factory.pick_bool()
         node = factory.make_Node()
-        dhcp_snippet = factory.make_DHCPSnippet(
-            name, value, description, enabled, node
-        )
+        dhcp_snippet = factory.make_DHCPSnippet(name, value, description, enabled, node)
         self.assertEqual(name, dhcp_snippet.name)
         self.assertEqual(value.data, dhcp_snippet.value.data)
         self.assertEqual(description, dhcp_snippet.description)
@@ -97,23 +93,17 @@ class TestDHCPSnippet(MAASServerTestCase):
 
     def test_filter_by_id(self):
         dhcp_snippet = factory.make_DHCPSnippet()
-        self.assertEqual(
-            dhcp_snippet, DHCPSnippet.objects.get(id=dhcp_snippet.id)
-        )
+        self.assertEqual(dhcp_snippet, DHCPSnippet.objects.get(id=dhcp_snippet.id))
 
     def test_filter_by_name(self):
         dhcp_snippet = factory.make_DHCPSnippet()
-        self.assertEqual(
-            dhcp_snippet, DHCPSnippet.objects.get(name=dhcp_snippet.name)
-        )
+        self.assertEqual(dhcp_snippet, DHCPSnippet.objects.get(name=dhcp_snippet.name))
 
     def test_delete_cleans_values(self):
         dhcp_snippet = factory.make_DHCPSnippet()
         value_ids = [dhcp_snippet.value.id]
         for _ in range(3):
-            dhcp_snippet.value = dhcp_snippet.value.update(
-                factory.make_string()
-            )
+            dhcp_snippet.value = dhcp_snippet.value.update(factory.make_string())
             value_ids.append(dhcp_snippet.value.id)
         dhcp_snippet.delete()
         for i in value_ids:
@@ -127,9 +117,7 @@ class TestDHCPSnippet(MAASServerTestCase):
         dhcp_snippet = factory.make_DHCPSnippet()
         value_ids = [dhcp_snippet.value.id]
         for _ in range(3):
-            dhcp_snippet.value = dhcp_snippet.value.update(
-                factory.make_string()
-            )
+            dhcp_snippet.value = dhcp_snippet.value.update(factory.make_string())
             value_ids.append(dhcp_snippet.value.id)
         DHCPSnippet.objects.filter(id=dhcp_snippet.id).delete()
         for i in value_ids:

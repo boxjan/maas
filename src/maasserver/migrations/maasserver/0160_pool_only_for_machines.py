@@ -12,10 +12,6 @@ def unset_resource_pools_nodes_not_machines(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0159_userprofile_auth_last_check_no_now_default")
-    ]
+    dependencies = [("maasserver", "0159_userprofile_auth_last_check_no_now_default")]
 
-    operations = [
-        migrations.RunPython(unset_resource_pools_nodes_not_machines)
-    ]
+    operations = [migrations.RunPython(unset_resource_pools_nodes_not_machines)]

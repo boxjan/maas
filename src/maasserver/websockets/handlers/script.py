@@ -37,9 +37,7 @@ class ScriptHandler(TimestampedModelHandler):
         revision = params.get("revision")
         script = self.get_object(params)
         if not script:
-            raise HandlerDoesNotExistError(
-                f"Script with id({id}) does not exist!"
-            )
+            raise HandlerDoesNotExistError(f"Script with id({id}) does not exist!")
         if revision:
             for rev in script.script.previous_versions():
                 if rev.id == revision:

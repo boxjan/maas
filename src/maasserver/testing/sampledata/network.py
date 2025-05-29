@@ -74,9 +74,7 @@ def make_network_interfaces(
                     make_network_ip(vlan, vlan_iface)
                 elif idx == 2:
                     network2 = machine_info.create_physical_network()
-                    bond = machine_info.create_bond_network(
-                        parents=[network, network2]
-                    )
+                    bond = machine_info.create_bond_network(parents=[network, network2])
                     make_network_ip(vlan, bond)
                 else:
                     make_network_ip(vlan, network)

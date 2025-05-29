@@ -112,19 +112,12 @@ def _parse_tokens(char_list):
             key = new_char_list.pop(index)
             skip, dict_value = _clip(new_char_list[index:])
             if continuous_line:
-                temp_list.append(
-                    {key: copy.deepcopy(_parse_tokens(dict_value))}
-                )
+                temp_list.append({key: copy.deepcopy(_parse_tokens(dict_value))})
             else:
-                dictionary_fragment[key] = copy.deepcopy(
-                    _parse_tokens(dict_value)
-                )
+                dictionary_fragment[key] = copy.deepcopy(_parse_tokens(dict_value))
             index += skip
         else:
-            if (
-                len(new_char_list[index].split()) == 1
-                and "{" not in new_char_list
-            ):
+            if len(new_char_list[index].split()) == 1 and "{" not in new_char_list:
                 for item in new_char_list:
                     if item in [";"]:
                         continue
@@ -135,9 +128,9 @@ def _parse_tokens(char_list):
             elif len(new_char_list[index].split()) >= 2:
                 if type(dictionary_fragment) == list:
                     raise ISCParseException("Syntax error")
-                dictionary_fragment[
-                    new_char_list[index].split()[0]
-                ] = " ".join(new_char_list[index].split()[1:])
+                dictionary_fragment[new_char_list[index].split()[0]] = " ".join(
+                    new_char_list[index].split()[1:]
+                )
                 index += 1
 
             # If there is just 1 'keyword' at new_char_list[index]
@@ -278,13 +271,9 @@ def make_isc_string(isc_dict, terminate=True):
             isc_list.append(
                 "{} {{ {} }}{}".format(option, " ".join(new_list), terminator)
             )
-        elif (
-            type(isc_dict[option]) == OrderedDict
-            or type(isc_dict[option]) == dict
-        ):
+        elif type(isc_dict[option]) == OrderedDict or type(isc_dict[option]) == dict:
             isc_list.append(
-                "%s { %s }%s"
-                % (option, make_isc_string(isc_dict[option]), terminator)
+                "%s { %s }%s" % (option, make_isc_string(isc_dict[option]), terminator)
             )
     return "\n".join(isc_list)
 

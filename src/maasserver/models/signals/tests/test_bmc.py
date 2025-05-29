@@ -32,6 +32,4 @@ class TestCreatePodHints(MAASServerTestCase):
         pod = pod.as_bmc()
         pod.bmc_type = BMC_TYPE.BMC
         pod.save()
-        self.assertRaises(
-            PodHints.DoesNotExist, lambda: reload_object(pod).hints
-        )
+        self.assertRaises(PodHints.DoesNotExist, lambda: reload_object(pod).hints)

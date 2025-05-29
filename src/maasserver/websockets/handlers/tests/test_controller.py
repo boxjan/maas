@@ -54,9 +54,7 @@ class TestControllerHandler(MAASServerTestCase):
         node = factory.make_RackController(owner=owner)
         list_results = handler.list({})
         self.assertEqual(1, len(list_results))
-        self.assertEqual(
-            NODE_TYPE.RACK_CONTROLLER, list_results[0].get("node_type")
-        )
+        self.assertEqual(NODE_TYPE.RACK_CONTROLLER, list_results[0].get("node_type"))
         self.assertEqual(
             list_results[0].get("last_image_sync"),
             dehydrate_datetime(node.last_image_sync),
@@ -73,9 +71,7 @@ class TestControllerHandler(MAASServerTestCase):
         node = factory.make_RackController(owner=owner, last_image_sync=None)
         list_results = handler.list({})
         self.assertEqual(1, len(list_results))
-        self.assertEqual(
-            NODE_TYPE.RACK_CONTROLLER, list_results[0].get("node_type")
-        )
+        self.assertEqual(NODE_TYPE.RACK_CONTROLLER, list_results[0].get("node_type"))
         self.assertIsNone(list_results[0].get("last_image_sync"))
         data = handler.get({"system_id": node.system_id})
         self.assertIsNone(data.get("last_image_sync"))
@@ -93,9 +89,7 @@ class TestControllerHandler(MAASServerTestCase):
         node = factory.make_RackController(owner=owner)
         list_results = handler.list({})
         self.assertEqual(1, len(list_results))
-        self.assertEqual(
-            NODE_TYPE.RACK_CONTROLLER, list_results[0].get("node_type")
-        )
+        self.assertEqual(NODE_TYPE.RACK_CONTROLLER, list_results[0].get("node_type"))
 
     def test_list_num_queries_is_the_expected_number(self):
         self.useFixture(RBACForceOffFixture())
@@ -232,9 +226,7 @@ class TestControllerHandler(MAASServerTestCase):
         data = handler.check_images(
             [{"system_id": node1.system_id}, {"system_id": node2.system_id}]
         )
-        self.assertEqual(
-            {node1.system_id: "Synced", node2.system_id: "Synced"}, data
-        )
+        self.assertEqual({node1.system_id: "Synced", node2.system_id: "Synced"}, data)
 
     def test_dehydrate_show_os_info_returns_true(self):
         owner = factory.make_admin()
@@ -432,9 +424,7 @@ class TestControllerHandler(MAASServerTestCase):
         tags = [factory.make_Tag(definition="") for _ in range(3)]
         region.tags.set(tags)
         list_results = handler.list({})
-        self.assertCountEqual(
-            list_results[0]["tags"], [tag.id for tag in tags]
-        )
+        self.assertCountEqual(list_results[0]["tags"], [tag.id for tag in tags])
 
     def test_dehydrate_includes_node_display_type(self):
         owner = factory.make_admin()
@@ -551,9 +541,7 @@ class TestControllerHandler(MAASServerTestCase):
             cohort="abc123",
         )
         ControllerInfo.objects.set_versions_info(region, versions)
-        ControllerInfo.objects.filter(node=region).update(
-            vault_configured=True
-        )
+        ControllerInfo.objects.filter(node=region).update(vault_configured=True)
 
         list_results = handler.list({})
         self.assertTrue(list_results[0]["vault_configured"])
@@ -575,9 +563,7 @@ class TestControllerHandler(MAASServerTestCase):
             cohort="abc123",
         )
         ControllerInfo.objects.set_versions_info(region, versions)
-        ControllerInfo.objects.filter(node=region).update(
-            vault_configured=False
-        )
+        ControllerInfo.objects.filter(node=region).update(vault_configured=False)
 
         list_results = handler.list({})
         self.assertFalse(list_results[0]["vault_configured"])

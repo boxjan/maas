@@ -91,8 +91,7 @@ def update_node_interfaces(node, data):
         address_extra = {}
 
     current_interfaces = {
-        interface.id: interface
-        for interface in node.current_config.interface_set.all()
+        interface.id: interface for interface in node.current_config.interface_set.all()
     }
 
     # Update the interfaces in dependency order. This make sure that the
@@ -122,9 +121,7 @@ def update_node_interfaces(node, data):
         )
         if interface is None:
             continue
-        interface.update_discovery_state(
-            discovery_mode, name in monitored_interfaces
-        )
+        interface.update_discovery_state(discovery_mode, name in monitored_interfaces)
         if interface.type == INTERFACE_TYPE.PHYSICAL:
             update_interface_details(interface, interfaces_details)
         if interface.id in current_interfaces:
@@ -135,9 +132,7 @@ def update_node_interfaces(node, data):
     deletion_order = {}
     for nic_id, nic in current_interfaces.items():
         deletion_order[nic_id] = [
-            parent.id
-            for parent in nic.parents.all()
-            if parent.id in current_interfaces
+            parent.id for parent in nic.parents.all() if parent.id in current_interfaces
         ]
     deletion_order = sorttop(deletion_order)
     deletion_order = [sorted(list(items)) for items in deletion_order]
@@ -241,8 +236,7 @@ def update_physical_interface(
             "enabled": True,
             # actual physical interfaces are to be considered non-acquired in hw sync to be preserved on release
             "acquired": not (
-                node.is_commissioning()
-                or (node.enable_hw_sync and port is not None)
+                node.is_commissioning() or (node.enable_hw_sync and port is not None)
             ),
         },
     )
@@ -339,9 +333,7 @@ def guess_vlan_from_hints(node, ifname, hints):
             "rx_own_beacon_on_other_interface",
             "same_local_fabric_as",
         ):
-            related_interface = find_related_interface(
-                node, True, related_ifname
-            )
+            related_interface = find_related_interface(node, True, related_ifname)
         # Found an interface that corresponds to the relevant hint.
         # If it has a VLAN defined, use it!
         if related_interface is not None:
@@ -417,9 +409,7 @@ def update_vlan_interface(node, name, network, links):
         _hardware_sync_network_device_notify(
             node,
             interface,
-            HARDWARE_SYNC_ACTIONS.ADDED
-            if created
-            else HARDWARE_SYNC_ACTIONS.UPDATED,
+            HARDWARE_SYNC_ACTIONS.ADDED if created else HARDWARE_SYNC_ACTIONS.UPDATED,
         )
     elif vlan is not None and interface.vlan != vlan:
         interface.vlan = vlan
@@ -456,9 +446,7 @@ def update_child_interface(node, name, network, links):
         raise RuntimeError(f"Unknown child interface: {network}")
     # Get all the parent interfaces for this interface. All the parents
     # should exists because of the order the links are processed.
-    parent_nics = Interface.objects.get_interfaces_on_node_by_name(
-        node, parents
-    )
+    parent_nics = Interface.objects.get_interfaces_on_node_by_name(node, parents)
 
     # Ignore most child interfaces that don't have parents. MAAS won't know
     # what to do with them since they can't be connected to a fabric.
@@ -582,9 +570,7 @@ def find_related_interface(
         # Couldn't find a physical interface; it could be a private
         # bridge.
         filter_args["name"] = related_ifname
-        related_interface = BridgeInterface.objects.filter(
-            **filter_args
-        ).first()
+        related_interface = BridgeInterface.objects.filter(**filter_args).first()
     return related_interface
 
 
@@ -596,8 +582,7 @@ def get_interface_vlan_from_links(links):
     This returns None if no VLAN is found.
     """
     cidrs = {
-        str(IPNetwork(f"{link['address']}/{link['netmask']}").cidr)
-        for link in links
+        str(IPNetwork(f"{link['address']}/{link['netmask']}").cidr) for link in links
     }
     return VLAN.objects.filter(subnet__cidr__in=cidrs).first()
 
@@ -622,13 +607,9 @@ def guess_best_vlan_from_ip_addresses(node, ip_addresses):
     return second_best
 
 
-def update_links(
-    node, interface, links, force_vlan=False, use_interface_vlan=True
-):
+def update_links(node, interface, links, force_vlan=False, use_interface_vlan=True):
     """Update the links on `interface`."""
-    interface.ip_addresses.filter(
-        alloc_type=IPADDRESS_TYPE.DISCOVERED
-    ).delete()
+    interface.ip_addresses.filter(alloc_type=IPADDRESS_TYPE.DISCOVERED).delete()
     current_ip_addresses = set(interface.ip_addresses.all())
     updated_ip_addresses = set()
     if use_interface_vlan and interface.vlan is not None:

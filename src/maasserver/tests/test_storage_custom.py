@@ -65,9 +65,7 @@ class TestGetStorageLayout(MAASTestCase):
         }
         sda = Disk(name="sda", ptable="gpt", boot=True)
         sda1 = Partition(name="sda1", on="sda", size=100 * MB, bootable=True)
-        sda1_fs = FileSystem(
-            name="sda1[fs]", on="sda1", type="vfat", mount="/boot/efi"
-        )
+        sda1_fs = FileSystem(name="sda1[fs]", on="sda1", type="vfat", mount="/boot/efi")
         sda2 = Partition(name="sda2", on="sda", size=20 * GB, after="sda1")
         sda2_fs = FileSystem(
             name="sda2[fs]",
@@ -87,9 +85,7 @@ class TestGetStorageLayout(MAASTestCase):
                 "sda2[fs]": sda2_fs,
             },
         )
-        self.assertEqual(
-            layout.sorted_entries, [sda, sda1, sda1_fs, sda2, sda2_fs]
-        )
+        self.assertEqual(layout.sorted_entries, [sda, sda1, sda1_fs, sda2, sda2_fs])
         self.assertEqual(layout.disk_names(), {"sda"})
 
     def test_special_filesystem(self):
@@ -193,9 +189,7 @@ class TestGetStorageLayout(MAASTestCase):
         }
         sda = Disk(name="sda", ptable="gpt")
         sda1 = Partition(name="sda1", on="sda", size=100 * MB)
-        sda1_fs = FileSystem(
-            name="sda1[fs]", on="sda1", type="vfat", mount="/boot/efi"
-        )
+        sda1_fs = FileSystem(name="sda1[fs]", on="sda1", type="vfat", mount="/boot/efi")
         sda2 = Partition(name="sda2", on="sda", size=20 * GB, after="sda1")
         sdb = Disk(name="sdb", ptable="gpt")
         sdb1 = Partition(name="sdb1", on="sdb", size=100 * MB)
@@ -249,9 +243,7 @@ class TestGetStorageLayout(MAASTestCase):
         sda = Disk(name="sda")
         sdb = Disk(name="sdb")
         sdc = Disk(name="sdc")
-        raid = RAID(
-            name="md0", level=1, members=["sda", "sdb"], spares=["sdc"]
-        )
+        raid = RAID(name="md0", level=1, members=["sda", "sdb"], spares=["sdc"])
         raid_fs = FileSystem(
             name="md0[fs]",
             on="md0",
@@ -339,9 +331,7 @@ class TestGetStorageLayout(MAASTestCase):
         }
         sda = Disk(name="sda", ptable="gpt")
         sda1 = Partition(name="sda1", on="sda", size=100 * MB)
-        sda1_fs = FileSystem(
-            name="sda1[fs]", on="sda1", type="vfat", mount="/boot/efi"
-        )
+        sda1_fs = FileSystem(name="sda1[fs]", on="sda1", type="vfat", mount="/boot/efi")
         sda2 = Partition(name="sda2", on="sda", size=100 * GB, after="sda1")
         sdb = Disk(name="sdb", ptable="gpt")
         sdb1 = Partition(name="sdb1", on="sdb", size=100 * MB)
@@ -437,9 +427,7 @@ class TestGetStorageLayout(MAASTestCase):
         }
         sda = Disk(name="sda", ptable="gpt")
         sda1 = Partition(name="sda1", on="sda", size=100 * MB)
-        sda1_fs = FileSystem(
-            name="sda1[fs]", on="sda1", type="vfat", mount="/boot/efi"
-        )
+        sda1_fs = FileSystem(name="sda1[fs]", on="sda1", type="vfat", mount="/boot/efi")
         sda2 = Partition(name="sda2", on="sda", size=100 * GB, after="sda1")
         sdb = Disk(name="sdb")
         bcache = BCache(
@@ -569,9 +557,7 @@ class TestGetStorageLayout(MAASTestCase):
                 storage_fs,
             ],
         )
-        self.assertEqual(
-            layout.disk_names(), {"sda", "sdb", "sdc", "sdd", "sde"}
-        )
+        self.assertEqual(layout.disk_names(), {"sda", "sdb", "sdc", "sdd", "sde"})
 
     def test_invalid_device_type(self):
         config = {
@@ -943,9 +929,7 @@ class TestApplyLayoutToMachine(MAASServerTestCase):
         }
         layout = get_storage_layout(config)
         machine = factory.make_Node()
-        disk = factory.make_PhysicalBlockDevice(
-            node=machine, name="sda", size=40 * GB
-        )
+        disk = factory.make_PhysicalBlockDevice(node=machine, name="sda", size=40 * GB)
         apply_layout_to_machine(layout, machine)
         ptable = disk.get_partitiontable()
         self.assertEqual(ptable.table_type, PARTITION_TABLE_TYPE.GPT)
@@ -996,18 +980,12 @@ class TestApplyLayoutToMachine(MAASServerTestCase):
         }
         layout = get_storage_layout(config)
         machine = factory.make_Node()
-        disk = factory.make_PhysicalBlockDevice(
-            node=machine, name="sda", size=40 * GB
-        )
+        disk = factory.make_PhysicalBlockDevice(node=machine, name="sda", size=40 * GB)
         ptable = factory.make_PartitionTable(block_device=disk)
         part1 = factory.make_Partition(partition_table=ptable, size=10 * GB)
-        fs1 = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.EXT4, partition=part1
-        )
+        fs1 = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.EXT4, partition=part1)
         part2 = factory.make_Partition(partition_table=ptable, size=15 * GB)
-        fs2 = factory.make_Filesystem(
-            fstype=FILESYSTEM_TYPE.XFS, partition=part2
-        )
+        fs2 = factory.make_Filesystem(fstype=FILESYSTEM_TYPE.XFS, partition=part2)
 
         apply_layout_to_machine(layout, machine)
         for obj in (ptable, part1, fs1, part2, fs2):
@@ -1080,12 +1058,8 @@ class TestApplyLayoutToMachine(MAASServerTestCase):
         }
         layout = get_storage_layout(config)
         machine = factory.make_Node()
-        sda = factory.make_PhysicalBlockDevice(
-            node=machine, name="sda", size=2 * TB
-        )
-        sdb = factory.make_PhysicalBlockDevice(
-            node=machine, name="sdb", size=500 * GB
-        )
+        sda = factory.make_PhysicalBlockDevice(node=machine, name="sda", size=2 * TB)
+        sdb = factory.make_PhysicalBlockDevice(node=machine, name="sdb", size=500 * GB)
         apply_layout_to_machine(layout, machine)
         ptable = sda.get_partitiontable()
         self.assertEqual(ptable.table_type, PARTITION_TABLE_TYPE.GPT)
@@ -1189,12 +1163,8 @@ class TestApplyLayoutToMachine(MAASServerTestCase):
         }
         layout = get_storage_layout(config)
         machine = factory.make_Node()
-        sda = factory.make_PhysicalBlockDevice(
-            node=machine, name="sda", size=2 * TB
-        )
-        sdb = factory.make_PhysicalBlockDevice(
-            node=machine, name="sdb", size=500 * GB
-        )
+        sda = factory.make_PhysicalBlockDevice(node=machine, name="sda", size=2 * TB)
+        sdb = factory.make_PhysicalBlockDevice(node=machine, name="sdb", size=500 * GB)
         apply_layout_to_machine(layout, machine)
         ptable1 = sda.get_partitiontable()
         self.assertEqual(ptable1.table_type, PARTITION_TABLE_TYPE.GPT)
@@ -1379,9 +1349,7 @@ class TestApplyLayoutToMachine(MAASServerTestCase):
         layout = get_storage_layout(config)
         machine = factory.make_Node()
         apply_layout_to_machine(layout, machine)
-        fs1, fs2 = machine.current_config.special_filesystems.order_by(
-            "mount_point"
-        )
+        fs1, fs2 = machine.current_config.special_filesystems.order_by("mount_point")
         self.assertEqual(fs1.fstype, FILESYSTEM_TYPE.TMPFS)
         self.assertEqual(fs1.mount_point, "/temp1")
         self.assertEqual(fs2.fstype, FILESYSTEM_TYPE.RAMFS)

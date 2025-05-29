@@ -100,9 +100,7 @@ class PCAP:
         if len(pcap_packet_header_bytes) == 0:
             raise EOFError("End of PCAP stream.")
         if len(pcap_packet_header_bytes) != PCAP_PACKET_HEADER_SIZE:
-            raise PCAPError(
-                "Unexpected end of PCAP stream: invalid packet header."
-            )
+            raise PCAPError("Unexpected end of PCAP stream: invalid packet header.")
         # typedef struct pcaprec_hdr_s {
         #     guint32 ts_sec;   /* timestamp seconds */
         #     guint32 ts_usec;  /* timestamp microseconds */

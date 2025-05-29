@@ -71,9 +71,7 @@ class TestSpecificConfigSettings(MAASServerTestCase):
     def test_commissioning_distro_series_config(self):
         field = get_config_field("commissioning_distro_series")
         self.assertEqual(
-            compose_invalid_choice_text(
-                "commissioning_distro_series", field.choices
-            ),
+            compose_invalid_choice_text("commissioning_distro_series", field.choices),
             field.error_messages["invalid_choice"],
         )
 

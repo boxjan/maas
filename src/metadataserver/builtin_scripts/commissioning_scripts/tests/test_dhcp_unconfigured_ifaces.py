@@ -127,9 +127,7 @@ ip_wlan0 = b"""\
 """
 
 
-DHCP6_TEMPLATE = (
-    "for idx in $(seq 10); do dhclient -6 %s && break || sleep 10; done"
-)
+DHCP6_TEMPLATE = "for idx in $(seq 10); do dhclient -6 %s && break || sleep 10; done"
 DHCPCD6_TEMPLATE = (
     "for idx in $(seq 10); do dhcpcd -t 60 -6 %s && break || sleep 10; done"
 )

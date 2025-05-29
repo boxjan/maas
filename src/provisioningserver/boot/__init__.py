@@ -214,9 +214,7 @@ class BootMethod(metaclass=ABCMeta):
         assert isinstance(self.name, str)
         assert isinstance(self.bios_boot_method, str)
         assert isinstance(self.bootloader_path, str)
-        assert isinstance(self.template_subdir, str) or (
-            self.template_subdir is None
-        )
+        assert isinstance(self.template_subdir, str) or (self.template_subdir is None)
         assert isinstance(self.bootloader_arches, list) and all(
             isinstance(element, str) for element in self.bootloader_arches
         )
@@ -227,9 +225,7 @@ class BootMethod(metaclass=ABCMeta):
             isinstance(self.arch_octet, str)
             or (
                 isinstance(self.arch_octet, list)
-                and all(
-                    isinstance(element, str) for element in self.arch_octet
-                )
+                and all(isinstance(element, str) for element in self.arch_octet)
             )
             or self.arch_octet is None
         )
@@ -256,9 +252,7 @@ class BootMethod(metaclass=ABCMeta):
         for filename in gen_template_filenames(purpose, arch, subarch):
             template_name = os.path.join(pxe_templates_dir, filename)
             try:
-                return tempita.Template.from_filename(
-                    template_name, encoding="UTF-8"
-                )
+                return tempita.Template.from_filename(template_name, encoding="UTF-8")
             except OSError as error:
                 if error.errno != ENOENT:
                     raise

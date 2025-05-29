@@ -127,9 +127,7 @@ class TestParseAvahiEvent(MAASTestCase):
             b'"BluetoothAddress=\xc8i\xcdB\xe2\x09"'
         )
         event = parse_avahi_event(input)
-        self.assertEqual(
-            b'"BluetoothAddress=\xc8i\xcdB\xe2\x09"', event["txt"]
-        )
+        self.assertEqual(b'"BluetoothAddress=\xc8i\xcdB\xe2\x09"', event["txt"])
 
     def test_returns_none_for_malformed_input(self):
         self.assertIsNone(parse_avahi_event(b";;;"))

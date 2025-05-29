@@ -327,16 +327,12 @@ def get_twisted_logging_level(verbosity: int):  # -> LogLevel
         return levels[verbosity]
 
 
-def show_warning_via_twisted(
-    message, category, filename, lineno, file=None, line=None
-):
+def show_warning_via_twisted(message, category, filename, lineno, file=None, line=None):
     """Replacement for `warnings.showwarning` that logs via Twisted."""
     if file is None:
         # Try to find a module name with which to log this warning.
         module = get_module_for_file(filename)
-        logger = twistedModern.Logger(
-            "global" if module is None else module.__name__
-        )
+        logger = twistedModern.Logger("global" if module is None else module.__name__)
         # `message` is/can be an instance of `category`, so stringify.
         logger.warn(
             "{category}: {message}",
@@ -349,9 +345,7 @@ def show_warning_via_twisted(
     else:
         # It's not clear why and when `file` will be specified, but try to
         # honour the intention.
-        warning = warnings.formatwarning(
-            message, category, filename, lineno, line
-        )
+        warning = warnings.formatwarning(message, category, filename, lineno, line)
         try:
             file.write(warning)
             file.flush()

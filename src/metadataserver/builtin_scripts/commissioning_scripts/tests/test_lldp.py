@@ -74,9 +74,7 @@ class TestLLDPScripts(MAASTestCase):
         mock_time.assert_called_once_with()
         # then sleeps until time_delay seconds has passed since the
         # mtime of the reference file.
-        mock_sleep.assert_called_once_with(
-            mock_mtime() + time_delay - mock_time()
-        )
+        mock_sleep.assert_called_once_with(mock_mtime() + time_delay - mock_time())
 
     def test_capture_lldpd_script_doesnt_waits_for_more_than_sixty_secs(self):
         # Regression test for LP:1801152
@@ -94,6 +92,4 @@ class TestLLDPScripts(MAASTestCase):
         reference_file = self.make_file("reference")
         check_call = self.patch(capture_lldpd, "check_call")
         capture_lldpd.lldpd_capture(reference_file, 0.0)
-        self.assertEqual(
-            check_call.call_args_list, [call(("lldpctl", "-f", "xml"))]
-        )
+        self.assertEqual(check_call.call_args_list, [call(("lldpctl", "-f", "xml"))])

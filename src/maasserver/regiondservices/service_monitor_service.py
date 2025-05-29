@@ -43,9 +43,7 @@ class ServiceMonitorService(TimerService):
         else:
             d = service_monitor.ensureServices()
             d.addCallback(self._updateDatabase)
-            d.addErrback(
-                log.err, "Failed to monitor services and update database."
-            )
+            d.addErrback(log.err, "Failed to monitor services and update database.")
             return d
 
     @inlineCallbacks

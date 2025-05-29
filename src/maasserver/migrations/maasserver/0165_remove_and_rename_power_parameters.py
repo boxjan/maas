@@ -8,9 +8,7 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.RemoveField(model_name="bmc", name="power_parameters"),
-        migrations.RemoveField(
-            model_name="node", name="instance_power_parameters"
-        ),
+        migrations.RemoveField(model_name="node", name="instance_power_parameters"),
         migrations.RenameField(
             model_name="bmc",
             old_name="new_power_parameters",

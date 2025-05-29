@@ -133,8 +133,7 @@ class DLIPowerDriver(PowerDriver):
                     return "off"
         except ExternalProcessError as e:
             raise PowerActionError(
-                "Failed to power query outlet %s: %s"
-                % (outlet_id, e.output_as_unicode)
+                "Failed to power query outlet %s: %s" % (outlet_id, e.output_as_unicode)
             )
 
     def power_on(self, system_id, context):

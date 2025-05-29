@@ -69,9 +69,7 @@ class DomainHandler(TimestampedModelHandler, AdminOnlyMixin):
     def _get_domain_or_permission_error(self, params):
         domain = params.get("domain")
         if domain is None:
-            raise HandlerValidationError(
-                {"domain": ["This field is required"]}
-            )
+            raise HandlerValidationError({"domain": ["This field is required"]})
         domain = self.get_object({"id": domain})
         if not self.user.has_perm(NodePermission.admin, domain):
             raise HandlerPermissionError()
@@ -90,9 +88,7 @@ class DomainHandler(TimestampedModelHandler, AdminOnlyMixin):
         dnsresource = DNSResource.objects.get(
             domain=domain, id=params["dnsresource_id"]
         )
-        form = DNSResourceForm(
-            instance=dnsresource, data=params, user=self.user
-        )
+        form = DNSResourceForm(instance=dnsresource, data=params, user=self.user)
         if form.is_valid():
             form.save()
         else:
@@ -110,8 +106,7 @@ class DomainHandler(TimestampedModelHandler, AdminOnlyMixin):
         domain = self._get_domain_or_permission_error(params)
         if params["ip_addresses"] == [""]:
             raise ValidationError(
-                "Data field is required when creating an %s record."
-                % params["rrtype"]
+                "Data field is required when creating an %s record." % params["rrtype"]
             )
         dnsresource, created = DNSResource.objects.get_or_create(
             domain=domain, name=params["name"]
@@ -122,9 +117,7 @@ class DomainHandler(TimestampedModelHandler, AdminOnlyMixin):
             ip_addresses = dnsresource.get_addresses()
         ip_addresses.extend(params["ip_addresses"])
         params["ip_addresses"] = " ".join(ip_addresses)
-        form = DNSResourceForm(
-            data=params, user=self.user, instance=dnsresource
-        )
+        form = DNSResourceForm(data=params, user=self.user, instance=dnsresource)
         if form.is_valid():
             form.save()
         else:
@@ -163,9 +156,7 @@ class DomainHandler(TimestampedModelHandler, AdminOnlyMixin):
             ip_addresses.remove(params["previous_rrdata"])
         ip_addresses.extend(params["ip_addresses"])
         params["ip_addresses"] = " ".join(ip_addresses)
-        form = DNSResourceForm(
-            data=params, user=self.user, instance=dnsresource
-        )
+        form = DNSResourceForm(data=params, user=self.user, instance=dnsresource)
         if form.is_valid():
             form.save()
         else:
@@ -179,9 +170,7 @@ class DomainHandler(TimestampedModelHandler, AdminOnlyMixin):
         ip_addresses = dnsresource.get_addresses()
         ip_addresses.remove(params["rrdata"])
         params["ip_addresses"] = " ".join(ip_addresses)
-        form = DNSResourceForm(
-            data=params, user=self.user, instance=dnsresource
-        )
+        form = DNSResourceForm(data=params, user=self.user, instance=dnsresource)
         if form.is_valid():
             form.save()
         else:

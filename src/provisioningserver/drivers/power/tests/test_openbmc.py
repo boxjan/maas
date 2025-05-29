@@ -50,9 +50,7 @@ class TestWebClientContextFactory(MAASTestCase):
 
 
 class TestOpenBMCPowerDriver(MAASTestCase):
-    run_tests_with = MAASTwistedRunTest.make_factory(
-        timeout=get_testing_timeout()
-    )
+    run_tests_with = MAASTwistedRunTest.make_factory(timeout=get_testing_timeout())
 
     def test_missing_packages(self):
         driver = OpenBMCPowerDriver()
@@ -111,9 +109,7 @@ class TestOpenBMCPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = make_context()
         url = driver.get_uri(context, HOST_STATE + "RequestedHostTransition")
-        mock_file_body_producer = self.patch(
-            openbmc_module, "FileBodyProducer"
-        )
+        mock_file_body_producer = self.patch(openbmc_module, "FileBodyProducer")
         dataon = FileBodyProducer(BytesIO(json.dumps(HOST_ON).encode("utf-8")))
         mock_openbmc_request = self.patch(driver, "openbmc_request")
         mock_openbmc_request.return_value = dataon
@@ -135,12 +131,8 @@ class TestOpenBMCPowerDriver(MAASTestCase):
         system_id = factory.make_name("system_id")
         context = make_context()
         url = driver.get_uri(context, HOST_STATE + "RequestedHostTransition")
-        mock_file_body_producer = self.patch(
-            openbmc_module, "FileBodyProducer"
-        )
-        dataoff = FileBodyProducer(
-            BytesIO(json.dumps(HOST_OFF).encode("utf-8"))
-        )
+        mock_file_body_producer = self.patch(openbmc_module, "FileBodyProducer")
+        dataoff = FileBodyProducer(BytesIO(json.dumps(HOST_OFF).encode("utf-8")))
         mock_openbmc_request = self.patch(driver, "openbmc_request")
         mock_openbmc_request.return_value = dataoff
         mock_file_body_producer.return_value = dataoff

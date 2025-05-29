@@ -48,9 +48,7 @@ class Migration(migrations.Migration):
                 ("last_seen", models.DateTimeField(editable=False)),
                 (
                     "hostname",
-                    models.CharField(
-                        max_length=256, editable=False, null=True
-                    ),
+                    models.CharField(max_length=256, editable=False, null=True),
                 ),
                 (
                     "observer_system_id",
@@ -75,9 +73,7 @@ class Migration(migrations.Migration):
                 ("vid", models.IntegerField(blank=True, null=True)),
                 (
                     "subnet_cidr",
-                    maasserver.fields.CIDRField(
-                        blank=True, null=True, editable=False
-                    ),
+                    maasserver.fields.CIDRField(blank=True, null=True, editable=False),
                 ),
                 (
                     "fabric",

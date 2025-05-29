@@ -33,7 +33,5 @@ class TestNodeMetadata(MAASServerTestCase):
         # We can only ever have one NodeMetadata object for a particular node
         # and key.
         entry1 = factory.make_NodeMetadata(key="key1", value="value")
-        entry2 = factory.make_NodeMetadata(
-            node=entry1.node, key="key2", value="value"
-        )
+        entry2 = factory.make_NodeMetadata(node=entry1.node, key="key2", value="value")
         self.assertNotEqual(entry1, entry2)

@@ -66,9 +66,7 @@ class MacaroonAuthorizationBackend(MAASAuthorizationBackend):
             user.is_active = True
             user.save()
 
-        if not validate_user_external_auth(
-            user, external_auth_info, force_check=True
-        ):
+        if not validate_user_external_auth(user, external_auth_info, force_check=True):
             return
 
         return user
@@ -87,9 +85,7 @@ class MacaroonAPIAuthentication:
             httpbakery.extract_macaroons(req_headers)
         )
         try:
-            auth_info = auth_checker.allow(
-                checkers.AuthContext(), [bakery.LOGIN_OP]
-            )
+            auth_info = auth_checker.allow(checkers.AuthContext(), [bakery.LOGIN_OP])
         except (bakery.DischargeRequiredError, bakery.PermissionDenied):
             return False
 
@@ -138,9 +134,7 @@ class MacaroonDischargeRequest:
             httpbakery.extract_macaroons(req_headers)
         )
         try:
-            auth_info = auth_checker.allow(
-                checkers.AuthContext(), [bakery.LOGIN_OP]
-            )
+            auth_info = auth_checker.allow(checkers.AuthContext(), [bakery.LOGIN_OP])
         except bakery.DischargeRequiredError as err:
             return _authorization_request(
                 macaroon_bakery, derr=err, req_headers=req_headers
@@ -167,10 +161,7 @@ class MacaroonDischargeRequest:
             backend="maasserver.macaroon_auth.MacaroonAuthorizationBackend",
         )
         return JsonResponse(
-            {
-                attr: getattr(user, attr)
-                for attr in ("id", "username", "is_superuser")
-            }
+            {attr: getattr(user, attr) for attr in ("id", "username", "is_superuser")}
         )
 
 
@@ -191,9 +182,7 @@ class KeyStore:
     # size in bytes of the key
     KEY_LENGTH = 24
 
-    def __init__(
-        self, expiry_duration, generate_interval=None, now=datetime.utcnow
-    ):
+    def __init__(self, expiry_duration, generate_interval=None, now=datetime.utcnow):
         self.expiry_duration = expiry_duration
         self.generate_interval = generate_interval
         if generate_interval is None:
@@ -231,9 +220,7 @@ class KeyStore:
         qs = RootKey.objects.filter(
             created__gte=now - self.generate_interval,
             expiration__gte=now - self.expiry_duration,
-            expiration__lte=(
-                now + self.expiry_duration + self.generate_interval
-            ),
+            expiration__lte=(now + self.expiry_duration + self.generate_interval),
         )
         qs = qs.order_by("-created")
         return qs.first()
@@ -259,9 +246,7 @@ class KeyStore:
         return to_bin(secret)
 
     def _set_key_material(self, key: RootKey, material: bytes):
-        self._secret_manager.set_simple_secret(
-            "material", to_hex(material), obj=key
-        )
+        self._secret_manager.set_simple_secret("material", to_hex(material), obj=key)
 
     def _delete_keys_material(self, *keys: list[RootKey]):
         manager = self._secret_manager
@@ -279,9 +264,7 @@ def get_auth_info():
     """Return the `AuthInfo` to authentication with Candid."""
     from maasserver.secrets import SecretManager
 
-    config = SecretManager().get_composite_secret(
-        "external-auth", default=None
-    )
+    config = SecretManager().get_composite_secret("external-auth", default=None)
     if config is None:
         return None
     key = bakery.PrivateKey.deserialize(config["key"])
@@ -441,9 +424,7 @@ def _validate_user_rbac(auth_info, username, client=None):
         client = RBACClient()
 
     try:
-        is_admin = bool(
-            client.allowed_for_user("maas", username, "admin")["admin"]
-        )
+        is_admin = bool(client.allowed_for_user("maas", username, "admin")["admin"])
         access_to_pools = any(
             client.allowed_for_user(
                 "resource-pool",
@@ -475,11 +456,7 @@ class _IDClient(bakery.IdentityClient):
     def identity_from_context(self, ctx):
         return (
             None,
-            [
-                _get_authentication_caveat(
-                    self.auth_endpoint, domain=self.auth_domain
-                )
-            ],
+            [_get_authentication_caveat(self.auth_endpoint, domain=self.auth_domain)],
         )
 
 
@@ -513,9 +490,7 @@ def _candid_login(credentials):
         if resp.headers["Content-Type"] == "application/json":
             idps = resp.json()["idps"]
             if len(idps) > 1:
-                raise RuntimeError(
-                    "Multiple authentication backends available"
-                )
+                raise RuntimeError("Multiple authentication backends available")
             url = idps[0]["url"]
         else:
             # The redirected page is the login form
@@ -536,9 +511,7 @@ def _get_bakery(request):
             allow_insecure=not auth_endpoint.startswith("https:")
         ),
         identity_client=_IDClient(auth_endpoint, auth_domain=auth_domain),
-        authorizer=bakery.ACLAuthorizer(
-            get_acl=lambda ctx, op: [bakery.EVERYONE]
-        ),
+        authorizer=bakery.ACLAuthorizer(get_acl=lambda ctx, op: [bakery.EVERYONE]),
     )
 
 
@@ -557,9 +530,7 @@ def _authorization_request(
         caveats, ops = _get_macaroon_caveats_ops(auth_endpoint, auth_domain)
     expiration = datetime.utcnow() + MACAROON_LIFESPAN
     macaroon = bakery.oven.macaroon(bakery_version, expiration, caveats, ops)
-    content, headers = httpbakery.discharge_required_response(
-        macaroon, "/", "maas"
-    )
+    content, headers = httpbakery.discharge_required_response(macaroon, "/", "maas")
     response = HttpResponse(status=401, reason="Unauthorized", content=content)
     for key, value in headers.items():
         response[key] = value

@@ -23,9 +23,7 @@ class TestDeviceOwnerData(APITestCase.ForUser):
         owner_data = {factory.make_name("key"): factory.make_name("value")}
         factory.make_Device(owner=self.user, owner_data=owner_data)
         response = self.client.get(reverse("devices_handler"))
-        self.assertEqual(
-            http.client.OK.value, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK.value, response.status_code, response.content)
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(
             [owner_data],
@@ -39,16 +37,12 @@ class TestDevicesAPI(APITestCase.ForUser):
 
     def test_POST_creates_device(self):
         hostname = factory.make_name("host")
-        macs = {
-            factory.make_mac_address() for _ in range(random.randint(1, 2))
-        }
+        macs = {factory.make_mac_address() for _ in range(random.randint(1, 2))}
         response = self.client.post(
             reverse("devices_handler"),
             {"hostname": hostname, "mac_addresses": macs},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         system_id = json_load_bytes(response.content)["system_id"]
         device = Device.objects.get(system_id=system_id)
         self.assertEqual(hostname, device.hostname)
@@ -57,18 +51,13 @@ class TestDevicesAPI(APITestCase.ForUser):
         self.assertEqual(self.user, device.owner)
         self.assertEqual(
             macs,
-            {
-                nic.mac_address
-                for nic in device.current_config.interface_set.all()
-            },
+            {nic.mac_address for nic in device.current_config.interface_set.all()},
         )
 
     def test_POST_creates_device_with_parent(self):
         parent = factory.make_Node()
         hostname = factory.make_name("host")
-        macs = {
-            factory.make_mac_address() for _ in range(random.randint(1, 2))
-        }
+        macs = {factory.make_mac_address() for _ in range(random.randint(1, 2))}
         response = self.client.post(
             reverse("devices_handler"),
             {
@@ -77,9 +66,7 @@ class TestDevicesAPI(APITestCase.ForUser):
                 "parent": parent.system_id,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         system_id = json_load_bytes(response.content)["system_id"]
         device = Device.objects.get(system_id=system_id)
         self.assertEqual(hostname, device.hostname)
@@ -88,16 +75,12 @@ class TestDevicesAPI(APITestCase.ForUser):
 
     def test_POST_creates_device_with_default_domain(self):
         hostname = factory.make_name("host")
-        macs = {
-            factory.make_mac_address() for _ in range(random.randint(1, 2))
-        }
+        macs = {factory.make_mac_address() for _ in range(random.randint(1, 2))}
         response = self.client.post(
             reverse("devices_handler"),
             {"hostname": hostname, "mac_addresses": macs},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         system_id = json_load_bytes(response.content)["system_id"]
         device = Device.objects.get(system_id=system_id)
         self.assertEqual(hostname, device.hostname)
@@ -107,9 +90,7 @@ class TestDevicesAPI(APITestCase.ForUser):
     def test_POST_creates_device_with_domain(self):
         hostname = factory.make_name("host")
         domain = factory.make_Domain()
-        macs = {
-            factory.make_mac_address() for _ in range(random.randint(1, 2))
-        }
+        macs = {factory.make_mac_address() for _ in range(random.randint(1, 2))}
         response = self.client.post(
             reverse("devices_handler"),
             {
@@ -118,9 +99,7 @@ class TestDevicesAPI(APITestCase.ForUser):
                 "domain": domain.name,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         system_id = json_load_bytes(response.content)["system_id"]
         device = Device.objects.get(system_id=system_id)
         self.assertEqual(hostname, device.hostname)
@@ -178,9 +157,7 @@ class TestDevicesAPI(APITestCase.ForUser):
 
     def create_devices(self, owner, nb=3):
         return [
-            factory.make_Node(
-                interface=True, node_type=NODE_TYPE.DEVICE, owner=owner
-            )
+            factory.make_Node(interface=True, node_type=NODE_TYPE.DEVICE, owner=owner)
             for _ in range(nb)
         ]
 
@@ -203,9 +180,7 @@ class TestDevicesAPI(APITestCase.ForUser):
         parsed_result = json_load_bytes(response.content)
 
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            [], [device.get("system_id") for device in parsed_result]
-        )
+        self.assertEqual([], [device.get("system_id") for device in parsed_result])
 
     def test_read_with_id_returns_matching_devices(self):
         # The "list" operation takes optional "id" parameters.  Only
@@ -213,9 +188,7 @@ class TestDevicesAPI(APITestCase.ForUser):
         devices = self.create_devices(owner=self.user)
         ids = [device.system_id for device in devices]
         matching_id = ids[0]
-        response = self.client.get(
-            reverse("devices_handler"), {"id": [matching_id]}
-        )
+        response = self.client.get(reverse("devices_handler"), {"id": [matching_id]})
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(
             [matching_id],
@@ -300,9 +273,7 @@ class TestDeviceAPI(APITestCase.ForUser):
         device = factory.make_Node(node_type=NODE_TYPE.DEVICE, owner=self.user)
 
         response = self.client.get(get_device_uri(device))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_device = json_load_bytes(response.content)
         self.assertEqual(device.system_id, parsed_device["system_id"])
 
@@ -315,9 +286,7 @@ class TestDeviceAPI(APITestCase.ForUser):
             get_device_uri(device),
             {"hostname": new_hostname, "description": new_description},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         device = reload_object(device)
         self.assertEqual(new_hostname, device.hostname)
@@ -333,9 +302,7 @@ class TestDeviceAPI(APITestCase.ForUser):
         response = self.client.put(
             get_device_uri(device), {"parent": new_parent.system_id}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         device = reload_object(device)
         self.assertEqual(new_parent, device.parent)
@@ -360,12 +327,8 @@ class TestDeviceAPI(APITestCase.ForUser):
         device = factory.make_Node(node_type=NODE_TYPE.DEVICE, owner=self.user)
         new_hostname = factory.make_name("hostname")
 
-        response = self.client.put(
-            get_device_uri(device), {"hostname": new_hostname}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.put(get_device_uri(device), {"hostname": new_hostname})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         device = reload_object(device)
         self.assertEqual(new_hostname, device.hostname)
@@ -373,9 +336,7 @@ class TestDeviceAPI(APITestCase.ForUser):
     def test_DELETE_removes_device(self):
         device = factory.make_Node(node_type=NODE_TYPE.DEVICE, owner=self.user)
         response = self.client.delete(get_device_uri(device))
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(device))
 
     def test_DELETE_rejects_deletion_if_not_permitted(self):
@@ -406,9 +367,7 @@ class TestDeviceAPI(APITestCase.ForUser):
         response = self.client.post(
             get_device_uri(device), {"op": "restore_networking_configuration"}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_restore_default_configuration(self):
         self.become_admin()
@@ -430,6 +389,4 @@ class TestDeviceAPI(APITestCase.ForUser):
         response = self.client.post(
             get_device_uri(device), {"op": "restore_default_configuration"}
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)

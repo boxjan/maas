@@ -52,9 +52,7 @@ PROXY_CONNECT = False
 # it disabled.
 DEBUG = True
 DEBUG_QUERIES = os.environ.get("MAAS_DEBUG_QUERIES", "0") == "1"
-DEBUG_QUERIES_LOG_ALL = (
-    os.environ.get("MAAS_DEBUG_QUERIES_LOG_ALL", "0") == "1"
-)
+DEBUG_QUERIES_LOG_ALL = os.environ.get("MAAS_DEBUG_QUERIES_LOG_ALL", "0") == "1"
 
 # Invalid strings should be visible.
 TEMPLATES[0]["OPTIONS"]["string_if_invalid"] = "#### INVALID STRING ####"

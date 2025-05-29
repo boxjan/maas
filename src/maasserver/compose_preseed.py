@@ -57,9 +57,7 @@ def _get_rack_host(request):
             boot_ip = rackcontroller_ips[0]
             boot_subnet = Subnet.objects.get_best_subnet_for_ip(boot_ip)
             if _subnet_uses_dns(machine_subnet):
-                internal_domain = Config.objects.get_config(
-                    "maas_internal_domain"
-                )
+                internal_domain = Config.objects.get_config("maas_internal_domain")
                 return f"{get_resource_name_for_subnet(boot_subnet)}.{internal_domain}"
             else:
                 return _wrap_ipv6_address(boot_ip)
@@ -183,15 +181,10 @@ def get_archive_config(request, node, preserve_sources=False):
     urls += "deb {} $RELEASE {}\n".format(archive.url, " ".join(components))
     if archive.disable_sources:
         urls += "# "
-    urls += "deb-src {} $RELEASE {}\n".format(
-        archive.url, " ".join(components)
-    )
+    urls += "deb-src {} $RELEASE {}\n".format(archive.url, " ".join(components))
 
     for pocket in archive.POCKETS_TO_DISABLE:
-        if (
-            not archive.disabled_pockets
-            or pocket not in archive.disabled_pockets
-        ):
+        if not archive.disabled_pockets or pocket not in archive.disabled_pockets:
             urls += "deb {} $RELEASE-{} {}\n".format(
                 archive.url,
                 pocket,
@@ -282,9 +275,7 @@ def get_enlist_archive_config(apt_proxy=None):
     disable_sources = default.disable_sources or ports.disable_sources
     for repo in [default, ports]:
         disabled_suites = disabled_suites.union(repo.disabled_pockets)
-        disabled_components = disabled_components.union(
-            repo.disabled_components
-        )
+        disabled_components = disabled_components.union(repo.disabled_components)
 
     components = " ".join(
         disabled_components.symmetric_difference(default.KNOWN_COMPONENTS)
@@ -292,9 +283,7 @@ def get_enlist_archive_config(apt_proxy=None):
     archives["apt"]["sources_list"] = "deb $PRIMARY $RELEASE %s\n" % components
     if disable_sources:
         archives["apt"]["sources_list"] += "# "
-    archives["apt"]["sources_list"] += (
-        "deb-src $PRIMARY $RELEASE %s\n" % components
-    )
+    archives["apt"]["sources_list"] += "deb-src $PRIMARY $RELEASE %s\n" % components
     for suite in ["updates", "backports"]:
         if suite not in disabled_suites:
             archives["apt"][
@@ -386,9 +375,7 @@ def get_old_archive_config():
                     "arches": ["default"],
                     "search": {
                         "primary": [PackageRepository.get_ports_archive().url],
-                        "security": [
-                            PackageRepository.get_ports_archive().url
-                        ],
+                        "security": [PackageRepository.get_ports_archive().url],
                     },
                     "failsafe": {
                         "primary": "http://ports.ubuntu.com/ubuntu-ports",
@@ -537,9 +524,7 @@ def _compose_cloud_init_preseed(
                 }
             },
             # This configure rsyslog for the ephemeral environment
-            "rsyslog": {
-                "remotes": {"maas": get_rsyslog_host_port(request, node)}
-            },
+            "rsyslog": {"remotes": {"maas": get_rsyslog_host_port(request, node)}},
         }
     )
     # This configures reporting for the ephemeral environment
@@ -552,9 +537,7 @@ def _compose_cloud_init_preseed(
         cloud_config.update(get_old_archive_config())
         # apt_proxy is deprecated in the cloud-init source code in favor of
         # what get_archive_config does.
-        apt_proxy = get_apt_proxy(
-            request, node.get_boot_rack_controller(), node
-        )
+        apt_proxy = get_apt_proxy(request, node.get_boot_rack_controller(), node)
         if apt_proxy:
             cloud_config["apt_proxy"] = apt_proxy
         # LP: #1743966 - If a custom archive is being used with a custom key,
@@ -563,9 +546,7 @@ def _compose_cloud_init_preseed(
             get_cloud_init_legacy_apt_config_to_inject_key_to_archive(node)
         )
     # Add APT configuration for new cloud-init (>= 0.7.7-17)
-    cloud_config.update(
-        get_archive_config(request, node, preserve_sources=False)
-    )
+    cloud_config.update(get_archive_config(request, node, preserve_sources=False))
     # Add snaps configuration
     cloud_config.update(get_snap_config(request, node))
 
@@ -693,9 +674,7 @@ def compose_enlistment_preseed(request, rack_controller, context):
         {
             "datasource": {
                 "MAAS": {
-                    "metadata_url": build_metadata_url(
-                        request, route, rack_controller
-                    ),
+                    "metadata_url": build_metadata_url(request, route, rack_controller),
                 },
             },
             "rsyslog": {"remotes": {"maas": context["syslog_host_port"]}},
@@ -705,9 +684,7 @@ def compose_enlistment_preseed(request, rack_controller, context):
                 "timeout": 1800,
                 "condition": "test ! -e /tmp/block-poweroff",
             },
-            **get_enlist_archive_config(
-                get_apt_proxy(request, rack_controller)
-            ),
+            **get_enlist_archive_config(get_apt_proxy(request, rack_controller)),
         }
     )
 

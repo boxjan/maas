@@ -146,9 +146,7 @@ class TestTagAPI(APITestCase.ForUser):
         tag.save()
         populate_nodes.assert_called_once_with(tag)
         self.become_admin()
-        response = self.client.put(
-            self.get_tag_uri(tag), {"definition": "//node/bar"}
-        )
+        response = self.client.put(self.get_tag_uri(tag), {"definition": "//node/bar"})
         self.assertEqual(http.client.OK, response.status_code)
         populate_nodes.assert_has_calls([call(tag), call(tag)])
 
@@ -175,9 +173,7 @@ class TestTagAPI(APITestCase.ForUser):
         response = self.client.get(self.get_tag_uri(tag), {"op": "nodes"})
 
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertCountEqual(
             [machine.system_id, device.system_id],
             [r["system_id"] for r in parsed_result],
@@ -236,12 +232,8 @@ class TestTagAPI(APITestCase.ForUser):
         response = self.client.get(self.get_tag_uri(tag), {"op": "machines"})
 
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            [machine.system_id], [r["system_id"] for r in parsed_result]
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual([machine.system_id], [r["system_id"] for r in parsed_result])
 
     def test_GET_machines_query_count(self):
         tag = factory.make_Tag()
@@ -278,9 +270,7 @@ class TestTagAPI(APITestCase.ForUser):
         # machines.
         base_count = 92
         for idx, machine_count in enumerate(machine_counts):
-            self.assertLessEqual(
-                query_counts[idx], base_count + (machine_count * 6)
-            )
+            self.assertLessEqual(query_counts[idx], base_count + (machine_count * 6))
 
     def test_GET_devices_returns_devices(self):
         tag = factory.make_Tag()
@@ -297,12 +287,8 @@ class TestTagAPI(APITestCase.ForUser):
         response = self.client.get(self.get_tag_uri(tag), {"op": "devices"})
 
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            [device.system_id], [r["system_id"] for r in parsed_result]
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual([device.system_id], [r["system_id"] for r in parsed_result])
 
     def test_GET_devices_query_count(self):
         tag = factory.make_Tag()
@@ -322,12 +308,8 @@ class TestTagAPI(APITestCase.ForUser):
 
         # Make sure the responses are ok as it's not useful to compare the
         # number of queries if they are not.
-        parsed_result_1 = json.loads(
-            response1.content.decode(settings.DEFAULT_CHARSET)
-        )
-        parsed_result_2 = json.loads(
-            response2.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result_1 = json.loads(response1.content.decode(settings.DEFAULT_CHARSET))
+        parsed_result_2 = json.loads(response2.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(
             [http.client.OK, http.client.OK, 3, 6],
             [
@@ -352,17 +334,11 @@ class TestTagAPI(APITestCase.ForUser):
         device.tags.add(tag)
         rack.tags.add(tag)
         region.tags.add(tag)
-        response = self.client.get(
-            self.get_tag_uri(tag), {"op": "rack_controllers"}
-        )
+        response = self.client.get(self.get_tag_uri(tag), {"op": "rack_controllers"})
 
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            [rack.system_id], [r["system_id"] for r in parsed_result]
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual([rack.system_id], [r["system_id"] for r in parsed_result])
 
     @skip("XXX: ltrager 2019-11-29 bug=1854546")
     def test_GET_rack_controllers_query_count(self):
@@ -385,12 +361,8 @@ class TestTagAPI(APITestCase.ForUser):
 
         # Make sure the responses are ok as it's not useful to compare the
         # number of queries if they are not.
-        parsed_result_1 = json.loads(
-            response1.content.decode(settings.DEFAULT_CHARSET)
-        )
-        parsed_result_2 = json.loads(
-            response2.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result_1 = json.loads(response1.content.decode(settings.DEFAULT_CHARSET))
+        parsed_result_2 = json.loads(response2.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(
             [http.client.OK, http.client.OK, 3, 6],
             [
@@ -414,14 +386,10 @@ class TestTagAPI(APITestCase.ForUser):
         device.tags.add(tag)
         rack.tags.add(tag)
         region.tags.add(tag)
-        response = self.client.get(
-            self.get_tag_uri(tag), {"op": "rack_controllers"}
-        )
+        response = self.client.get(self.get_tag_uri(tag), {"op": "rack_controllers"})
 
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual([], parsed_result)
 
     def test_GET_region_controllers_returns_region_controllers(self):
@@ -437,17 +405,11 @@ class TestTagAPI(APITestCase.ForUser):
         device.tags.add(tag)
         rack.tags.add(tag)
         region.tags.add(tag)
-        response = self.client.get(
-            self.get_tag_uri(tag), {"op": "region_controllers"}
-        )
+        response = self.client.get(self.get_tag_uri(tag), {"op": "region_controllers"})
 
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            [region.system_id], [r["system_id"] for r in parsed_result]
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual([region.system_id], [r["system_id"] for r in parsed_result])
 
     def test_GET_region_controllers_query_count(self):
         self.become_admin()
@@ -473,12 +435,8 @@ class TestTagAPI(APITestCase.ForUser):
 
         # Make sure the responses are ok as it's not useful to compare the
         # number of queries if they are not.
-        parsed_result_1 = json.loads(
-            response1.content.decode(settings.DEFAULT_CHARSET)
-        )
-        parsed_result_2 = json.loads(
-            response2.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result_1 = json.loads(response1.content.decode(settings.DEFAULT_CHARSET))
+        parsed_result_2 = json.loads(response2.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(
             [http.client.OK, http.client.OK, 3, 6],
             [
@@ -504,14 +462,10 @@ class TestTagAPI(APITestCase.ForUser):
         device.tags.add(tag)
         rack.tags.add(tag)
         region.tags.add(tag)
-        response = self.client.get(
-            self.get_tag_uri(tag), {"op": "region_controllers"}
-        )
+        response = self.client.get(self.get_tag_uri(tag), {"op": "region_controllers"})
 
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual([], parsed_result)
 
     def test_GET_nodes_hides_invisible_nodes(self):
@@ -525,19 +479,13 @@ class TestTagAPI(APITestCase.ForUser):
         response = self.client.get(self.get_tag_uri(tag), {"op": "nodes"})
 
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
-        self.assertEqual(
-            [node1.system_id], [r["system_id"] for r in parsed_result]
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
+        self.assertEqual([node1.system_id], [r["system_id"] for r in parsed_result])
         # The other user can also see his node
         client2 = MAASSensibleOAuthClient(user2)
         response = client2.get(self.get_tag_uri(tag), {"op": "nodes"})
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertCountEqual(
             [node1.system_id, node2.system_id],
             [r["system_id"] for r in parsed_result],
@@ -589,9 +537,7 @@ class TestTagAPI(APITestCase.ForUser):
             },
         )
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertCountEqual([node_second], tag.node_set.all())
         self.assertEqual({"added": 1, "removed": 1}, parsed_result)
 
@@ -610,9 +556,7 @@ class TestTagAPI(APITestCase.ForUser):
             },
         )
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertCountEqual([], tag.node_set.all())
         self.assertEqual({"added": 0, "removed": 0}, parsed_result)
 
@@ -626,18 +570,14 @@ class TestTagAPI(APITestCase.ForUser):
             {"op": "update_nodes", "add": [node.system_id]},
         )
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual({"added": 1, "removed": 0}, parsed_result)
         response = self.client.post(
             self.get_tag_uri(tag),
             {"op": "update_nodes", "remove": [node.system_id]},
         )
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual({"added": 0, "removed": 1}, parsed_result)
 
     def test_POST_update_nodes_rejects_normal_user(self):
@@ -673,9 +613,7 @@ class TestTagAPI(APITestCase.ForUser):
             },
         )
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual({"added": 1, "removed": 0}, parsed_result)
         self.assertCountEqual([node], tag.node_set.all())
 
@@ -747,9 +685,7 @@ class TestTagAPI(APITestCase.ForUser):
         populate_nodes.assert_called_once_with(tag)
         response = self.client.post(self.get_tag_uri(tag), {"op": "rebuild"})
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual({"rebuilding": tag.name}, parsed_result)
         populate_nodes.assert_has_calls([call(tag), call(tag)])
 
@@ -761,9 +697,7 @@ class TestTagAPI(APITestCase.ForUser):
         self.become_admin()
         response = self.client.post(self.get_tag_uri(tag), {"op": "rebuild"})
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual({"rebuilding": tag.name}, parsed_result)
         self.assertCountEqual([node], tag.node_set.all())
 
@@ -814,9 +748,7 @@ class TestTagsAPI(APITestCase.ForUser):
             {"name": name, "comment": comment, "definition": definition},
         )
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(name, parsed_result["name"])
         self.assertEqual(comment, parsed_result["comment"])
         self.assertEqual(definition, parsed_result["definition"])
@@ -843,9 +775,7 @@ class TestTagsAPI(APITestCase.ForUser):
             reverse("tags_handler"), {"name": name, "comment": comment}
         )
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(name, parsed_result["name"])
         self.assertEqual(comment, parsed_result["comment"])
         self.assertEqual("", parsed_result["definition"])
@@ -866,8 +796,7 @@ class TestTagsAPI(APITestCase.ForUser):
         self.assertEqual(
             http.client.BAD_REQUEST,
             response.status_code,
-            "We did not get BAD_REQUEST for an invalid tag name: %r"
-            % (invalid,),
+            "We did not get BAD_REQUEST for an invalid tag name: %r" % (invalid,),
         )
         self.assertFalse(Tag.objects.filter(name=invalid).exists())
 
@@ -888,9 +817,7 @@ class TestTagsAPI(APITestCase.ForUser):
             },
         )
         self.assertEqual(http.client.OK, response.status_code)
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(name, parsed_result["name"])
         self.assertEqual(comment, parsed_result["comment"])
         self.assertEqual(definition, parsed_result["definition"])

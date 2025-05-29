@@ -54,9 +54,7 @@ from provisioningserver.utils.twisted import asynchronous, call
 # Default port for regiond.
 DEFAULT_PORT = 5240
 
-reactor.addSystemEventTrigger(
-    "before", "startup", disable_all_database_connections
-)
+reactor.addSystemEventTrigger("before", "startup", disable_all_database_connections)
 
 logger = logging.getLogger(f"{__name__}_{os.getpid()}")
 
@@ -267,9 +265,7 @@ class MAASServices(MultiService):
         yield maybeDeferred(self.eventloop.prepare)
         Service.startService(self)
         self._set_globals()
-        yield DeferredList(
-            [maybeDeferred(service.startService) for service in self]
-        )
+        yield DeferredList([maybeDeferred(service.startService) for service in self])
 
     def _set_globals(self):
         set_global_labels(maas_uuid=MAAS_UUID.get(), service_type="region")
@@ -557,9 +553,7 @@ class RegionEventLoop:
                     )
                 elif not item["only_on_master"] and not master:
                     importService = item.get("import_service", False)
-                    if (
-                        importService and import_services
-                    ) or not importService:
+                    if (importService and import_services) or not importService:
                         self.populateService(
                             name,
                             master=master,
@@ -602,9 +596,7 @@ class RegionEventLoop:
         """Convenience method that resets and starts event-loop."""
         self.logger.info("Restarting region")
         d = self.reset()
-        d.addCallback(
-            call, self.start, master=self.master, all_in_one=self.all_in_one
-        )
+        d.addCallback(call, self.start, master=self.master, all_in_one=self.all_in_one)
         d.addCallback(call, self.logger.info, "Region restarted")
         return d
 

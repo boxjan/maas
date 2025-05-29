@@ -84,10 +84,8 @@ class TestScriptForm(MAASServerTestCase):
         if script_type == SCRIPT_TYPE.COMMISSIONING:
             for_hardware = [
                 "modalias:%s" % factory.make_name("mod_alias"),
-                "pci:%04X:%04x"
-                % (random.randint(0, 9999), random.randint(0, 9999)),
-                "usb:%04x:%04X"
-                % (random.randint(0, 9999), random.randint(0, 9999)),
+                "pci:%04X:%04x" % (random.randint(0, 9999), random.randint(0, 9999)),
+                "usb:%04x:%04X" % (random.randint(0, 9999), random.randint(0, 9999)),
                 "system_vendor:%s" % factory.make_name("system_name"),
                 "system_product:%s" % factory.make_name("system_product"),
                 "system_version:%s" % factory.make_name("system_version"),
@@ -174,10 +172,8 @@ class TestScriptForm(MAASServerTestCase):
         if script_type == SCRIPT_TYPE.COMMISSIONING:
             for_hardware = [
                 "modalias:%s" % factory.make_name("mod_alias"),
-                "pci:%04x:%04X"
-                % (random.randint(0, 9999), random.randint(0, 9999)),
-                "usb:%04x:%04X"
-                % (random.randint(0, 9999), random.randint(0, 9999)),
+                "pci:%04x:%04X" % (random.randint(0, 9999), random.randint(0, 9999)),
+                "usb:%04x:%04X" % (random.randint(0, 9999), random.randint(0, 9999)),
                 "system_vendor:%s" % factory.make_name("system_name"),
                 "system_product:%s" % factory.make_name("system_product"),
                 "system_version:%s" % factory.make_name("system_version"),
@@ -228,9 +224,7 @@ class TestScriptForm(MAASServerTestCase):
         self.assertEqual(destructive, script.destructive)
         self.assertEqual(script_content, script.script.data)
         self.assertEqual(comment, script.script.comment)
-        self.assertEqual(
-            orig_script_content, script.script.previous_version.data
-        )
+        self.assertEqual(orig_script_content, script.script.previous_version.data)
         self.assertIsNone(script.script.previous_version.comment)
         self.assertEqual(
             apply_configured_networking, script.apply_configured_networking
@@ -303,9 +297,7 @@ class TestScriptForm(MAASServerTestCase):
                 continue
             else:
                 value = factory.make_string()
-            form = ScriptForm(
-                data={name: value}, instance=script, edit_default=True
-            )
+            form = ScriptForm(data={name: value}, instance=script, edit_default=True)
             self.assertTrue(form.is_valid(), form.errors)
 
     def test_update_allows_editing_tag_and_timeout_on_default_script(self):
@@ -333,8 +325,7 @@ class TestScriptForm(MAASServerTestCase):
         self.assertEqual(
             {
                 "comment": [
-                    '"comment" may only be used when specifying a "script" '
-                    "as well."
+                    '"comment" may only be used when specifying a "script" ' "as well."
                 ]
             },
             form.errors,
@@ -437,11 +428,7 @@ class TestScriptForm(MAASServerTestCase):
         )
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            {
-                "script_type": [
-                    "Script type must be commissioning, testing or release"
-                ]
-            },
+            {"script_type": ["Script type must be commissioning, testing or release"]},
             form.errors,
         )
         self.assertCountEqual([], VersionedTextFile.objects.all())
@@ -503,11 +490,7 @@ class TestScriptForm(MAASServerTestCase):
         )
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            {
-                "parallel": [
-                    "Script parallel must be disabled, instance, or any."
-                ]
-            },
+            {"parallel": ["Script parallel must be disabled, instance, or any."]},
             form.errors,
         )
         self.assertCountEqual([], VersionedTextFile.objects.all())
@@ -620,10 +603,8 @@ class TestScriptForm(MAASServerTestCase):
         if embedded_yaml["script_type"] == SCRIPT_TYPE.COMMISSIONING:
             embedded_yaml["for_hardware"] = [
                 "modalias:%s" % factory.make_name("mod_alias"),
-                "pci:%04X:%04x"
-                % (random.randint(0, 9999), random.randint(0, 9999)),
-                "usb:%04X:%04x"
-                % (random.randint(0, 9999), random.randint(0, 9999)),
+                "pci:%04X:%04x" % (random.randint(0, 9999), random.randint(0, 9999)),
+                "usb:%04X:%04x" % (random.randint(0, 9999), random.randint(0, 9999)),
                 "system_vendor:%s" % factory.make_name("system_name"),
                 "system_product:%s" % factory.make_name("system_product"),
                 "system_version:%s" % factory.make_name("system_version"),
@@ -646,18 +627,12 @@ class TestScriptForm(MAASServerTestCase):
         self.assertCountEqual(embedded_yaml["results"], script.results)
         self.assertCountEqual(embedded_yaml["parameters"], script.parameters)
         self.assertEqual(embedded_yaml["packages"], script.packages)
-        self.assertEqual(
-            timedelta(0, embedded_yaml["timeout"]), script.timeout
-        )
+        self.assertEqual(timedelta(0, embedded_yaml["timeout"]), script.timeout)
         self.assertEqual(embedded_yaml["destructive"], script.destructive)
         self.assertEqual(embedded_yaml["may_reboot"], script.may_reboot)
         if embedded_yaml["script_type"] == SCRIPT_TYPE.COMMISSIONING:
-            self.assertCountEqual(
-                embedded_yaml["for_hardware"], script.for_hardware
-            )
-            self.assertEqual(
-                embedded_yaml["recommission"], script.recommission
-            )
+            self.assertCountEqual(embedded_yaml["for_hardware"], script.for_hardware)
+            self.assertEqual(embedded_yaml["recommission"], script.recommission)
         else:
             self.assertCountEqual([], script.for_hardware)
             self.assertFalse(script.recommission)
@@ -666,9 +641,7 @@ class TestScriptForm(MAASServerTestCase):
 
     def test_only_loads_when_script_updated(self):
         script = factory.make_Script(
-            script=factory.make_script_content(
-                {"name": factory.make_name("name")}
-            )
+            script=factory.make_script_content({"name": factory.make_name("name")})
         )
         name = factory.make_name("name")
         form = ScriptForm(instance=script, data={"name": name})
@@ -715,9 +688,7 @@ class TestScriptForm(MAASServerTestCase):
         form = ScriptForm(
             data={
                 "name": factory.make_name("name"),
-                "script": factory.make_script_content(
-                    factory.make_name("bad_yaml")
-                ),
+                "script": factory.make_script_content(factory.make_name("bad_yaml")),
             }
         )
         self.assertFalse(form.is_valid())
@@ -788,9 +759,7 @@ class TestScriptForm(MAASServerTestCase):
         form = ScriptForm(
             data={
                 "name": factory.make_name("name"),
-                "script": factory.make_script_content(
-                    {"tags": [{} for _ in range(3)]}
-                ),
+                "script": factory.make_script_content({"tags": [{} for _ in range(3)]}),
             }
         )
         self.assertFalse(form.is_valid())
@@ -928,11 +897,7 @@ class TestScriptForm(MAASServerTestCase):
         )
         self.assertFalse(form.is_valid())
         self.assertEqual(
-            {
-                "packages": [
-                    "Snap channel must be stable, edge, beta, or candidate."
-                ]
-            },
+            {"packages": ["Snap channel must be stable, edge, beta, or candidate."]},
             form.errors,
         )
         self.assertCountEqual([], VersionedTextFile.objects.all())
@@ -972,9 +937,7 @@ class TestScriptForm(MAASServerTestCase):
             }
         )
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            {"packages": ["Snap package must be a string."]}, form.errors
-        )
+        self.assertEqual({"packages": ["Snap package must be a string."]}, form.errors)
         self.assertCountEqual([], VersionedTextFile.objects.all())
 
     def test_allows_list_of_results(self):
@@ -1061,9 +1024,7 @@ class TestScriptForm(MAASServerTestCase):
         self.assertCountEqual([], VersionedTextFile.objects.all())
 
     def test_title_description_of_result_must_be_strings(self):
-        results = {
-            factory.make_name("result"): {"title": None, "description": None}
-        }
+        results = {factory.make_name("result"): {"title": None, "description": None}}
         form = ScriptForm(
             data={
                 "script": factory.make_script_content(
@@ -1112,9 +1073,7 @@ class TestScriptForm(MAASServerTestCase):
             }
         )
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            {"for_hardware": ["Must be a list or string"]}, form.errors
-        )
+        self.assertEqual({"for_hardware": ["Must be a list or string"]}, form.errors)
         self.assertCountEqual([], VersionedTextFile.objects.all())
 
     def test_errors_when_hardware_invalid(self):
@@ -1161,9 +1120,7 @@ class TestCommissioningScriptForm(MAASServerTestCase):
         request.user = factory.make_User()
         content = factory.make_script_content()
         name = factory.make_name("filename")
-        uploaded_file = SimpleUploadedFile(
-            content=content.encode("ascii"), name=name
-        )
+        uploaded_file = SimpleUploadedFile(content=content.encode("ascii"), name=name)
         form = CommissioningScriptForm(files={"content": uploaded_file})
         self.assertTrue(form.is_valid(), form._errors)
         form.save(request)
@@ -1191,9 +1148,7 @@ class TestCommissioningScriptForm(MAASServerTestCase):
         request.user = factory.make_User()
         content = factory.make_script_content()
         name = factory.make_name("filename")
-        uploaded_file = SimpleUploadedFile(
-            content=content.encode("ascii"), name=name
-        )
+        uploaded_file = SimpleUploadedFile(content=content.encode("ascii"), name=name)
         form = CommissioningScriptForm(files={"content": uploaded_file})
         self.assertTrue(form.is_valid(), form._errors)
         form.save(request)
@@ -1208,9 +1163,7 @@ class TestCommissioningScriptForm(MAASServerTestCase):
         )
         form = CommissioningScriptForm(files={"content": uploaded_file})
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            {"content": ['name: "none" is a reserved name.']}, form.errors
-        )
+        self.assertEqual({"content": ['name: "none" is a reserved name.']}, form.errors)
 
     def test_not_valid_when_empty(self):
         # Regression test for LP:1712423
@@ -1239,9 +1192,7 @@ class TestTestingScriptForm(MAASServerTestCase):
         request.user = factory.make_User()
         content = factory.make_script_content()
         name = factory.make_name("filename")
-        uploaded_file = SimpleUploadedFile(
-            content=content.encode("ascii"), name=name
-        )
+        uploaded_file = SimpleUploadedFile(content=content.encode("ascii"), name=name)
         form = TestingScriptForm(files={"content": uploaded_file})
         self.assertTrue(form.is_valid(), form._errors)
         form.save(request)
@@ -1269,18 +1220,14 @@ class TestTestingScriptForm(MAASServerTestCase):
         request.user = factory.make_User()
         content = factory.make_script_content()
         name = factory.make_name("filename")
-        uploaded_file = SimpleUploadedFile(
-            content=content.encode("ascii"), name=name
-        )
+        uploaded_file = SimpleUploadedFile(content=content.encode("ascii"), name=name)
         form = TestingScriptForm(files={"content": uploaded_file})
         self.assertTrue(form.is_valid(), form._errors)
         form.save(request)
         new_script = Script.objects.get(name=name)
         event = Event.objects.get(type__level=AUDIT)
         self.assertIsNotNone(event)
-        self.assertEqual(
-            event.description, "Saved script '%s'." % new_script.name
-        )
+        self.assertEqual(event.description, "Saved script '%s'." % new_script.name)
 
     def test_propagates_script_form_errors(self):
         # Regression test for LP:1712422
@@ -1289,9 +1236,7 @@ class TestTestingScriptForm(MAASServerTestCase):
         )
         form = TestingScriptForm(files={"content": uploaded_file})
         self.assertFalse(form.is_valid())
-        self.assertEqual(
-            {"content": ['name: "none" is a reserved name.']}, form.errors
-        )
+        self.assertEqual({"content": ['name: "none" is a reserved name.']}, form.errors)
 
     def test_not_valid_when_empty(self):
         # Regression test for LP:1712423

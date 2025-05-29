@@ -70,9 +70,7 @@ class Command(BaseCommand):
                         # file to MAAS.
                         if config.value is None:
                             config.value = ""
-                        maas_forwarders = OrderedDict.fromkeys(
-                            config.value.split()
-                        )
+                        maas_forwarders = OrderedDict.fromkeys(config.value.split())
                         maas_forwarders.update(bind_forwarders)
                         config.value = " ".join(maas_forwarders)
                         config.save()
@@ -81,8 +79,7 @@ class Command(BaseCommand):
                     pass
             else:
                 stdout.write(
-                    "// Append to MAAS forwarders: %s\n"
-                    % " ".join(bind_forwarders)
+                    "// Append to MAAS forwarders: %s\n" % " ".join(bind_forwarders)
                 )
 
             # Only delete forwarders from the config if MAAS was able to
@@ -118,8 +115,7 @@ class Command(BaseCommand):
                     pass
             else:
                 stdout.write(
-                    "// Set MAAS dnssec_validation to: %s\n"
-                    % dnssec_validation
+                    "// Set MAAS dnssec_validation to: %s\n" % dnssec_validation
                 )
             # Always attempt to delete this option as MAAS will always create
             # a default for it.

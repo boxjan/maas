@@ -127,9 +127,7 @@ def raise_error_for_invalid_state_on_allocated_operations(
 
 def raise_error_if_controller(node, operation):
     if node.is_controller:
-        raise MAASAPIForbidden(
-            "Cannot %s interface on a controller." % operation
-        )
+        raise MAASAPIForbidden("Cannot %s interface on a controller." % operation)
 
 
 class InterfacesHandler(OperationsHandler):
@@ -503,9 +501,7 @@ class InterfaceHandler(OperationsHandler):
 
     @classmethod
     def children(cls, interface):
-        return sorted(
-            nic.child.name for nic in interface.children_relationships.all()
-        )
+        return sorted(nic.child.name for nic in interface.children_relationships.all())
 
     @classmethod
     def links(cls, interface):
@@ -726,9 +722,7 @@ class InterfaceHandler(OperationsHandler):
             )
         if node.is_controller:
             if interface.type == INTERFACE_TYPE.VLAN:
-                raise MAASAPIForbidden(
-                    "Cannot modify VLAN interface on controller."
-                )
+                raise MAASAPIForbidden("Cannot modify VLAN interface on controller.")
             interface_form = ControllerInterfaceForm
         elif node.status == NODE_STATUS.DEPLOYED:
             interface_form = DeployedInterfaceForm
@@ -746,10 +740,7 @@ class InterfaceHandler(OperationsHandler):
         else:
             # Replace parents with parent so it matches the API parameter, if
             # the interface being editted was a VLAN interface.
-            if (
-                interface.type == INTERFACE_TYPE.VLAN
-                and "parents" in form.errors
-            ):
+            if interface.type == INTERFACE_TYPE.VLAN and "parents" in form.errors:
                 form.errors["parent"] = form.errors.pop("parents")
             raise MAASAPIValidationError(form.errors)
 
@@ -1020,9 +1011,7 @@ class InterfaceHandler(OperationsHandler):
             raise_error_for_invalid_state_on_allocated_operations(
                 node, request.user, "set default gateway"
             )
-        form = InterfaceSetDefaultGatwayForm(
-            instance=interface, data=request.data
-        )
+        form = InterfaceSetDefaultGatwayForm(instance=interface, data=request.data)
         if form.is_valid():
             return form.save()
         else:

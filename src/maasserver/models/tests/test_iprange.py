@@ -21,9 +21,7 @@ def make_plain_subnet():
 
 
 def make_plain_ipv6_subnet():
-    return factory.make_Subnet(
-        cidr="2001::/64", gateway_ip="2001::1", dns_servers=[]
-    )
+    return factory.make_Subnet(cidr="2001::/64", gateway_ip="2001::1", dns_servers=[])
 
 
 class TestIPRange(MAASServerTestCase):
@@ -172,12 +170,8 @@ class TestIPRange(MAASServerTestCase):
         self.assertEqual(
             cm.exception.message_dict,
             {
-                "start_ip": [
-                    f"IP addresses must be within subnet: {subnet.cidr}."
-                ],
-                "end_ip": [
-                    f"IP addresses must be within subnet: {subnet.cidr}."
-                ],
+                "start_ip": [f"IP addresses must be within subnet: {subnet.cidr}."],
+                "end_ip": [f"IP addresses must be within subnet: {subnet.cidr}."],
             },
         )
 
@@ -196,9 +190,7 @@ class TestIPRange(MAASServerTestCase):
         self.assertEqual(
             cm.exception.message_dict,
             {
-                "start_ip": [
-                    f"Start IP address must be within subnet: {subnet.cidr}."
-                ],
+                "start_ip": [f"Start IP address must be within subnet: {subnet.cidr}."],
             },
         )
 
@@ -217,9 +209,7 @@ class TestIPRange(MAASServerTestCase):
         self.assertEqual(
             cm.exception.message_dict,
             {
-                "end_ip": [
-                    f"End IP address must be within subnet: {subnet.cidr}."
-                ],
+                "end_ip": [f"End IP address must be within subnet: {subnet.cidr}."],
             },
         )
 
@@ -238,9 +228,7 @@ class TestIPRange(MAASServerTestCase):
         self.assertEqual(
             cm.exception.message_dict,
             {
-                "end_ip": [
-                    "End IP address must not be less than Start IP address."
-                ],
+                "end_ip": ["End IP address must not be less than Start IP address."],
             },
         )
 
@@ -258,9 +246,7 @@ class TestIPRange(MAASServerTestCase):
         self.assertEqual(
             cm.exception.message_dict,
             {
-                "end_ip": [
-                    "Broadcast address cannot be included in IP range."
-                ],
+                "end_ip": ["Broadcast address cannot be included in IP range."],
             },
         )
 

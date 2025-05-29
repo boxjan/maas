@@ -40,15 +40,11 @@ class TestIPRangesAPI(APITestCase.ForUser):
         uri = get_ipranges_uri()
         response = self.client.get(uri)
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         expected_ids = [iprange.id for iprange in IPRange.objects.all()]
         result_ids = [
             iprange["id"]
-            for iprange in json.loads(
-                response.content.decode(settings.DEFAULT_CHARSET)
-            )
+            for iprange in json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         ]
         self.assertCountEqual(expected_ids, result_ids)
 
@@ -65,9 +61,7 @@ class TestIPRangesAPI(APITestCase.ForUser):
                 "subnet": "%d" % subnet.id,
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual("10.0.0.10", data["start_ip"])
         self.assertEqual("10.0.0.20", data["end_ip"])
@@ -99,9 +93,7 @@ class TestIPRangesAPI(APITestCase.ForUser):
             ),
             "application/x-www-form-urlencoded",
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual("10.0.0.10", data["start_ip"])
         self.assertEqual("10.0.0.20", data["end_ip"])
@@ -119,9 +111,7 @@ class TestIPRangesAPI(APITestCase.ForUser):
                 "subnet": "%d" % subnet.id,
             },
         )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_create_does_not_require_subnet(self):
         uri = get_ipranges_uri()
@@ -134,9 +124,7 @@ class TestIPRangesAPI(APITestCase.ForUser):
                 "end_ip": "10.0.0.20",
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual("10.0.0.10", data["start_ip"])
         self.assertEqual("10.0.0.20", data["end_ip"])
@@ -151,9 +139,7 @@ class TestIPRangesAPI(APITestCase.ForUser):
         self.assertEqual(
             http.client.BAD_REQUEST, response.status_code, response.content
         )
-        self.assertEqual(
-            b'{"type": ["This field is required."]}', response.content
-        )
+        self.assertEqual(b'{"type": ["This field is required."]}', response.content)
 
     def test_create_sets_user_to_authenticated_user(self):
         uri = get_ipranges_uri()
@@ -166,9 +152,7 @@ class TestIPRangesAPI(APITestCase.ForUser):
                 "end_ip": "10.0.0.20",
             },
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         data = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(self.user.username, data["user"]["username"])
 
@@ -188,12 +172,8 @@ class TestIPRangeAPI(APITestCase.ForUser):
         factory.make_IPRange(subnet, "10.0.0.21", "10.0.0.30")
         uri = get_iprange_uri(iprange)
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
-        parsed_ipranges = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
+        parsed_ipranges = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(parsed_ipranges.get("id"), iprange.id)
         self.assertEqual(parsed_ipranges.get("start_ip"), iprange.start_ip)
         self.assertEqual(parsed_ipranges.get("end_ip"), iprange.end_ip)
@@ -204,26 +184,18 @@ class TestIPRangeAPI(APITestCase.ForUser):
     def test_read_404_when_bad_id(self):
         uri = reverse("iprange_handler", args=[random.randint(10000, 20000)])
         response = self.client.get(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_update(self):
         subnet = factory.make_Subnet(cidr="10.0.0.0/24")
-        iprange = factory.make_IPRange(
-            subnet, "10.0.0.2", "10.0.0.10", user=self.user
-        )
+        iprange = factory.make_IPRange(subnet, "10.0.0.2", "10.0.0.10", user=self.user)
         uri = get_iprange_uri(iprange)
         comment = factory.make_name("comment")
         response = self.client.put(uri, {"comment": comment})
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             comment,
-            json.loads(response.content.decode(settings.DEFAULT_CHARSET))[
-                "comment"
-            ],
+            json.loads(response.content.decode(settings.DEFAULT_CHARSET))["comment"],
         )
         self.assertEqual(comment, reload_object(iprange).comment)
 
@@ -234,27 +206,19 @@ class TestIPRangeAPI(APITestCase.ForUser):
         )
         uri = get_iprange_uri(iprange)
         response = self.client.put(uri, {})
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_update_404_when_invalid_id(self):
         uri = reverse("iprange_handler", args=[random.randint(100, 1000)])
         response = self.client.put(uri, {})
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)
 
     def test_delete_deletes_iprange(self):
         subnet = factory.make_Subnet(cidr="10.0.0.0/24")
-        iprange = factory.make_IPRange(
-            subnet, "10.0.0.2", "10.0.0.10", user=self.user
-        )
+        iprange = factory.make_IPRange(subnet, "10.0.0.2", "10.0.0.10", user=self.user)
         uri = get_iprange_uri(iprange)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response.content)
         self.assertIsNone(reload_object(iprange))
 
     def test_delete_403_when_not_user(self):
@@ -264,14 +228,10 @@ class TestIPRangeAPI(APITestCase.ForUser):
         )
         uri = get_iprange_uri(iprange)
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
         self.assertIsNotNone(reload_object(iprange))
 
     def test_delete_404_when_invalid_id(self):
         uri = reverse("iprange_handler", args=[random.randint(100, 1000)])
         response = self.client.delete(uri)
-        self.assertEqual(
-            http.client.NOT_FOUND, response.status_code, response.content
-        )
+        self.assertEqual(http.client.NOT_FOUND, response.status_code, response.content)

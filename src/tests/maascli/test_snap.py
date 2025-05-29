@@ -92,9 +92,7 @@ class TestHelpers(MAASTestCase):
     def test_get_default_url_uses_gateway_ip(self):
         ipv4_address = factory.make_ipv4_address()
         self.patch(snap, "get_default_gateway_ip").return_value = ipv4_address
-        self.assertEqual(
-            "http://%s:5240/MAAS" % ipv4_address, snap.get_default_url()
-        )
+        self.assertEqual("http://%s:5240/MAAS" % ipv4_address, snap.get_default_url())
 
     def test_get_default_url_fallsback_to_localhost(self):
         self.patch(snap, "get_default_gateway_ip").return_value = None
@@ -219,9 +217,7 @@ class TestCmdInit(MAASTestCase):
             "postgres://maas:pwd@localhost/db",
             "http://localhost:5240/MAAS",
         ]
-        self.mock_clear_certificates_dir = self.patch(
-            snap, "clear_certificates_dir"
-        )
+        self.mock_clear_certificates_dir = self.patch(snap, "clear_certificates_dir")
         options = self.parser.parse_args(["region+rack"])
         self.cmd(options)
         self.mock_clear_certificates_dir.assert_called_once()
@@ -239,9 +235,7 @@ class TestCmdInit(MAASTestCase):
             "pwd",
             "http://localhost:5240/MAAS",
         ]
-        options = self.parser.parse_args(
-            ["region+rack", "--database-uri", "invalid"]
-        )
+        options = self.parser.parse_args(["region+rack", "--database-uri", "invalid"])
         error = self.assertRaises(CommandError, self.cmd, options)
         self.assertEqual(
             "Database URI needs to be either 'maas-test-db:///' or start "
@@ -270,9 +264,7 @@ class TestCmdInit(MAASTestCase):
         )
 
     def test_get_database_settings_prompt_dsn(self):
-        self.mock_read_input.side_effect = [
-            "postgres://dbuser:pwd@dbhost/dbname"
-        ]
+        self.mock_read_input.side_effect = ["postgres://dbuser:pwd@dbhost/dbname"]
         options = self.parser.parse_args(["region+rack"])
         settings = snap.get_database_settings(options)
         self.assertEqual(
@@ -393,8 +385,7 @@ class TestCmdInit(MAASTestCase):
             snap.DatabaseSettingsError, snap.get_database_settings, options
         )
         self.assertEqual(
-            "Error parsing database URI: "
-            "Unsupported parameters: options, passfile",
+            "Error parsing database URI: " "Unsupported parameters: options, passfile",
             str(error),
         )
 
@@ -405,9 +396,7 @@ class TestCmdInit(MAASTestCase):
         error = self.assertRaises(
             snap.DatabaseSettingsError, snap.get_database_settings, options
         )
-        self.assertEqual(
-            "No user found in URI: postgres://myhost/", str(error)
-        )
+        self.assertEqual("No user found in URI: postgres://myhost/", str(error))
 
     def test_get_database_settings_invalid_maas_test_db(self):
         options = self.parser.parse_args(
@@ -610,9 +599,7 @@ class TestCmdStatus(MAASTestCase):
         cmd = snap.cmd_status(parser)
         self.patch(os, "getuid").return_value = 1000
         error = self.assertRaises(SystemExit, cmd, parser.parse_args([]))
-        self.assertEqual(
-            str(error), "The 'status' command must be run by root."
-        )
+        self.assertEqual(str(error), "The 'status' command must be run by root.")
 
 
 class TestCmdConfig(MAASTestCase):
@@ -642,9 +629,7 @@ class TestCmdConfig(MAASTestCase):
         self.patch(sys, "stdout", stdout)
 
         self.cmd(options)
-        mock_maas_configuration().update.assert_called_once_with(
-            {"debug": True}
-        )
+        mock_maas_configuration().update.assert_called_once_with({"debug": True})
         # After config is changed, services are restarted
         self.assertEqual(stdout.getvalue(), "Stopping services\n")
         mock_restart_pebble.assert_called_once_with()

@@ -95,9 +95,7 @@ class TestEventToDict(APITestCase.ForUser):
             event.created.strftime("%a, %d %b. %Y %H:%M:%S"),
         )
         self.assertEqual(event_dict["type"], event.type.description)
-        self.assertEqual(
-            event_dict["description"], event.render_audit_description
-        )
+        self.assertEqual(event_dict["description"], event.render_audit_description)
 
 
 class TestEventsAPI(APITestCase.ForUser):
@@ -231,9 +229,7 @@ class TestEventsAPI(APITestCase.ForUser):
     def test_GET_query_with_macs_returns_matching_nodes(self):
         # The "list" operation takes optional "mac_address" parameters. Only
         # events for nodes with matching MAC addresses will be returned.
-        nodes = [
-            factory.make_Node_with_Interface_on_Subnet() for _ in range(3)
-        ]
+        nodes = [factory.make_Node_with_Interface_on_Subnet() for _ in range(3)]
         events = [factory.make_Event(node=node) for node in nodes]
         first_node = nodes[0]
         first_node_mac = first_node.get_boot_interface().mac_address
@@ -373,9 +369,7 @@ class TestEventsAPI(APITestCase.ForUser):
             system_ids.intersection(device.system_id for device in devices),
             set(),
         )
-        self.assertEqual(
-            len(machines) + len(rack_controllers), parsed_result["count"]
-        )
+        self.assertEqual(len(machines) + len(rack_controllers), parsed_result["count"])
 
     def test_GET_query_with_zone_filters_by_zone(self):
         zone1 = factory.make_Zone(name="zone1")
@@ -458,9 +452,7 @@ class TestEventsAPI(APITestCase.ForUser):
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
         # Two events created AFTER events[1] are returned, newest first.
-        self.assertEqual(
-            [events[3].id, events[2].id], extract_event_ids(parsed_result)
-        )
+        self.assertEqual([events[3].id, events[2].id], extract_event_ids(parsed_result))
         self.assertEqual(2, parsed_result["count"])
 
     def test_GET_query_with_after_event_id_without_limit(self):
@@ -492,9 +484,7 @@ class TestEventsAPI(APITestCase.ForUser):
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
         # Two events created BEFORE events[3] are returned, newest first.
-        self.assertEqual(
-            [events[2].id, events[1].id], extract_event_ids(parsed_result)
-        )
+        self.assertEqual([events[2].id, events[1].id], extract_event_ids(parsed_result))
         self.assertEqual(2, parsed_result["count"])
 
     def test_GET_query_with_before_event_id_without_limit(self):
@@ -552,9 +542,7 @@ class TestEventsAPI(APITestCase.ForUser):
         self.assertEqual(http.client.OK, info_response.status_code)
         info_result = json_load_bytes(info_response.content)
 
-        default_response = self.client.get(
-            reverse("events_handler"), {"op": "query"}
-        )
+        default_response = self.client.get(reverse("events_handler"), {"op": "query"})
         self.assertEqual(http.client.OK, default_response.status_code)
         default_result = json_load_bytes(default_response.content)
 
@@ -587,9 +575,7 @@ class TestEventsAPI(APITestCase.ForUser):
     def test_audit_query_filters_nodes(self):
         nodes = [factory.make_Node() for _ in range(3)]
         events = [
-            factory.make_Event(
-                node=node, type=factory.make_EventType(level=AUDIT)
-            )
+            factory.make_Event(node=node, type=factory.make_EventType(level=AUDIT))
             for node in nodes
         ]
         first_node = nodes[0]
@@ -656,9 +642,7 @@ class TestEventsAPI(APITestCase.ForUser):
         num_nodes_per_group = 5
         events_per_group = num_nodes_per_group * events_per_node
 
-        self.make_nodes_in_group_with_events(
-            num_nodes_per_group, events_per_node
-        )
+        self.make_nodes_in_group_with_events(num_nodes_per_group, events_per_node)
 
         handler = events_module.EventsHandler()
 
@@ -667,9 +651,7 @@ class TestEventsAPI(APITestCase.ForUser):
             RequestFixture({"op": "query", "level": "DEBUG"}, ["op", "level"]),
         )
 
-        self.make_nodes_in_group_with_events(
-            num_nodes_per_group, events_per_node
-        )
+        self.make_nodes_in_group_with_events(num_nodes_per_group, events_per_node)
 
         query_2_count, query_2_result = count_queries(
             handler.query,
@@ -813,9 +795,7 @@ class TestEventsURIsWithoutEvents(APITestCase.ForUser):
         expected_uri_path = reverse("events_handler")
 
         # Build a query dict for the given combination of params.
-        request_params = {
-            param: self.factories[param]() for param in self.params
-        }
+        request_params = {param: self.factories[param]() for param in self.params}
 
         # Ensure that op is always included.
         request_params["op"] = "query"
@@ -839,9 +819,7 @@ class TestEventsURIsWithoutEvents(APITestCase.ForUser):
         self.assertEqual(next_uri.path, expected_uri_path)
         self.assertEqual(next_uri.fragment, "")
 
-        next_uri_params = dict(
-            parse_qsl(next_uri.query, keep_blank_values=True)
-        )
+        next_uri_params = dict(parse_qsl(next_uri.query, keep_blank_values=True))
         if "before" in request_params:
             # The window was limited in the request by the presence of a
             # `before` argument, so the next_uri omits the `before` argument
@@ -864,9 +842,7 @@ class TestEventsURIsWithoutEvents(APITestCase.ForUser):
             self.assertEqual(prev_uri.params, "")
             self.assertEqual(prev_uri.path, expected_uri_path)
             self.assertEqual(prev_uri.fragment, "")
-            prev_uri_params = dict(
-                parse_qsl(prev_uri.query, keep_blank_values=True)
-            )
+            prev_uri_params = dict(parse_qsl(prev_uri.query, keep_blank_values=True))
             if "after" in request_params:
                 # The window was limited in the request by the presence of an
                 # `after` argument, so the prev_uri omits the `after` argument

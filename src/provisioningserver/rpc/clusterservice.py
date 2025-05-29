@@ -248,9 +248,7 @@ def check_ip_address(request):
 
     # This will only occur if the ping was successful and now the MAC address
     # for that IP address will now be in the ARP cache.
-    done.addCallback(
-        lambda _: deferToThread(find_mac_via_arp, request["ip_address"])
-    )
+    done.addCallback(lambda _: deferToThread(find_mac_via_arp, request["ip_address"]))
 
     return done
 
@@ -262,9 +260,7 @@ class Cluster(SecuredRPCProtocol):
     connection is established, AMP is symmetric.
     """
 
-    def __init__(
-        self, auth_status: ConnectionAuthStatus = ConnectionAuthStatus()
-    ):
+    def __init__(self, auth_status: ConnectionAuthStatus = ConnectionAuthStatus()):
         super().__init__(
             unauthenticated_commands=[cluster.Authenticate.commandName],
             auth_status=auth_status,
@@ -350,9 +346,7 @@ class Cluster(SecuredRPCProtocol):
     def power_query(self, system_id, hostname, power_type, context):
         d = get_power_state(system_id, hostname, power_type, context=context)
         d.addCallback(lambda x: {"state": x})
-        d.addErrback(
-            lambda f: {"state": "error", "error_msg": f.getErrorMessage()}
-        )
+        d.addErrback(lambda f: {"state": "error", "error_msg": f.getErrorMessage()})
         return d
 
     @cluster.PowerDriverCheck.responder
@@ -375,9 +369,7 @@ class Cluster(SecuredRPCProtocol):
         elif not driver.can_set_boot_order:
             # Don't raise NotImplementedError because most boot drivers can
             # provide a boot config to boot the proper device.
-            log.debug(
-                f"{power_type} does not support configuring the boot order!"
-            )
+            log.debug(f"{power_type} does not support configuring the boot order!")
             return {}
         else:
             d = driver.set_boot_order(system_id, context, order)
@@ -662,9 +654,7 @@ class Cluster(SecuredRPCProtocol):
                 accept_all,
                 domain,
             )
-            d.addErrback(
-                partial(catch_probe_and_enlist_error, "SeaMicro 15000")
-            )
+            d.addErrback(partial(catch_probe_and_enlist_error, "SeaMicro 15000"))
         elif chassis_type == "mscm":
             d = deferToThread(
                 probe_and_enlist_mscm,
@@ -760,9 +750,7 @@ class Cluster(SecuredRPCProtocol):
         Implementation of
         :py:class:`~provisioningserver.rpc.cluster.ComposeMachine`.
         """
-        return pods.compose_machine(
-            type, context, request, pod_id=pod_id, name=name
-        )
+        return pods.compose_machine(type, context, request, pod_id=pod_id, name=name)
 
     @cluster.DecomposeMachine.responder
     def decompose_machine(self, type, context, pod_id, name):
@@ -838,9 +826,7 @@ class Cluster(SecuredRPCProtocol):
             # (-15) and do not raise an error.
             if not (running_in_snap() and e.returncode == -15):
                 maaslog.error("Unable to disable and stop the rackd service")
-                raise exceptions.CannotDisableAndShutoffRackd(
-                    e.output_as_unicode
-                )
+                raise exceptions.CannotDisableAndShutoffRackd(e.output_as_unicode)
         return {}
 
     @cluster.CheckIPs.responder
@@ -850,9 +836,7 @@ class Cluster(SecuredRPCProtocol):
         Implementation of
         :py:class:`~provisioningserver.rpc.cluster.CheckIPs`.
         """
-        d = DeferredList(
-            map(check_ip_address, ip_addresses), consumeErrors=True
-        )
+        d = DeferredList(map(check_ip_address, ip_addresses), consumeErrors=True)
 
         def map_results(results):
             for request, (success, mac_address) in zip(ip_addresses, results):
@@ -978,10 +962,7 @@ class ClusterClient(Cluster):
                     "No 'encrypted_cluster_certificate' in the RegisterRackController rpc response. The services relying "
                     "on such certificate are degraded."
                 )
-            if (
-                not get_maas_cluster_cert_paths()
-                and encrypted_cluster_certificate
-            ):
+            if not get_maas_cluster_cert_paths() and encrypted_cluster_certificate:
                 decoded_secret = json.loads(
                     fernet_decrypt_psk(encrypted_cluster_certificate)
                 )
@@ -1002,10 +983,7 @@ class ClusterClient(Cluster):
             # post-registration.
             return True
         except exceptions.CannotRegisterRackController:
-            log.msg(
-                "Rack controller REJECTED by the region (via %s)."
-                % self.eventloop
-            )
+            log.msg("Rack controller REJECTED by the region (via %s)." % self.eventloop)
             return False
 
     @inlineCallbacks
@@ -1167,16 +1145,11 @@ class ClusterClientService(TimerService):
             raise exceptions.NoConnectionsAvailable()
         else:
             try:
-                return common.Client(
-                    self.connections.get_random_free_connection()
-                )
+                return common.Client(self.connections.get_random_free_connection())
             except exceptions.AllConnectionsBusy as e:
                 if not busy_ok:
                     for endpoint_conns in self.connections.values():
-                        if (
-                            len(endpoint_conns)
-                            < self.connections._max_connections
-                        ):
+                        if len(endpoint_conns) < self.connections._max_connections:
                             raise e
                 # return a busy connection, assume it will free up or timeout
                 return common.Client(self.connections.get_random_connection())
@@ -1205,10 +1178,7 @@ class ClusterClientService(TimerService):
 
     def getAllClients(self):
         """Return a list of all connected :class:`common.Client`s."""
-        return [
-            common.Client(conn)
-            for conn in self.connections.get_all_connections()
-        ]
+        return [common.Client(conn) for conn in self.connections.get_all_connections()]
 
     def _tryUpdate(self):
         """Attempt to refresh outgoing connections.
@@ -1337,14 +1307,9 @@ class ClusterClientService(TimerService):
         """Update the saved RPC info state."""
         # Build a list of addresses based on the current connections.
         connected_addr = {
-            conn.address[0]
-            for _, conns in self.connections.items()
-            for conn in conns
+            conn.address[0] for _, conns in self.connections.items() for conn in conns
         }
-        if (
-            self._rpc_info_state is None
-            or self._rpc_info_state != connected_addr
-        ):
+        if self._rpc_info_state is None or self._rpc_info_state != connected_addr:
             path = self._get_saved_rpc_info_path()
             with open(path, "w") as stream:
                 for addr in sorted(list(connected_addr)):
@@ -1422,9 +1387,7 @@ class ClusterClientService(TimerService):
                     if eventloops is not None:
                         eventloops_count = len(eventloops)
                         if eventloops_count > 0:
-                            successful.append(
-                                (eventloops_count, eventloops, orig_url)
-                            )
+                            successful.append((eventloops_count, eventloops, orig_url))
                 else:
                     errors.append(result)
 
@@ -1432,9 +1395,7 @@ class ClusterClientService(TimerService):
             # ensures that the rack controller will connect to as many RPC
             # eventloops as possible.
             if len(successful) > 0:
-                successful = sorted(
-                    successful, key=itemgetter(0), reverse=True
-                )
+                successful = sorted(successful, key=itemgetter(0), reverse=True)
                 return (successful[0][1], successful[0][2])
 
             # No success so lets raise the first error.
@@ -1481,9 +1442,7 @@ class ClusterClientService(TimerService):
             if saved_urls:
                 urls = yield self._build_rpc_info_urls(saved_urls)
                 try:
-                    eventloops, maas_url = yield self._parallel_fetch_rpc_info(
-                        urls
-                    )
+                    eventloops, maas_url = yield self._parallel_fetch_rpc_info(urls)
                     if eventloops is None:
                         maas_url = None
                 except Exception:
@@ -1569,9 +1528,7 @@ class ClusterClientService(TimerService):
         # they'll work as dictionary keys.
         eventloops = {
             name: [
-                map_to_ipv6(address)
-                for address in addresses
-                if map_to_ipv6(address)
+                map_to_ipv6(address) for address in addresses if map_to_ipv6(address)
             ]
             for name, addresses in eventloops.items()
         }
@@ -1585,8 +1542,7 @@ class ClusterClientService(TimerService):
         if len(drop) == 0 and len(connect) == 0:
             if prev_work != (drop, connect) and len(eventloops) > 0:
                 controllers = {
-                    eventloop.split(":")[0]
-                    for eventloop, _ in eventloops.items()
+                    eventloop.split(":")[0] for eventloop, _ in eventloops.items()
                 }
                 log.msg(
                     "Fully connected to all %d event-loops on all %d "
@@ -1601,8 +1557,7 @@ class ClusterClientService(TimerService):
         # Drop all connections at once, as the are no longer required.
         if len(drop) > 0:
             log.msg(
-                "Dropping connections to event-loops: %s"
-                % (", ".join(drop.keys()))
+                "Dropping connections to event-loops: %s" % (", ".join(drop.keys()))
             )
             drop_defers = []
             for eventloop, connections in drop.items():
@@ -1619,8 +1574,7 @@ class ClusterClientService(TimerService):
         # Make all the new connections to each endpoint at the same time.
         if len(connect) > 0:
             log.msg(
-                "Making connections to event-loops: %s"
-                % (", ".join(connect.keys()))
+                "Making connections to event-loops: %s" % (", ".join(connect.keys()))
             )
             yield DeferredList(
                 [
@@ -1685,18 +1639,12 @@ class ClusterClientService(TimerService):
                 connection = yield self.connections.connect(eventloop, address)
             except ConnectError as error:
                 host, port = address
-                log.msg(
-                    "Event-loop %s (%s:%d): %s"
-                    % (eventloop, host, port, error)
-                )
+                log.msg("Event-loop %s (%s:%d): %s" % (eventloop, host, port, error))
             except Exception:
                 host, port = address
                 log.err(
                     None,
-                    (
-                        "Failure with event-loop %s (%s:%d)"
-                        % (eventloop, host, port)
-                    ),
+                    ("Failure with event-loop %s (%s:%d)" % (eventloop, host, port)),
                 )
             else:
                 self.connections.stage_connection(eventloop, connection)
@@ -1759,17 +1707,12 @@ class ClusterClientCheckerService(TimerService):
 
     def tryLoop(self):
         d = self.loop()
-        d.addErrback(
-            log.err, "Failure while performing ping on RPC connections."
-        )
+        d.addErrback(log.err, "Failure while performing ping on RPC connections.")
         return d
 
     def loop(self):
         return DeferredList(
-            [
-                self._ping(client)
-                for client in self.client_service.getAllClients()
-            ],
+            [self._ping(client) for client in self.client_service.getAllClients()],
             consumeErrors=True,
         )
 
@@ -1778,8 +1721,7 @@ class ClusterClientCheckerService(TimerService):
 
         def _onFailure(failure):
             log.msg(
-                "Failure on ping dropping connection to event-loop: %s"
-                % (client.ident)
+                "Failure on ping dropping connection to event-loop: %s" % (client.ident)
             )
             # The protocol will call `remove_connection on the
             # `ClusterClientService` that will perform the reconnection.

@@ -46,9 +46,7 @@ class TestNetworksAPI(APITestCase.ForUser):
         return interface
 
     def test_handler_path(self):
-        self.assertEqual(
-            "/MAAS/api/2.0/networks/", reverse("networks_handler")
-        )
+        self.assertEqual("/MAAS/api/2.0/networks/", reverse("networks_handler"))
 
     def test_POST_returns_410(self):
         self.become_admin()
@@ -59,9 +57,7 @@ class TestNetworksAPI(APITestCase.ForUser):
         subnet = factory.make_Subnet()
         subnet_cidr = subnet.get_ipnetwork()
         response = self.client.get(reverse("networks_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(1, len(parsed_result))
@@ -84,9 +80,7 @@ class TestNetworksAPI(APITestCase.ForUser):
 
     def test_GET_returns_empty_if_no_subnets(self):
         response = self.client.get(reverse("networks_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual([], json_load_bytes(response.content))
 
     def test_GET_sorts_by_name(self):
@@ -95,9 +89,7 @@ class TestNetworksAPI(APITestCase.ForUser):
             for _ in range(3)
         ]
         response = self.client.get(reverse("networks_handler"))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         self.assertEqual(
             sorted(convert_to_network_name(subnet) for subnet in subnets),
@@ -111,9 +103,7 @@ class TestNetworksAPI(APITestCase.ForUser):
         response = self.client.get(
             reverse("networks_handler"), {"node": [node.system_id]}
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         self.assertEqual(
             {convert_to_network_name(subnet) for subnet in subnets[1:3]},
@@ -133,9 +123,7 @@ class TestNetworksAPI(APITestCase.ForUser):
             reverse("networks_handler"),
             {"node": [node1.system_id, node2.system_id]},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
 
         self.assertEqual(
             {convert_to_network_name(subnets[2])},
@@ -161,9 +149,7 @@ class TestNetworksAPI(APITestCase.ForUser):
             reverse("networks_handler"),
             {"node": [node.system_id, node.system_id]},
         )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             {convert_to_network_name(subnet)},
             {network["name"] for network in json_load_bytes(response.content)},

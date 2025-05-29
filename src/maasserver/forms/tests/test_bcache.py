@@ -19,9 +19,7 @@ class TestCreateBcacheForm(MAASServerTestCase):
         form = CreateBcacheForm(node=node, data={})
 
         self.assertFalse(form.is_valid(), form.errors)
-        self.assertEqual(
-            form.errors["cache_mode"], ["This field is required."]
-        )
+        self.assertEqual(form.errors["cache_mode"], ["This field is required."])
 
     def test_choices_are_being_populated_correctly(self):
         node = factory.make_Node(with_boot_disk=False)
@@ -44,9 +42,9 @@ class TestCreateBcacheForm(MAASServerTestCase):
             partition.name for partition in partitions
         ]
         # Get the IDs of the non-partitioned devices.
-        block_devices = [
-            bd.id for bd in bds if bd.get_partitiontable() is None
-        ] + [bd.name for bd in bds if bd.get_partitiontable() is None]
+        block_devices = [bd.id for bd in bds if bd.get_partitiontable() is None] + [
+            bd.name for bd in bds if bd.get_partitiontable() is None
+        ]
         form = CreateBcacheForm(node=node, data={})
         self.assertCountEqual(
             cache_set_choices,
@@ -65,9 +63,7 @@ class TestCreateBcacheForm(MAASServerTestCase):
         node = factory.make_Node()
         backing_size = 10 * 1000**4
         cache_set = factory.make_CacheSet(node=node)
-        backing_device = factory.make_PhysicalBlockDevice(
-            node=node, size=backing_size
-        )
+        backing_device = factory.make_PhysicalBlockDevice(node=node, size=backing_size)
         uuid = str(uuid4())
         form = CreateBcacheForm(
             node=node,
@@ -96,9 +92,7 @@ class TestCreateBcacheForm(MAASServerTestCase):
         node = factory.make_Node()
         backing_size = 10 * 1000**4
         cache_set = factory.make_CacheSet(node=node)
-        backing_device = factory.make_PhysicalBlockDevice(
-            node=node, size=backing_size
-        )
+        backing_device = factory.make_PhysicalBlockDevice(node=node, size=backing_size)
         backing_partition_table = factory.make_PartitionTable(
             block_device=backing_device
         )
@@ -193,9 +187,7 @@ class TestCreateBcacheForm(MAASServerTestCase):
     def test_bcache_creation_without_cache_set_fails(self):
         node = factory.make_Node()
         backing_size = 10 * 1000**4
-        backing_device = factory.make_PhysicalBlockDevice(
-            node=node, size=backing_size
-        )
+        backing_device = factory.make_PhysicalBlockDevice(node=node, size=backing_size)
         form = CreateBcacheForm(
             node=node,
             data={
@@ -221,10 +213,7 @@ class TestCreateBcacheForm(MAASServerTestCase):
         self.assertFalse(form.is_valid(), form.errors)
         self.assertEqual(
             form.errors["__all__"],
-            [
-                "Either backing_device or backing_partition must be "
-                "specified."
-            ],
+            ["Either backing_device or backing_partition must be " "specified."],
         )
 
 
@@ -247,9 +236,7 @@ class TestUpdateBcacheForm(MAASServerTestCase):
             factory.make_PartitionTable(block_device=bd).add_partition()
             for bd in bds[5:]
         ]
-        partition_choices = [p.id for p in partitions] + [
-            p.name for p in partitions
-        ]
+        partition_choices = [p.id for p in partitions] + [p.name for p in partitions]
         # Get the chocies of the non-partitioned devices.
         block_device_choices = [
             bd.id for bd in bds if bd.get_partitiontable() is None
@@ -305,9 +292,7 @@ class TestUpdateBcacheForm(MAASServerTestCase):
             name=disk.name,
         )
 
-        form = UpdateBcacheForm(
-            bcache=bcache, data={"backing_device": disk.name}
-        )
+        form = UpdateBcacheForm(bcache=bcache, data={"backing_device": disk.name})
         self.assertTrue(form.is_valid(), form.errors)
         bcache = form.save()
         self.assertEqual(
@@ -332,9 +317,7 @@ class TestUpdateBcacheForm(MAASServerTestCase):
             cache_set=cache_set,
             filesystems=filesystems,
         )
-        form = UpdateBcacheForm(
-            bcache=bcache, data={"cache_mode": "Writeonly"}
-        )
+        form = UpdateBcacheForm(bcache=bcache, data={"cache_mode": "Writeonly"})
         self.assertFalse(form.is_valid(), form.errors)
         self.assertIn("Select a valid choice.", form.errors["cache_mode"][0])
         self.assertIn(
@@ -364,9 +347,7 @@ class TestUpdateBcacheForm(MAASServerTestCase):
             bcache=bcache, data={"backing_device": backing_device.id}
         )
         self.assertFalse(form.is_valid(), form.errors)
-        self.assertIn(
-            "Select a valid choice.", form.errors["backing_device"][0]
-        )
+        self.assertIn("Select a valid choice.", form.errors["backing_device"][0])
         self.assertIn(
             "is not one of the available choices.",
             form.errors["backing_device"][0],
@@ -389,9 +370,7 @@ class TestUpdateBcacheForm(MAASServerTestCase):
             cache_set=cache_set,
             filesystems=filesystems,
         )
-        form = UpdateBcacheForm(
-            bcache=bcache, data={"backing_device": boot_disk.id}
-        )
+        form = UpdateBcacheForm(bcache=bcache, data={"backing_device": boot_disk.id})
         self.assertTrue(form.is_valid(), form.errors)
         bcache = form.save()
         boot_partition = boot_disk.get_partitiontable().partitions.first()

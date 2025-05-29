@@ -118,9 +118,9 @@ class Script:
 
     def should_run(self):
         """Whether the script should be run."""
-        return self.info.get(
-            "default", False
-        ) and "deploy-info" in self.info.get("tags", [])
+        return self.info.get("default", False) and "deploy-info" in self.info.get(
+            "tags", []
+        )
 
     def run(self, console_output=False):
         exit_status = 0
@@ -204,9 +204,7 @@ def add_maas_admin_args(parser):
     parser.add_argument(
         "admin_token",
         type=oauth_token,
-        help="Admin user OAuth token, in the {form} form".format(
-            form=TOKEN_FORMAT
-        ),
+        help="Admin user OAuth token, in the {form} form".format(form=TOKEN_FORMAT),
     )
 
 
@@ -270,9 +268,7 @@ def parse_args(args):
     report_results.add_argument(
         "--machine-token",
         type=oauth_token,
-        help="Machine OAuth token, in the {form} form".format(
-            form=TOKEN_FORMAT
-        ),
+        help="Machine OAuth token, in the {form} form".format(form=TOKEN_FORMAT),
     )
     report_results.add_argument(
         "--metadata-url",
@@ -312,9 +308,7 @@ def get_config(ns):
 
 
 def fetch_scripts(maas_url, metadata_url, paths, credentials):
-    res = geturl(
-        metadata_url + "maas-scripts", credentials=credentials, retry=False
-    )
+    res = geturl(metadata_url + "maas-scripts", credentials=credentials, retry=False)
     if res.status == http.client.NO_CONTENT:
         raise ExitError("No script returned")
 
@@ -346,9 +340,7 @@ def get_machine_token(maas_url, admin_token, system_id):
         )
     creds = json.loads(response.read().decode("utf8"))
     if creds is None:
-        raise ExitError(
-            "Failed getting machine credentials: Credentials not found"
-        )
+        raise ExitError("Failed getting machine credentials: Credentials not found")
     creds["endpoint"] = maas_url + "/metadata/status/" + system_id
     return creds
 
@@ -386,9 +378,7 @@ def action_report_results(ns):
             )
         )
 
-        for script in fetch_scripts(
-            maas_url, metadata_url, paths, config.credentials
-        ):
+        for script in fetch_scripts(maas_url, metadata_url, paths, config.credentials):
             if not script.should_run():
                 continue
             print(

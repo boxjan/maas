@@ -64,9 +64,7 @@ class TestEventHandler(MAASServerTestCase):
         handler = EventHandler(user, {}, None)
         node = factory.make_Node()
         node.delete()
-        self.assertRaises(
-            HandlerDoesNotExistError, handler.list, {"node_id": node.id}
-        )
+        self.assertRaises(HandlerDoesNotExistError, handler.list, {"node_id": node.id})
 
     def test_list_places_node_id_in_cache(self):
         user = factory.make_User()
@@ -119,8 +117,7 @@ class TestEventHandler(MAASServerTestCase):
         node = factory.make_Node()
         maxdays = random.randint(3, 50)
         events = [
-            self.make_event_in_the_past(user, node, maxdays - 1)
-            for _ in range(3)
+            self.make_event_in_the_past(user, node, maxdays - 1) for _ in range(3)
         ]
         for _ in range(3):
             self.make_event_in_the_past(user, node, maxdays + 1)
@@ -134,9 +131,7 @@ class TestEventHandler(MAASServerTestCase):
         handler = EventHandler(user, {}, None)
         node = factory.make_Node()
         events = list(
-            reversed(
-                [factory.make_Event(user=user, node=node) for _ in range(6)]
-            )
+            reversed([factory.make_Event(user=user, node=node) for _ in range(6)])
         )
         expected_output = self.dehydrate_events(events[3:])
         self.assertCountEqual(
@@ -149,9 +144,7 @@ class TestEventHandler(MAASServerTestCase):
         handler = EventHandler(user, {}, None)
         node = factory.make_Node()
         events = list(
-            reversed(
-                [factory.make_Event(user=user, node=node) for _ in range(6)]
-            )
+            reversed([factory.make_Event(user=user, node=node) for _ in range(6)])
         )
         expected_output = self.dehydrate_events(events[:3])
         self.assertCountEqual(
@@ -163,16 +156,12 @@ class TestEventHandler(MAASServerTestCase):
         handler = EventHandler(user, {}, None)
         node = factory.make_Node()
         events = list(
-            reversed(
-                [factory.make_Event(user=user, node=node) for _ in range(9)]
-            )
+            reversed([factory.make_Event(user=user, node=node) for _ in range(9)])
         )
         expected_output = self.dehydrate_events(events[3:6])
         self.assertCountEqual(
             expected_output,
-            handler.list(
-                {"node_id": node.id, "start": events[2].id, "limit": 3}
-            ),
+            handler.list({"node_id": node.id, "start": events[2].id, "limit": 3}),
         )
 
     def test_clear_raises_error_if_missing_node_id(self):
@@ -185,9 +174,7 @@ class TestEventHandler(MAASServerTestCase):
         handler = EventHandler(user, {}, None)
         node = factory.make_Node()
         node.delete()
-        self.assertRaises(
-            HandlerDoesNotExistError, handler.clear, {"node_id": node.id}
-        )
+        self.assertRaises(HandlerDoesNotExistError, handler.clear, {"node_id": node.id})
 
     def test_clear_removes_node_id_from_cache(self):
         user = factory.make_User()
@@ -244,9 +231,7 @@ class TestEventHandler(MAASServerTestCase):
         handler = EventHandler(user, {}, None)
         node = factory.make_Node()
         event = factory.make_Event(node=node)
-        self.assertIsNone(
-            handler.on_listen(sentinel.channel, "create", event.id)
-        )
+        self.assertIsNone(handler.on_listen(sentinel.channel, "create", event.id))
 
     def test_on_listen_returns_handler_name_action_and_event(self):
         user = factory.make_User()

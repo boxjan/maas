@@ -128,9 +128,7 @@ def get_env_with_locale(environ=os.environ, locale="C.UTF-8"):
     :param locale: The locale to set in the environment, 'C.UTF-8' by default.
     """
     environ = {
-        name: value
-        for name, value in environ.items()
-        if not name.startswith("LC_")
+        name: value for name, value in environ.items() if not name.startswith("LC_")
     }
     environ.update({"LC_ALL": locale, "LANG": locale, "LANGUAGE": locale})
     return environ
@@ -151,9 +149,7 @@ def get_env_with_bytes_locale(environ=os.environb, locale=b"C.UTF-8"):
     :param locale: The locale to set in the environment, 'C.UTF-8' by default.
     """
     environ = {
-        name: value
-        for name, value in environ.items()
-        if not name.startswith(b"LC_")
+        name: value for name, value in environ.items() if not name.startswith(b"LC_")
     }
     environ.update({b"LC_ALL": locale, b"LANG": locale, b"LANGUAGE": locale})
     return environ

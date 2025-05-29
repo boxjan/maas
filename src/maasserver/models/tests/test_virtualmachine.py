@@ -103,9 +103,7 @@ class TestVirtualMachineInterface(MAASServerTestCase):
 
     def test_unique_with_host_interface(self):
         node = factory.make_Node()
-        other_node_config = factory.make_NodeConfig(
-            node=node, name="deployment"
-        )
+        other_node_config = factory.make_NodeConfig(node=node, name="deployment")
         iface1 = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL,
             name="eth0",
@@ -134,9 +132,7 @@ class TestVirtualMachineInterface(MAASServerTestCase):
 
     def test_objects_current_config(self):
         node = factory.make_Node()
-        other_node_config = factory.make_NodeConfig(
-            node=node, name="deployment"
-        )
+        other_node_config = factory.make_NodeConfig(node=node, name="deployment")
         iface1 = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL,
             name="eth0",
@@ -180,9 +176,7 @@ class TestVirtualMachineDisk(MAASServerTestCase):
 
     def test_unique_with_block_device(self):
         node = factory.make_Node()
-        other_node_config = factory.make_NodeConfig(
-            node=node, name="deployment"
-        )
+        other_node_config = factory.make_NodeConfig(node=node, name="deployment")
         disk1 = factory.make_PhysicalBlockDevice(
             name="sda",
             node_config=node.current_config,
@@ -343,9 +337,7 @@ class TestGetVMHostResources(MAASServerTestCase):
         self.assertEqual(resources.memory.general.overcommited, 20480 * MB)
         self.assertEqual(resources.memory.hugepages.free, 1024 * MB)
         self.assertEqual(resources.memory.hugepages.allocated, 1024 * MB)
-        self.assertEqual(
-            resources.memory.hugepages.allocated_tracked, 1024 * MB
-        )
+        self.assertEqual(resources.memory.hugepages.allocated_tracked, 1024 * MB)
         self.assertEqual(resources.memory.hugepages.allocated_other, 0)
         self.assertEqual(resources.storage.allocated_tracked, disk1.size)
         self.assertEqual(resources.storage.allocated_other, disk2.size)
@@ -457,9 +449,7 @@ class TestGetVMHostResources(MAASServerTestCase):
                 host_interface=if0,
                 attachment_type=InterfaceAttachType.SRIOV,
             )
-        vm1 = factory.make_VirtualMachine(
-            bmc=pod, project=factory.make_string()
-        )
+        vm1 = factory.make_VirtualMachine(bmc=pod, project=factory.make_string())
         for _ in range(2):
             VirtualMachineInterface.objects.create(
                 vm=vm1,
@@ -637,9 +627,7 @@ class TestGetVMHostResources(MAASServerTestCase):
         numa_node0.cores = [0, 1]
         numa_node0.memory = 4096
         numa_node0.save()
-        numa_node1 = factory.make_NUMANode(
-            node=node, cores=[2, 3], memory=8192
-        )
+        numa_node1 = factory.make_NUMANode(node=node, cores=[2, 3], memory=8192)
         factory.make_NUMANodeHugepages(
             numa_node=numa_node0, page_size=1024 * MB, total=1024 * MB
         )
@@ -747,9 +735,7 @@ class TestGetVMHostResources(MAASServerTestCase):
         numa_node0.cores = [0, 1]
         numa_node0.memory = 4096
         numa_node0.save()
-        numa_node1 = factory.make_NUMANode(
-            node=node, cores=[2, 3], memory=4096
-        )
+        numa_node1 = factory.make_NUMANode(node=node, cores=[2, 3], memory=4096)
         factory.make_NUMANodeHugepages(
             numa_node=numa_node0, page_size=1024 * MB, total=1024 * MB
         )
@@ -809,9 +795,7 @@ class TestGetVMHostResources(MAASServerTestCase):
         numa_node0.cores = [0, 1]
         numa_node0.memory = 4096
         numa_node0.save()
-        numa_node1 = factory.make_NUMANode(
-            node=node, cores=[2, 3], memory=8192
-        )
+        numa_node1 = factory.make_NUMANode(node=node, cores=[2, 3], memory=8192)
         factory.make_NUMANodeHugepages(
             numa_node=numa_node0, page_size=2048 * MB, total=4096 * MB
         )
@@ -874,9 +858,7 @@ class TestGetVMHostResources(MAASServerTestCase):
         pool = factory.make_PodStoragePool(pod=vmhost)
 
         node = factory.make_Node()
-        other_node_config = factory.make_NodeConfig(
-            node=node, name="deployment"
-        )
+        other_node_config = factory.make_NodeConfig(node=node, name="deployment")
         disk = factory.make_PhysicalBlockDevice(node=node)
         disk_other_config = factory.make_PhysicalBlockDevice(
             node_config=other_node_config
@@ -902,9 +884,7 @@ class TestGetVMHostResources(MAASServerTestCase):
 
     def test_get_resources_only_current_interfaces(self):
         node = factory.make_Node()
-        other_node_config = factory.make_NodeConfig(
-            node=node, name="deployment"
-        )
+        other_node_config = factory.make_NodeConfig(node=node, name="deployment")
         iface = factory.make_Interface(
             INTERFACE_TYPE.PHYSICAL,
             name="eth0",
@@ -1060,9 +1040,7 @@ class TestGetVMHostUsedResources(MAASServerTestCase):
         pool = factory.make_PodStoragePool(pod=vmhost)
 
         node = factory.make_Node()
-        other_node_config = factory.make_NodeConfig(
-            node=node, name="deployment"
-        )
+        other_node_config = factory.make_NodeConfig(node=node, name="deployment")
         disk = factory.make_PhysicalBlockDevice(node=node)
         disk_other_config = factory.make_PhysicalBlockDevice(
             node_config=other_node_config

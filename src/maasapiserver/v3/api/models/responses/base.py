@@ -32,9 +32,7 @@ class HalResponse(GenericModel, Generic[HAL]):
     """
 
     hal_links: Optional[HAL] = Field(default=None, alias="_links")
-    hal_embedded: Optional[Dict[str, Any]] = Field(
-        default=None, alias="_embedded"
-    )
+    hal_embedded: Optional[Dict[str, Any]] = Field(default=None, alias="_embedded")
 
     class Config:
         allow_population_by_field_name = True

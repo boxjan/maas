@@ -25,9 +25,7 @@ class TestVirtualMachineAPI(APITestCase.ForUser):
             memory=1024, unpinned_cores=4, hugepages_backed=True
         )
         response = self.client.get(get_vm_uri(vm.id))
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             json_load_bytes(response.content),
             {
@@ -69,9 +67,7 @@ class TestVirtualMachinesAPI(APITestCase.ForUser):
             hugepages_backed=False,
         )
         response = self.client.get("/MAAS/api/2.0/virtual-machines/")
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         self.assertEqual(
             json_load_bytes(response.content),
             [

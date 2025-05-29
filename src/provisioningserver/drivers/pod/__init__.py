@@ -99,8 +99,7 @@ def converter_list(expected):
                         new_list.append(expected(**item))
                     else:
                         raise TypeError(
-                            "Item %r is not of type %s or dict"
-                            % (item, expected)
+                            "Item %r is not of type %s or dict" % (item, expected)
                         )
                 return new_list
         else:
@@ -170,12 +169,8 @@ class DiscoveredMachineInterface:
     vid = attr.ib(converter=int, default=-1)
     tags = attr.ib(converter=converter_list(str), default=attr.Factory(list))
     boot = attr.ib(converter=bool, default=False)
-    attach_type = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
-    attach_name = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
+    attach_type = attr.ib(converter=converter_obj(str, optional=True), default=None)
+    attach_name = attr.ib(converter=converter_obj(str, optional=True), default=None)
 
 
 @attr.s
@@ -187,15 +182,11 @@ class DiscoveredMachineBlockDevice:
     size = attr.ib(converter=int)
     block_size = attr.ib(converter=int, default=512)
     tags = attr.ib(converter=converter_list(str), default=attr.Factory(list))
-    id_path = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
+    id_path = attr.ib(converter=converter_obj(str, optional=True), default=None)
 
     # Optional id of the storage pool this block device exists on. Only
     # used when the Pod supports STORAGE_POOLS.
-    storage_pool = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
+    storage_pool = attr.ib(converter=converter_obj(str, optional=True), default=None)
 
 
 @attr.s
@@ -207,25 +198,19 @@ class DiscoveredMachine:
     cpu_speed = attr.ib(converter=int)
     memory = attr.ib(converter=int)
     interfaces = attr.ib(converter=converter_list(DiscoveredMachineInterface))
-    block_devices = attr.ib(
-        converter=converter_list(DiscoveredMachineBlockDevice)
-    )
+    block_devices = attr.ib(converter=converter_list(DiscoveredMachineBlockDevice))
     power_state = attr.ib(converter=str, default="unknown")
     power_parameters = attr.ib(
         converter=converter_obj(dict), default=attr.Factory(dict)
     )
     tags = attr.ib(converter=converter_list(str), default=attr.Factory(list))
     hostname = attr.ib(converter=str, default=None)
-    pinned_cores = attr.ib(
-        converter=converter_list(int), default=attr.Factory(list)
-    )
+    pinned_cores = attr.ib(converter=converter_list(int), default=attr.Factory(list))
     hugepages_backed = attr.ib(converter=bool, default=False)
     bios_boot_method = attr.ib(
         converter=converter_obj(str, optional=True), default=None
     )
-    location = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
+    location = attr.ib(converter=converter_obj(str, optional=True), default=None)
 
     @property
     def instance_name(self):
@@ -271,9 +256,7 @@ class DiscoveredPodHints:
 class DiscoveredPod:
     """Discovered pod information."""
 
-    architectures = attr.ib(
-        converter=converter_list(str), default=attr.Factory(list)
-    )
+    architectures = attr.ib(converter=converter_list(str), default=attr.Factory(list))
     name = attr.ib(converter=converter_obj(str, optional=True), default=None)
     version = attr.ib(converter=converter_obj(str, optional=True), default="")
     cores = attr.ib(converter=int, default=-1)
@@ -285,9 +268,7 @@ class DiscoveredPod:
         default=DiscoveredPodHints(),
     )
     # XXX - This should be the hardware UUID but LXD doesn't provide it.
-    mac_addresses = attr.ib(
-        converter=converter_list(str), default=attr.Factory(list)
-    )
+    mac_addresses = attr.ib(converter=converter_list(str), default=attr.Factory(list))
     capabilities = attr.ib(
         converter=converter_list(str),
         default=attr.Factory(list),
@@ -309,12 +290,8 @@ class DiscoveredCluster:
 
     name = attr.ib(converter=converter_obj(str, optional=True), default=None)
     project = attr.ib(converter=str, default="")
-    pods = attr.ib(
-        converter=converter_list(DiscoveredPod), default=attr.Factory(list)
-    )
-    pod_addresses = attr.ib(
-        converter=converter_list(str), default=attr.Factory(list)
-    )
+    pods = attr.ib(converter=converter_list(DiscoveredPod), default=attr.Factory(list))
+    pod_addresses = attr.ib(converter=converter_list(str), default=attr.Factory(list))
 
 
 @attr.s
@@ -330,24 +307,12 @@ class RequestedMachineInterface:
     """Requested machine interface information."""
 
     ifname = attr.ib(converter=converter_obj(str, optional=True), default=None)
-    attach_name = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
-    attach_type = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
-    attach_options = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
-    attach_vlan = attr.ib(
-        converter=converter_obj(int, optional=True), default=None
-    )
-    requested_ips = attr.ib(
-        converter=converter_list(str), default=attr.Factory(list)
-    )
-    ip_mode = attr.ib(
-        converter=converter_obj(str, optional=True), default=None
-    )
+    attach_name = attr.ib(converter=converter_obj(str, optional=True), default=None)
+    attach_type = attr.ib(converter=converter_obj(str, optional=True), default=None)
+    attach_options = attr.ib(converter=converter_obj(str, optional=True), default=None)
+    attach_vlan = attr.ib(converter=converter_obj(int, optional=True), default=None)
+    requested_ips = attr.ib(converter=converter_list(str), default=attr.Factory(list))
+    ip_mode = attr.ib(converter=converter_obj(str, optional=True), default=None)
 
 
 @attr.s
@@ -357,9 +322,7 @@ class KnownHostInterface:
     ifname = attr.ib(converter=str, default=None)
     attach_type = attr.ib(converter=str, default=None)
     attach_name = attr.ib(converter=str, default=None)
-    attach_vlan = attr.ib(
-        converter=converter_obj(int, optional=True), default=None
-    )
+    attach_vlan = attr.ib(converter=converter_obj(int, optional=True), default=None)
     dhcp_enabled = attr.ib(converter=bool, default=False)
 
 
@@ -371,15 +334,11 @@ class RequestedMachine:
     architecture = attr.ib(converter=str)
     cores = attr.ib(converter=int)
     memory = attr.ib(converter=int)
-    block_devices = attr.ib(
-        converter=converter_list(RequestedMachineBlockDevice)
-    )
+    block_devices = attr.ib(converter=converter_list(RequestedMachineBlockDevice))
     interfaces = attr.ib(converter=converter_list(RequestedMachineInterface))
 
     # Optional fields.
-    cpu_speed = attr.ib(
-        converter=converter_obj(int, optional=True), default=None
-    )
+    cpu_speed = attr.ib(converter=converter_obj(int, optional=True), default=None)
     known_host_interfaces = attr.ib(
         converter=converter_list(KnownHostInterface),
         default=attr.Factory(list),
@@ -438,9 +397,7 @@ class PodDriverBase(PowerDriverBase):
 
         Calculates the missing packages on each invoke.
         """
-        schema = super().get_schema(
-            detect_missing_packages=detect_missing_packages
-        )
+        schema = super().get_schema(detect_missing_packages=detect_missing_packages)
         schema["driver_type"] = "pod"
         return schema
 

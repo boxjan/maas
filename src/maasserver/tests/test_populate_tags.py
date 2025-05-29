@@ -86,16 +86,12 @@ def make_lldp_result(node, stdout=None, exit_status=0):
 
 class TestDoPopulateTags(MAASServerTestCase):
     def patch_clients(self, rack_controllers):
-        clients = [
-            create_autospec(Client, instance=True) for _ in rack_controllers
-        ]
+        clients = [create_autospec(Client, instance=True) for _ in rack_controllers]
         for rack, client in zip(rack_controllers, clients):
             client.side_effect = always_succeed_with(None)
             client.ident = rack.system_id
 
-        _get_clients = self.patch_autospec(
-            populate_tags_module, "getAllClients"
-        )
+        _get_clients = self.patch_autospec(populate_tags_module, "getAllClients")
         _get_clients.return_value = clients
 
         return clients
@@ -116,9 +112,7 @@ class TestDoPopulateTags(MAASServerTestCase):
         for rack, client in zip(rack_controllers, clients):
             creds = factory.make_name("creds")
             rack_creds.append(creds)
-            nodes = [
-                {"system_id": factory.make_Node().system_id} for _ in range(3)
-            ]
+            nodes = [{"system_id": factory.make_Node().system_id} for _ in range(3)]
             rack_nodes.append(nodes)
             work.append(
                 {
@@ -175,8 +169,7 @@ class TestDoPopulateTags(MAASServerTestCase):
                     "tag_nsmap": tag_nsmap,
                     "credentials": factory.make_name("creds"),
                     "nodes": [
-                        {"system_id": factory.make_Node().system_id}
-                        for _ in range(3)
+                        {"system_id": factory.make_Node().system_id} for _ in range(3)
                     ],
                 }
             )
@@ -213,8 +206,7 @@ class TestDoPopulateTags(MAASServerTestCase):
                     "tag_nsmap": tag_nsmap,
                     "credentials": factory.make_name("creds"),
                     "nodes": [
-                        {"system_id": factory.make_Node().system_id}
-                        for _ in range(3)
+                        {"system_id": factory.make_Node().system_id} for _ in range(3)
                     ],
                 }
             )
@@ -278,9 +270,7 @@ class TestPopulateTagsEndToNearlyEnd(MAASTransactionServerTestCase):
         wait_for_populate = asynchronous(lambda: d)
         wait_for_populate().wait(get_testing_timeout())
 
-        for rack, protocol, creds in zip(
-            rack_controllers, protocols, rack_creds
-        ):
+        for rack, protocol, creds in zip(rack_controllers, protocols, rack_creds):
             protocol.EvaluateTag.assert_called_once_with(
                 protocol,
                 tag_name=tag.name,
@@ -351,9 +341,7 @@ class TestPopulateTagsForSingleNode(MAASServerTestCase):
             factory.make_Tag("baz", "/foo/bar", populate=False),
         ]
         populate_tags_for_single_node(tags, node)
-        self.assertCountEqual(
-            ["foo", "bar"], [tag.name for tag in node.tags.all()]
-        )
+        self.assertCountEqual(["foo", "bar"], [tag.name for tag in node.tags.all()])
 
     def test_ignores_tags_with_unrecognised_namespaces(self):
         node = factory.make_Node()
@@ -363,9 +351,7 @@ class TestPopulateTagsForSingleNode(MAASServerTestCase):
             factory.make_Tag("lou", "//nge:bar", populate=False),
         ]
         populate_tags_for_single_node(tags, node)  # Look mom, no exception!
-        self.assertSequenceEqual(
-            ["foo"], [tag.name for tag in node.tags.all()]
-        )
+        self.assertSequenceEqual(["foo"], [tag.name for tag in node.tags.all()])
 
     def test_ignores_tags_without_definition(self):
         node = factory.make_Node()
@@ -375,9 +361,7 @@ class TestPopulateTagsForSingleNode(MAASServerTestCase):
             Tag(name="empty", definition=""),
         ]
         populate_tags_for_single_node(tags, node)  # Look mom, no exception!
-        self.assertSequenceEqual(
-            ["foo"], [tag.name for tag in node.tags.all()]
-        )
+        self.assertSequenceEqual(["foo"], [tag.name for tag in node.tags.all()])
 
 
 class TestPopulateTagForMultipleNodes(MAASServerTestCase):

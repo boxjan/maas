@@ -202,9 +202,7 @@ class TestParseISCString(MAASTestCase):
                 [
                     (
                         "acl canonical-int-ns",
-                        OrderedDict(
-                            [("91.189.90.151", True), ("91.189.89.192", True)]
-                        ),
+                        OrderedDict([("91.189.90.151", True), ("91.189.89.192", True)]),
                     ),
                     (
                         "options",
@@ -302,9 +300,7 @@ class TestParseISCString(MAASTestCase):
         )
 
     def test_parse_unmatched_brackets_throws_iscparseexception(self):
-        with self.assertRaisesRegex(
-            ISCParseException, r"^Invalid brackets\.$"
-        ):
+        with self.assertRaisesRegex(ISCParseException, r"^Invalid brackets\.$"):
             parse_isc_string("forwarders {")
 
     def test_parse_malformed_list_throws_iscparseexception(self):

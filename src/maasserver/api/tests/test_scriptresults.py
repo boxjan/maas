@@ -72,8 +72,7 @@ class TestNodeScriptResultsAPI(APITestCase.ForUser):
         node = factory.make_Node()
         result_type = factory.pick_choice(RESULT_TYPE_CHOICES)
         script_sets = [
-            factory.make_ScriptSet(result_type=result_type, node=node)
-            for _ in range(3)
+            factory.make_ScriptSet(result_type=result_type, node=node) for _ in range(3)
         ]
 
         for _ in range(10):
@@ -98,9 +97,7 @@ class TestNodeScriptResultsAPI(APITestCase.ForUser):
     def test_GET_filters_by_hardware_type(self):
         hardware_type = factory.pick_choice(HARDWARE_TYPE_CHOICES)
         script_set = factory.make_ScriptSet()
-        scripts = [
-            factory.make_Script(hardware_type=hardware_type) for _ in range(3)
-        ]
+        scripts = [factory.make_Script(hardware_type=hardware_type) for _ in range(3)]
         for script in scripts:
             factory.make_ScriptResult(script_set=script_set, script=script)
 
@@ -177,11 +174,7 @@ class TestNodeScriptResultsAPI(APITestCase.ForUser):
                     [
                         name_filter_script.name,
                         random.choice(
-                            [
-                                tag
-                                for tag in tag_filter_script.tags
-                                if "tag" in tag
-                            ]
+                            [tag for tag in tag_filter_script.tags if "tag" in tag]
                         ),
                     ]
                 )
@@ -314,9 +307,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
             )
 
     def test_GET_redacts_password_parameter(self):
-        string_script = factory.make_Script(
-            parameters={"string": {"type": "string"}}
-        )
+        string_script = factory.make_Script(parameters={"string": {"type": "string"}})
         password_script = factory.make_Script(
             parameters={"password": {"type": "password"}}
         )
@@ -346,9 +337,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
                 )
                 self.assertEqual(
                     string,
-                    reload_object(string_script_result).parameters["string"][
-                        "value"
-                    ],
+                    reload_object(string_script_result).parameters["string"]["value"],
                 )
             else:
                 self.assertEqual(
@@ -357,9 +346,9 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
                 )
                 self.assertEqual(
                     password,
-                    reload_object(password_script_result).parameters[
-                        "password"
-                    ]["value"],
+                    reload_object(password_script_result).parameters["password"][
+                        "value"
+                    ],
                 )
 
     def test_GET_include_output(self):
@@ -441,11 +430,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
                 % (
                     filtered_results[0].name,
                     random.choice(
-                        [
-                            tag
-                            for tag in filtered_results[1].script.tags
-                            if "tag" in tag
-                        ]
+                        [tag for tag in filtered_results[1].script.tags if "tag" in tag]
                     ),
                     filtered_results[2].id,
                 )
@@ -504,9 +489,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
     def test_GET_filters_by_hardware_type(self):
         script_set = self.make_scriptset()
         hardware_type = factory.pick_choice(HARDWARE_TYPE_CHOICES)
-        scripts = [
-            factory.make_Script(hardware_type=hardware_type) for _ in range(3)
-        ]
+        scripts = [factory.make_Script(hardware_type=hardware_type) for _ in range(3)]
         for script in scripts:
             factory.make_ScriptResult(script_set=script_set, script=script)
         for _ in range(3):
@@ -633,11 +616,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
                 % (
                     filtered_results[0].name,
                     random.choice(
-                        [
-                            tag
-                            for tag in filtered_results[1].script.tags
-                            if "tag" in tag
-                        ]
+                        [tag for tag in filtered_results[1].script.tags if "tag" in tag]
                     ),
                     filtered_results[2].id,
                 )
@@ -702,9 +681,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
         node = factory.make_Node()
         hardware_type = factory.pick_choice(HARDWARE_TYPE_CHOICES)
         script_set = self.make_scriptset(node=node)
-        scripts = [
-            factory.make_Script(hardware_type=hardware_type) for _ in range(3)
-        ]
+        scripts = [factory.make_Script(hardware_type=hardware_type) for _ in range(3)]
         for script in scripts:
             factory.make_ScriptResult(script_set=script_set, script=script)
         response = self.client.put(
@@ -743,9 +720,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
         script_result = factory.make_ScriptResult(script_set, script=script)
 
         # Make some additional scripts and script results
-        scripts = [
-            factory.make_Script(hardware_type=hardware_type) for _ in range(3)
-        ]
+        scripts = [factory.make_Script(hardware_type=hardware_type) for _ in range(3)]
         script_results = []
         for script in scripts:
             script_results.append(
@@ -775,9 +750,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
         script_result = factory.make_ScriptResult(script_set, script=script)
 
         # Make some additional scripts and script results
-        scripts = [
-            factory.make_Script(hardware_type=hardware_type) for _ in range(3)
-        ]
+        scripts = [factory.make_Script(hardware_type=hardware_type) for _ in range(3)]
         script_results = []
         for script in scripts:
             script_results.append(
@@ -852,9 +825,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
             list(script_results), key=lambda script_result: script_result.name
         ):
             dashes = "-" * int((80.0 - (2 + len(script_result.name))) / 2)
-            binary.write(
-                (f"{dashes} {script_result.name} {dashes}\n").encode()
-            )
+            binary.write((f"{dashes} {script_result.name} {dashes}\n").encode())
             binary.write(script_result.output)
             binary.write(b"\n")
         self.assertEqual(binary.getvalue(), response.content)
@@ -907,9 +878,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
                     member.mtime,
                 )
                 self.assertEqual(0o644, member.mode)
-                self.assertEqual(
-                    script_result.output, tar.extractfile(path).read()
-                )
+                self.assertEqual(script_result.output, tar.extractfile(path).read())
 
     def test_download_filetype_unknown(self):
         script_set = self.make_scriptset()
@@ -1022,11 +991,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
                 % (
                     filtered_results[0].name,
                     random.choice(
-                        [
-                            tag
-                            for tag in filtered_results[1].script.tags
-                            if "tag" in tag
-                        ]
+                        [tag for tag in filtered_results[1].script.tags if "tag" in tag]
                     ),
                     filtered_results[2].id,
                 ),
@@ -1049,9 +1014,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
                     member.mtime,
                 )
                 self.assertEqual(0o644, member.mode)
-                self.assertEqual(
-                    script_result.output, tar.extractfile(path).read()
-                )
+                self.assertEqual(script_result.output, tar.extractfile(path).read())
 
     def test_download_filters_by_hardware_type(self):
         hardware_type = factory.pick_choice(HARDWARE_TYPE_CHOICES)
@@ -1062,9 +1025,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
             )
         )
         script_set = self.make_scriptset()
-        script_result = factory.make_ScriptResult(
-            script_set=script_set, script=script
-        )
+        script_result = factory.make_ScriptResult(script_set=script_set, script=script)
         factory.make_ScriptResult(script_set=script_set, script=other_script)
 
         response = self.client.get(
@@ -1104,9 +1065,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
                 % (script_result.name, script_result.physical_blockdevice.name)
                 for script_result in sorted(
                     script_results,
-                    key=lambda script_result: (
-                        script_result.physical_blockdevice.name
-                    ),
+                    key=lambda script_result: (script_result.physical_blockdevice.name),
                 )
             ],
         )
@@ -1160,9 +1119,7 @@ class TestNodeScriptResultAPI(APITestCase.ForUser):
         self.assertEqual(response.status_code, http.client.OK)
         binary = BytesIO()
         dashes = "-" * int((80.0 - (2 + len(curtin_error_tarfile.name))) / 2)
-        binary.write(
-            f"{dashes} {curtin_error_tarfile.name} {dashes}\n".encode()
-        )
+        binary.write(f"{dashes} {curtin_error_tarfile.name} {dashes}\n".encode())
         binary.write(b"Binary file\n")
         dashes = "-" * int((80.0 - (2 + len(other_result.name))) / 2)
         binary.write(f"{dashes} {other_result.name} {dashes}\n".encode())

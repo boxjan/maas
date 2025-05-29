@@ -152,9 +152,7 @@ class SignalsManager:
             deleted too. By default this is false.
         :type delete: bool
         """
-        return self.add(
-            Signal(*connect_to_field_change(cb, model, fields, delete))
-        )
+        return self.add(Signal(*connect_to_field_change(cb, model, fields, delete)))
 
     def watch_config(self, cb, name):
         """Watch a configuration item for changes.

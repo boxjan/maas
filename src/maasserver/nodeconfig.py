@@ -43,8 +43,7 @@ def duplicate_nodeconfig(src_config: NodeConfig, dest_type: str) -> NodeConfig:
             updated=now,
         )
         for parent_id, child_id in InterfaceRelationship.objects.filter(
-            Q(parent_id__in=orig_interface_ids)
-            | Q(child_id__in=orig_interface_ids)
+            Q(parent_id__in=orig_interface_ids) | Q(child_id__in=orig_interface_ids)
         ).values_list("parent_id", "child_id")
     )
 
@@ -52,9 +51,7 @@ def duplicate_nodeconfig(src_config: NodeConfig, dest_type: str) -> NodeConfig:
         viface.host_interface_id = interface_map.get(viface.host_interface_id)
 
     _duplicate_entry_set(
-        VirtualMachineInterface.objects.filter(
-            host_interface_id__in=interface_map
-        ),
+        VirtualMachineInterface.objects.filter(host_interface_id__in=interface_map),
         process_virtualmachineinterface,
     )
 
@@ -81,9 +78,7 @@ def duplicate_nodeconfig(src_config: NodeConfig, dest_type: str) -> NodeConfig:
         fsgroup.cache_set_id = cacheset_map.get(fsgroup.cache_set_id)
 
     filesystemgroup_map = _duplicate_entry_set(
-        FilesystemGroup.objects.filter(
-            virtual_devices__node_config=src_config
-        ),
+        FilesystemGroup.objects.filter(virtual_devices__node_config=src_config),
         process_filesystemgroup,
     )
 
@@ -116,9 +111,7 @@ def duplicate_nodeconfig(src_config: NodeConfig, dest_type: str) -> NodeConfig:
 
     def process_filesystem(fs):
         fs.node_config = dest_node_config
-        fs.filesystem_group_id = filesystemgroup_map.get(
-            fs.filesystem_group_id
-        )
+        fs.filesystem_group_id = filesystemgroup_map.get(fs.filesystem_group_id)
         fs.cache_set_id = cacheset_map.get(fs.cache_set_id)
         fs.partition_id = partition_map.get(fs.partition_id)
         fs.block_device_id = blockdevice_map.get(fs.block_device_id)
@@ -133,9 +126,7 @@ def duplicate_nodeconfig(src_config: NodeConfig, dest_type: str) -> NodeConfig:
         device.physical_blockdevice_id = blockdevice_map.get(
             device.physical_blockdevice_id
         )
-        device.physical_interface_id = interface_map.get(
-            device.physical_interface_id
-        )
+        device.physical_interface_id = interface_map.get(device.physical_interface_id)
 
     _duplicate_entry_set(
         src_config.nodedevice_set.all(),

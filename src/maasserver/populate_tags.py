@@ -48,9 +48,7 @@ log = LegacyLogger()
 
 # The nsmap that XPath expression must be compiled with. This will
 # ensure that expressions like //lshw:something will work correctly.
-tag_nsmap = {
-    namespace: namespace for namespace in script_output_nsmap.values()
-}
+tag_nsmap = {namespace: namespace for namespace in script_output_nsmap.values()}
 
 
 def chunk_list(items, num_chunks):
@@ -230,8 +228,7 @@ def populate_tag_for_multiple_nodes(tag, nodes, batch_size=DEFAULT_BATCH_SIZE):
     for batch in gen_batches(nodes, batch_size):
         probed_details = get_probed_details(batch)
         probed_details_docs_by_node = {
-            node: merge_details(probed_details[node.system_id])
-            for node in batch
+            node: merge_details(probed_details[node.system_id]) for node in batch
         }
         nodes_matching, nodes_nonmatching = classify(
             partial(try_match_xpath, xpath, logger=maaslog),

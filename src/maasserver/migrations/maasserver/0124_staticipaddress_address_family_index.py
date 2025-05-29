@@ -2,9 +2,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0123_make_iprange_comment_default_to_empty_string")
-    ]
+    dependencies = [("maasserver", "0123_make_iprange_comment_default_to_empty_string")]
 
     operations = [
         migrations.RunSQL(

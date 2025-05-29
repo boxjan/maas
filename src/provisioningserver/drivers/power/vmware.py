@@ -61,9 +61,7 @@ class VMwarePowerDriver(PowerDriver):
             required=True,
             secret=True,
         ),
-        make_setting_field(
-            "power_port", "VMware API port (optional)", required=False
-        ),
+        make_setting_field("power_port", "VMware API port (optional)", required=False),
         make_setting_field(
             "power_protocol", "VMware API protocol (optional)", required=False
         ),

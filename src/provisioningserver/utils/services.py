@@ -382,9 +382,7 @@ def set_ipv6_multicast_source_ifindex(sock, ifindex):
     """
     sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_HOPS, 1)
     packed_ifindex = struct.pack("I", ifindex)
-    sock.setsockopt(
-        socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_IF, packed_ifindex
-    )
+    sock.setsockopt(socket.IPPROTO_IPV6, socket.IPV6_MULTICAST_IF, packed_ifindex)
 
 
 def join_ipv6_beacon_group(sock, ifindex):
@@ -481,9 +479,7 @@ class BeaconingSocketProtocol(DatagramProtocol):
             # This is only necessary for testing.
             self.transport.setLoopbackMode(self.loopback)
             set_ipv6_multicast_loopback(sock, self.loopback)
-            self.transport.joinGroup(
-                BEACON_IPV4_MULTICAST, interface="127.0.0.1"
-            )
+            self.transport.joinGroup(BEACON_IPV4_MULTICAST, interface="127.0.0.1")
             # Loopback interface always has index 1.
             join_ipv6_beacon_group(sock, 1)
         for ifname, ifdata in self.interfaces.items():
@@ -542,8 +538,7 @@ class BeaconingSocketProtocol(DatagramProtocol):
         except OSError as e:
             if self.debug:
                 log.msg(
-                    "Error while sending beacon to %r: %s"
-                    % (destination_address, e)
+                    "Error while sending beacon to %r: %s" % (destination_address, e)
                 )
         return False
 
@@ -645,9 +640,7 @@ class BeaconingSocketProtocol(DatagramProtocol):
         See `queueMulticastAdvertisement`, which schedules this method to run.
         """
         mtime = time.monotonic()
-        beacon_type = (
-            "solicitation" if self.mcast_solicitation else "advertisement"
-        )
+        beacon_type = "solicitation" if self.mcast_solicitation else "advertisement"
         if self.debug:
             log.msg("Sending multicast beacon %ss." % beacon_type)
         self.send_multicast_beacons(self.interfaces, beacon_type)
@@ -1141,11 +1134,7 @@ class NetworksMonitoringService(SingleInstanceService):
         # serialize hints and remove empty values to make the payload
         # smaller
         return [
-            {
-                key: value
-                for key, value in hint._asdict().items()
-                if value is not None
-            }
+            {key: value for key, value in hint._asdict().items() if value is not None}
             for hint in self.beaconing_protocol.getAllTopologyHints()
         ]
 
@@ -1160,9 +1149,7 @@ class NetworksMonitoringService(SingleInstanceService):
                 yield pause(3.0)
                 # Retry beacon soliciations, in case any packet loss occurred
                 # the first time.
-                self.beaconing_protocol.queueMulticastBeaconing(
-                    solicitation=True
-                )
+                self.beaconing_protocol.queueMulticastBeaconing(solicitation=True)
                 yield pause(3.0)
                 hints = self._get_topology_hints()
 
@@ -1189,17 +1176,13 @@ class NetworksMonitoringService(SingleInstanceService):
             # solicitations so that replies will be received, that way peers
             # will reply and the hinting will be accurate.)
             if self.enable_beaconing:
-                self.beaconing_protocol.queueMulticastBeaconing(
-                    solicitation=True
-                )
+                self.beaconing_protocol.queueMulticastBeaconing(solicitation=True)
             # If the interfaces didn't change, we still need to poll for
             # monitoring state changes.
             yield maybeDeferred(self._configureNetworkDiscovery, interfaces)
 
     @inlineCallbacks
-    def _run_refresh(
-        self, maas_url, system_id, credentials, interfaces, hints
-    ):
+    def _run_refresh(self, maas_url, system_id, credentials, interfaces, hints):
         yield deferToThread(
             refresh,
             system_id,
@@ -1228,9 +1211,7 @@ class NetworksMonitoringService(SingleInstanceService):
             lxd_data = json.load(fp)
         lxd_data["network-extra"] = {
             "interfaces": interfaces,
-            "monitored-interfaces": get_default_monitored_interfaces(
-                interfaces
-            ),
+            "monitored-interfaces": get_default_monitored_interfaces(interfaces),
             "hints": hints,
         }
         with script_stdout.open("w") as fp:
@@ -1249,9 +1230,7 @@ class NetworksMonitoringService(SingleInstanceService):
         if is_dev_environment() or not self._locked or interfaces is None:
             return set()
         monitored_interfaces = {
-            ifname
-            for ifname, ifdata in interfaces.items()
-            if ifdata["monitored"]
+            ifname for ifname, ifdata in interfaces.items() if ifdata["monitored"]
         }
         return monitored_interfaces
 
@@ -1335,9 +1314,7 @@ class NetworksMonitoringService(SingleInstanceService):
                 pass
             else:
                 service.disownServiceParent()
-                maaslog.info(
-                    "Stopped neighbour observation service for %s." % ifname
-                )
+                maaslog.info("Stopped neighbour observation service for %s." % ifname)
 
     def _startBeaconingServices(self, new_interfaces):
         """Start monitoring services for the specified set of interfaces."""
@@ -1431,9 +1408,7 @@ class NetworksMonitoringService(SingleInstanceService):
             log.msg("Starting beaconing for interfaces: %r" % new_interfaces)
             self._startBeaconingServices(new_interfaces)
         if len(deleted_interfaces) > 0:
-            log.msg(
-                "Stopping beaconing for interfaces: %r" % deleted_interfaces
-            )
+            log.msg("Stopping beaconing for interfaces: %r" % deleted_interfaces)
             self._stopBeaconingServices(deleted_interfaces)
         self._beaconing = beaconing_interfaces
         if self.beaconing_protocol is None:
@@ -1458,15 +1433,11 @@ class NetworksMonitoringService(SingleInstanceService):
         new_interfaces = monitored_interfaces.difference(self._monitored)
         deleted_interfaces = self._monitored.difference(monitored_interfaces)
         if len(new_interfaces) > 0:
-            log.msg(
-                "Starting neighbour discovery for interfaces: %r"
-                % new_interfaces
-            )
+            log.msg("Starting neighbour discovery for interfaces: %r" % new_interfaces)
             self._startNeighbourDiscoveryServices(new_interfaces)
         if len(deleted_interfaces) > 0:
             log.msg(
-                "Stopping neighbour discovery for interfaces: %r"
-                % deleted_interfaces
+                "Stopping neighbour discovery for interfaces: %r" % deleted_interfaces
             )
             self._stopNeighbourDiscoveryServices(deleted_interfaces)
         self._monitored = monitored_interfaces

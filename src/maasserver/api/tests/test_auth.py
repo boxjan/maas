@@ -70,9 +70,7 @@ class TestMAASAPIAuthentication(MAASServerTestCase):
 
         auth = MAASAPIAuthentication()
         user = factory.make_User()
-        user.userprofile.auth_last_check = datetime.utcnow() - timedelta(
-            days=1
-        )
+        user.userprofile.auth_last_check = datetime.utcnow() - timedelta(days=1)
         mock_token = mock.Mock(user=user)
         request = self.make_request()
 
@@ -81,9 +79,7 @@ class TestMAASAPIAuthentication(MAASServerTestCase):
         self.assertTrue(auth.is_authenticated(request))
         mock_validate.assert_called_with(
             user,
-            ExternalAuthInfo(
-                "candid", "https://example.com", "domain", "admins"
-            ),
+            ExternalAuthInfo("candid", "https://example.com", "domain", "admins"),
         )
 
     def test_is_authenticated_external_auth_validate_fail(self):
@@ -92,9 +88,7 @@ class TestMAASAPIAuthentication(MAASServerTestCase):
 
         auth = MAASAPIAuthentication()
         user = factory.make_User()
-        user.userprofile.auth_last_check = datetime.utcnow() - timedelta(
-            days=1
-        )
+        user.userprofile.auth_last_check = datetime.utcnow() - timedelta(days=1)
         mock_token = mock.Mock(user=user)
         request = self.make_request()
         auth.is_valid_request = lambda request: True

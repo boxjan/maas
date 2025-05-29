@@ -21,7 +21,9 @@ if __name__ == "__main__":
 
     from lxml import html
 
-    modindex_url = f"https://docs.python.org/{version.major}.{version.minor}/py-modindex.html"
+    modindex_url = (
+        f"https://docs.python.org/{version.major}.{version.minor}/py-modindex.html"
+    )
     try:
         content = urlopen(modindex_url).read()
     except OSError:

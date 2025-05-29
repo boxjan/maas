@@ -47,9 +47,7 @@ class TestGetVersionFromPythonPackage(MAASTestCase):
     ]
 
     def test_version(self):
-        self.patch(version, "DISTRIBUTION").parsed_version = parse_version(
-            self.version
-        )
+        self.patch(version, "DISTRIBUTION").parsed_version = parse_version(self.version)
         self.assertEqual(_get_version_from_python_package(), self.output)
 
 
@@ -239,14 +237,10 @@ class TestMAASVersionScenarios(MAASTestCase):
         self.assertEqual(maas_version, self.maas_version)
         self.assertEqual(maas_version.short_version, self.short_version)
         self.assertEqual(maas_version.extended_info, self.extended_info)
-        self.assertEqual(
-            maas_version._qualifier_type_order, self.qualifier_type_order
-        )
+        self.assertEqual(maas_version._qualifier_type_order, self.qualifier_type_order)
 
     def test_string(self):
-        self.assertEqual(
-            str(MAASVersion.from_string(self.version)), self.str_version
-        )
+        self.assertEqual(str(MAASVersion.from_string(self.version)), self.str_version)
 
     def test_short_version(self):
         maas_version = MAASVersion.from_string(self.version)
@@ -308,9 +302,7 @@ class TestGetRunningVersion(TestVersionTestCase):
 
     def test_uses_version_from_python(self):
         self.patch(version, "_get_version_from_apt").return_value = None
-        self.patch(version, "DISTRIBUTION").parsed_version = parse_version(
-            "2.10.0b1"
-        )
+        self.patch(version, "DISTRIBUTION").parsed_version = parse_version("2.10.0b1")
         self.patch(version, "_get_maas_repo_hash").return_value = None
         self.patch(version, "_get_maas_repo_commit_count").return_value = 0
         maas_version = get_running_version()
@@ -319,9 +311,7 @@ class TestGetRunningVersion(TestVersionTestCase):
 
     def test_uses_version_from_python_with_git_info(self):
         self.patch(version, "_get_version_from_apt").return_value = None
-        self.patch(version, "DISTRIBUTION").parsed_version = parse_version(
-            "2.10.0b1"
-        )
+        self.patch(version, "DISTRIBUTION").parsed_version = parse_version("2.10.0b1")
         self.patch(version, "_get_maas_repo_commit_count").return_value = 1234
         self.patch(version, "_get_maas_repo_hash").return_value = "deadbeef"
         maas_version = get_running_version()

@@ -19,9 +19,7 @@ class TestPackageRepositoryManager(MAASServerTestCase):
         archive = factory.make_PackageRepository(
             url=main_url, default=True, arches=["i386", "amd64"]
         )
-        self.assertEqual(
-            archive, PackageRepository.objects.get_default_archive(arch)
-        )
+        self.assertEqual(archive, PackageRepository.objects.get_default_archive(arch))
 
     def test_get_additional_repositories(self):
         arch = "amd64"
@@ -31,9 +29,7 @@ class TestPackageRepositoryManager(MAASServerTestCase):
         )
         self.assertEqual(
             archive,
-            PackageRepository.objects.get_additional_repositories(
-                arch
-            ).first(),
+            PackageRepository.objects.get_additional_repositories(arch).first(),
         )
 
     def test_additional_repositories_can_be_deleted(self):
@@ -42,18 +38,12 @@ class TestPackageRepositoryManager(MAASServerTestCase):
             url=main_url, default=False, arches=["i386", "amd64"]
         )
         archive.delete()
-        gone = PackageRepository.objects.get_additional_repositories(
-            "amd64"
-        ).first()
+        gone = PackageRepository.objects.get_additional_repositories("amd64").first()
         self.assertIsNone(gone)
 
     def test_default_repositories_cannot_be_deleted(self):
-        self.assertRaises(
-            ValidationError, PackageRepository.get_main_archive().delete
-        )
-        self.assertRaises(
-            ValidationError, PackageRepository.get_ports_archive().delete
-        )
+        self.assertRaises(ValidationError, PackageRepository.get_main_archive().delete)
+        self.assertRaises(ValidationError, PackageRepository.get_ports_archive().delete)
 
     def test_get_multiple_with_a_ppa(self):
         ppa_arch = "armhf"
@@ -71,15 +61,11 @@ class TestPackageRepositoryManager(MAASServerTestCase):
         )
         self.assertEqual(
             ppa_archive,
-            PackageRepository.objects.get_additional_repositories(
-                ppa_arch
-            ).first(),
+            PackageRepository.objects.get_additional_repositories(ppa_arch).first(),
         )
         self.assertEqual(
             archive,
-            PackageRepository.objects.get_additional_repositories(
-                arch
-            ).first(),
+            PackageRepository.objects.get_additional_repositories(arch).first(),
         )
 
     def test_get_known_architectures(self):

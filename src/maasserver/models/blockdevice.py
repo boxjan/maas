@@ -93,9 +93,7 @@ class BlockDeviceManager(Manager):
                 raise ValueError("Requires iterable object to filter.")
             tags = list(tags)
         tags_where, tags_params = psql_array(tags, sql_type="text")
-        where_contains = (
-            '"maasserver_blockdevice"."tags"::text[] @> %s' % tags_where
-        )
+        where_contains = '"maasserver_blockdevice"."tags"::text[] @> %s' % tags_where
         return self.extra(where=[where_contains], params=tags_params)
 
 

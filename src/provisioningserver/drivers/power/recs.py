@@ -149,9 +149,7 @@ class RECSAPI:
 
     def get_node_power_state(self, nodeid):
         """Gets the power state of the node."""
-        return self.extract_from_response(
-            self.get("node/%s" % nodeid), "state"
-        )
+        return self.extract_from_response(self.get("node/%s" % nodeid), "state")
 
     def _set_power(self, nodeid, action):
         """Set power for node."""
@@ -219,9 +217,7 @@ class RECSPowerDriver(PowerDriver):
     ]
     ip_extractor = make_ip_extractor("power_address")
 
-    def power_control_recs(
-        self, ip, port, username, password, node_id, power_change
-    ):
+    def power_control_recs(self, ip, port, username, password, node_id, power_change):
         """Control the power state for the given node."""
 
         port = 8000 if port is None or port == 0 else port
@@ -248,8 +244,7 @@ class RECSPowerDriver(PowerDriver):
             )
         except urllib.error.URLError as e:
             raise RECSError(
-                "Failed to retrieve power state. Server not reachable: %s"
-                % e.reason
+                "Failed to retrieve power state. Server not reachable: %s" % e.reason
             )
 
         if power_state == "1":
@@ -273,37 +268,23 @@ class RECSPowerDriver(PowerDriver):
     def power_on(self, system_id, context):
         """Power on RECS node."""
         power_change = "on"
-        ip, port, username, password, node_id = extract_recs_parameters(
-            context
-        )
+        ip, port, username, password, node_id = extract_recs_parameters(context)
 
         # Set default (persistent) boot to HDD
-        self.set_boot_source_recs(
-            ip, port, username, password, node_id, "HDD", True
-        )
+        self.set_boot_source_recs(ip, port, username, password, node_id, "HDD", True)
         # Set next boot to PXE
-        self.set_boot_source_recs(
-            ip, port, username, password, node_id, "PXE", False
-        )
-        self.power_control_recs(
-            ip, port, username, password, node_id, power_change
-        )
+        self.set_boot_source_recs(ip, port, username, password, node_id, "PXE", False)
+        self.power_control_recs(ip, port, username, password, node_id, power_change)
 
     def power_off(self, system_id, context):
         """Power off RECS node."""
         power_change = "off"
-        ip, port, username, password, node_id = extract_recs_parameters(
-            context
-        )
-        self.power_control_recs(
-            ip, port, username, password, node_id, power_change
-        )
+        ip, port, username, password, node_id = extract_recs_parameters(context)
+        self.power_control_recs(ip, port, username, password, node_id, power_change)
 
     def power_query(self, system_id, context):
         """Power query RECS node."""
-        ip, port, username, password, node_id = extract_recs_parameters(
-            context
-        )
+        ip, port, username, password, node_id = extract_recs_parameters(context)
         return self.power_state_recs(ip, port, username, password, node_id)
 
 
@@ -335,8 +316,7 @@ def probe_and_enlist_recs(
         raise RECSError(
             "Failed to probe nodes for RECS_Master with ip=%s "
             "port=%s, username=%s, password=%s. "
-            "Server could not be reached: %s"
-            % (ip, port, username, password, e.reason)
+            "Server could not be reached: %s" % (ip, port, username, password, e.reason)
         )
 
     for node_id, data in nodes.items():
@@ -351,18 +331,14 @@ def probe_and_enlist_recs(
         if data["arch"] == "arm":
             arch = "armhf"
 
-        maaslog.info(
-            "Creating RECS node %s with MACs: %s", node_id, data["macs"]
-        )
+        maaslog.info("Creating RECS node %s with MACs: %s", node_id, data["macs"])
 
         # Set default (persistent) boot to HDD
         api.set_boot_source(node_id, "HDD", True)
         # Set next boot to PXE
         api.set_boot_source(node_id, "PXE", False)
 
-        system_id = create_node(
-            data["macs"], arch, "recs_box", params, domain
-        ).wait(30)
+        system_id = create_node(data["macs"], arch, "recs_box", params, domain).wait(30)
 
         if accept_all:
             commission_node(system_id, user).wait(30)

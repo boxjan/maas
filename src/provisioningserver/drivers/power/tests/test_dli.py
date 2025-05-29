@@ -78,9 +78,7 @@ class TestDLIPowerDriver(MAASTestCase):
     def test_set_outlet_state_crashes_when_wget_exits_nonzero(self):
         driver = dli_module.DLIPowerDriver()
         call_and_check_mock = self.patch(dli_module, "call_and_check")
-        call_and_check_mock.side_effect = ExternalProcessError(
-            1, "dli something"
-        )
+        call_and_check_mock.side_effect = ExternalProcessError(1, "dli something")
         self.assertRaises(
             PowerActionError,
             driver._set_outlet_state,
@@ -155,9 +153,7 @@ class TestDLIPowerDriver(MAASTestCase):
     def test_query_outlet_state_crashes_when_wget_exits_nonzero(self):
         driver = dli_module.DLIPowerDriver()
         call_and_check_mock = self.patch(dli_module, "call_and_check")
-        call_and_check_mock.side_effect = ExternalProcessError(
-            1, "dli something"
-        )
+        call_and_check_mock.side_effect = ExternalProcessError(1, "dli something")
         self.assertRaises(
             PowerActionError,
             driver._query_outlet_state,
@@ -178,9 +174,7 @@ class TestDLIPowerDriver(MAASTestCase):
 
         driver.power_on(system_id, context)
 
-        _query_outlet_state_mock.assert_has_calls(
-            [call(**context), call(**context)]
-        )
+        _query_outlet_state_mock.assert_has_calls([call(**context), call(**context)])
         _set_outlet_state_mock.assert_has_calls(
             [call("OFF", **context), call("ON", **context)]
         )
@@ -195,9 +189,7 @@ class TestDLIPowerDriver(MAASTestCase):
         self.patch(dli_module, "sleep")
 
         self.assertRaises(PowerError, driver.power_on, system_id, context)
-        _query_outlet_state_mock.assert_has_calls(
-            [call(**context), call(**context)]
-        )
+        _query_outlet_state_mock.assert_has_calls([call(**context), call(**context)])
         _set_outlet_state_mock.assert_called_once_with("OFF", **context)
 
     def test_power_off(self):

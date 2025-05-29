@@ -62,9 +62,7 @@ class TestControllerForm(MAASServerTestCase):
             instance=rack,
         )
         rack = form.save()
-        self.assertEqual(
-            power_parameters_field, rack.get_power_parameters()["field"]
-        )
+        self.assertEqual(power_parameters_field, rack.get_power_parameters()["field"])
 
     def test_sets_zone(self):
         rack = factory.make_RackController()

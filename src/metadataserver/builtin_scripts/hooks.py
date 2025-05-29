@@ -98,8 +98,7 @@ def _parse_interface_speed(port):
 
     # Return the highest supported speed.
     return max(
-        int(supported_mode.split("base")[0])
-        for supported_mode in supported_modes
+        int(supported_mode.split("base")[0]) for supported_mode in supported_modes
     )
 
 
@@ -218,9 +217,7 @@ def update_boot_interface(node, output, exit_status):
             type="physical", mac_address=boot_mac
         )
     except Interface.DoesNotExist:
-        logger.error(
-            f"BOOTIF interface {boot_mac} doesn't exist for {node.fqdn}"
-        )
+        logger.error(f"BOOTIF interface {boot_mac} doesn't exist for {node.fqdn}")
     except Interface.MultipleObjectsReturned:
         logger.error(
             f"Multiple physical interfaces found with {boot_mac} for {node.fqdn}"
@@ -264,9 +261,7 @@ def update_node_network_information(node, data, numa_nodes):
 
         if (
             not link_connected
-            and not interface.ip_addresses.filter(
-                subnet__vlan=interface.vlan
-            ).exists()
+            and not interface.ip_addresses.filter(subnet__vlan=interface.vlan).exists()
         ):
             # This interface is now disconnected.
             if interface.vlan is not None:
@@ -297,9 +292,7 @@ def update_node_network_information(node, data, numa_nodes):
             # This creates a ScriptResult with proper parameters for each interface
             # on the system. Interfaces no long available will be deleted which
             # causes a casade delete on their assoicated ScriptResults.
-            node.current_testing_script_set.regenerate(
-                storage=False, network=True
-            )
+            node.current_testing_script_set.regenerate(storage=False, network=True)
 
     return network_devices
 
@@ -337,9 +330,7 @@ def _process_system_information(node, system_data):
                 node.hardware_uuid = None
                 # If the UUID isn't really unique make sure it isn't stored on
                 # any Node.
-                Node.objects.filter(hardware_uuid=uuid).update(
-                    hardware_uuid=None
-                )
+                Node.objects.filter(hardware_uuid=uuid).update(hardware_uuid=None)
 
     # Gather system information. Custom built machines and some Supermicro
     # servers do not provide this information.
@@ -501,13 +492,9 @@ def _add_or_update_node_device(
                     | Q(physical_interface=network_device)
                 )
             elif storage_device:
-                qs = qs.filter(
-                    Q(**identifier) | Q(physical_blockdevice=storage_device)
-                )
+                qs = qs.filter(Q(**identifier) | Q(physical_blockdevice=storage_device))
             elif network_device:
-                qs = qs.filter(
-                    Q(**identifier) | Q(physical_interface=network_device)
-                )
+                qs = qs.filter(Q(**identifier) | Q(physical_interface=network_device))
             else:
                 qs = qs.filter(**identifier)
             qs.delete()
@@ -562,15 +549,9 @@ def _process_usb_devices(add_func, data):
         # USB devices can have different drivers for each
         # functionality. e.g a webcam has a video and audio driver.
         commissioning_driver = ", ".join(
-            {
-                interface["driver"]
-                for interface in interfaces
-                if "driver" in interface
-            }
+            {interface["driver"] for interface in interfaces if "driver" in interface}
         )
-        add_func(
-            NODE_DEVICE_BUS.USB, device, usb_address, key, commissioning_driver
-        )
+        add_func(NODE_DEVICE_BUS.USB, device, usb_address, key, commissioning_driver)
 
 
 def update_node_devices(
@@ -655,9 +636,7 @@ def _process_lxd_resources(node, data):
     update_deployment_resources = node.status == NODE_STATUS.DEPLOYED
     # Update CPU details.
     old_cpu_count = node.cpu_count
-    node.cpu_count, node.cpu_speed, cpu_model, numa_nodes = parse_lxd_cpuinfo(
-        resources
-    )
+    node.cpu_count, node.cpu_speed, cpu_model, numa_nodes = parse_lxd_cpuinfo(resources)
 
     old_memory = node.memory
     # Update memory.
@@ -694,9 +673,7 @@ def _process_lxd_resources(node, data):
         custom_storage_config=data.get("storage-extra"),
     )
 
-    update_node_devices(
-        node, resources, numa_nodes, network_devices, storage_devices
-    )
+    update_node_devices(node, resources, numa_nodes, network_devices, storage_devices)
 
     if cpu_model:
         _, created = NodeMetadata.objects.update_or_create(
@@ -705,9 +682,7 @@ def _process_lxd_resources(node, data):
 
         # in the case of hardware sync for a cpu, a new one is added if this value has been updated
         if created and old_cpu_count > 0:
-            _hardware_sync_cpu_notify(
-                node, cpu_model, HARDWARE_SYNC_ACTIONS.ADDED
-            )
+            _hardware_sync_cpu_notify(node, cpu_model, HARDWARE_SYNC_ACTIONS.ADDED)
 
     _process_system_information(node, resources.get("system", {}))
     _link_dpu(node)
@@ -715,15 +690,11 @@ def _process_lxd_resources(node, data):
 
 def _process_machine_extra(node, extra):
     if extra is None:
-        logger.warning(
-            f"Machine configuration extra for `{node.system_id}` is None"
-        )
+        logger.warning(f"Machine configuration extra for `{node.system_id}` is None")
         return
 
     if "platform" in extra:
-        node.architecture = (
-            f'{node.architecture.split("/", 2)[0]}/{extra["platform"]}'
-        )
+        node.architecture = f'{node.architecture.split("/", 2)[0]}/{extra["platform"]}'
 
     node.save()
 
@@ -786,15 +757,11 @@ _MP_PATH_ID = {
     "fc": [re.compile(r"^(?P<port>\w+)-(?P<lun>lun-(0x)?[\da-fA-F]+)$")],
     "vmbus": [re.compile(r"^(?P<guid>\w+)-(?P<lun>lun-(0x)?[\da-fA-F]+)$")],
     "sas": [
-        re.compile(
-            r"^(?P<sas_addr>0x[\da-fA-F]+)-(?P<lun>lun-(0x)?[\da-fA-F]+)$"
-        ),
+        re.compile(r"^(?P<sas_addr>0x[\da-fA-F]+)-(?P<lun>lun-(0x)?[\da-fA-F]+)$"),
         re.compile(
             r"^exp0x[\da-fA-F]+-phy(?P<phy_id>(0x)?[\da-fA-F]+)-(?P<lun>lun-(0x)?[\da-fA-F]+)$"
         ),
-        re.compile(
-            r"^phy(?P<phy_id>(0x)?[\da-fA-F]+)-(?P<lun>lun-(0x)?[\da-fA-F]+)$"
-        ),
+        re.compile(r"^phy(?P<phy_id>(0x)?[\da-fA-F]+)-(?P<lun>lun-(0x)?[\da-fA-F]+)$"),
     ],
     "ip": [
         re.compile(
@@ -854,9 +821,7 @@ def _condense_luns(disks):
     return sorted(processed_disks, key=itemgetter("id"))
 
 
-def _hardware_sync_notify(
-    ev_type, node, device_name, action, device_type=None
-):
+def _hardware_sync_notify(ev_type, node, device_name, action, device_type=None):
     """
     creates an event for hardware sync detectd updates
     """
@@ -886,10 +851,7 @@ def _hardware_sync_block_device_notify(node, block_device, action):
 
 
 def _hardware_sync_block_devices_notify(node, block_devices, action):
-    [
-        _hardware_sync_block_device_notify(node, bd, action)
-        for bd in block_devices
-    ]
+    [_hardware_sync_block_device_notify(node, bd, action) for bd in block_devices]
 
 
 def _hardware_sync_PCI_device_notify(node, pci_device, action):
@@ -920,10 +882,7 @@ def _hardware_sync_node_device_notify(node, device, action):
 
 
 def _hardware_sync_node_devices_notify(node, devices, action):
-    [
-        _hardware_sync_node_device_notify(node, device, action)
-        for device in devices
-    ]
+    [_hardware_sync_node_device_notify(node, device, action) for device in devices]
 
 
 def _hardware_sync_cpu_notify(node, cpu_model, action):
@@ -942,9 +901,7 @@ def _hardware_sync_memory_notify(node, old_size):
         EVENT_TYPES.NODE_HARDWARE_SYNC_MEMORY,
         node,
         f"{human_readable_bytes(diff)} of memory",
-        HARDWARE_SYNC_ACTIONS.ADDED
-        if diff > 0
-        else HARDWARE_SYNC_ACTIONS.REMOVED,
+        HARDWARE_SYNC_ACTIONS.ADDED if diff > 0 else HARDWARE_SYNC_ACTIONS.REMOVED,
     )
 
 
@@ -970,9 +927,7 @@ def _update_node_physical_block_devices(
         return block_devices
 
     previous_block_devices = list(
-        PhysicalBlockDevice.objects.filter(
-            node_config=node.current_config
-        ).all()
+        PhysicalBlockDevice.objects.filter(node_config=node.current_config).all()
     )
     for block_info in _condense_luns(data.get("storage", {}).get("disks", [])):
         # Skip the read-only devices or cdroms. We keep them in the output
@@ -1085,9 +1040,7 @@ def _update_node_physical_block_devices(
     # on the commissioned node.
     delete_block_device_ids = [bd.id for bd in previous_block_devices]
     if delete_block_device_ids:
-        PhysicalBlockDevice.objects.filter(
-            id__in=delete_block_device_ids
-        ).delete()
+        PhysicalBlockDevice.objects.filter(id__in=delete_block_device_ids).delete()
         _hardware_sync_block_devices_notify(
             node, previous_block_devices, HARDWARE_SYNC_ACTIONS.REMOVED
         )
@@ -1121,9 +1074,9 @@ def _process_lxd_environment(node, data):
     # Verify the architecture is set correctly. This is how the architecture
     # gets set on controllers.
     cur_arch, cur_subarch = node.split_arch()
-    arch, subarch = kernel_to_debian_architecture(
-        data["kernel_architecture"]
-    ).split("/")
+    arch, subarch = kernel_to_debian_architecture(data["kernel_architecture"]).split(
+        "/"
+    )
     if cur_arch == arch and subarch == "generic" and cur_subarch != "generic":
         # keep the previous subarch since it's more specific
         subarch = cur_subarch
@@ -1134,11 +1087,7 @@ def _process_lxd_environment(node, data):
     # on the running machine and LXD Pods are getting this data from LXD
     # on the running machine. In those cases the information gathered below
     # is correct.
-    if (
-        not node.is_commissioning()
-        and data.get("os_name")
-        and data.get("os_version")
-    ):
+    if not node.is_commissioning() and data.get("os_name") and data.get("os_version"):
         # MAAS always stores OS information in lower case
         node.osystem = data["os_name"].lower()
         node.distro_series = data["os_version"].lower()
@@ -1161,15 +1110,12 @@ def process_lxd_results(node, output, exit_status):
         Event.objects.create_node_event(
             system_id=node,
             event_type=EVENT_TYPES.SCRIPT_RESULT_ERROR,
-            event_description=(
-                f"Failed processing commissioning data: {reason}"
-            ),
+            event_description=(f"Failed processing commissioning data: {reason}"),
         )
 
     if exit_status != 0:
         logger.error(
-            "%s: lxd script failed with status: "
-            "%s." % (node.hostname, exit_status)
+            "%s: lxd script failed with status: " "%s." % (node.hostname, exit_status)
         )
         return
     assert isinstance(output, bytes)
@@ -1192,9 +1138,7 @@ def process_lxd_results(node, output, exit_status):
         "resources_system",
         "resources_usb_pci",
     }
-    missing_extensions = required_extensions - set(
-        data.get("api_extensions", ())
-    )
+    missing_extensions = required_extensions - set(data.get("api_extensions", ()))
     assert (
         not missing_extensions
     ), f"Missing required LXD API extensions {sorted(missing_extensions)}"
@@ -1389,9 +1333,7 @@ def get_dmi_data(modaliases):
     return frozenset()
 
 
-def filter_modaliases(
-    modaliases_discovered, modaliases=None, pci=None, usb=None
-):
+def filter_modaliases(modaliases_discovered, modaliases=None, pci=None, usb=None):
     """Determines which candidate modaliases match what was discovered.
 
     :param modaliases_discovered: The list of modaliases found on the node.
@@ -1550,8 +1492,7 @@ def retag_node_for_hardware_by_modalias(
             node.tags.remove(existing_tag)
             tags_removed.add(existing_tag)
             logger.info(
-                "%s: Removed tag '%s'; hardware is missing."
-                % (node.hostname, tag_name)
+                "%s: Removed tag '%s'; hardware is missing." % (node.hostname, tag_name)
             )
     return tags_added, tags_removed
 
@@ -1610,9 +1551,7 @@ def _link_dpu(node):
         try:
             parent = Node.objects.get(query)
         except Node.MultipleObjectsReturned:
-            logger.warning(
-                f"Multiple possible parent nodes for the node {node}"
-            )
+            logger.warning(f"Multiple possible parent nodes for the node {node}")
         except Node.DoesNotExist:
             pass
         else:
@@ -1621,11 +1560,7 @@ def _link_dpu(node):
 
 
 # Register the post processing hooks.
-NODE_INFO_SCRIPTS[GET_FRUID_DATA_OUTPUT_NAME][
-    "hook"
-] = update_node_fruid_metadata
-NODE_INFO_SCRIPTS[LIST_MODALIASES_OUTPUT_NAME][
-    "hook"
-] = create_metadata_by_modalias
+NODE_INFO_SCRIPTS[GET_FRUID_DATA_OUTPUT_NAME]["hook"] = update_node_fruid_metadata
+NODE_INFO_SCRIPTS[LIST_MODALIASES_OUTPUT_NAME]["hook"] = create_metadata_by_modalias
 NODE_INFO_SCRIPTS[COMMISSIONING_OUTPUT_NAME]["hook"] = process_lxd_results
 NODE_INFO_SCRIPTS[KERNEL_CMDLINE_OUTPUT_NAME]["hook"] = update_boot_interface

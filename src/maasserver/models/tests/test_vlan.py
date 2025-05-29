@@ -24,9 +24,7 @@ class TestVLANManager(MAASServerTestCase):
         vlan = factory.make_VLAN()
         factory.make_VLAN()
         vid = vlan.vid
-        self.assertCountEqual(
-            VLAN.objects.filter_by_specifiers("%s" % vid), [vlan]
-        )
+        self.assertCountEqual(VLAN.objects.filter_by_specifiers("%s" % vid), [vlan])
 
     def test_default_specifier_matches_name(self):
         factory.make_VLAN()
@@ -50,9 +48,7 @@ class TestVLANManager(MAASServerTestCase):
         vlan = factory.make_VLAN()
         vid = vlan.vid
         factory.make_VLAN()
-        self.assertCountEqual(
-            VLAN.objects.filter_by_specifiers("vid:%d" % vid), [vlan]
-        )
+        self.assertCountEqual(VLAN.objects.filter_by_specifiers("vid:%d" % vid), [vlan])
 
     def test_space_specifier_matches_space_by_name(self):
         factory.make_VLAN()
@@ -166,9 +162,7 @@ class TestVLAN(MAASServerTestCase):
             INTERFACE_TYPE.VLAN, vlan=vlan, parents=[parent]
         )
         vlan.delete()
-        self.assertCountEqual(
-            [], VLANInterface.objects.filter(id=interface.id)
-        )
+        self.assertCountEqual([], VLANInterface.objects.filter(id=interface.id))
 
     def test_interfaces_are_reconnected_when_vlan_is_deleted(self):
         node = factory.make_Node()
@@ -178,9 +172,7 @@ class TestVLAN(MAASServerTestCase):
             INTERFACE_TYPE.PHYSICAL, node=node, vlan=vlan
         )
         vlan.delete()
-        reconnected_interfaces = PhysicalInterface.objects.filter(
-            id=interface.id
-        )
+        reconnected_interfaces = PhysicalInterface.objects.filter(id=interface.id)
         self.assertCountEqual([interface], reconnected_interfaces)
         reconnected_interface = reconnected_interfaces[0]
         self.assertEqual(reconnected_interface.vlan, fabric.get_default_vlan())
@@ -207,9 +199,7 @@ class TestVLAN(MAASServerTestCase):
         Notification.objects.filter(ident="dhcp_disabled_all_vlans").delete()
         factory.make_VLAN(dhcp_on=False)
         self.assertTrue(
-            Notification.objects.filter(
-                ident="dhcp_disabled_all_vlans"
-            ).exists()
+            Notification.objects.filter(ident="dhcp_disabled_all_vlans").exists()
         )
 
     def tests_deletes_notification_once_there_is_dhcp(self):
@@ -220,9 +210,7 @@ class TestVLAN(MAASServerTestCase):
         vlan.dhcp_on = True
         vlan.save()
         self.assertFalse(
-            Notification.objects.filter(
-                ident="dhcp_disabled_all_vlans"
-            ).exists()
+            Notification.objects.filter(ident="dhcp_disabled_all_vlans").exists()
         )
 
     def test_connected_rack_controllers(self):

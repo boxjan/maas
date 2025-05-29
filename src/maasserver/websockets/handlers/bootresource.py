@@ -249,13 +249,9 @@ class BootResourceHandler(Handler):
         """Adds helper attributes to the resource."""
         resource.title = self.get_resource_title(resource)
         resource.arch, resource.subarch = resource.split_arch()
-        resource.number_of_nodes = self.get_number_of_nodes_deployed_for(
-            resource
-        )
-        resource.machine_count = (
-            self.get_number_of_nodes_of_node_type_deployed_for(
-                resource, NODE_TYPE.MACHINE
-            )
+        resource.number_of_nodes = self.get_number_of_nodes_deployed_for(resource)
+        resource.machine_count = self.get_number_of_nodes_of_node_type_deployed_for(
+            resource, NODE_TYPE.MACHINE
         )
         resource_set = resource.get_latest_set()
         if resource_set is None:
@@ -352,9 +348,7 @@ class BootResourceHandler(Handler):
 
         # Count the number of nodes with same os/release and architecture.
         count = 0
-        for node in self.nodes.filter(
-            osystem=osystem, distro_series=distro_series
-        ):
+        for node in self.nodes.filter(osystem=osystem, distro_series=distro_series):
             if self.node_has_architecture_for_resource(node, resource):
                 count += 1
 
@@ -406,9 +400,7 @@ class BootResourceHandler(Handler):
             )
         return count
 
-    def pick_latest_datetime(
-        self, time: datetime, other_time: datetime
-    ) -> datetime:
+    def pick_latest_datetime(self, time: datetime, other_time: datetime) -> datetime:
         """Return the datetime that is the latest."""
         if time is None:
             return other_time
@@ -451,21 +443,15 @@ class BootResourceHandler(Handler):
             release = osystem.releases[distro_series_name]
             if resource.architecture not in release.architectures:
                 continue
-            if release.architectures[
-                resource.architecture
-            ].can_deploy_to_memory:
+            if release.architectures[resource.architecture].can_deploy_to_memory:
                 return True
         return False
 
-    def get_last_update_for_resources(
-        self, resources: list[BootResource]
-    ) -> datetime:
+    def get_last_update_for_resources(self, resources: list[BootResource]) -> datetime:
         """Return the latest updated time for all resources."""
         last_update = None
         for resource in resources:
-            last_update = self.pick_latest_datetime(
-                last_update, resource.updated
-            )
+            last_update = self.pick_latest_datetime(last_update, resource.updated)
             resource_set = resource.get_latest_set()
             if resource_set is not None:
                 last_update = self.pick_latest_datetime(
@@ -476,8 +462,7 @@ class BootResourceHandler(Handler):
     def get_number_of_nodes_for_resources(self, resources):
         """Return the number of nodes used by all resources."""
         return sum(
-            self.get_number_of_nodes_deployed_for(resource)
-            for resource in resources
+            self.get_number_of_nodes_deployed_for(resource) for resource in resources
         )
 
     def get_number_of_nodes_of_node_type_for_resources(
@@ -485,9 +470,7 @@ class BootResourceHandler(Handler):
     ):
         """Return the number of nodes of node_type='node_type' used by all resources"""
         return sum(
-            self.get_number_of_nodes_of_node_type_deployed_for(
-                resource, node_type
-            )
+            self.get_number_of_nodes_of_node_type_deployed_for(resource, node_type)
             for resource in resources
         )
 
@@ -618,9 +601,7 @@ class BootResourceHandler(Handler):
             status__in=[NODE_STATUS.DEPLOYED, NODE_STATUS.DEPLOYING]
         )
         self.default_osystem = Config.objects.get_config("default_osystem")
-        self.default_distro_series = Config.objects.get_config(
-            "default_distro_series"
-        )
+        self.default_distro_series = Config.objects.get_config("default_distro_series")
 
         # Load all the resources and generate the result
         resources = [
@@ -638,9 +619,7 @@ class BootResourceHandler(Handler):
                 "canDeployToMemory": resource.can_deploy_to_memory,
                 "numberOfNodes": resource.number_of_nodes,
                 "machineCount": resource.machine_count,
-                "lastUpdate": resource.last_update.strftime(
-                    "%a, %d %b. %Y %H:%M:%S"
-                ),
+                "lastUpdate": resource.last_update.strftime("%a, %d %b. %Y %H:%M:%S"),
                 "lastDeployed": resource.last_deployed.strftime(
                     "%a, %d %b. %Y %H:%M:%S"
                 )
@@ -670,9 +649,7 @@ class BootResourceHandler(Handler):
             "other_images": self.format_other_images(),
         }
 
-    def get_bootsource(
-        self, params: dict, from_db: bool = False
-    ) -> BootSource:
+    def get_bootsource(self, params: dict, from_db: bool = False) -> BootSource:
         source_type = params.get("source_type", "custom")
         if source_type == "maas.io":
             url = DEFAULT_IMAGES_URL

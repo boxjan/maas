@@ -13,9 +13,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterModelManagers(
             name="permission",
-            managers=[
-                ("objects", django.contrib.auth.models.PermissionManager())
-            ],
+            managers=[("objects", django.contrib.auth.models.PermissionManager())],
         ),
         migrations.AlterModelManagers(
             name="user",
@@ -59,9 +57,7 @@ class Migration(migrations.Migration):
             model_name="user",
             name="username",
             field=models.CharField(
-                error_messages={
-                    "unique": "A user with that username already exists."
-                },
+                error_messages={"unique": "A user with that username already exists."},
                 max_length=30,
                 validators=[
                     django.core.validators.RegexValidator(

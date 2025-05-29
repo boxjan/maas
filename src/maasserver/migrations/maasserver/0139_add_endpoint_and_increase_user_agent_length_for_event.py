@@ -4,9 +4,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0138_add_ip_and_user_agent_to_event_model")
-    ]
+    dependencies = [("maasserver", "0138_add_ip_and_user_agent_to_event_model")]
 
     operations = [
         migrations.AddField(

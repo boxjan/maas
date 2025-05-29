@@ -59,9 +59,7 @@ class TestDiscoveredClasses(MAASTestCase):
 
     def test_block_device_size(self):
         size = random.randint(512, 512 * 1024)
-        device = DiscoveredMachineBlockDevice(
-            model=None, serial=None, size=size
-        )
+        device = DiscoveredMachineBlockDevice(model=None, serial=None, size=size)
         self.assertIsNone(device.model)
         self.assertIsNone(device.serial)
         self.assertEqual(size, device.size)
@@ -184,9 +182,7 @@ class TestDiscoveredClasses(MAASTestCase):
             power_state = factory.make_name("unknown")
             power_parameters = {"power_id": factory.make_name("power_id")}
             interfaces = [
-                DiscoveredMachineInterface(
-                    mac_address=factory.make_mac_address()
-                )
+                DiscoveredMachineInterface(mac_address=factory.make_mac_address())
                 for _ in range(3)
             ]
             block_devices = [
@@ -349,12 +345,8 @@ class TestFakePodDriverBase(MAASTestCase):
         fake_name = factory.make_name("name")
         fake_description = factory.make_name("description")
         fake_setting = factory.make_name("setting")
-        fake_settings = [
-            make_setting_field(fake_setting, fake_setting.title())
-        ]
-        fake_driver = FakePodDriverBase(
-            fake_name, fake_description, fake_settings
-        )
+        fake_settings = [make_setting_field(fake_setting, fake_setting.title())]
+        fake_driver = FakePodDriverBase(fake_name, fake_description, fake_settings)
         self.assertEqual(fake_driver.name, fake_name)
         self.assertEqual(fake_driver.description, fake_description)
         self.assertEqual(fake_driver.settings, fake_settings)
@@ -363,9 +355,7 @@ class TestFakePodDriverBase(MAASTestCase):
         fake_name = factory.make_name("name")
         fake_description = factory.make_name("description")
         fake_setting = factory.make_name("setting")
-        fake_settings = [
-            make_setting_field(fake_setting, fake_setting.title())
-        ]
+        fake_settings = [make_setting_field(fake_setting, fake_setting.title())]
         fake_driver = make_pod_driver_base(
             name=fake_name,
             description=fake_description,
@@ -433,12 +423,8 @@ class TestPodDriverBase(MAASTestCase):
         fake_name = factory.make_name("name")
         fake_description = factory.make_name("description")
         fake_setting = factory.make_name("setting")
-        fake_settings = [
-            make_setting_field(fake_setting, fake_setting.title())
-        ]
-        fake_driver = make_pod_driver_base(
-            fake_name, fake_description, fake_settings
-        )
+        fake_settings = [make_setting_field(fake_setting, fake_setting.title())]
+        fake_driver = make_pod_driver_base(fake_name, fake_description, fake_settings)
         self.assertEqual(
             {
                 "driver_type": "pod",
@@ -478,9 +464,7 @@ class TestPodDriverBase(MAASTestCase):
             dhcp_enabled=True,
         )
         driver = make_pod_driver_base()
-        self.assertEqual(
-            driver.get_default_interface_parent([if1, if2, if3]), if3
-        )
+        self.assertEqual(driver.get_default_interface_parent([if1, if2, if3]), if3)
 
     def test_get_default_interface_parent_none(self):
         if1 = KnownHostInterface(
@@ -513,12 +497,8 @@ class TestPodDriverBase(MAASTestCase):
         if3 = make_interface(InterfaceAttachType.SRIOV)
         if4 = make_interface(InterfaceAttachType.BRIDGE)
         driver = make_pod_driver_base()
-        self.assertEqual(
-            driver.get_default_interface_parent([if1, if2, if3, if4]), if4
-        )
-        self.assertEqual(
-            driver.get_default_interface_parent([if1, if2, if3]), if3
-        )
+        self.assertEqual(driver.get_default_interface_parent([if1, if2, if3, if4]), if4)
+        self.assertEqual(driver.get_default_interface_parent([if1, if2, if3]), if3)
         self.assertEqual(driver.get_default_interface_parent([if1, if2]), if2)
 
 

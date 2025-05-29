@@ -20,20 +20,14 @@ def _mock_ensure_link_up(self):
 
 class TestEnableAndDisableInterface(MAASServerTestCase):
     def test_enable_interface_creates_link_up(self):
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, enabled=False
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, enabled=False)
         interface.enabled = True
         interface.save()
-        link_ip = interface.ip_addresses.get(
-            alloc_type=IPADDRESS_TYPE.STICKY, ip=None
-        )
+        link_ip = interface.ip_addresses.get(alloc_type=IPADDRESS_TYPE.STICKY, ip=None)
         self.assertIsNotNone(link_ip)
 
     def test_enable_interface_creates_link_up_on_children(self):
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, enabled=False
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, enabled=False)
         vlan_interface = factory.make_Interface(
             INTERFACE_TYPE.VLAN, parents=[interface]
         )
@@ -45,27 +39,21 @@ class TestEnableAndDisableInterface(MAASServerTestCase):
         self.assertIsNotNone(link_ip)
 
     def test_ensure_link_up_only_called_once_per_interface(self):
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, enabled=False
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, enabled=False)
         interface.enabled = True
         self.patch(Interface, "ensure_link_up", _mock_ensure_link_up)
         # This will cause a RecursionError if the code doesn't work.
         interface.save()
 
     def test_disable_interface_removes_links(self):
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, enabled=True
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, enabled=True)
         interface.ensure_link_up()
         interface.enabled = False
         interface.save()
         self.assertCountEqual([], interface.ip_addresses.all())
 
     def test_disable_interface_removes_links_on_children(self):
-        interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, enabled=True
-        )
+        interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, enabled=True)
         vlan_interface = factory.make_Interface(
             INTERFACE_TYPE.VLAN, parents=[interface]
         )
@@ -76,12 +64,8 @@ class TestEnableAndDisableInterface(MAASServerTestCase):
 
     def test_disable_interface_doesnt_remove_links_on_enabled_children(self):
         node = factory.make_Node()
-        nic0 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=node, enabled=True
-        )
-        nic1 = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=node, enabled=True
-        )
+        nic0 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node, enabled=True)
+        nic1 = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node, enabled=True)
         bond_interface = factory.make_Interface(
             INTERFACE_TYPE.BOND, parents=[nic0, nic1]
         )
@@ -106,22 +90,14 @@ class TestMTUParams(MAASServerTestCase):
         )
         physical_interface.params = {"mtu": new_mtu}
         physical_interface.save()
-        self.assertEqual(
-            {"mtu": new_mtu}, reload_object(vlan1_interface).params
-        )
+        self.assertEqual({"mtu": new_mtu}, reload_object(vlan1_interface).params)
         self.assertEqual("", reload_object(vlan2_interface).params)
 
     def test_updates_parents_mtu(self):
         node = factory.make_Node()
-        physical1_interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=node
-        )
-        physical2_interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=node
-        )
-        physical3_interface = factory.make_Interface(
-            INTERFACE_TYPE.PHYSICAL, node=node
-        )
+        physical1_interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node)
+        physical2_interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node)
+        physical3_interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL, node=node)
         bond_interface = factory.make_Interface(
             INTERFACE_TYPE.BOND,
             parents=[
@@ -142,16 +118,12 @@ class TestMTUParams(MAASServerTestCase):
         bond_mtu = random.randint(2000, 3999)
         bond_interface.params = {"mtu": bond_mtu}
         bond_interface.save()
-        self.assertEqual(
-            {"mtu": bond_mtu}, reload_object(physical1_interface).params
-        )
+        self.assertEqual({"mtu": bond_mtu}, reload_object(physical1_interface).params)
         self.assertEqual(
             {"mtu": physical2_mtu}, reload_object(physical2_interface).params
         )
         # Physical 3 should be set the the bond interface MTU.
-        self.assertEqual(
-            {"mtu": bond_mtu}, reload_object(physical3_interface).params
-        )
+        self.assertEqual({"mtu": bond_mtu}, reload_object(physical3_interface).params)
 
 
 class TestInterfaceVLANUpdateNotController(MAASServerTestCase):
@@ -290,9 +262,7 @@ class TestInterfaceVLANUpdateController(MAASServerTestCase):
             INTERFACE_TYPE.VLAN, vlan=old_vlan, parents=[parent]
         )
         vlan_subnet = factory.make_Subnet(vlan=old_vlan)
-        factory.make_StaticIPAddress(
-            subnet=vlan_subnet, interface=vlan_interface
-        )
+        factory.make_StaticIPAddress(subnet=vlan_subnet, interface=vlan_interface)
         new_fabric = factory.make_Fabric()
         new_vlan = new_fabric.get_default_vlan()
         parent.vlan = new_vlan
@@ -366,9 +336,7 @@ class TestDiscoveryConfigChanges(MAASServerTestCase):
         factory.make_RegionRackController()
         factory.make_RegionController()
         factory.make_RackController()
-        mock_update_discovery_state = self.patch(
-            Controller, "update_discovery_state"
-        )
+        mock_update_discovery_state = self.patch(Controller, "update_discovery_state")
         Config.objects.set_config("network_discovery", "active")
         mock_update_discovery_state.assert_has_calls(
             [call(NetworkDiscoveryConfig(active=True, passive=True))] * 3
@@ -378,9 +346,7 @@ class TestDiscoveryConfigChanges(MAASServerTestCase):
         factory.make_RegionRackController()
         factory.make_RegionController()
         factory.make_RackController()
-        mock_update_discovery_state = self.patch(
-            Controller, "update_discovery_state"
-        )
+        mock_update_discovery_state = self.patch(Controller, "update_discovery_state")
         Config.objects.set_config("network_discovery", "enabled")
         mock_update_discovery_state.assert_has_calls(
             [call(NetworkDiscoveryConfig(active=False, passive=True))] * 3
@@ -390,9 +356,7 @@ class TestDiscoveryConfigChanges(MAASServerTestCase):
         factory.make_RegionRackController()
         factory.make_RegionController()
         factory.make_RackController()
-        mock_update_discovery_state = self.patch(
-            Controller, "update_discovery_state"
-        )
+        mock_update_discovery_state = self.patch(Controller, "update_discovery_state")
         Config.objects.set_config("network_discovery", "disabled")
         mock_update_discovery_state.assert_has_calls(
             [call(NetworkDiscoveryConfig(active=False, passive=False))] * 3

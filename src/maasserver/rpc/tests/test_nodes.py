@@ -84,10 +84,7 @@ class TestCreateNode(MAASTransactionServerTestCase):
         self.assertIsNotNone(node.id)
         self.assertCountEqual(
             mac_addresses,
-            [
-                nic.mac_address
-                for nic in node.current_config.interface_set.all()
-            ],
+            [nic.mac_address for nic in node.current_config.interface_set.all()],
         )
 
     def test_creates_node_with_explicit_hostname(self):
@@ -97,9 +94,7 @@ class TestCreateNode(MAASTransactionServerTestCase):
         architecture = make_usable_architecture(self)
         hostname = factory.make_hostname()
 
-        node = create_node(
-            architecture, "manual", {}, mac_addresses, hostname=hostname
-        )
+        node = create_node(architecture, "manual", {}, mac_addresses, hostname=hostname)
 
         self.assertEqual(
             (architecture, "manual", {}, hostname),
@@ -113,10 +108,7 @@ class TestCreateNode(MAASTransactionServerTestCase):
         self.assertIsNotNone(node.id)
         self.assertCountEqual(
             mac_addresses,
-            [
-                nic.mac_address
-                for nic in node.current_config.interface_set.all()
-            ],
+            [nic.mac_address for nic in node.current_config.interface_set.all()],
         )
 
     def test_create_node_fails_with_invalid_hostname(self):
@@ -168,10 +160,7 @@ class TestCreateNode(MAASTransactionServerTestCase):
         self.assertIsNotNone(node.id)
         self.assertCountEqual(
             mac_addresses,
-            [
-                nic.mac_address
-                for nic in node.current_config.interface_set.all()
-            ],
+            [nic.mac_address for nic in node.current_config.interface_set.all()],
         )
 
     def test_create_node_fails_with_invalid_domain(self):
@@ -233,9 +222,7 @@ class TestCreateNode(MAASTransactionServerTestCase):
             "power_id": factory.make_name("power_id"),
         }
 
-        node = create_node(
-            architecture, "virsh", power_parameters, mac_addresses
-        )
+        node = create_node(architecture, "virsh", power_parameters, mac_addresses)
 
         # Reload the object from the DB so that we're sure its power
         # parameters are being persisted.
@@ -291,9 +278,7 @@ class TestCommissionNode(MAASTransactionServerTestCase):
         user = factory.make_User()
         node = factory.make_Node(owner=user, status=NODE_STATUS.RELEASING)
 
-        self.assertRaises(
-            CommissionNodeFailed, commission_node, node.system_id, user
-        )
+        self.assertRaises(CommissionNodeFailed, commission_node, node.system_id, user)
 
 
 class TestMarkNodeFailed(MAASServerTestCase):
@@ -305,9 +290,7 @@ class TestMarkNodeFailed(MAASServerTestCase):
 
         node = factory.make_Node(status=NODE_STATUS.COMMISSIONING)
         mark_node_failed(node.system_id, factory.make_name("error"))
-        self.assertEqual(
-            NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status
-        )
+        self.assertEqual(NODE_STATUS.FAILED_COMMISSIONING, reload_object(node).status)
 
     def test_raises_NoSuchNode_if_node_doesnt_exist(self):
         self.assertRaises(
@@ -337,9 +320,7 @@ class TestRequestNodeInfoByMACAddress(MAASServerTestCase):
 
     def test_request_node_info_by_mac_address_returns_node_for_mac(self):
         interface = factory.make_Interface(INTERFACE_TYPE.PHYSICAL)
-        node, boot_purpose = request_node_info_by_mac_address(
-            interface.mac_address
-        )
+        node, boot_purpose = request_node_info_by_mac_address(interface.mac_address)
         self.assertEqual(node, interface.node_config.node)
 
 
@@ -356,9 +337,7 @@ class TestListClusterNodesPowerParameters(MAASServerTestCase):
         if power_state_queried is None:
             # Ensure that this node was last queried at least 5 minutes ago.
             power_state_queried = now() - timedelta(minutes=randint(6, 16))
-        node = factory.make_Node(
-            power_state_queried=power_state_queried, **kwargs
-        )
+        node = factory.make_Node(power_state_queried=power_state_queried, **kwargs)
         return node
 
     def test_raises_NoSuchCluster_if_rack_doesnt_exist(self):
@@ -371,9 +350,7 @@ class TestListClusterNodesPowerParameters(MAASServerTestCase):
     def test_returns_only_accessible_nodes(self):
         rack = factory.make_RackController()
         # Accessible nodes.
-        node_ids = [
-            self.make_Node(bmc_connected_to=rack).system_id for _ in range(3)
-        ]
+        node_ids = [self.make_Node(bmc_connected_to=rack).system_id for _ in range(3)]
         # Inaccessible nodes.
         for _ in range(3):
             node = self.make_Node(bmc_connected_to=rack)
@@ -471,9 +448,7 @@ class TestListClusterNodesPowerParameters(MAASServerTestCase):
         # Checked nodes are always sorted from least recently checked to most.
         node_sort_key = attrgetter("power_state_queried", "system_id")
         nodes_in_order = sorted(nodes, key=node_sort_key)
-        self.assertEqual(
-            [node.system_id for node in nodes_in_order], system_ids
-        )
+        self.assertEqual([node.system_id for node in nodes_in_order], system_ids)
 
     def test_returns_at_most_60kiB_of_JSON(self):
         # Configure the rack controller subnet to be very large so it
@@ -481,9 +456,7 @@ class TestListClusterNodesPowerParameters(MAASServerTestCase):
         # controller.
         rack = factory.make_RackController()
         rack_interface = rack.get_boot_interface()
-        subnet = factory.make_Subnet(
-            cidr=str(factory.make_ipv6_network(slash=8))
-        )
+        subnet = factory.make_Subnet(cidr=str(factory.make_ipv6_network(slash=8)))
         factory.make_StaticIPAddress(
             ip=factory.pick_ip_in_Subnet(subnet),
             subnet=subnet,
@@ -517,9 +490,7 @@ class TestListClusterNodesPowerParameters(MAASServerTestCase):
         # Configure the rack controller subnet to be large enough.
         rack = factory.make_RackController()
         rack_interface = rack.get_boot_interface()
-        subnet = factory.make_Subnet(
-            cidr=str(factory.make_ipv6_network(slash=8))
-        )
+        subnet = factory.make_Subnet(cidr=str(factory.make_ipv6_network(slash=8)))
         factory.make_StaticIPAddress(
             ip=factory.pick_ip_in_Subnet(subnet),
             subnet=subnet,
@@ -531,9 +502,7 @@ class TestListClusterNodesPowerParameters(MAASServerTestCase):
             self.make_Node(bmc_connected_to=rack)
 
         # Only 10 nodes' power parameters are returned.
-        self.assertEqual(
-            len(list_cluster_nodes_power_parameters(rack.system_id)), 10
-        )
+        self.assertEqual(len(list_cluster_nodes_power_parameters(rack.system_id)), 10)
 
 
 class TestUpdateNodePowerState(MAASServerTestCase):

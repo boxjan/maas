@@ -84,9 +84,7 @@ class AnonFilesHandler(AnonymousOperationsHandler):
 
     create = read = update = delete = None
 
-    get_by_key = operation(idempotent=True, exported_as="get_by_key")(
-        get_file_by_key
-    )
+    get_by_key = operation(idempotent=True, exported_as="get_by_key")(get_file_by_key)
 
     @classmethod
     def resource_uri(cls, *args, **kwargs):
@@ -203,12 +201,8 @@ class FilesHandler(OperationsHandler):
     update = None
     anonymous = AnonFilesHandler
 
-    get_by_name = operation(idempotent=True, exported_as="get")(
-        get_file_by_name
-    )
-    get_by_key = operation(idempotent=True, exported_as="get_by_key")(
-        get_file_by_key
-    )
+    get_by_name = operation(idempotent=True, exported_as="get")(get_file_by_name)
+    get_by_key = operation(idempotent=True, exported_as="get_by_key")(get_file_by_key)
 
     def create(self, request):
         """@description-title Add a new file

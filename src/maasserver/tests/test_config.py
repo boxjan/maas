@@ -41,18 +41,14 @@ class TestRegionConfiguration(MAASTestCase):
 
     def test_set_maas_url_accepts_very_short_hostnames(self):
         config = RegionConfiguration({})
-        example_url = factory.make_simple_http_url(
-            netloc=factory.make_string(size=1)
-        )
+        example_url = factory.make_simple_http_url(netloc=factory.make_string(size=1))
         config.maas_url = example_url
         self.assertEqual(example_url, config.maas_url)
         self.assertEqual({"maas_url": example_url}, config.store)
 
     def test_set_maas_url_rejects_bare_ipv6_addresses(self):
         config = RegionConfiguration({})
-        example_url = factory.make_simple_http_url(
-            netloc=factory.make_ipv6_address()
-        )
+        example_url = factory.make_simple_http_url(netloc=factory.make_ipv6_address())
         with self.assertRaisesRegex(
             formencode.api.Invalid, "^That is not a valid URL$"
         ):

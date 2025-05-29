@@ -29,9 +29,7 @@ class TestSSLKeyHandler(MAASServerTestCase):
         user = factory.make_User()
         handler = SSLKeyHandler(user, {}, None)
         sslkey = factory.make_SSLKey(user)
-        self.assertEqual(
-            self.dehydrate_sslkey(sslkey), handler.get({"id": sslkey.id})
-        )
+        self.assertEqual(self.dehydrate_sslkey(sslkey), handler.get({"id": sslkey.id}))
 
     def test_get_doesnt_work_if_not_owned(self):
         user = factory.make_User()

@@ -33,9 +33,7 @@ class NodeMetadata(CleanSave, TimestampedModel):
         verbose_name_plural = "NodeMetadata"
         unique_together = ("node", "key")
 
-    node = ForeignKey(
-        Node, null=False, blank=False, editable=False, on_delete=CASCADE
-    )
+    node = ForeignKey(Node, null=False, blank=False, editable=False, on_delete=CASCADE)
 
     key = CharField(max_length=64, null=False, blank=False)
 

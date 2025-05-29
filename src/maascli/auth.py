@@ -64,13 +64,9 @@ def obtain_credentials(url, credentials, ca_certs=None, insecure=False):
     if credentials == "-":
         credentials = sys.stdin.readline().strip()
     elif credentials is None:
-        credentials = get_apikey_via_macaroon(
-            url, ca_certs=ca_certs, insecure=insecure
-        )
+        credentials = get_apikey_via_macaroon(url, ca_certs=ca_certs, insecure=insecure)
         if credentials is None:
-            credentials = try_getpass(
-                "API key (leave empty for anonymous access): "
-            )
+            credentials = try_getpass("API key (leave empty for anonymous access): ")
     # Ensure that the credentials have a valid form.
     if credentials and not credentials.isspace():
         return convert_string_to_tuple(credentials)

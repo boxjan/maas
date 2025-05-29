@@ -159,9 +159,7 @@ class TestNodeAPI(APITestCase.ForUser):
 
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(
-            reverse(
-                "rackcontroller_handler", args=[parsed_result["system_id"]]
-            ),
+            reverse("rackcontroller_handler", args=[parsed_result["system_id"]]),
             parsed_result["resource_uri"],
         )
 
@@ -175,9 +173,7 @@ class TestNodeAPI(APITestCase.ForUser):
 
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(
-            reverse(
-                "regioncontroller_handler", args=[parsed_result["system_id"]]
-            ),
+            reverse("regioncontroller_handler", args=[parsed_result["system_id"]]),
             parsed_result["resource_uri"],
         )
 
@@ -237,10 +233,8 @@ class TestNodeAPI(APITestCase.ForUser):
                 hardware_type=HARDWARE_TYPE.NETWORK,
             )
         )
-        testing_script_results = (
-            machine.get_latest_testing_script_results.exclude(
-                status=SCRIPT_STATUS.ABORTED
-            )
+        testing_script_results = machine.get_latest_testing_script_results.exclude(
+            status=SCRIPT_STATUS.ABORTED
         )
         testing_status = get_status_from_qs(testing_script_results)
 
@@ -267,9 +261,7 @@ class TestNodeAPI(APITestCase.ForUser):
             SCRIPT_STATUS_CHOICES[testing_status][1],
             parsed_result["testing_status_name"],
         )
-        self.assertEqual(
-            status(cpu_script_result), parsed_result["cpu_test_status"]
-        )
+        self.assertEqual(status(cpu_script_result), parsed_result["cpu_test_status"])
         self.assertEqual(
             status_name(cpu_script_result),
             parsed_result["cpu_test_status_name"],
@@ -295,9 +287,7 @@ class TestNodeAPI(APITestCase.ForUser):
             status_name(storage_script_result),
             parsed_result["storage_test_status_name"],
         )
-        self.assertEqual(
-            status(node_script_result), parsed_result["other_test_status"]
-        )
+        self.assertEqual(status(node_script_result), parsed_result["other_test_status"])
         self.assertEqual(
             status_name(node_script_result),
             parsed_result["other_test_status_name"],
@@ -321,18 +311,10 @@ class TestNodeAPI(APITestCase.ForUser):
         system_serial = factory.make_NodeMetadata(machine, "system_serial")
         system_sku = factory.make_NodeMetadata(machine, "system_sku")
         cpu_model = factory.make_NodeMetadata(machine, "cpu_model")
-        mainboard_vendor = factory.make_NodeMetadata(
-            machine, "mainboard_vendor"
-        )
-        mainboard_product = factory.make_NodeMetadata(
-            machine, "mainboard_product"
-        )
-        mainboard_serial = factory.make_NodeMetadata(
-            machine, "mainboard_serial"
-        )
-        mainboard_version = factory.make_NodeMetadata(
-            machine, "mainboard_version"
-        )
+        mainboard_vendor = factory.make_NodeMetadata(machine, "mainboard_vendor")
+        mainboard_product = factory.make_NodeMetadata(machine, "mainboard_product")
+        mainboard_serial = factory.make_NodeMetadata(machine, "mainboard_serial")
+        mainboard_version = factory.make_NodeMetadata(machine, "mainboard_version")
         mainboard_firmware_vendor = factory.make_NodeMetadata(
             machine, "mainboard_firmware_vendor"
         )
@@ -420,18 +402,14 @@ class TestNodeAPI(APITestCase.ForUser):
         self.assertEqual(http.client.NOT_FOUND, response.status_code)
 
     def test_CREATE_disabled(self):
-        response = self.client.post(
-            reverse("node_handler", args=["invalid-uuid"]), {}
-        )
+        response = self.client.post(reverse("node_handler", args=["invalid-uuid"]), {})
         self.assertEqual(http.client.METHOD_NOT_ALLOWED, response.status_code)
 
     def test_UPDATE_disabled(self):
         machine = factory.make_Node(
             owner=self.user, architecture=make_usable_architecture(self)
         )
-        response = self.client.put(
-            self.get_node_uri(machine), {"hostname": "francis"}
-        )
+        response = self.client.put(self.get_node_uri(machine), {"hostname": "francis"})
         self.assertEqual(http.client.METHOD_NOT_ALLOWED, response.status_code)
 
 
@@ -472,9 +450,7 @@ class TestGetDetails(APITestCase.ForUser):
 
     def test_GET_returns_empty_details_when_there_are_none(self):
         node = factory.make_Node()
-        self.assertDictEqual(
-            {"lshw": None, "lldp": None}, self.get_details(node)
-        )
+        self.assertDictEqual({"lshw": None, "lldp": None}, self.get_details(node))
 
     def test_GET_returns_all_details(self):
         node = factory.make_Node()
@@ -523,24 +499,16 @@ class TestPowerParameters(APITestCase.ForUser):
         self.become_admin()
         power_parameters = {factory.make_string(): factory.make_string()}
         node = factory.make_Node(power_parameters=power_parameters)
-        response = self.client.get(
-            self.get_node_uri(node), {"op": "power_parameters"}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.get(self.get_node_uri(node), {"op": "power_parameters"})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_params = json_load_bytes(response.content)
         self.assertEqual(node.get_power_parameters(), parsed_params)
 
     def test_get_power_parameters_user(self):
         power_parameters = {factory.make_string(): factory.make_string()}
         node = factory.make_Node(power_parameters=power_parameters)
-        response = self.client.get(
-            self.get_node_uri(node), {"op": "power_parameters"}
-        )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        response = self.client.get(self.get_node_uri(node), {"op": "power_parameters"})
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_get_power_parameters_rbac_pool_admin(self):
         self.patch(auth, "validate_user_external_auth").return_value = True
@@ -550,12 +518,8 @@ class TestPowerParameters(APITestCase.ForUser):
         node = factory.make_Machine(power_parameters=power_parameters)
         rbac.store.add_pool(node.pool)
         rbac.store.allow(self.user.username, node.pool, "admin-machines")
-        response = self.client.get(
-            self.get_node_uri(node), {"op": "power_parameters"}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.get(self.get_node_uri(node), {"op": "power_parameters"})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_params = json_load_bytes(response.content)
         self.assertEqual(node.get_power_parameters(), parsed_params)
 
@@ -568,22 +532,14 @@ class TestPowerParameters(APITestCase.ForUser):
         rbac.store.add_pool(node.pool)
         rbac.store.allow(self.user.username, node.pool, "view")
         rbac.store.allow(self.user.username, node.pool, "deploy-machines")
-        response = self.client.get(
-            self.get_node_uri(node), {"op": "power_parameters"}
-        )
-        self.assertEqual(
-            http.client.FORBIDDEN, response.status_code, response.content
-        )
+        response = self.client.get(self.get_node_uri(node), {"op": "power_parameters"})
+        self.assertEqual(http.client.FORBIDDEN, response.status_code, response.content)
 
     def test_get_power_parameters_empty(self):
         self.become_admin()
         node = factory.make_Node()
-        response = self.client.get(
-            self.get_node_uri(node), {"op": "power_parameters"}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.get(self.get_node_uri(node), {"op": "power_parameters"})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_params = json_load_bytes(response.content)
         self.assertEqual(node.get_power_parameters(), parsed_params)
 
@@ -593,12 +549,8 @@ class TestPowerParameters(APITestCase.ForUser):
         node = factory.make_Node(
             owner=self.user, power_parameters=power_parameters, locked=True
         )
-        response = self.client.get(
-            self.get_node_uri(node), {"op": "power_parameters"}
-        )
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        response = self.client.get(self.get_node_uri(node), {"op": "power_parameters"})
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         parsed_params = json_load_bytes(response.content)
         self.assertEqual(node.get_power_parameters(), parsed_params)
 
@@ -622,8 +574,7 @@ class TestSetWorkloadAnnotations(APITestCase.ForUser):
     def test_must_be_owned(self):
         node = self.maker(status=NODE_STATUS.READY)
         params = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         params["op"] = "set_workload_annotations"
         response = self.client.post(self.get_node_uri(node), params)
@@ -632,8 +583,7 @@ class TestSetWorkloadAnnotations(APITestCase.ForUser):
     def test_adds_data(self):
         node = self.maker(status=NODE_STATUS.ALLOCATED, owner=self.user)
         annotations = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         params = annotations.copy()
         params["op"] = "set_workload_annotations"
@@ -646,8 +596,7 @@ class TestSetWorkloadAnnotations(APITestCase.ForUser):
 
     def test_updates_data(self):
         annotations = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         node = self.maker(
             status=NODE_STATUS.ALLOCATED,
@@ -667,8 +616,7 @@ class TestSetWorkloadAnnotations(APITestCase.ForUser):
 
     def test_removes_data(self):
         annotations = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         node = self.maker(
             status=NODE_STATUS.ALLOCATED,
@@ -695,8 +643,7 @@ class TestSetOwnerData(APITestCase.ForUser):
     def test_adds_data(self):
         node = factory.make_Node(status=NODE_STATUS.ALLOCATED, owner=self.user)
         owner_data = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         params = owner_data.copy()
         params["op"] = "set_owner_data"
@@ -713,9 +660,7 @@ class TestPowerMixin(APITestCase.ForUser):
 
     def setUp(self):
         super().setUp()
-        commissioning_osystem = Config.objects.get_config(
-            name="commissioning_osystem"
-        )
+        commissioning_osystem = Config.objects.get_config(name="commissioning_osystem")
         commissioning_series = Config.objects.get_config(
             name="commissioning_distro_series"
         )
@@ -735,9 +680,7 @@ class TestPowerMixin(APITestCase.ForUser):
     def test_POST_power_off_checks_permission(self):
         machine = factory.make_Node(owner=factory.make_User())
         machine_stop = self.patch(machine, "stop")
-        response = self.client.post(
-            self.get_node_uri(machine), {"op": "power_off"}
-        )
+        response = self.client.post(self.get_node_uri(machine), {"op": "power_off"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
         machine_stop.assert_not_called()
 
@@ -748,9 +691,7 @@ class TestPowerMixin(APITestCase.ForUser):
         machine = factory.make_Node(owner=self.user)
         machine_stop = self.patch(node_module.Machine, "stop")
         machine_stop.return_value = False
-        response = self.client.post(
-            self.get_node_uri(machine), {"op": "power_off"}
-        )
+        response = self.client.post(self.get_node_uri(machine), {"op": "power_off"})
         self.assertEqual(http.client.OK, response.status_code)
         self.assertIsNone(json_load_bytes(response.content))
         machine_stop.mock_called_once_with(ANY, stop_mode=ANY, comment=None)
@@ -758,9 +699,7 @@ class TestPowerMixin(APITestCase.ForUser):
     def test_POST_power_off_returns_machine(self):
         machine = factory.make_Node(owner=self.user)
         self.patch(node_module.Machine, "stop").return_value = True
-        response = self.client.post(
-            self.get_node_uri(machine), {"op": "power_off"}
-        )
+        response = self.client.post(self.get_node_uri(machine), {"op": "power_off"})
         self.assertEqual(http.client.OK, response.status_code)
         self.assertEqual(
             machine.system_id, json_load_bytes(response.content)["system_id"]
@@ -772,9 +711,7 @@ class TestPowerMixin(APITestCase.ForUser):
         )
         self.patch(machine, "stop")
         self.client.post(self.get_node_uri(machine), {"op": "power_off"})
-        response = self.client.post(
-            self.get_node_uri(machine), {"op": "power_off"}
-        )
+        response = self.client.post(self.get_node_uri(machine), {"op": "power_off"})
         self.assertEqual(http.client.OK, response.status_code)
 
     def test_POST_power_off_power_offs_machines(self):
@@ -798,9 +735,7 @@ class TestPowerMixin(APITestCase.ForUser):
             self.get_node_uri(machine),
             {"op": "power_off", "stop_mode": stop_mode},
         )
-        machine_stop.mock_called_once_with(
-            self.user, stop_mode=stop_mode, comment=None
-        )
+        machine_stop.mock_called_once_with(self.user, stop_mode=stop_mode, comment=None)
 
     def test_POST_power_off_returns_503_when_power_already_in_progress(self):
         machine = factory.make_Node(owner=self.user)
@@ -808,31 +743,19 @@ class TestPowerMixin(APITestCase.ForUser):
         self.patch(
             node_module.Machine, "stop"
         ).side_effect = PowerActionAlreadyInProgress(exc_text)
-        response = self.client.post(
-            self.get_node_uri(machine), {"op": "power_off"}
-        )
+        response = self.client.post(self.get_node_uri(machine), {"op": "power_off"})
         self.assertEqual(response.status_code, http.client.SERVICE_UNAVAILABLE)
-        self.assertIn(
-            exc_text, response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        self.assertIn(exc_text, response.content.decode(settings.DEFAULT_CHARSET))
 
     def test_POST_power_on_checks_permission(self):
-        machine = factory.make_Node_with_Interface_on_Subnet(
-            owner=factory.make_User()
-        )
-        response = self.client.post(
-            self.get_node_uri(machine), {"op": "power_on"}
-        )
+        machine = factory.make_Node_with_Interface_on_Subnet(owner=factory.make_User())
+        response = self.client.post(self.get_node_uri(machine), {"op": "power_on"})
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_POST_power_on_checks_ownership(self):
         self.become_admin()
-        machine = factory.make_Node_with_Interface_on_Subnet(
-            status=NODE_STATUS.READY
-        )
-        response = self.client.post(
-            self.get_node_uri(machine), {"op": "power_on"}
-        )
+        machine = factory.make_Node_with_Interface_on_Subnet(status=NODE_STATUS.READY)
+        response = self.client.post(self.get_node_uri(machine), {"op": "power_on"})
         self.assertEqual(http.client.CONFLICT, response.status_code)
         self.assertEqual(
             "Can't start node: it hasn't been allocated.",
@@ -864,21 +787,15 @@ class TestPowerMixin(APITestCase.ForUser):
             node_module.Node, "power_query"
         ).return_value
         mock__power_control_node.wait = Mock(return_value=POWER_STATE.ON)
-        response = self.client.get(
-            self.get_node_uri(node), {"op": "query_power_state"}
-        )
+        response = self.client.get(self.get_node_uri(node), {"op": "query_power_state"})
         self.assertEqual(http.client.OK, response.status_code)
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(POWER_STATE.ON, parsed_result["state"])
 
     def test_POST_test_tests_machine(self):
         self.patch(node_module.Machine, "_start").return_value = succeed(None)
-        factory.make_Script(
-            script_type=SCRIPT_TYPE.TESTING, tags=["commissioning"]
-        )
-        self.patch(
-            node_module.Node, "_power_control_node"
-        ).return_value = succeed(None)
+        factory.make_Script(script_type=SCRIPT_TYPE.TESTING, tags=["commissioning"])
+        self.patch(node_module.Node, "_power_control_node").return_value = succeed(None)
         node = factory.make_Node(
             status=NODE_STATUS.DEPLOYED,
             owner=factory.make_User(),
@@ -899,8 +816,7 @@ class TestPowerMixin(APITestCase.ForUser):
         self.become_admin()
 
         testing_scripts = [
-            factory.make_Script(script_type=SCRIPT_TYPE.TESTING)
-            for _ in range(10)
+            factory.make_Script(script_type=SCRIPT_TYPE.TESTING) for _ in range(10)
         ]
         testing_script_selected_by_tag = random.choice(testing_scripts)
         testing_script_selected_by_name = random.choice(testing_scripts)
@@ -949,9 +865,7 @@ class TestPowerMixin(APITestCase.ForUser):
         self.assertEqual(b"No testing scripts found!", response.content)
 
     def test_POST_test_tests_machine_errors_on_bad_form_data(self):
-        node = factory.make_Node(
-            status=NODE_STATUS.NEW, owner=factory.make_User()
-        )
+        node = factory.make_Node(status=NODE_STATUS.NEW, owner=factory.make_User())
         self.become_admin()
         response = self.client.post(self.get_node_uri(node), {"op": "test"})
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
@@ -1008,21 +922,15 @@ class TestPowerMixin(APITestCase.ForUser):
 
     def test_abort_passes_comment(self):
         self.become_admin()
-        node = factory.make_Node(
-            status=NODE_STATUS.DISK_ERASING, owner=self.user
-        )
+        node = factory.make_Node(status=NODE_STATUS.DISK_ERASING, owner=self.user)
         node_method = self.patch(node_module.Node, "abort_operation")
         comment = factory.make_name("comment")
-        self.client.post(
-            self.get_node_uri(node), {"op": "abort", "comment": comment}
-        )
+        self.client.post(self.get_node_uri(node), {"op": "abort", "comment": comment})
         node_method.mock_called_once_with(self.user, comment)
 
     def test_abort_handles_missing_comment(self):
         self.become_admin()
-        node = factory.make_Node(
-            status=NODE_STATUS.DISK_ERASING, owner=self.user
-        )
+        node = factory.make_Node(status=NODE_STATUS.DISK_ERASING, owner=self.user)
         node_method = self.patch(node_module.Node, "abort_operation")
         self.client.post(self.get_node_uri(node), {"op": "abort"})
         node_method.mock_called_once_with(self.user, None)

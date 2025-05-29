@@ -85,9 +85,7 @@ class BootResourceSet(CleanSave, TimestampedModel):
     @property
     def total_size(self):
         """Total amount of space this set will consume."""
-        total_size = self.files.all().aggregate(total_size=Sum("size"))[
-            "total_size"
-        ]
+        total_size = self.files.all().aggregate(total_size=Sum("size"))["total_size"]
         return total_size or 0
 
     @property
@@ -95,9 +93,9 @@ class BootResourceSet(CleanSave, TimestampedModel):
         if not self.files.exists():
             return 0.0
         return (
-            self.files.all().aggregate(
-                total_size=Sum("bootresourcefilesync__size")
-            )["total_size"]
+            self.files.all().aggregate(total_size=Sum("bootresourcefilesync__size"))[
+                "total_size"
+            ]
             or 0
         )
 

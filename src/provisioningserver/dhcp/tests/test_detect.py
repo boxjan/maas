@@ -52,9 +52,7 @@ class TestMakeDHCPTransactionID(MAASTestCase):
         self.assertEqual(4, len(transaction_id))
 
     def test_randomises(self):
-        self.assertNotEqual(
-            make_dhcp_transaction_id(), make_dhcp_transaction_id()
-        )
+        self.assertNotEqual(make_dhcp_transaction_id(), make_dhcp_transaction_id())
 
 
 class TestDHCPDiscoverPacket(MAASTestCase):
@@ -85,9 +83,7 @@ class TestDHCPDiscoverPacket(MAASTestCase):
         mac = factory.make_mac_address()
         seconds = random.randint(0, 1024)
         xid = factory.make_bytes(4)
-        discover = DHCPDiscoverPacket(
-            transaction_id=xid, mac=mac, seconds=seconds
-        )
+        discover = DHCPDiscoverPacket(transaction_id=xid, mac=mac, seconds=seconds)
         seconds_bytes = seconds.to_bytes(2, "big")
         expected = (
             b"\x01\x01\x06\x00"
@@ -139,9 +135,7 @@ class TestGetInterfaceIP(MAASTestCase):
 
     def test_invalid_interface_raises_interfacenotfound(self):
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        with self.assertRaisesRegex(
-            detect_module.InterfaceNotFound, "not found"
-        ):
+        with self.assertRaisesRegex(detect_module.InterfaceNotFound, "not found"):
             get_interface_ip(sock, factory.make_unicode_string(size=15))
 
     def test_no_ip_raises_ipaddressnotavailable(self):
@@ -167,9 +161,7 @@ class TestGetInterfaceIP(MAASTestCase):
 def patch_socket(testcase):
     """Patch `socket.socket` to return a mock."""
     sock = mock.MagicMock()
-    testcase.patch(
-        detect_module.socket, "socket", mock.MagicMock(return_value=sock)
-    )
+    testcase.patch(detect_module.socket, "socket", mock.MagicMock(return_value=sock))
     return sock
 
 
@@ -181,9 +173,7 @@ class TestUDPSocket(MAASTestCase):
         with udp_socket() as sock:
             socket_calls = list(socket.socket.mock_calls)
             close_calls = list(sock.close.mock_calls)
-        self.assertEqual(
-            [mock.call(socket.AF_INET, socket.SOCK_DGRAM)], socket_calls
-        )
+        self.assertEqual([mock.call(socket.AF_INET, socket.SOCK_DGRAM)], socket_calls)
         self.assertEqual([], close_calls)
 
     def test_closes_socket_on_exit(self):
@@ -208,14 +198,10 @@ class TestSendDHCPRequestPacket(MAASTestCase):
         mock_socket.bind = mock.MagicMock()
         mock_socket.sendto = mock.MagicMock()
         self.patch(detect_module.get_interface_ip).return_value = "127.0.0.1"
-        self.patch(
-            detect_module.get_interface_mac
-        ).return_value = "00:00:00:00:00:00"
+        self.patch(detect_module.get_interface_mac).return_value = "00:00:00:00:00:00"
         request = DHCPDiscoverPacket()
         send_dhcp_request_packet(request, "lo")
-        mock_socket.bind.assert_called_once_with(
-            ("127.0.0.1", BOOTP_CLIENT_PORT)
-        )
+        mock_socket.bind.assert_called_once_with(("127.0.0.1", BOOTP_CLIENT_PORT))
         mock_socket.sendto.assert_called_once_with(
             request.packet, ("<broadcast>", BOOTP_SERVER_PORT)
         )
@@ -292,9 +278,7 @@ class TestDHCPRequestMonitor(MAASTestCase):
             ]
         )
         mock_socket.bind.assert_called_once_with(("", 68))
-        mock_socket.settimeout.assert_called_once_with(
-            detect_module.SOCKET_TIMEOUT
-        )
+        mock_socket.settimeout.assert_called_once_with(detect_module.SOCKET_TIMEOUT)
         mock_socket.recvfrom.assert_has_calls(
             [call(2048), call(2048), call(2048), call(2048), call(2048)]
         )
@@ -351,9 +335,7 @@ class TestDHCPRequestMonitor(MAASTestCase):
         logger = self.useFixture(TwistedLoggerFixture())
         monitor = DHCPRequestMonitor("lo")
         error = factory.make_string()
-        monitor.deferredDHCPRequestErrback(
-            make_Failure(DHCPProbeException, error)
-        )
+        monitor.deferredDHCPRequestErrback(make_Failure(DHCPProbeException, error))
         self.assertEqual([f"DHCP probe failed. {error}"], logger.messages)
 
     def test_deferredDHCPRequestErrback_logs_unknown_exceptions(self):
@@ -412,9 +394,7 @@ class TestDHCPRequestMonitor(MAASTestCase):
     def test_run_logs_result_and_makes_properties_available(self):
         logger = self.useFixture(TwistedLoggerFixture())
         monitor = DHCPRequestMonitor("lo")
-        mock_send_and_await = self.patch(
-            monitor, "send_requests_and_await_replies"
-        )
+        mock_send_and_await = self.patch(monitor, "send_requests_and_await_replies")
         mock_send_and_await.return_value = {
             DHCPServer("127.0.0.1", "127.0.0.1"),
             DHCPServer("127.1.1.1", "127.2.2.2"),
@@ -432,9 +412,7 @@ class TestDHCPRequestMonitor(MAASTestCase):
     def test_run_skips_logging_if_no_servers_found(self):
         logger = self.useFixture(TwistedLoggerFixture())
         monitor = DHCPRequestMonitor("lo")
-        mock_send_and_await = self.patch(
-            monitor, "send_requests_and_await_replies"
-        )
+        mock_send_and_await = self.patch(monitor, "send_requests_and_await_replies")
         mock_send_and_await.return_value = {}
         yield monitor.run()
         mock_send_and_await.assert_called_once_with()

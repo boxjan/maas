@@ -181,9 +181,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
             fields=["hostname", "power_type"], exclude=["power_type"]
         )
         node = factory.make_Node()
-        self.assertEqual(
-            {"hostname": node.hostname}, handler.full_dehydrate(node)
-        )
+        self.assertEqual({"hostname": node.hostname}, handler.full_dehydrate(node))
 
     def test_full_dehydrate_includes_permissions_when_defined(self):
         handler = self.make_nodes_handler(
@@ -199,9 +197,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         )
 
     def test_full_dehydrate_only_includes_list_fields_when_for_list(self):
-        handler = self.make_nodes_handler(
-            list_fields=["cpu_count", "power_state"]
-        )
+        handler = self.make_nodes_handler(list_fields=["cpu_count", "power_state"])
         node = factory.make_Node()
         self.assertEqual(
             {"cpu_count": node.cpu_count, "power_state": node.power_state},
@@ -224,9 +220,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         mock_dehydrate_hostname = self.patch(handler, "dehydrate_hostname")
         mock_dehydrate_hostname.return_value = sentinel.hostname
         node = factory.make_Node()
-        self.assertEqual(
-            {"hostname": sentinel.hostname}, handler.full_dehydrate(node)
-        )
+        self.assertEqual({"hostname": sentinel.hostname}, handler.full_dehydrate(node))
         mock_dehydrate_hostname.assert_called_once_with(node.hostname)
 
     def test_full_dehydrate_calls_final_dehydrate_method(self):
@@ -234,9 +228,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         mock_dehydrate = self.patch_autospec(handler, "dehydrate")
         mock_dehydrate.return_value = sentinel.final_dehydrate
         node = factory.make_Node()
-        self.assertEqual(
-            sentinel.final_dehydrate, handler.full_dehydrate(node)
-        )
+        self.assertEqual(sentinel.final_dehydrate, handler.full_dehydrate(node))
         mock_dehydrate.assert_called_once_with(
             node, {"hostname": node.hostname}, for_list=False
         )
@@ -333,9 +325,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         call_hostname = factory.make_name("hostname")
         hostname = factory.make_name("hostname")
         handler = self.make_nodes_handler(fields=["hostname"])
-        node = self.make_mock_node_with_fields(
-            hostname=factory.make_name("hostname")
-        )
+        node = self.make_mock_node_with_fields(hostname=factory.make_name("hostname"))
         mock_hydrate_hostname = self.patch(handler, "hydrate_hostname")
         mock_hydrate_hostname.return_value = hostname
         handler.full_hydrate(node, {"hostname": call_hostname})
@@ -345,9 +335,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
     def test_full_hydrate_calls_final_hydrate_method(self):
         hostname = factory.make_name("hostname")
         handler = self.make_nodes_handler(fields=["hostname"])
-        node = self.make_mock_node_with_fields(
-            hostname=factory.make_name("hostname")
-        )
+        node = self.make_mock_node_with_fields(hostname=factory.make_name("hostname"))
         mock_hydrate = self.patch_autospec(handler, "hydrate")
         mock_hydrate.return_value = sentinel.final_hydrate
         self.assertEqual(
@@ -358,15 +346,11 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
 
     def test_hydrate_does_nothing(self):
         handler = self.make_nodes_handler()
-        self.assertEqual(
-            sentinel.obj, handler.hydrate(sentinel.obj, sentinel.nothing)
-        )
+        self.assertEqual(sentinel.obj, handler.hydrate(sentinel.obj, sentinel.nothing))
 
     def test_get_object_raises_HandlerValidationError(self):
         handler = self.make_nodes_handler()
-        self.assertRaises(
-            HandlerValidationError, handler.get_object, {"host": "test"}
-        )
+        self.assertRaises(HandlerValidationError, handler.get_object, {"host": "test"})
 
     def test_get_object_raises_HandlerDoesNotExistError(self):
         handler = self.make_nodes_handler()
@@ -397,9 +381,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         )
 
     def test_get_own_object_returns_object(self):
-        handler = self.make_nodes_handler(
-            queryset=SSLKey.objects.all(), pk="pk"
-        )
+        handler = self.make_nodes_handler(queryset=SSLKey.objects.all(), pk="pk")
         owned_sslkey = factory.make_SSLKey(handler.user)
         self.assertEqual(
             owned_sslkey.pk,
@@ -407,9 +389,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         )
 
     def test_get_own_object_doesnt_return_not_owned_objects(self):
-        handler = self.make_nodes_handler(
-            queryset=SSLKey.objects.all(), pk="id"
-        )
+        handler = self.make_nodes_handler(queryset=SSLKey.objects.all(), pk="id")
         not_owned_sslkey = factory.make_SSLKey(factory.make_User())
         self.assertRaises(
             HandlerDoesNotExistError,
@@ -510,9 +490,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         nodes = [factory.make_Node() for _ in range(9)]
         output = [{"hostname": node.hostname} for node in nodes[3:6]]
         handler = self.make_nodes_handler(fields=["hostname"])
-        self.assertCountEqual(
-            output, handler.list({"start": nodes[2].id, "limit": 3})
-        )
+        self.assertCountEqual(output, handler.list({"start": nodes[2].id, "limit": 3}))
 
     def test_list_pager_get_one(self):
         nodes = [factory.make_Node() for _ in range(5)]
@@ -714,9 +692,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
                 "mac_addresses": [factory.make_mac_address()],
             }
         )
-        self.assertEqual(
-            {"hostname": hostname, "architecture": arch}, json_obj
-        )
+        self.assertEqual({"hostname": hostname, "architecture": arch}, json_obj)
 
     def test_create_with_form_uses_form_from_get_form_class(self):
         hostname = factory.make_name("hostname")
@@ -733,9 +709,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
                 "mac_addresses": [factory.make_mac_address()],
             }
         )
-        self.assertEqual(
-            {"hostname": hostname, "architecture": arch}, json_obj
-        )
+        self.assertEqual({"hostname": hostname, "architecture": arch}, json_obj)
 
     def test_create_raised_permission_error(self):
         hostname = factory.make_name("hostname")
@@ -784,9 +758,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         handler = self.make_nodes_handler(fields=["hostname"])
         node = factory.make_Node()
         hostname = factory.make_name("hostname")
-        json_obj = handler.update(
-            {"system_id": node.system_id, "hostname": hostname}
-        )
+        json_obj = handler.update({"system_id": node.system_id, "hostname": hostname})
         self.assertEqual({"hostname": hostname}, json_obj)
         self.assertEqual(reload_object(node).hostname, hostname)
 
@@ -794,13 +766,9 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         arch = make_usable_architecture(self)
         node = factory.make_Node(architecture=arch, power_type="manual")
         hostname = factory.make_name("hostname")
-        handler = self.make_nodes_handler(
-            fields=["hostname"], form=AdminMachineForm
-        )
+        handler = self.make_nodes_handler(fields=["hostname"], form=AdminMachineForm)
         handler.user = factory.make_admin()
-        json_obj = handler.update(
-            {"system_id": node.system_id, "hostname": hostname}
-        )
+        json_obj = handler.update({"system_id": node.system_id, "hostname": hostname})
         self.assertEqual({"hostname": hostname}, json_obj)
         self.assertEqual(reload_object(node).hostname, hostname)
 
@@ -811,9 +779,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         handler = self.make_nodes_handler(fields=["hostname"])
         handler.user = factory.make_admin()
         self.patch(handler, "get_form_class").return_value = AdminMachineForm
-        json_obj = handler.update(
-            {"system_id": node.system_id, "hostname": hostname}
-        )
+        json_obj = handler.update({"system_id": node.system_id, "hostname": hostname})
         self.assertEqual({"hostname": hostname}, json_obj)
         self.assertEqual(reload_object(node).hostname, hostname)
 
@@ -837,9 +803,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
 
     def test_delete_raises_permission_error(self):
         node = factory.make_Node()
-        handler = self.make_nodes_handler(
-            delete_permission=NodePermission.admin
-        )
+        handler = self.make_nodes_handler(delete_permission=NodePermission.admin)
         self.assertRaises(
             HandlerPermissionError,
             handler.delete,
@@ -871,9 +835,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
         mock_listen = self.patch(handler, "listen")
         mock_listen.side_effect = HandlerDoesNotExistError()
         handler.on_listen(sentinel.channel, sentinel.action, pk)
-        mock_listen.assert_called_once_with(
-            sentinel.channel, sentinel.action, pk
-        )
+        mock_listen.assert_called_once_with(sentinel.channel, sentinel.action, pk)
 
     def test_on_listen_returns_None_if_unknown_action(self):
         handler = self.make_nodes_handler()
@@ -1019,9 +981,7 @@ class TestHandler(MAASServerTestCase, FakeNodesHandlerMixin):
             handler.listen(sentinel.channel, "update", sentinel.pk),
             sentinel.obj,
         )
-        mock_get_object.assert_called_once_with(
-            {handler._meta.pk: sentinel.pk}
-        )
+        mock_get_object.assert_called_once_with({handler._meta.pk: sentinel.pk})
 
     def test_sort_simple(self):
         for idx in range(3):
@@ -1052,12 +1012,8 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         return super().make_nodes_handler(use_paginated_list=True, **kwargs)
 
     def test_group_simple(self):
-        nodes_ready = [
-            factory.make_Node(status=NODE_STATUS.READY) for _ in range(3)
-        ]
-        nodes_new = [
-            factory.make_Node(status=NODE_STATUS.NEW) for _ in range(2)
-        ]
+        nodes_ready = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(3)]
+        nodes_new = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(2)]
 
         handler = self.make_nodes_handler(fields=["hostname", "status"])
         result = handler.list({"group_key": "status"})
@@ -1073,8 +1029,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
                     "count": 2,
                     "collapsed": False,
                     "items": [
-                        {"hostname": n.hostname, "status": n.status}
-                        for n in nodes_new
+                        {"hostname": n.hostname, "status": n.status} for n in nodes_new
                     ],
                 },
                 {
@@ -1096,12 +1051,8 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
             if key == "status":
                 return NODE_STATUS_CHOICES_DICT[value]
 
-        nodes_ready = [
-            factory.make_Node(status=NODE_STATUS.READY) for _ in range(3)
-        ]
-        nodes_new = [
-            factory.make_Node(status=NODE_STATUS.NEW) for _ in range(2)
-        ]
+        nodes_ready = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(3)]
+        nodes_new = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(2)]
 
         handler = self.make_nodes_handler(fields=["hostname", "status"])
         handler._get_group_label = get_group_label
@@ -1118,8 +1069,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
                     "count": 2,
                     "collapsed": False,
                     "items": [
-                        {"hostname": n.hostname, "status": n.status}
-                        for n in nodes_new
+                        {"hostname": n.hostname, "status": n.status} for n in nodes_new
                     ],
                 },
                 {
@@ -1206,9 +1156,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         self.assertEqual(None, result["groups"][0]["value"])
 
     def test_group_suppresion(self):
-        nodes_ready = [
-            factory.make_Node(status=NODE_STATUS.READY) for _ in range(3)
-        ]
+        nodes_ready = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(3)]
         _ = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(2)]
 
         handler = self.make_nodes_handler(fields=["hostname", "status"])
@@ -1243,9 +1191,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         self.assertEqual(output, result)
 
     def test_group_suppresion_out_of_scope(self):
-        nodes_ready = [
-            factory.make_Node(status=NODE_STATUS.READY) for _ in range(3)
-        ]
+        nodes_ready = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(3)]
 
         handler = self.make_nodes_handler(fields=["hostname", "status"])
         result = handler.list(
@@ -1273,9 +1219,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
 
     def test_group_page_first(self):
         _ = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)]
-        nodes_new = [
-            factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)
-        ]
+        nodes_new = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)]
 
         handler = self.make_nodes_handler(fields=["hostname", "status"])
         result = handler.list(
@@ -1306,12 +1250,8 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         self.assertEqual(output, result)
 
     def test_group_page_next(self):
-        nodes_ready = [
-            factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)
-        ]
-        nodes_new = [
-            factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)
-        ]
+        nodes_ready = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)]
+        nodes_new = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)]
 
         handler = self.make_nodes_handler(fields=["hostname", "status"])
         result = handler.list(
@@ -1352,9 +1292,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         self.assertEqual(output, result)
 
     def test_group_page_last(self):
-        nodes_ready = [
-            factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)
-        ]
+        nodes_ready = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)]
         _ = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)]
 
         handler = self.make_nodes_handler(fields=["hostname", "status"])
@@ -1386,9 +1324,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         self.assertEqual(output, result)
 
     def test_group_page_suppresion_beginning(self):
-        nodes_ready = [
-            factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)
-        ]
+        nodes_ready = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)]
         _ = [factory.make_Node(status=NODE_STATUS.DEPLOYED) for _ in range(5)]
         _ = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)]
 
@@ -1476,9 +1412,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         nodes_deployed = [
             factory.make_Node(status=NODE_STATUS.DEPLOYED) for _ in range(5)
         ]
-        nodes_new = [
-            factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)
-        ]
+        nodes_new = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)]
 
         handler = self.make_nodes_handler(fields=["hostname", "status"])
         result = handler.list(
@@ -1527,9 +1461,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         self.assertEqual(output, result)
 
     def test_group_page_suppresion_end(self):
-        nodes_ready = [
-            factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)
-        ]
+        nodes_ready = [factory.make_Node(status=NODE_STATUS.READY) for _ in range(5)]
         _ = [factory.make_Node(status=NODE_STATUS.DEPLOYED) for _ in range(5)]
         _ = [factory.make_Node(status=NODE_STATUS.NEW) for _ in range(5)]
 
@@ -1570,9 +1502,7 @@ class TestHandlerGrouping(MAASServerTestCase, FakeNodesHandlerMixin):
         self.assertEqual(output, result)
 
 
-class TestHandlerTransaction(
-    MAASTransactionServerTestCase, FakeNodesHandlerMixin
-):
+class TestHandlerTransaction(MAASTransactionServerTestCase, FakeNodesHandlerMixin):
     def test_execute_calls_asynchronous_method_with_params(self):
         # An asynchronous method -- decorated with @asynchronous -- is called
         # directly, not in a thread.

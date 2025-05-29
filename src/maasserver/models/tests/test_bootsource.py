@@ -37,9 +37,7 @@ class TestBootSource(MAASServerTestCase):
 
     def test_url_is_unqiue(self):
         boot_source = factory.make_BootSource()
-        self.assertRaises(
-            ValidationError, factory.make_BootSource, url=boot_source.url
-        )
+        self.assertRaises(ValidationError, factory.make_BootSource, url=boot_source.url)
 
     def test_cannot_set_keyring_data_and_filename(self):
         # A BootSource cannot have both a keyring filename and keyring
@@ -127,9 +125,7 @@ class TestBootSource(MAASServerTestCase):
     def test_compare_dict_without_selections_compares_True_to_self(self):
         boot_source = make_BootSource()
         boot_source_dict = boot_source.to_dict_without_selections()
-        self.assertTrue(
-            boot_source.compare_dict_without_selections(boot_source_dict)
-        )
+        self.assertTrue(boot_source.compare_dict_without_selections(boot_source_dict))
 
     def test_compare_dict_without_selections_compares_False_to_other(self):
         boot_source_1 = make_BootSource()
@@ -143,14 +139,10 @@ class TestBootSource(MAASServerTestCase):
     def test_compare_dict_without_selections_ignores_selections(self):
         boot_source = make_BootSource()
         boot_source_dict = boot_source.to_dict()
-        self.assertTrue(
-            boot_source.compare_dict_without_selections(boot_source_dict)
-        )
+        self.assertTrue(boot_source.compare_dict_without_selections(boot_source_dict))
 
     def test_compare_dict_without_selections_ignores_other_keys(self):
         boot_source = make_BootSource()
         boot_source_dict = boot_source.to_dict()
         boot_source_dict[factory.make_name("key")] = factory.make_name("value")
-        self.assertTrue(
-            boot_source.compare_dict_without_selections(boot_source_dict)
-        )
+        self.assertTrue(boot_source.compare_dict_without_selections(boot_source_dict))

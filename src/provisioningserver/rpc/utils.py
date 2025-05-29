@@ -26,9 +26,7 @@ maaslog = get_maas_logger("region")
 
 @asynchronous
 @inlineCallbacks
-def create_node(
-    macs, arch, power_type, power_parameters, domain=None, hostname=None
-):
+def create_node(macs, arch, power_type, power_parameters, domain=None, hostname=None):
     """Create a Node on the region and return its system_id.
 
     :param macs: A list of MAC addresses belonging to the node.

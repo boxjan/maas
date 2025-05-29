@@ -30,9 +30,7 @@ except ImportError:
 else:
     # Rackd service that twisted will spawn.
     twistd_plugins.append(
-        ProvisioningServiceMaker(
-            "maas-rackd", "The MAAS Rack Controller daemon."
-        )
+        ProvisioningServiceMaker("maas-rackd", "The MAAS Rack Controller daemon.")
     )
 
 try:

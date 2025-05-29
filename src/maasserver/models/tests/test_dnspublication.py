@@ -91,9 +91,7 @@ class TestDNSPublicationManager(MAASServerTestCase):
         self.assertEqual(DNSPublication.objects.all().count(), 10)
         DNSPublication.objects.collect_garbage()
         self.assertEqual(DNSPublication.objects.all().count(), 1)
-        self.assertEqual(
-            DNSPublication.objects.get_most_recent().serial, serial
-        )
+        self.assertEqual(DNSPublication.objects.get_most_recent().serial, serial)
 
     def test_collect_garbage_does_nothing_when_no_publications(self):
         self.assertFalse(DNSPublication.objects.all().exists())

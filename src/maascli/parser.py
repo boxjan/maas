@@ -31,15 +31,11 @@ class ArgumentParser(argparse.ArgumentParser):
         sys.stderr.write(message)
 
     def __init__(self, *args, **kwargs):
-        kwargs.setdefault(
-            "formatter_class", argparse.RawDescriptionHelpFormatter
-        )
+        kwargs.setdefault("formatter_class", argparse.RawDescriptionHelpFormatter)
         super().__init__(*args, **kwargs)
 
     def add_subparsers(self, title="drill down", metavar="COMMAND", **kwargs):
-        assert (
-            self.__subparsers is None
-        ), "Only one group of subparsers allowed."
+        assert self.__subparsers is None, "Only one group of subparsers allowed."
         self.__subparsers = super().add_subparsers(
             title=title, metavar=metavar, **kwargs
         )

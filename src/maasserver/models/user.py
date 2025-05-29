@@ -44,9 +44,7 @@ def create_auth_token(user, consumer_name=None):
     """
     if consumer_name is None:
         consumer_name = GENERIC_CONSUMER
-    consumer = Consumer.objects.create(
-        user=user, name=consumer_name, status="accepted"
-    )
+    consumer = Consumer.objects.create(user=user, name=consumer_name, status="accepted")
     consumer.generate_random_codes()
     # This is a 'generic' consumer aimed to service many clients, hence
     # we don't authenticate the consumer with key/secret key.

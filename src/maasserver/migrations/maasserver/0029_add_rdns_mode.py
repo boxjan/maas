@@ -2,9 +2,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0028_update_default_vlan_on_interface_and_subnet")
-    ]
+    dependencies = [("maasserver", "0028_update_default_vlan_on_interface_and_subnet")]
 
     operations = [
         migrations.AddField(

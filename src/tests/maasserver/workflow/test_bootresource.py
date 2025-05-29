@@ -64,9 +64,7 @@ def a_file(image_store_dir):
 
 @pytest.mark.usefixtures("maasdb")
 class TestCheckDiskSpace:
-    async def test_check_disk_space_total(
-        self, boot_activities, image_store_dir
-    ):
+    async def test_check_disk_space_total(self, boot_activities, image_store_dir):
         env = ActivityEnvironment()
         param = SpaceRequirementParam(total_resources_size=100)
         ok = await env.run(boot_activities.check_disk_space, param)
@@ -80,9 +78,7 @@ class TestCheckDiskSpace:
         ok = await env.run(boot_activities.check_disk_space, param)
         assert ok
 
-    async def test_check_disk_space_total_full(
-        self, boot_activities, image_store_dir
-    ):
+    async def test_check_disk_space_total_full(self, boot_activities, image_store_dir):
         env = ActivityEnvironment()
         param = SpaceRequirementParam(total_resources_size=120)
         ok = await env.run(boot_activities.check_disk_space, param)

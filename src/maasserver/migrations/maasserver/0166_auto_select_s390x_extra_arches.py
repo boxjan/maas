@@ -6,9 +6,7 @@ from django.db import migrations
 def add_s390x_to_pkg_repository_to_arches(apps, schema_editor):
     arches = ["armhf", "arm64", "ppc64el", "s390x"]
     PackageRepository = apps.get_model("maasserver", "PackageRepository")
-    repo = PackageRepository.objects.get(
-        url="http://ports.ubuntu.com/ubuntu-ports"
-    )
+    repo = PackageRepository.objects.get(url="http://ports.ubuntu.com/ubuntu-ports")
     repo.arches = arches
     repo.save()
 

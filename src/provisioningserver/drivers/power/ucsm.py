@@ -41,9 +41,7 @@ class UCSMPowerDriver(PowerDriver):
             "power_pass", "API password", field_type="password", secret=True
         ),
     ]
-    ip_extractor = make_ip_extractor(
-        "power_address", IP_EXTRACTOR_PATTERNS.URL
-    )
+    ip_extractor = make_ip_extractor("power_address", IP_EXTRACTOR_PATTERNS.URL)
 
     def detect_missing_packages(self):
         # uses urllib2 http client - nothing to look for!
@@ -57,9 +55,7 @@ class UCSMPowerDriver(PowerDriver):
     def power_off(self, system_id, context):
         """Power off UCSM node."""
         url, username, password, uuid = extract_ucsm_parameters(context)
-        power_control_ucsm(
-            url, username, password, uuid, maas_power_mode="off"
-        )
+        power_control_ucsm(url, username, password, uuid, maas_power_mode="off")
 
     def power_query(self, system_id, context):
         """Power query UCSM node."""

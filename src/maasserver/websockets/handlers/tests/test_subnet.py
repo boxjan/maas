@@ -249,9 +249,7 @@ class TestSubnetHandlerScan(MAASServerTestCase):
         result = handler.scan({"id": subnet.id})
         self.assertEqual(sentinel.result, result)
         self.scan_all_rack_networks.assert_called_once_with(cidrs=[cidr])
-        self.user_friendly_scan_results.assert_called_once_with(
-            sentinel.rpc_result
-        )
+        self.user_friendly_scan_results.assert_called_once_with(sentinel.rpc_result)
 
     def test_scan_as_admin_logs_the_fact_that_a_scan_happened(self):
         user = factory.make_admin()
@@ -279,9 +277,7 @@ class TestSubnetHandlerScan(MAASServerTestCase):
         user = factory.make_admin()
         handler = SubnetHandler(user, {}, None)
         subnet = factory.make_Subnet(version=4)
-        with self.assertRaisesRegex(
-            ValueError, ".*must be configured on a rack*"
-        ):
+        with self.assertRaisesRegex(ValueError, ".*must be configured on a rack*"):
             handler.scan({"id": subnet.id})
 
     def test_scan_as_non_admin_asserts(self):

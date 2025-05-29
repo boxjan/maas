@@ -153,14 +153,11 @@ class StatusHandlerResource(Resource):
             return error_msg.encode("ascii")
 
         # Ensure the other required keys exist.
-        missing_keys = [
-            key for key in self.requiredMessageKeys if key not in message
-        ]
+        missing_keys = [key for key in self.requiredMessageKeys if key not in message]
         if len(missing_keys) > 0:
             request.setResponseCode(400)
-            error_msg = (
-                "Missing parameter(s) %s in "
-                "status message." % ", ".join(missing_keys)
+            error_msg = "Missing parameter(s) %s in " "status message." % ", ".join(
+                missing_keys
             )
             logger.error(error_msg)
             return error_msg.encode("ascii")
@@ -288,15 +285,11 @@ def _get_ip_address_for_vmhost(node):
     new_ids = {boot_interface.id}
     while new_ids:
         new_ids = set(
-            Interface.objects.filter(parents__in=new_ids).values_list(
-                "id", flat=True
-            )
+            Interface.objects.filter(parents__in=new_ids).values_list("id", flat=True)
         )
         interface_ids |= new_ids
 
-    ip = node.ip_addresses(
-        ifaces=Interface.objects.filter(id__in=interface_ids)
-    )[0]
+    ip = node.ip_addresses(ifaces=Interface.objects.filter(id__in=interface_ids))[0]
     if ":" in ip:
         ip = f"[{ip}]"
     return ip
@@ -329,9 +322,9 @@ class StatusWorkerService(TimerService):
         Return a list of (node, messages) tuples, where each node is found
         from its authorisation.
         """
-        keys = NodeKey.objects.filter(
-            token__key__in=list(queue.keys())
-        ).select_related("node", "token")
+        keys = NodeKey.objects.filter(token__key__in=list(queue.keys())).select_related(
+            "node", "token"
+        )
         return [(key.node, queue[key.token.key]) for key in keys]
 
     def _processMessagesLater(self, tasks):
@@ -348,8 +341,7 @@ class StatusWorkerService(TimerService):
         # connection (e.g. via deferToDatabase).
         if in_transaction():
             raise TransactionManagementError(
-                "_processMessages must be called from "
-                "outside of a transaction."
+                "_processMessages must be called from " "outside of a transaction."
             )
         else:
             # Here we're in a database thread, with a database connection.
@@ -363,8 +355,7 @@ class StatusWorkerService(TimerService):
                 except Exception:
                     log.err(
                         None,
-                        "Failed to process message "
-                        "for node: %s" % node.hostname,
+                        "Failed to process message " "for node: %s" % node.hostname,
                     )
 
     @transactional
@@ -423,9 +414,7 @@ class StatusWorkerService(TimerService):
             ):
                 script_set = node.current_installation_script_set
             else:
-                raise ValueError(
-                    "Invalid status for saving files: %d" % node.status
-                )
+                raise ValueError("Invalid status for saving files: %d" % node.status)
 
             script_name = sent_file["path"]
             encoding = sent_file.get("encoding")
@@ -436,9 +425,7 @@ class StatusWorkerService(TimerService):
             # has occured(LP:1772118). Empty files are still captured as
             # they are sent as the empty string
             if content is not None:
-                content = self._retrieve_content(
-                    compression, encoding, content
-                )
+                content = self._retrieve_content(compression, encoding, content)
                 process_file(
                     results,
                     script_set,
@@ -510,9 +497,7 @@ class StatusWorkerService(TimerService):
                     _create_vmhost_for_deployment(node)
             elif node.status == NODE_STATUS.DISK_ERASING:
                 if failed:
-                    node.mark_failed(
-                        comment="Failed to erase disks.", commit=False
-                    )
+                    node.mark_failed(comment="Failed to erase disks.", commit=False)
                     save_node = True
                 elif self._is_modules_final_event(message):
                     # Cloud-init has completed. Finally, release the machine and all its resources.
@@ -520,9 +505,7 @@ class StatusWorkerService(TimerService):
 
             elif node.status == NODE_STATUS.RELEASING:
                 if failed:
-                    node.mark_failed(
-                        comment="Failed to release machine.", commit=False
-                    )
+                    node.mark_failed(comment="Failed to release machine.", commit=False)
                     save_node = True
                 elif self._is_modules_final_event(message):
                     # Cloud-init has completed. Finally, release the machine and all its resources.
@@ -597,24 +580,18 @@ class StatusWorkerService(TimerService):
 
     def _is_modules_final_event(self, message) -> bool:
         """Determines if the given message is the final event sent by cloud-init."""
-        return (
-            message["event_type"] == "finish"
-            and message["name"] == "modules-final"
-        )
+        return message["event_type"] == "finish" and message["name"] == "modules-final"
 
     def _processMessageNow(self, authorization, message):
         # This should be called in a non-reactor thread with a pre-existing
         # connection (e.g. via deferToDatabase).
         if in_transaction():
             raise TransactionManagementError(
-                "_processMessageNow must be called from "
-                "outside of a transaction."
+                "_processMessageNow must be called from " "outside of a transaction."
             )
         else:
             try:
-                node = transactional(NodeKey.objects.get_node_for_key)(
-                    authorization
-                )
+                node = transactional(NodeKey.objects.get_node_for_key)(authorization)
             except NodeKey.DoesNotExist:
                 # The node that should get this message has already had its
                 # owner cleared or changed and this message cannot be saved.
@@ -629,9 +606,7 @@ class StatusWorkerService(TimerService):
         # datetime object. This is used for the time for the event message.
         timestamp = message.get("timestamp", None)
         if timestamp is not None:
-            message["timestamp"] = datetime.utcfromtimestamp(
-                message["timestamp"]
-            )
+            message["timestamp"] = datetime.utcfromtimestamp(message["timestamp"])
         else:
             message["timestamp"] = datetime.utcnow()
 
@@ -643,15 +618,13 @@ class StatusWorkerService(TimerService):
             and message["origin"] == "curtin"
         )
         is_final_event = (
-            self._is_top_level(message["name"])
-            and message["event_type"] == "finish"
+            self._is_top_level(message["name"]) and message["event_type"] == "finish"
         )
         has_files = len(message.get("files", [])) > 0
         # Process Curtin early/late start/finish messages so that
         # status_expires is reset allowing them to take up to 40 min.
         is_curtin_early_late = (
-            message["name"]
-            in ["cmd-install/stage-early", "cmd-install/stage-late"]
+            message["name"] in ["cmd-install/stage-early", "cmd-install/stage-late"]
             and message["event_type"] in ["start", "finish"]
             and message["origin"] == "curtin"
         )
@@ -666,12 +639,8 @@ class StatusWorkerService(TimerService):
             or is_curtin_early_late
             or is_status_message_event
         ):
-            d = deferToDatabase(
-                self._processMessageNow, authorization, message
-            )
-            d.addErrback(
-                log.err, "Failed to process status message instantly."
-            )
+            d = deferToDatabase(self._processMessageNow, authorization, message)
+            d.addErrback(log.err, "Failed to process status message instantly.")
             return d
         else:
             self.queue[authorization].append(message)

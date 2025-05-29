@@ -60,9 +60,7 @@ class TestServiceManager(MAASServerTestCase):
         controller = factory.make_RegionController()
         Service.objects.create_services_for(controller)
         services = Service.objects.filter(node=controller)
-        self.assertEqual(
-            REGION_SERVICES, {service.name for service in services}
-        )
+        self.assertEqual(REGION_SERVICES, {service.name for service in services})
 
         controller.node_type = NODE_TYPE.MACHINE
         controller.save()
@@ -74,9 +72,7 @@ class TestServiceManager(MAASServerTestCase):
         controller = factory.make_RegionController()
         Service.objects.create_services_for(controller)
         services = Service.objects.filter(node=controller)
-        self.assertEqual(
-            REGION_SERVICES, {service.name for service in services}
-        )
+        self.assertEqual(REGION_SERVICES, {service.name for service in services})
 
         controller.node_type = NODE_TYPE.RACK_CONTROLLER
         controller.save()
@@ -91,9 +87,7 @@ class TestServiceManager(MAASServerTestCase):
         status = factory.pick_choice(SERVICE_STATUS_CHOICES)
         info = factory.make_name("info")
         observed = reload_object(
-            Service.objects.update_service_for(
-                controller, service, status, info
-            )
+            Service.objects.update_service_for(controller, service, status, info)
         )
 
         self.assertEqual(observed.node, controller)

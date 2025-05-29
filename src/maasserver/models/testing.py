@@ -13,9 +13,7 @@ class SignalDisconnected(fixtures.Fixture):  # DEPRECATED
     :deprecated: Use the managers in `m.models.signals` instead.
     """
 
-    def __init__(
-        self, signal, receiver, sender=None, weak=True, dispatch_uid=None
-    ):
+    def __init__(self, signal, receiver, sender=None, weak=True, dispatch_uid=None):
         super().__init__()
         self.signal = signal
         self.receiver = receiver

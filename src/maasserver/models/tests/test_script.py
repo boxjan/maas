@@ -20,9 +20,7 @@ class TestScriptManager(MAASServerTestCase):
         script_str = factory.make_string()
         comment = factory.make_name("comment")
 
-        script = Script.objects.create(
-            name=name, script=script_str, comment=comment
-        )
+        script = Script.objects.create(name=name, script=script_str, comment=comment)
 
         self.assertEqual(script_str, script.script.data)
         self.assertEqual(comment, script.script.comment)
@@ -42,9 +40,7 @@ class TestScriptManager(MAASServerTestCase):
         script_str = factory.make_string()
         timeout = random.randint(0, 1000)
 
-        script = Script.objects.create(
-            name=name, script=script_str, timeout=timeout
-        )
+        script = Script.objects.create(name=name, script=script_str, timeout=timeout)
 
         self.assertEqual(timedelta(seconds=timeout), script.timeout)
 
@@ -53,9 +49,7 @@ class TestScriptManager(MAASServerTestCase):
         script_str = factory.make_string()
         timeout = timedelta(random.randint(0, 1000))
 
-        script = Script.objects.create(
-            name=name, script=script_str, timeout=timeout
-        )
+        script = Script.objects.create(name=name, script=script_str, timeout=timeout)
 
         self.assertEqual(timeout, script.timeout)
 
@@ -81,9 +75,7 @@ class TestScript(MAASServerTestCase):
 
     def test_remove_tag(self):
         script = factory.make_Script()
-        removed_tag = random.choice(
-            [tag for tag in script.tags if "tag" in tag]
-        )
+        removed_tag = random.choice([tag for tag in script.tags if "tag" in tag])
         script.remove_tag(removed_tag)
         script.save()
         self.assertNotIn(removed_tag, reload_object(script).tags)

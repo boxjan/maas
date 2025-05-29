@@ -109,9 +109,7 @@ class TestVaultClient:
         client.set("mysecret", {"foo": "bar"})
         assert len(mock_hvac_client.auth.approle.login.mock_calls) == 1
         # simulate having an expired token
-        client._token_expire = datetime.now(tz=timezone.utc) - timedelta(
-            minutes=10
-        )
+        client._token_expire = datetime.now(tz=timezone.utc) - timedelta(minutes=10)
         client.set("othersecret", {"a": "b"})
         assert len(mock_hvac_client.auth.approle.login.mock_calls) == 2
 
@@ -194,9 +192,7 @@ class TestNoProxySettingForHVAC:
 
 class TestGetRegionVaultClient:
     def test_cached(self, mocker):
-        mock_get_client = mocker.patch.object(
-            vault, "_get_region_vault_client"
-        )
+        mock_get_client = mocker.patch.object(vault, "_get_region_vault_client")
         get_region_vault_client()
         get_region_vault_client()
         mock_get_client.assert_called_once()
@@ -224,9 +220,7 @@ class TestGetRegionVaultClient:
         assert client._secrets_base_path == secrets_path
         assert client._secrets_mount == secrets_mount
 
-    def test_get_client_with_custom_secrets_mount(
-        self, factory, vault_regionconfig
-    ):
+    def test_get_client_with_custom_secrets_mount(self, factory, vault_regionconfig):
         approle_id = factory.make_name("uuid")
         secret_id = factory.make_name("uuid")
         vault_regionconfig["vault_url"] = "http://vault:8200"
@@ -239,9 +233,7 @@ class TestGetRegionVaultClient:
 
 class TestGetRegionVaultClientIfEnabled:
     def test_cached(self, mocker):
-        mock_get_client = mocker.patch.object(
-            vault, "_get_region_vault_client"
-        )
+        mock_get_client = mocker.patch.object(vault, "_get_region_vault_client")
         mock_get_config = mocker.patch.object(Config.objects, "get_config")
         mock_get_config.return_value = True
 
@@ -275,14 +267,10 @@ class TestGetRegionVaultClientIfEnabled:
 class TestUnwrapSecret:
     def test_unwrap_secret_success(self, factory, mocker, mock_hvac_client):
         secret_id = factory.make_name("uuid")
-        mock_hvac_client.sys.unwrap.return_value = {
-            "data": {"secret_id": secret_id}
-        }
+        mock_hvac_client.sys.unwrap.return_value = {"data": {"secret_id": secret_id}}
         assert vault.unwrap_secret("http://vault:8200", "token") == secret_id
 
-    def test_unwrap_secret_no_secret_id_wrapped(
-        self, mocker, mock_hvac_client
-    ):
+    def test_unwrap_secret_no_secret_id_wrapped(self, mocker, mock_hvac_client):
         mock_hvac_client.sys.unwrap.return_value = {
             "data": {"something_thats_not_secret_id": "is wrapped"}
         }
@@ -296,9 +284,7 @@ class TestUnwrapSecret:
         with pytest.raises(WrappedSecretError):
             vault.unwrap_secret("http://vault:8200", "token")
 
-    def test_unwrap_secret_reraises_hvac_exceptions(
-        self, mocker, mock_hvac_client
-    ):
+    def test_unwrap_secret_reraises_hvac_exceptions(self, mocker, mock_hvac_client):
         mocker.patch.object(
             mock_hvac_client.sys, "unwrap"
         ).side_effect = HVACVaultError("Test")
@@ -367,9 +353,7 @@ class TestCheckApprolePermissions:
 class TestClearVaultCaches:
     def test_clears_vault_caches(self, mocker):
         mocker.patch.object(Config.objects, "get_config").return_value = True
-        mock_get_client = mocker.patch.object(
-            vault, "_get_region_vault_client"
-        )
+        mock_get_client = mocker.patch.object(vault, "_get_region_vault_client")
         first_client = MagicMock()
         second_client = MagicMock()
         mock_get_client.side_effect = [first_client, second_client]

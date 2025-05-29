@@ -77,8 +77,7 @@ def capture_queries_while_holding_lock(lock):
 
 class TestDatabaseLock(MAASTransactionServerTestCase):
     scenarios = tuple(
-        ("%s/%s" % mode, {"mode": mode})
-        for mode in dblocks.DatabaseLock.MODE_CHOICES
+        ("%s/%s" % mode, {"mode": mode}) for mode in dblocks.DatabaseLock.MODE_CHOICES
     )
 
     def make_lock(self, objid):
@@ -183,9 +182,7 @@ class TestDatabaseLock(MAASTransactionServerTestCase):
         objid = get_objid()
         connection.close()
         lock = self.make_lock(objid)
-        self.assertRaises(
-            dblocks.DatabaseLockAttemptWithoutConnection, lock.__enter__
-        )
+        self.assertRaises(dblocks.DatabaseLockAttemptWithoutConnection, lock.__enter__)
 
     def test_releasing_lock_fails_when_lock_not_held(self):
         objid = get_objid()
@@ -300,9 +297,7 @@ class TestDatabaseXactLock(MAASTransactionServerTestCase):
     def test_obtaining_lock_fails_when_outside_of_transaction(self):
         objid = get_objid()
         lock = self.make_lock(objid)
-        self.assertRaises(
-            dblocks.DatabaseLockAttemptOutsideTransaction, lock.__enter__
-        )
+        self.assertRaises(dblocks.DatabaseLockAttemptOutsideTransaction, lock.__enter__)
 
     def test_releasing_lock_does_nothing(self):
         objid = get_objid()
@@ -376,9 +371,7 @@ class TestTryingToAcquireLockedLock(MAASServerTestCase):
     def test_try_shared_variation_when_already_exclusively_locked(self):
         lock = self.make_lock(get_objid())
         with lock_held_in_other_thread(lock):
-            self.assertRaises(
-                dblocks.DatabaseLockNotHeld, lock.TRY.SHARED.__enter__
-            )
+            self.assertRaises(dblocks.DatabaseLockNotHeld, lock.TRY.SHARED.__enter__)
 
     def test_try_shared_variation_when_already_share_locked(self):
         lock = self.make_lock(get_objid())

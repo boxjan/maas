@@ -4,9 +4,7 @@ from maasserver.enum import NODE_STATUS
 
 
 def test_node_mark_failed_deployment_logs_failure(factory, caplog):
-    node = factory.make_Node(
-        status=NODE_STATUS.DEPLOYING, with_boot_disk=False
-    )
+    node = factory.make_Node(status=NODE_STATUS.DEPLOYING, with_boot_disk=False)
     with caplog.at_level(logging.DEBUG):
         node.mark_failed()
     assert node.status == NODE_STATUS.FAILED_DEPLOYMENT

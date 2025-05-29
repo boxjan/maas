@@ -42,9 +42,7 @@ class TestStatusQueryEvent(MAASServerTestCase):
 
         # One post-commit hooks have been fired, then it's called.
         post_commit_hooks.fire()
-        power.update_power_state_of_node_soon.assert_called_once_with(
-            node.system_id
-        )
+        power.update_power_state_of_node_soon.assert_called_once_with(node.system_id)
 
     def test_changing_not_tracked_status_of_node_doesnt_emit_event(self):
         self.patch_autospec(power, "update_power_state_of_node_soon")
@@ -63,9 +61,7 @@ class TestUpdatePowerStateOfNodeSoon(MAASServerTestCase):
         power.update_power_state_of_node_soon(node.system_id, clock=clock)
         power.update_power_state_of_node.assert_not_called()
         clock.advance(power.WAIT_TO_QUERY.total_seconds())
-        power.update_power_state_of_node.assert_called_once_with(
-            node.system_id
-        )
+        power.update_power_state_of_node.assert_called_once_with(node.system_id)
 
 
 class TestUpdatePowerStateOfNode(MAASTransactionServerTestCase):
@@ -111,6 +107,5 @@ class TestUpdatePowerStateOfNode(MAASTransactionServerTestCase):
         yield power.update_power_state_of_node(node.system_id)
         mock_log_err.assert_called_once_with(
             ANY,
-            "Failed to update power state of machine after state "
-            "transition.",
+            "Failed to update power state of machine after state " "transition.",
         )

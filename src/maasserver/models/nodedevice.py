@@ -60,9 +60,7 @@ class NodeDevice(CleanSave, TimestampedModel):
 
     node_config = ForeignKey("NodeConfig", on_delete=CASCADE)
 
-    numa_node = ForeignKey(
-        "NUMANode", related_name="node_devices", on_delete=CASCADE
-    )
+    numa_node = ForeignKey("NUMANode", related_name="node_devices", on_delete=CASCADE)
 
     # Only used if the NodeDevice is a PhysicalBlockDevice directly attached
     # to a bus(e.g NVMe)
@@ -87,9 +85,7 @@ class NodeDevice(CleanSave, TimestampedModel):
     # Vendor and product IDs are defined in the hardware and never change
     vendor_id = CharField(
         max_length=4,
-        validators=[
-            RegexValidator(DEVICE_ID_REGEX, "Must be an 8 byte hex value")
-        ],
+        validators=[RegexValidator(DEVICE_ID_REGEX, "Must be an 8 byte hex value")],
         blank=False,
         null=False,
         editable=False,
@@ -97,9 +93,7 @@ class NodeDevice(CleanSave, TimestampedModel):
 
     product_id = CharField(
         max_length=4,
-        validators=[
-            RegexValidator(DEVICE_ID_REGEX, "Must be an 8 byte hex value")
-        ],
+        validators=[RegexValidator(DEVICE_ID_REGEX, "Must be an 8 byte hex value")],
         blank=False,
         null=False,
         editable=False,
@@ -163,7 +157,5 @@ class NodeDevice(CleanSave, TimestampedModel):
             if "update_fields" in kwargs:
                 kwargs["update_fields"] += ["bus_number", "device_number"]
         if self.is_usb and self.pci_address is not None:
-            raise ValidationError(
-                {"pci_address": ["Cannot be set on a USB device!"]}
-            )
+            raise ValidationError({"pci_address": ["Cannot be set on a USB device!"]})
         return super().save(*args, **kwargs)

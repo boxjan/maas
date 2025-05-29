@@ -75,9 +75,7 @@ class TestWedgePowerDriver(MAASTestCase):
         SSHClient = self.patch(wedge_module, "SSHClient")
         ssh_client = SSHClient.return_value
         ssh_client.connect.side_effect = error
-        self.assertRaises(
-            PowerConnError, driver.run_wedge_command, command, **context
-        )
+        self.assertRaises(PowerConnError, driver.run_wedge_command, command, **context)
 
     def test_power_on_calls_run_wedge_command(self):
         driver = WedgePowerDriver()
@@ -100,9 +98,7 @@ class TestWedgePowerDriver(MAASTestCase):
         power_query.return_value = "off"
         run_wedge_command = self.patch(driver, "run_wedge_command")
         run_wedge_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_on, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_on, system_id, context)
 
     def test_power_off_calls_run_wedge_command(self):
         driver = WedgePowerDriver()
@@ -120,9 +116,7 @@ class TestWedgePowerDriver(MAASTestCase):
         context = make_context()
         run_wedge_command = self.patch(driver, "run_wedge_command")
         run_wedge_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_off, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_off, system_id, context)
 
     @given(sampled_from(WedgeState.ON + WedgeState.OFF))
     @settings(deadline=None)
@@ -147,9 +141,7 @@ class TestWedgePowerDriver(MAASTestCase):
         context = make_context()
         run_wedge_command = self.patch(driver, "run_wedge_command")
         run_wedge_command.side_effect = PowerConnError("Connection Error")
-        self.assertRaises(
-            PowerActionError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerActionError, driver.power_query, system_id, context)
 
     def test_power_query_crashes_when_unable_to_find_match(self):
         driver = WedgePowerDriver()
@@ -157,6 +149,4 @@ class TestWedgePowerDriver(MAASTestCase):
         context = make_context()
         run_wedge_command = self.patch(driver, "run_wedge_command")
         run_wedge_command.return_value = "Rubbish"
-        self.assertRaises(
-            PowerFatalError, driver.power_query, system_id, context
-        )
+        self.assertRaises(PowerFatalError, driver.power_query, system_id, context)

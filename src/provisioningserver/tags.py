@@ -57,9 +57,7 @@ def process_response(response):
     elif content_type == "application/json":
         content_charset = response.headers.get_content_charset()
         return json.loads(
-            content.decode(
-                "utf-8" if content_charset is None else content_charset
-            )
+            content.decode("utf-8" if content_charset is None else content_charset)
         )
     else:
         return content
@@ -80,9 +78,7 @@ def get_details_for_nodes(client, system_ids):
     return details
 
 
-def post_updated_nodes(
-    client, rack_id, tag_name, tag_definition, added, removed
-):
+def post_updated_nodes(client, rack_id, tag_name, tag_definition, added, removed):
     """Update the nodes relevant for a particular tag.
 
     :param client: MAAS client

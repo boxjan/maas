@@ -165,9 +165,7 @@ class PodForm(MAASModelForm):
         initial=MACVLAN_MODE_CHOICES[0],
     )
 
-    def __init__(
-        self, data=None, instance=None, request=None, user=None, **kwargs
-    ):
+    def __init__(self, data=None, instance=None, request=None, user=None, **kwargs):
         self.is_new = instance is None
         self.request = request
         self.user = user
@@ -185,12 +183,9 @@ class PodForm(MAASModelForm):
         if not self.drivers:
             type_value = ""
         elif type_value not in self.drivers:
-            type_value = (
-                "" if self.instance is None else self.instance.power_type
-            )
+            type_value = "" if self.instance is None else self.instance.power_type
         choices = [
-            (name, driver["description"])
-            for name, driver in self.drivers.items()
+            (name, driver["description"]) for name, driver in self.drivers.items()
         ]
         self.fields["type"] = forms.ChoiceField(
             required=True, choices=choices, initial=type_value
@@ -203,9 +198,7 @@ class PodForm(MAASModelForm):
             self.initial["tags"] = ",".join(instance.tags)
             self.initial["zone"] = instance.zone.name
             self.initial["pool"] = instance.pool.name
-            self.fields[
-                "default_storage_pool"
-            ].queryset = instance.storage_pools.all()
+            self.fields["default_storage_pool"].queryset = instance.storage_pools.all()
             if instance.default_storage_pool:
                 self.initial[
                     "default_storage_pool"
@@ -222,9 +215,7 @@ class PodForm(MAASModelForm):
             driver_fields = get_driver_parameters_from_json(
                 self.drivers_orig, scope=SETTING_SCOPE.BMC
             )
-            self.param_fields = driver_fields[
-                self.cleaned_data["type"]
-            ].field_dict
+            self.param_fields = driver_fields[self.cleaned_data["type"]].field_dict
             self.fields.update(self.param_fields)
             if not self.is_new:
                 for key, value in self.instance.get_power_parameters().items():
@@ -296,8 +287,7 @@ class PodForm(MAASModelForm):
                     # Pod already exists with the same power_type and
                     # parameters.
                     raise ValidationError(
-                        "Pod %s with type and "
-                        "parameters already exist." % bmc.name
+                        "Pod %s with type and " "parameters already exist." % bmc.name
                     )
 
         # update the object
@@ -436,9 +426,7 @@ class ComposeMachineForm(forms.Form):
                 required=False,
             )
         else:
-            self.fields["cpu_speed"] = IntegerField(
-                min_value=300, required=False
-            )
+            self.fields["cpu_speed"] = IntegerField(min_value=300, required=False)
 
         def duplicated_hostname(hostname):
             if Node.objects.filter(hostname=hostname).exists():
@@ -497,9 +485,7 @@ class ComposeMachineForm(forms.Form):
         for _, size, tags in storage_constraints:
             if tags is None:
                 tags = []
-            block_devices.append(
-                RequestedMachineBlockDevice(size=size, tags=tags)
-            )
+            block_devices.append(RequestedMachineBlockDevice(size=size, tags=tags))
         interfaces_label_map = self.get_value_for("interfaces")
         if interfaces_label_map is not None:
             requested_machine_interfaces = (
@@ -525,12 +511,10 @@ class ComposeMachineForm(forms.Form):
         )
 
     def _pick_interface(self, interfaces):
-        bridge_interfaces = interfaces.filter(
-            type=INTERFACE_TYPE.BRIDGE
-        ).order_by("-id")
-        bond_interfaces = interfaces.filter(type=INTERFACE_TYPE.BOND).order_by(
+        bridge_interfaces = interfaces.filter(type=INTERFACE_TYPE.BRIDGE).order_by(
             "-id"
         )
+        bond_interfaces = interfaces.filter(type=INTERFACE_TYPE.BOND).order_by("-id")
         bridge_interface = list(bridge_interfaces[:1])
         if bridge_interface:
             return bridge_interface[0]
@@ -556,9 +540,7 @@ class ComposeMachineForm(forms.Form):
         )
         pod_node_id = self.pod.host.id
         if pod_node_id not in result.node_ids:
-            raise ValidationError(
-                "This pod does not match the specified networks."
-            )
+            raise ValidationError("This pod does not match the specified networks.")
         has_bootable_vlan = False
         for label in result.label_map.keys():
             # XXX: We might want to use the "deepest" interface in the
@@ -568,9 +550,7 @@ class ComposeMachineForm(forms.Form):
             # Search for bridges, followed by bonds, and finally with the
             # remaining interfaces.
             interface_ids = result.label_map[label][pod_node_id]
-            interfaces = Interface.objects.filter(
-                id__in=interface_ids
-            ).order_by("-id")
+            interfaces = Interface.objects.filter(id__in=interface_ids).order_by("-id")
             interface = self._pick_interface(interfaces)
 
             # Check to see if we have a bootable VLAN,
@@ -702,9 +682,7 @@ class ComposeMachineForm(forms.Form):
                 pod_id=self.pod.id,
                 name=self.pod.name,
             )
-            d.addCallback(
-                partial(deferToDatabase, transactional(create_and_sync))
-            )
+            d.addCallback(partial(deferToDatabase, transactional(create_and_sync)))
             d.addCallback(
                 lambda created_machine, _: created_machine,
                 request_commissioning_results(self.pod),
@@ -743,8 +721,7 @@ class ComposeMachineForm(forms.Form):
             except crochet.TimeoutError:
                 raise PodProblem(
                     "Unable to compose a machine because '%s' driver "
-                    "timed out after %d seconds."
-                    % (self.pod.power_type, timeout)
+                    "timed out after %d seconds." % (self.pod.power_type, timeout)
                 )
             created_machine = create_and_sync((requested_machine, result))
             post_commit_do(
@@ -810,9 +787,7 @@ class ComposeMachineForPodsForm(forms.Form):
             pod_form for pod_form in self.pod_forms if pod_form.is_valid()
         ]
         if not self.valid_pod_forms:
-            self.add_error(
-                "__all__", "No current pod resources match constraints."
-            )
+            self.add_error("__all__", "No current pod resources match constraints.")
 
 
 class DeletePodForm(forms.Form):

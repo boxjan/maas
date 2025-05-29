@@ -43,9 +43,7 @@ class NodePowerMonitorService(TimerService):
         try:
             client = getRegionClient()
         except NoConnectionsAvailable:
-            log.debug(
-                "Cannot monitor nodes' power status; region not available."
-            )
+            log.debug("Cannot monitor nodes' power status; region not available.")
         else:
             d = self.query_nodes(client)
             d.addErrback(self.query_nodes_failed, client.localIdent)
@@ -56,9 +54,7 @@ class NodePowerMonitorService(TimerService):
         # Get the nodes' power parameters from the region. Keep getting more
         # power parameters until the region returns an empty list.
         while True:
-            response = yield client(
-                ListNodePowerParameters, uuid=client.localIdent
-            )
+            response = yield client(ListNodePowerParameters, uuid=client.localIdent)
             power_parameters = response["nodes"]
             if len(power_parameters) > 0:
                 yield query_all_nodes(
@@ -71,9 +67,7 @@ class NodePowerMonitorService(TimerService):
 
     def query_nodes_failed(self, failure, localIdent):
         if failure.check(NoSuchCluster):
-            maaslog.error(
-                "Rack controller '%s' is not recognised.", localIdent
-            )
+            maaslog.error("Rack controller '%s' is not recognised.", localIdent)
         elif failure.check(ConnectionDone):
             maaslog.error("Lost connection to region controller.")
         else:

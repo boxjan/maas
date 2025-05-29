@@ -153,9 +153,7 @@ def _create_cluster_certificate_if_necessary(
     secret_manager = SecretManager(client)
 
     # The PK/certificate for the maas CA are not in the db yet
-    maas_ca = _get_certificate_from_database(
-        secret_manager, "maas-ca-certificate"
-    )
+    maas_ca = _get_certificate_from_database(secret_manager, "maas-ca-certificate")
     if not maas_ca:
         maas_ca = generate_ca_certificate("maas-ca")
         secrets = {

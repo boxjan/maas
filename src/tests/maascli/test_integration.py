@@ -33,9 +33,7 @@ class TestMAASCli(MAASTestCase):
             self.run_command()
         except CalledProcessError as error:
             self.assertTrue(
-                error.output.decode("utf-8").startswith(
-                    "usage: maas [-h] COMMAND"
-                )
+                error.output.decode("utf-8").startswith("usage: maas [-h] COMMAND")
             )
 
     def test_help_option_succeeds(self):

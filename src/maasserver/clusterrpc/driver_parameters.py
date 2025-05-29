@@ -64,9 +64,7 @@ def make_form_field(json_field):
     :return: The correct Django form field for the field type, as
         specified in FIELD_TYPE_MAPPINGS.
     """
-    field_class = FIELD_TYPE_MAPPINGS.get(
-        json_field["field_type"], forms.CharField
-    )
+    field_class = FIELD_TYPE_MAPPINGS.get(json_field["field_type"], forms.CharField)
     if json_field["field_type"] in ("choice", "multiple_choice"):
         invalid_choice_message = compose_invalid_choice_text(
             json_field["name"], json_field["choices"]
@@ -216,9 +214,7 @@ def get_driver_parameters_from_json(
 
 def get_driver_parameters(initial_power_params=None, skip_check=False):
     params = get_all_power_types()
-    return get_driver_parameters_from_json(
-        params, initial_power_params, skip_check
-    )
+    return get_driver_parameters_from_json(params, initial_power_params, skip_check)
 
 
 def get_driver_choices():

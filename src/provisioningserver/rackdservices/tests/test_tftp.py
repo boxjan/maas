@@ -167,9 +167,7 @@ class TestTFTPBackend(MAASTestCase):
         backend = TFTPBackend(self.make_dir(), client_service)
 
         with TwistedLoggerFixture() as logger:
-            with self.assertRaisesRegex(
-                BackendError, re.escape(exception_message)
-            ):
+            with self.assertRaisesRegex(BackendError, re.escape(exception_message)):
                 yield backend.get_reader(b"pxelinux.cfg/default")
 
         # The original exception is logged.
@@ -192,9 +190,7 @@ class TestTFTPBackend(MAASTestCase):
             params_json_reader = BytesReader(params_json)
             return succeed(params_json_reader)
 
-        reader = yield context.call(
-            call_context, backend.get_reader, config_path
-        )
+        reader = yield context.call(call_context, backend.get_reader, config_path)
         output = reader.read(10000).decode("ascii")
         # The addresses provided by python-tx-tftp in the call context are
         # passed over the wire as address:port strings.
@@ -244,9 +240,7 @@ class TestTFTPBackend(MAASTestCase):
         for _ in range(10):
             client = Mock()
             client.localIdent = factory.make_name("system_id")
-            client.side_effect = lambda *args, **kwargs: (
-                succeed(dict(fake_params))
-            )
+            client.side_effect = lambda *args, **kwargs: (succeed(dict(fake_params)))
             clients.append(client)
         client_service = Mock()
         client_service.getClientNow.side_effect = [
@@ -298,9 +292,7 @@ class TestTFTPBackend(MAASTestCase):
         for _ in range(10):
             client = Mock()
             client.localIdent = factory.make_name("system_id")
-            client.side_effect = lambda *args, **kwargs: (
-                succeed(dict(fake_params))
-            )
+            client.side_effect = lambda *args, **kwargs: (succeed(dict(fake_params)))
             clients.append(client)
         client_service = Mock()
         client_service.getClientNow.side_effect = [
@@ -355,9 +347,7 @@ class TestTFTPBackend(MAASTestCase):
         for _ in range(10):
             client = Mock()
             client.localIdent = factory.make_name("system_id")
-            client.side_effect = lambda *args, **kwargs: (
-                succeed(dict(fake_params))
-            )
+            client.side_effect = lambda *args, **kwargs: (succeed(dict(fake_params)))
             clients.append(client)
         client_service = Mock()
         client_service.getClientNow.side_effect = [
@@ -605,9 +595,7 @@ class TestTFTPBackend(MAASTestCase):
             params_json_reader = BytesReader(params_json)
             return succeed(params_json_reader)
 
-        reader = yield context.call(
-            call_context, backend.get_reader, config_path
-        )
+        reader = yield context.call(call_context, backend.get_reader, config_path)
         output = reader.read(10000).decode("ascii")
         observed_params = json.loads(output)
         # XXX: GavinPanella 2015-11-25 bug=1519804: get_by_pxealias() on
@@ -620,8 +608,7 @@ class TestTFTPBackend(MAASTestCase):
             for name, _ in GetBootConfig.arguments
         }
         params_other = {
-            factory.make_name("name"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("name"): factory.make_name("value") for _ in range(3)
         }
         params_all = params_okay.copy()
         params_all.update(params_other)
@@ -636,9 +623,7 @@ class TestTFTPBackend(MAASTestCase):
 
         backend.get_kernel_params(params_all)
 
-        backend.fetcher.assert_called_once_with(
-            client, GetBootConfig, **params_okay
-        )
+        backend.fetcher.assert_called_once_with(client, GetBootConfig, **params_okay)
 
     def test_get_cache_reader_200(self):
         params_okay = {
@@ -711,9 +696,7 @@ class TestTFTPService(MAASTestCase):
     def test_tftp_service(self):
         # A TFTP service is configured and added to the top-level service.
         interfaces = [factory.make_ipv4_address(), factory.make_ipv6_address()]
-        self.patch(
-            tftp_module, "get_all_interface_addresses", lambda: interfaces
-        )
+        self.patch(tftp_module, "get_all_interface_addresses", lambda: interfaces)
         example_root = self.make_dir()
         example_client_service = Mock()
         example_port = factory.pick_port()
@@ -741,9 +724,7 @@ class TestTFTPService(MAASTestCase):
             protocol = server.args[1]
             self.assertIsInstance(protocol, TFTP)
             self.assertEqual(protocol.backend.base.path, example_root)
-            self.assertEqual(
-                protocol.backend.client_service, example_client_service
-            )
+            self.assertEqual(protocol.backend.client_service, example_client_service)
         # Only the interface used for each service differs.
         self.assertCountEqual(
             [svc.kwargs for svc in tftp_service.getServers()],
@@ -753,9 +734,7 @@ class TestTFTPService(MAASTestCase):
     def test_tftp_service_rebinds_on_HUP(self):
         # Initial set of interfaces to bind to.
         interfaces = {"1.1.1.1", "2.2.2.2"}
-        self.patch(
-            tftp_module, "get_all_interface_addresses", lambda: interfaces
-        )
+        self.patch(tftp_module, "get_all_interface_addresses", lambda: interfaces)
 
         tftp_service = TFTPService(
             resource_root=self.make_dir(),
@@ -838,14 +817,10 @@ class TestTransferTimeTrackingTFTP(MAASTestCase):
         return tftp._clean_filename(datagram)
 
     def test_clean_filename(self):
-        self.assertEqual(
-            self.clean_filename(b"files/foo.txt"), "files/foo.txt"
-        )
+        self.assertEqual(self.clean_filename(b"files/foo.txt"), "files/foo.txt")
 
     def test_clean_filename_strip_leading_slashes(self):
-        self.assertEqual(
-            self.clean_filename(b"//files/foo.txt"), "files/foo.txt"
-        )
+        self.assertEqual(self.clean_filename(b"//files/foo.txt"), "files/foo.txt")
 
     def test_clean_filename_pxelinux_cfg(self):
         self.assertEqual(
@@ -866,9 +841,7 @@ class TestTransferTimeTrackingTFTP(MAASTestCase):
         )
 
     def test_clean_filename_windows(self):
-        self.assertEqual(
-            self.clean_filename(b"\\boot\\winpe.wim"), "boot/winpe.wim"
-        )
+        self.assertEqual(self.clean_filename(b"\\boot\\winpe.wim"), "boot/winpe.wim")
 
 
 class TestTransferTimeTrackingTFTPStartSession(MAASTestCase):

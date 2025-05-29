@@ -34,9 +34,7 @@ class RegionTemporalService(Service):
     def _configure(self):
         """Update the Temporal configuration for the Temporal service."""
         template = load_template("temporal", "production.yaml.template")
-        dynamic_template = load_template(
-            "temporal", "production-dynamic.yaml.template"
-        )
+        dynamic_template = load_template("temporal", "production-dynamic.yaml.template")
 
         # Can't use the public attribute since it hits
         # maasserver.utils.orm.DisabledDatabaseConnection
@@ -69,9 +67,7 @@ class RegionTemporalService(Service):
                 )
 
         temporal_config_dir = Path(
-            os.environ.get(
-                "MAAS_TEMPORAL_CONFIG_DIR", get_maas_data_path("temporal")
-            )
+            os.environ.get("MAAS_TEMPORAL_CONFIG_DIR", get_maas_data_path("temporal"))
         )
         temporal_config_dir.mkdir(parents=True, exist_ok=True)
 
@@ -91,9 +87,7 @@ class RegionTemporalService(Service):
         }
 
         rendered_template = template.substitute(environ).encode()
-        rendered_dynamic_template = dynamic_template.substitute(
-            environ
-        ).encode()
+        rendered_dynamic_template = dynamic_template.substitute(environ).encode()
 
         atomic_write(
             rendered_template,

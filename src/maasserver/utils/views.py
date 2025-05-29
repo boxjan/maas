@@ -139,9 +139,7 @@ class MAASDjangoTemplateResponse(SimpleTemplateResponse):
         # on the new object when the original was content-less
         # will render as a template with the new status code.
         if response is not None and hasattr(response, "status_code"):
-            if response.status_code == http.client.OK and hasattr(
-                response, "content"
-            ):
+            if response.status_code == http.client.OK and hasattr(response, "content"):
                 self.content = response.content
 
 
@@ -204,8 +202,7 @@ class WebApplicationHandler(WSGIHandler):
 
                 if mw_instance is None:
                     raise ImproperlyConfigured(
-                        "Middleware factory %s returned None."
-                        % middleware_path
+                        "Middleware factory %s returned None." % middleware_path
                     )
 
                 if hasattr(mw_instance, "process_view"):
@@ -215,17 +212,13 @@ class WebApplicationHandler(WSGIHandler):
                         mw_instance.process_template_response
                     )
                 if hasattr(mw_instance, "process_exception"):
-                    self._exception_middleware.append(
-                        mw_instance.process_exception
-                    )
+                    self._exception_middleware.append(mw_instance.process_exception)
 
                 handler = mw_instance
 
         self._middleware_chain = handler
 
-    def handle_uncaught_exception(
-        self, request, resolver, exc_info, reraise=True
-    ):
+    def handle_uncaught_exception(self, request, resolver, exc_info, reraise=True):
         """Override `BaseHandler.handle_uncaught_exception`.
 
         If a retryable failure is detected, a retry is requested. It's up
@@ -367,9 +360,7 @@ class WebApplicationHandler(WSGIHandler):
                         return conflict_response
                     else:
                         # We'll retry after a brief interlude.
-                        log_failed_attempt(
-                            request, attempt, elapsed, remaining, wait
-                        )
+                        log_failed_attempt(request, attempt, elapsed, remaining, wait)
                         delete_oauth_nonce(request)
                         request = reset_request(request)
                         sleep(wait)

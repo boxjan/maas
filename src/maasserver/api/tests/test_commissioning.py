@@ -64,9 +64,7 @@ class TestAdminCommissioningScriptsAPI(APITestCase.ForAdmin):
 
         returned_script = response.json()
         self.assertEqual(name, returned_script["name"])
-        self.assertEqual(
-            content.encode(), b64decode(returned_script["content"])
-        )
+        self.assertEqual(content.encode(), b64decode(returned_script["content"]))
 
         stored_script = Script.objects.get(name=name)
         self.assertEqual(content, stored_script.script.data)
@@ -133,9 +131,7 @@ class TestAdminCommissioningScriptAPI(APITestCase.ForAdmin):
         self.assertEqual(response.status_code, http.client.OK)
         self.assertEqual(rc.ALL_OK.content, response.content)
 
-        self.assertEqual(
-            new_content.decode("utf-8"), reload_object(script).script.data
-        )
+        self.assertEqual(new_content.decode("utf-8"), reload_object(script).script.data)
 
     def test_PUT_errors(self):
         old_content = factory.make_script_content(
@@ -171,9 +167,7 @@ class TestAdminCommissioningScriptAPI(APITestCase.ForAdmin):
         self.assertCountEqual([], Script.objects.filter(name=script.name))
         event = Event.objects.get(type__level=AUDIT)
         self.assertIsNotNone(event)
-        self.assertEqual(
-            event.description, "Deleted script '%s'." % script.name
-        )
+        self.assertEqual(event.description, "Deleted script '%s'." % script.name)
 
 
 class TestCommissioningScriptAPI(APITestCase.ForUser):
@@ -264,16 +258,12 @@ class TestNodeCommissionResultHandlerAPI(APITestCase.ForUser):
         )
         self.assertEqual(script_result.id, parsed_result["id"])
         self.assertEqual(script_result.name, parsed_result["name"])
-        self.assertEqual(
-            script_result.exit_status, parsed_result["script_result"]
-        )
+        self.assertEqual(script_result.exit_status, parsed_result["script_result"])
         self.assertEqual(script_set.result_type, parsed_result["result_type"])
         self.assertEqual(
             {"system_id": script_set.node.system_id}, parsed_result["node"]
         )
-        self.assertEqual(
-            script_result.stdout, b64decode(parsed_result["data"])
-        )
+        self.assertEqual(script_result.stdout, b64decode(parsed_result["data"]))
 
     def test_list_returns_with_multiple_empty_data(self):
         node = factory.make_Node(with_empty_script_sets=True)
@@ -282,9 +272,7 @@ class TestNodeCommissionResultHandlerAPI(APITestCase.ForUser):
             node.current_testing_script_set,
             node.current_installation_script_set,
         ):
-            self.store_result(
-                script_result, exit_status=0, stdout="", stderr=""
-            )
+            self.store_result(script_result, exit_status=0, stdout="", stderr="")
 
         url = reverse("node_results_handler")
         response = self.client.get(url)
@@ -309,9 +297,7 @@ class TestNodeCommissionResultHandlerAPI(APITestCase.ForUser):
             node.current_testing_script_set,
             node.current_installation_script_set,
         ):
-            self.store_result(
-                script_result, exit_status=0, stdout="", stderr=""
-            )
+            self.store_result(script_result, exit_status=0, stdout="", stderr="")
 
         url = reverse("node_results_handler")
         response = self.client.get(url, {"system_id": [node.system_id]})
@@ -397,9 +383,7 @@ class TestNodeCommissionResultHandlerAPI(APITestCase.ForUser):
         self.assertEqual(script_result.id, parsed_results[0]["id"])
 
     def test_list_displays_only_visible_nodes(self):
-        node = factory.make_Node(
-            owner=factory.make_User(), with_empty_script_sets=True
-        )
+        node = factory.make_Node(owner=factory.make_User(), with_empty_script_sets=True)
         for script_result in node.current_commissioning_script_set:
             self.store_result(script_result, exit_status=0)
 

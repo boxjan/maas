@@ -67,9 +67,7 @@ class TestPackageRepositoryForm(MAASServerTestCase):
         )
 
     def test_create_package_repository_requires_name(self):
-        form = PackageRepositoryForm(
-            data={"url": factory.make_url(scheme="http")}
-        )
+        form = PackageRepositoryForm(data={"url": factory.make_url(scheme="http")})
         self.assertFalse(form.is_valid())
 
     def test_create_package_repository_requires_url(self):
@@ -111,9 +109,7 @@ class TestPackageRepositoryForm(MAASServerTestCase):
     def test_updates_name(self):
         package_repository = factory.make_PackageRepository()
         name = factory.make_name("name")
-        form = PackageRepositoryForm(
-            instance=package_repository, data={"name": name}
-        )
+        form = PackageRepositoryForm(instance=package_repository, data={"name": name})
         self.assertTrue(form.is_valid(), form.errors)
         request = HttpRequest()
         request.user = factory.make_User()
@@ -130,9 +126,7 @@ class TestPackageRepositoryForm(MAASServerTestCase):
     def test_updates_url(self):
         package_repository = factory.make_PackageRepository()
         url = factory.make_url(scheme="http")
-        form = PackageRepositoryForm(
-            instance=package_repository, data={"url": url}
-        )
+        form = PackageRepositoryForm(instance=package_repository, data={"url": url})
         self.assertTrue(form.is_valid(), form.errors)
         request = HttpRequest()
         request.user = factory.make_User()
@@ -190,25 +184,17 @@ class TestPackageRepositoryForm(MAASServerTestCase):
         package_repository = form.save(endpoint, request)
         for key, value in params.items():
             self.assertEqual(getattr(package_repository, key), value)
-        self.assertCountEqual(
-            package_repository.arches, PackageRepository.MAIN_ARCHES
-        )
+        self.assertCountEqual(package_repository.arches, PackageRepository.MAIN_ARCHES)
 
     def test_default_ports_package_repository_arches(self):
-        package_repository = PackageRepository.objects.get(
-            name="ports_archive"
-        )
-        form = PackageRepositoryForm(
-            instance=package_repository, data={"arches": []}
-        )
+        package_repository = PackageRepository.objects.get(name="ports_archive")
+        form = PackageRepositoryForm(instance=package_repository, data={"arches": []})
         self.assertTrue(form.is_valid(), form.errors)
         request = HttpRequest()
         request.user = factory.make_User()
         endpoint = factory.pick_choice(ENDPOINT_CHOICES)
         package_repository = form.save(endpoint, request)
-        self.assertCountEqual(
-            package_repository.arches, PackageRepository.PORTS_ARCHES
-        )
+        self.assertCountEqual(package_repository.arches, PackageRepository.PORTS_ARCHES)
 
     def test_arches_validation(self):
         package_repository = factory.make_PackageRepository()
@@ -293,9 +279,7 @@ class TestPackageRepositoryForm(MAASServerTestCase):
         self.assertEqual(["updates"], repo.disabled_pockets)
 
     def test_disabled_component_comma_cleaning(self):
-        package_repository = factory.make_PackageRepository(
-            default=True, components=[]
-        )
+        package_repository = factory.make_PackageRepository(default=True, components=[])
         form = PackageRepositoryForm(
             instance=package_repository,
             data={"disabled_components": ["universe,multiverse"]},

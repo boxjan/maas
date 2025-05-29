@@ -31,9 +31,7 @@ class TestOperatingSystem(MAASTestCase):
     def test_is_release_supported(self):
         osystem = self.make_usable_osystem()
         releases = [factory.make_name("release") for _ in range(3)]
-        supported = [
-            osystem.is_release_supported(release) for release in releases
-        ]
+        supported = [osystem.is_release_supported(release) for release in releases]
         self.assertEqual([True, True, True], supported)
 
     def test_format_release_choices(self):

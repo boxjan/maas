@@ -135,9 +135,7 @@ class BootResourcesActivity(MAASAPIClient):
             return False
 
     @activity.defn(name="get-bootresourcefile-sync-status")
-    async def get_bootresourcefile_sync_status(
-        self, with_sources: bool = True
-    ) -> dict:
+    async def get_bootresourcefile_sync_status(self, with_sources: bool = True) -> dict:
         url = f"{self.url}/api/2.0/images-sync-progress/"
         return await self.request_async(
             "GET", url, params={"sources": str(with_sources)}
@@ -164,9 +162,7 @@ class BootResourcesActivity(MAASAPIClient):
         return regions_endpoints
 
     @activity.defn(name="download-bootresourcefile")
-    async def download_bootresourcefile(
-        self, param: ResourceDownloadParam
-    ) -> bool:
+    async def download_bootresourcefile(self, param: ResourceDownloadParam) -> bool:
         """downloads boot resource file
 
         Returns:
@@ -177,9 +173,7 @@ class BootResourcesActivity(MAASAPIClient):
             param.sha256, param.filename_on_disk, param.total_size, param.size
         )
 
-        url = param.source_list[
-            activity.info().attempt % len(param.source_list)
-        ]
+        url = param.source_list[activity.info().attempt % len(param.source_list)]
         activity.logger.debug(f"Downloading from {url}")
 
         try:
@@ -237,30 +231,22 @@ class BootResourcesActivity(MAASAPIClient):
                 activity.logger.error(ex.strerror)
                 return False
 
-            raise ApplicationError(
-                ex.strerror, type=ex.__class__.__name__
-            ) from None
+            raise ApplicationError(ex.strerror, type=ex.__class__.__name__) from None
         except (
             ClientError,
             LocalStoreInvalidHash,
             LocalStoreWriteBeyondEOF,
         ) as ex:
-            raise ApplicationError(
-                str(ex), type=ex.__class__.__name__
-            ) from None
+            raise ApplicationError(str(ex), type=ex.__class__.__name__) from None
         finally:
             lfile.release_lock()
 
     @activity.defn(name="delete-bootresourcefile")
-    async def delete_bootresourcefile(
-        self, param: ResourceDeleteParam
-    ) -> bool:
+    async def delete_bootresourcefile(self, param: ResourceDeleteParam) -> bool:
         """Delete files from disk"""
         for file in param.files:
             activity.logger.debug(f"attempt to delete {file}")
-            lfile = LocalBootResourceFile(
-                file.sha256, file.filename_on_disk, 0
-            )
+            lfile = LocalBootResourceFile(file.sha256, file.filename_on_disk, 0)
             try:
                 while not lfile.acquire_lock(try_lock=True):
                     activity.heartbeat()
@@ -364,8 +350,7 @@ class SyncBootResourcesWorkflow:
 
         # check disk space
         check_space_jobs = [
-            _schedule_disk_check(input.requirement, region)
-            for region in regions
+            _schedule_disk_check(input.requirement, region) for region in regions
         ]
         has_space: list[bool] = await gather(*check_space_jobs)
         if not all(has_space):
@@ -423,9 +408,7 @@ class SyncBootResourcesWorkflow:
             # In order to balance the workload on the regions we randomize the order of the source_list.
             new_res = replace(
                 res,
-                source_list=random_generator.sample(
-                    eps, min(len(eps), MAX_SOURCES)
-                ),
+                source_list=random_generator.sample(eps, min(len(eps), MAX_SOURCES)),
             )
             for region in missing:
                 sync_jobs.append(_schedule_download(new_res, region))
@@ -475,9 +458,7 @@ class CleanupBootResourceWorkflow:
             False,
             start_to_close_timeout=timedelta(seconds=30),
         )
-        expected_files = list(
-            set(f["filename_on_disk"] for _, f in sync_status)
-        )
+        expected_files = list(set(f["filename_on_disk"] for _, f in sync_status))
 
         endpoints = await workflow.execute_activity(
             "get-bootresourcefile-endpoints",

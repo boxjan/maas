@@ -45,9 +45,7 @@ class TestRegionNetworksMonitoringService(MAASTransactionServerTestCase):
     @wait_for()
     @inlineCallbacks
     def test_logs_error_when_running_region_controller_cannot_be_found(self):
-        service = RegionNetworksMonitoringService(
-            reactor, enable_beaconing=False
-        )
+        service = RegionNetworksMonitoringService(reactor, enable_beaconing=False)
         self.patch(service, "getInterfaces").return_value = {}
 
         with TwistedLoggerFixture() as logger:
@@ -86,6 +84,4 @@ class TestRegionNetworksMonitoringService(MAASTransactionServerTestCase):
             "token_key": region_token.key,
             "token_secret": region_token.secret,
         }
-        self.assertEqual(
-            (example_url, region.system_id, region_credentials), details
-        )
+        self.assertEqual((example_url, region.system_id, region_credentials), details)

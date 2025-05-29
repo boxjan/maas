@@ -97,9 +97,7 @@ def sanitise_power_parameters(power_type, power_parameters):
         return power_parameters, {}
 
     secret_params = set(
-        setting["name"]
-        for setting in power_driver.settings
-        if setting.get("secret")
+        setting["name"] for setting in power_driver.settings if setting.get("secret")
     )
 
     parameters = {}

@@ -110,9 +110,7 @@ class TestDeferredHooks(MAASTestCase, PostCommitHooksTestMixin):
         dhooks = DeferredHooks()
         queues = []
         for _ in range(3):
-            thread = threading.Thread(
-                target=lambda: queues.append(dhooks.hooks)
-            )
+            thread = threading.Thread(target=lambda: queues.append(dhooks.hooks))
             thread.start()
             thread.join()
         self.assertEqual(len(queues), 3)

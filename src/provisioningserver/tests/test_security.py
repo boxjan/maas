@@ -46,9 +46,7 @@ class TestInstallSharedSecretScript(MAASTestCase):
         super().setUp()
         tempdir = Path(self.make_dir())
         utils_env.MAAS_SHARED_SECRET.clear_cached()
-        self.patch(
-            utils_env.MAAS_SHARED_SECRET, "_path", lambda: tempdir / "secret"
-        )
+        self.patch(utils_env.MAAS_SHARED_SECRET, "_path", lambda: tempdir / "secret")
         self._mock_print = self.patch(security, "print")
 
     def read_secret_from_fs(self):
@@ -81,9 +79,7 @@ class TestInstallSharedSecretScript(MAASTestCase):
         secret = factory.make_bytes()
 
         stdin = self.patch_autospec(security, "stdin")
-        stdin.readline.return_value = (
-            " " + b2a_hex(secret).decode("ascii") + " \n"
-        )
+        stdin.readline.return_value = " " + b2a_hex(secret).decode("ascii") + " \n"
         stdin.isatty.return_value = False
 
         self.installAndCheckExitCode(0)
@@ -152,9 +148,7 @@ class TestInstallSharedSecretScript(MAASTestCase):
 
     def test_prints_message_when_secret_is_installed(self):
         stdin = self.patch_autospec(security, "stdin")
-        stdin.readline.return_value = b2a_hex(factory.make_bytes()).decode(
-            "ascii"
-        )
+        stdin.readline.return_value = b2a_hex(factory.make_bytes()).decode("ascii")
         stdin.isatty.return_value = False
 
         self.installAndCheckExitCode(0)

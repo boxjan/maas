@@ -106,9 +106,7 @@ class TestNodeEventHubLogByID(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_rpc_methods(self, side_effect=None):
         fixture = self.useFixture(MockLiveClusterToRegionRPCFixture())
@@ -202,9 +200,7 @@ class TestSendEventMACAddress(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_rpc_methods(self, side_effect=None):
         fixture = self.useFixture(MockLiveClusterToRegionRPCFixture())
@@ -234,9 +230,7 @@ class TestSendEventMACAddress(MAASTestCase):
 
     @inlineCallbacks
     def test_failure_is_suppressed_if_node_not_found(self):
-        protocol, connecting = self.patch_rpc_methods(
-            side_effect=[fail(NoSuchNode())]
-        )
+        protocol, connecting = self.patch_rpc_methods(side_effect=[fail(NoSuchNode())])
         self.addCleanup((yield connecting))
 
         mac_address = factory.make_mac_address()
@@ -316,9 +310,7 @@ class TestSendEventIPAddress(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def patch_rpc_methods(self, side_effect=None):
         fixture = self.useFixture(MockLiveClusterToRegionRPCFixture())
@@ -348,9 +340,7 @@ class TestSendEventIPAddress(MAASTestCase):
 
     @inlineCallbacks
     def test_failure_is_suppressed_if_node_not_found(self):
-        protocol, connecting = self.patch_rpc_methods(
-            side_effect=[fail(NoSuchNode())]
-        )
+        protocol, connecting = self.patch_rpc_methods(side_effect=[fail(NoSuchNode())])
         self.addCleanup((yield connecting))
 
         ip_address = factory.make_ip_address()

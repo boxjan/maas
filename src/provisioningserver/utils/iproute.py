@@ -33,9 +33,7 @@ def get_ip_route():
     :raises:ExternalProcessError: if IP route information could not be
         gathered.
     """
-    output = call_and_check(
-        ["ip", "-json", "route", "list", "scope", "global"]
-    )
+    output = call_and_check(["ip", "-json", "route", "list", "scope", "global"])
     routes = {}
     for entry in json.loads(output):
         routes[entry.pop("dst")] = entry

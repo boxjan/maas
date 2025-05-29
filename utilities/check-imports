@@ -67,9 +67,7 @@ class Pattern:
     def compile(self):
         self._matcher = re.compile(
             r"(%s)\Z"
-            % "|".join(
-                chain.from_iterable(map(self._compile_pattern, self.patterns))
-            ),
+            % "|".join(chain.from_iterable(map(self._compile_pattern, self.patterns))),
             re.MULTILINE | re.DOTALL,
         )
 
@@ -139,9 +137,7 @@ class Rule:
 
     def __or__(self, other):
         if isinstance(other, self.__class__):
-            return self.__class__(
-                self.allow, self.deny, other.allow, other.deny
-            )
+            return self.__class__(self.allow, self.deny, other.allow, other.deny)
         else:
             return self.__class__(self.allow, self.deny, other)
 

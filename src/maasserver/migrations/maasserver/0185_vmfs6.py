@@ -4,9 +4,7 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-    dependencies = [
-        ("maasserver", "0184_add_ephemeral_deploy_setting_to_node")
-    ]
+    dependencies = [("maasserver", "0184_add_ephemeral_deploy_setting_to_node")]
 
     operations = [
         migrations.CreateModel(

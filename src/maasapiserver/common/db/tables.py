@@ -32,9 +32,7 @@ DefaultResourceTable = Table(
     Column("id", BigInteger, primary_key=True, unique=True),
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
-    Column(
-        "zone_id", BigInteger, ForeignKey("maasserver_zone.id"), nullable=False
-    ),
+    Column("zone_id", BigInteger, ForeignKey("maasserver_zone.id"), nullable=False),
 )
 
 UserTable = Table(
@@ -90,9 +88,7 @@ SubnetTable = Table(
     Column("cidr", CIDR, nullable=False),
     Column("gateway_ip", INET, nullable=True),
     Column("dns_servers", Text, nullable=True),
-    Column(
-        "vlan_id", BigInteger, ForeignKey("maasserver_vlan.id"), nullable=False
-    ),
+    Column("vlan_id", BigInteger, ForeignKey("maasserver_vlan.id"), nullable=False),
     Column("rdns_mode", Integer, nullable=False),
     Column("allow_proxy", Boolean, nullable=False),
     Column("description", Text, nullable=False),
@@ -179,9 +175,7 @@ NodeConfigTable = Table(
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
     Column("name", Text, nullable=False),
-    Column(
-        "node_id", BigInteger, ForeignKey("maasserver_zone.id"), nullable=False
-    ),
+    Column("node_id", BigInteger, ForeignKey("maasserver_zone.id"), nullable=False),
 )
 
 DomainTable = Table(
@@ -234,9 +228,7 @@ NodeTable = Table(
         ForeignKey("maasserver_node.id"),
         nullable=True,
     ),
-    Column(
-        "zone_id", BigInteger, ForeignKey("maasserver_zone.id"), nullable=False
-    ),
+    Column("zone_id", BigInteger, ForeignKey("maasserver_zone.id"), nullable=False),
     Column(
         "boot_disk_id",
         Integer,
@@ -244,13 +236,9 @@ NodeTable = Table(
         nullable=True,
     ),
     Column("node_type", Integer, nullable=False),
-    Column(
-        "domain_id", Integer, ForeignKey("maasserver_domain.id"), nullable=True
-    ),
+    Column("domain_id", Integer, ForeignKey("maasserver_domain.id"), nullable=True),
     Column("dns_process_id", Integer, nullable=True),
-    Column(
-        "bmc_id", BigInteger, ForeignKey("maasserver_bmc.id"), nullable=True
-    ),
+    Column("bmc_id", BigInteger, ForeignKey("maasserver_bmc.id"), nullable=True),
     Column("address_ttl", Integer, nullable=True),
     Column("status_expires", DateTime(timezone=True), nullable=True),
     Column("power_state_queried", DateTime(timezone=True), nullable=True),
@@ -295,12 +283,8 @@ NodeTagTable = Table(
     "maasserver_node_tags",
     METADATA,
     Column("id", BigInteger, primary_key=True),
-    Column(
-        "node_id", BigInteger, ForeignKey("maasserver_node.id"), nullable=False
-    ),
-    Column(
-        "tag_id", BigInteger, ForeignKey("maasserver_tag.id"), nullable=False
-    ),
+    Column("node_id", BigInteger, ForeignKey("maasserver_node.id"), nullable=False),
+    Column("tag_id", BigInteger, ForeignKey("maasserver_tag.id"), nullable=False),
 )
 
 TagTable = Table(
@@ -322,9 +306,7 @@ EventTable = Table(
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
     Column("description", Text, nullable=False),
-    Column(
-        "node_id", BigInteger, ForeignKey("maasserver_node.id"), nullable=True
-    ),
+    Column("node_id", BigInteger, ForeignKey("maasserver_node.id"), nullable=True),
     Column(
         "type_id",
         BigInteger,
@@ -379,9 +361,7 @@ BMCTable = Table(
         ForeignKey("maasserver_resourcepool.id"),
         nullable=True,
     ),
-    Column(
-        "zone_id", BigInteger, ForeignKey("maasserver_zone.id"), nullable=False
-    ),
+    Column("zone_id", BigInteger, ForeignKey("maasserver_zone.id"), nullable=False),
     Column("tags", ARRAY(Text), nullable=True),
     Column("cpu_over_commit_ratio", Float, nullable=False),
     Column("memory_over_commit_ratio", Float, nullable=False),
@@ -497,9 +477,7 @@ ScriptSetTable = Table(
     Column("id", BigInteger, primary_key=True, unique=True),
     Column("last_ping", DateTime(timezone=True), nullable=True),
     Column("result_type", Integer, nullable=False),
-    Column(
-        "node_id", BigInteger, ForeignKey("maasserver_node.id"), nullable=False
-    ),
+    Column("node_id", BigInteger, ForeignKey("maasserver_node.id"), nullable=False),
     Column("power_state_before_transition", String(10), nullable=False),
     Column("tags", Text, nullable=True),
 )
@@ -524,9 +502,7 @@ InterfaceTable = Table(
     Column("params", JSONB, nullable=False),
     Column("tags", Text, nullable=True),
     Column("enabled", Boolean, nullable=False),
-    Column(
-        "vlan_id", BigInteger, ForeignKey("maasserver_vlan.id"), nullable=True
-    ),
+    Column("vlan_id", BigInteger, ForeignKey("maasserver_vlan.id"), nullable=True),
     Column("acquired", Boolean, nullable=False),
     Column("mdns_discovery_state", Boolean, nullable=False),
     Column("neighbour_discovery_state", Boolean, nullable=False),

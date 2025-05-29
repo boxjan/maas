@@ -105,9 +105,7 @@ class TestNewUserCreationForm(MAASServerTestCase):
         }
         form = NewUserCreationForm(params)
         form.save(commit=False)
-        self.assertCountEqual(
-            [], User.objects.filter(username=params["username"])
-        )
+        self.assertCountEqual([], User.objects.filter(username=params["username"]))
 
     def test_fields_order(self):
         form = NewUserCreationForm()

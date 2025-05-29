@@ -171,9 +171,7 @@ class DatabaseLockBase(tuple):
     @property
     def TRY(self):
         """Return an equivalent lock that uses `try` locking functions."""
-        return self.__class__(
-            self.objid, (to_try[self.lock], to_try[self.unlock])
-        )
+        return self.__class__(self.objid, (to_try[self.lock], to_try[self.unlock]))
 
     @property
     def SHARED(self):

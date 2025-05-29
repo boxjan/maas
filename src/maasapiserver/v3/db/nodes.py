@@ -16,9 +16,7 @@ class NodesRepository(BaseRepository[Node, NodeRequest]):
     async def find_by_id(self, id: int) -> Node | None:
         raise Exception("Not implemented yet.")
 
-    async def list(
-        self, pagination_params: PaginationParams
-    ) -> ListResult[Node]:
+    async def list(self, pagination_params: PaginationParams) -> ListResult[Node]:
         raise Exception("Not implemented yet.")
 
     async def update(self, id: int, request: NodeRequest) -> Node:

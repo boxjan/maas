@@ -59,9 +59,7 @@ def get_full_thread_dump():
             % (threadId, thread_names.get(threadId, "unknown"))
         )
         for filename, lineno, name, line in traceback.extract_stack(stack):
-            output.write(
-                'File: "%s", line %d, in %s\n' % (filename, lineno, name)
-            )
+            output.write('File: "%s", line %d, in %s\n' % (filename, lineno, name))
             if line:
                 output.write("  %s\n" % (line.strip()))
     output.write("\n<<<< End stack trace <<<<\n\n")

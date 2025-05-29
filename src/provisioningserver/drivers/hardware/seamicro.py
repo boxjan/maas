@@ -61,9 +61,7 @@ class SeaMicroAPIV09:
         if params is None:
             params = []
         params = [param for param in params if bool(param)]
-        return (
-            urllib.parse.urljoin(self.url, location) + "?" + "&".join(params)
-        )
+        return urllib.parse.urljoin(self.url, location) + "?" + "&".join(params)
 
     def parse_response(self, url, response):
         """Parses the HTTP response, checking for errors
@@ -85,9 +83,7 @@ class SeaMicroAPIV09:
             json_data = None
 
         if not json_data:
-            raise SeaMicroAPIV09Error(
-                f"No JSON data found from {url}: got {text}"
-            )
+            raise SeaMicroAPIV09Error(f"No JSON data found from {url}: got {text}")
         json_rpc_code = int(json_data["error"]["code"])
         if json_rpc_code not in self.allowed_codes:
             raise SeaMicroAPIV09Error(
@@ -163,8 +159,7 @@ class SeaMicroAPIV09:
         idx = self.server_index(server_id)
         if idx is None:
             raise SeaMicroAPIV09Error(
-                "Failed to retrieve server index, "
-                "invalid server_id: %s" % server_id
+                "Failed to retrieve server index, " "invalid server_id: %s" % server_id
             )
 
         location = "servers/%s" % idx
@@ -256,9 +251,7 @@ def select_seamicro15k_api_version(power_control):
         return ["v0.9"]
     if power_control == "restapi2":
         return ["v2.0"]
-    raise SeaMicroError(
-        "Unsupported power control method: %s." % power_control
-    )
+    raise SeaMicroError("Unsupported power control method: %s." % power_control)
 
 
 def find_seamicro15k_servers(ip, username, password, power_control):
@@ -296,9 +289,7 @@ def probe_seamicro15k_and_enlist(
             "system_id": system_id,
         }
         maaslog.info("Creating seamicro15k node with MACs: %s", macs)
-        system_id = create_node(
-            macs, "amd64", "sm15k", params, domain=domain
-        ).wait(30)
+        system_id = create_node(macs, "amd64", "sm15k", params, domain=domain).wait(30)
 
         if accept_all:
             commission_node(system_id, user).wait(30)
@@ -336,9 +327,7 @@ def power_control_seamicro15k_v09(
         break
 
 
-def power_control_seamicro15k_v2(
-    ip, username, password, server_id, power_change
-):
+def power_control_seamicro15k_v2(ip, username, password, server_id, power_change):
     server_id = "%s/0" % server_id
     api = get_seamicro15k_api("v2.0", ip, username, password)
     if api is None:

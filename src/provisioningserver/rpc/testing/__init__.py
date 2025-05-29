@@ -64,8 +64,7 @@ def call_responder(protocol, command, arguments):
             # ordinarily get squashed.
             return Failure(
                 amp.UnknownRemoteError(
-                    "%s: %s"
-                    % (reflect.qual(error.type), reflect.safe_str(error.value))
+                    "%s: %s" % (reflect.qual(error.type), reflect.safe_str(error.value))
                 )
             )
 
@@ -117,9 +116,7 @@ class MockClusterToRegionRPCFixtureBase(fixtures.Fixture, metaclass=ABCMeta):
         # Pretend event-loops only exist for those connections that already
         # exist. The chicken-and-egg will be resolved by injecting a
         # connection later on.
-        self.rpc_service._get_config_rpc_info_urls = (
-            self._get_config_rpc_info_urls
-        )
+        self.rpc_service._get_config_rpc_info_urls = self._get_config_rpc_info_urls
         self.rpc_service._build_rpc_info_urls = self._build_rpc_info_urls
         self.rpc_service._fetch_rpc_info = self._fetch_rpc_info
         # Finally, start the service. If the clock is advanced, this will do
@@ -133,9 +130,7 @@ class MockClusterToRegionRPCFixtureBase(fixtures.Fixture, metaclass=ABCMeta):
             self.stopping = defer.succeed(None)
         else:
             self.starting.cancel()
-            self.stopping = defer.maybeDeferred(
-                self.rpc_service.disownServiceParent
-            )
+            self.stopping = defer.maybeDeferred(self.rpc_service.disownServiceParent)
         # Ensure the cluster's services will be left in a consistent state.
         self.stopping.addCallback(callOut, self.checkServicesClean)
 
@@ -411,9 +406,7 @@ class MockLiveClusterToRegionRPCFixture(MockClusterToRegionRPCFixtureBase):
 
 
 # An iterable of names for new dynamically-created AMP protocol factories.
-amp_protocol_factory_names = (
-    "AMPTestProtocol#%d" % seq for seq in itertools.count(1)
-)
+amp_protocol_factory_names = ("AMPTestProtocol#%d" % seq for seq in itertools.count(1))
 
 
 def make_amp_protocol_factory(*commands):

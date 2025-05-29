@@ -31,10 +31,7 @@ class ResourcePoolQueriesMixin(MAASQueriesMixin):
             "id": "__id",
         }
         return super().get_specifiers_q(
-            specifiers,
-            specifier_types=specifier_types,
-            separator=separator,
-            **kwargs
+            specifiers, specifier_types=specifier_types, separator=separator, **kwargs
         )
 
 
@@ -95,9 +92,7 @@ class ResourcePoolManager(Manager, ResourcePoolQueriesMixin):
         from maasserver.rbac import rbac
 
         if rbac.is_enabled():
-            fetched = rbac.get_resource_pool_ids(
-                user.username, "view", "view-all"
-            )
+            fetched = rbac.get_resource_pool_ids(user.username, "view", "view-all")
             pool_ids = set(fetched["view"] + fetched["view-all"])
             return self.filter(id__in=pool_ids)
         return self.all()
@@ -133,11 +128,7 @@ class ResourcePool(CleanSave, TimestampedModel):
 
     def delete(self):
         if self.is_default():
-            raise ValidationError(
-                "This is the default pool, it cannot be deleted."
-            )
+            raise ValidationError("This is the default pool, it cannot be deleted.")
         if self.node_set.exists():
-            raise ValidationError(
-                "Pool has machines in it, it cannot be deleted."
-            )
+            raise ValidationError("Pool has machines in it, it cannot be deleted.")
         super().delete()

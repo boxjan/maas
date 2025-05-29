@@ -8,8 +8,6 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="node",
             name="last_image_sync",
-            field=models.DateTimeField(
-                default=None, null=True, editable=False
-            ),
+            field=models.DateTimeField(default=None, null=True, editable=False),
         )
     ]

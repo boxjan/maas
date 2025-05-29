@@ -36,6 +36,4 @@ class TestSUSEOS(MAASTestCase):
             ("tumbleweed-20230101", "OpenSUSE Tumbleweed 20230101"),
         ]
         for release, title in cases:
-            self.assertEqual(
-                title, osystem.get_release_title(release), release
-            )
+            self.assertEqual(title, osystem.get_release_title(release), release)

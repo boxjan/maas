@@ -5,9 +5,7 @@ from django.db import migrations
 
 def drop_notifications(apps, schema_editor):
     Notification = apps.get_model("maasserver", "Notification")
-    Notification.objects.filter(
-        ident__startswith="controller_out_of_date_"
-    ).delete()
+    Notification.objects.filter(ident__startswith="controller_out_of_date_").delete()
 
 
 class Migration(migrations.Migration):

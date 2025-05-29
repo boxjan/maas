@@ -35,13 +35,9 @@ from maascli.utils import (
 )
 
 
-def http_request(
-    url, method, body=None, headers=None, ca_certs=None, insecure=False
-):
+def http_request(url, method, body=None, headers=None, ca_certs=None, insecure=False):
     """Issue an http request."""
-    http = httplib2.Http(
-        ca_certs=ca_certs, disable_ssl_certificate_validation=insecure
-    )
+    http = httplib2.Http(ca_certs=ca_certs, disable_ssl_certificate_validation=insecure)
     try:
         # XXX mpontillo 2015-12-15: Should force input to be in bytes here.
         # This calls into httplib2, which is going to call a parser which
@@ -63,9 +59,7 @@ def fetch_api_description(url, ca_certs=None, insecure=False):
         ascii_url(url_describe), "GET", ca_certs=ca_certs, insecure=insecure
     )
     if response.status != http.client.OK:
-        raise CommandError(
-            "{0.status} {0.reason}:\n{1}".format(response, content)
-        )
+        raise CommandError("{0.status} {0.reason}:\n{1}".format(response, content))
     if response["content-type"] != "application/json":
         raise CommandError(
             "Expected application/json, got: %(content-type)s" % response
@@ -216,9 +210,7 @@ class Action(Command):
             else:
                 raise AssertionError("Unrecognised separator %r" % what)
         else:
-            raise CommandError(
-                "%r is not a name=value or name@=filename pair" % string
-            )
+            raise CommandError("%r is not a name=value or name@=filename pair" % string)
 
     @classmethod
     def prepare_payload(cls, op, method, uri, data):

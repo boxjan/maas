@@ -51,9 +51,7 @@ class BootResourcesCreateAction(Action):
         # Upload content
         data = dict(options.data)
         upload_uri = urljoin(uri, rfile["upload_uri"])
-        self.upload_content(
-            upload_uri, data["content"], insecure=options.insecure
-        )
+        self.upload_content(upload_uri, data["content"], insecure=options.insecure)
 
     def initial_request(self, uri, options):
         """Performs the initial POST request, to create the boot resource."""

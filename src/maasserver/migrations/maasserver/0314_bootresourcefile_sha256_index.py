@@ -11,8 +11,6 @@ class Migration(migrations.Migration):
     operations = [
         migrations.AddIndex(
             model_name="bootresourcefile",
-            index=models.Index(
-                fields=["sha256"], name="maasserver__sha256_f07a8e_idx"
-            ),
+            index=models.Index(fields=["sha256"], name="maasserver__sha256_f07a8e_idx"),
         ),
     ]

@@ -48,9 +48,7 @@ def create_checkpoint_nonce():
     'key' field.
     """
     now = time.time()
-    Nonce.objects.get_or_create(
-        token_key="", consumer_key="", key=get_time_string(now)
-    )
+    Nonce.objects.get_or_create(token_key="", consumer_key="", key=get_time_string(now))
 
 
 # Key prefix used when creating checkpoint nonces to avoid clashing with

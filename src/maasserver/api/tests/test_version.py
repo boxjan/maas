@@ -32,9 +32,7 @@ class TestVersionAPI(APITestCase.ForAnonymousAndUser):
         response = self.client.get(reverse("version_handler"))
         self.assertEqual(http.client.OK, response.status_code)
 
-        parsed_result = json.loads(
-            response.content.decode(settings.DEFAULT_CHARSET)
-        )
+        parsed_result = json.loads(response.content.decode(settings.DEFAULT_CHARSET))
         self.assertEqual(
             {
                 "capabilities": API_CAPABILITIES_LIST,

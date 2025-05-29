@@ -87,9 +87,7 @@ def notify(args):
         notify_packet["lease_time"] = args.lease_time
         hostname = args.hostname
         has_hostname = (
-            hostname is not None
-            and len(hostname) > 0
-            and not hostname.isspace()
+            hostname is not None and len(hostname) > 0 and not hostname.isspace()
         )
         if has_hostname:
             notify_packet["hostname"] = hostname

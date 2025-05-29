@@ -599,9 +599,7 @@ class WebSocketsResource:
         @type request: L{twisted.web.iweb.IRequest} provider
         @param request: The request received.
         """
-        raise RuntimeError(
-            "Cannot get IResource children from WebSocketsResource"
-        )
+        raise RuntimeError("Cannot get IResource children from WebSocketsResource")
 
     def putChild(self, path, child):
         """
@@ -615,9 +613,7 @@ class WebSocketsResource:
         @type child: L{IResource} provider
         @param child: A resource to put underneat this one.
         """
-        raise RuntimeError(
-            "Cannot put IResource children under WebSocketsResource"
-        )
+        raise RuntimeError("Cannot put IResource children under WebSocketsResource")
 
     def render(self, request):
         """
@@ -665,9 +661,7 @@ class WebSocketsResource:
             request.setResponseCode(400)
             return b""
 
-        askedProtocols = request.requestHeaders.getRawHeaders(
-            b"Sec-WebSocket-Protocol"
-        )
+        askedProtocols = request.requestHeaders.getRawHeaders(b"Sec-WebSocket-Protocol")
         protocol, protocolName = self._lookupProtocol(askedProtocols, request)
 
         # If a protocol is not created, we deliver an error status.
@@ -706,15 +700,11 @@ class WebSocketsResource:
 
         # Set the user-agent on the transport.  This allows the protocol to
         # view the user-agent.
-        transport.user_agent = request.requestHeaders.getRawHeaders(
-            "user-agent"
-        )[0]
+        transport.user_agent = request.requestHeaders.getRawHeaders("user-agent")[0]
 
         # Set the peer IP on the transport.  This allows the protocol to view
         # the IP address of the client.
-        transport.ip_address = getattr(
-            request.getClientAddress(), "host", None
-        )
+        transport.ip_address = getattr(request.getClientAddress(), "host", None)
 
         # Set the host.
         transport.host = request.requestHeaders.getRawHeaders("host")[0]

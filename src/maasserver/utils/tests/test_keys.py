@@ -67,15 +67,11 @@ class TestKeys(MAASServerTestCase):
         else:
             mock_get_keys = self.patch(keys_module, "get_github_ssh_keys")
         mock_get_keys.return_value = []
-        self.assertRaises(
-            ImportSSHKeysError, get_protocol_keys, protocol, auth_id
-        )
+        self.assertRaises(ImportSSHKeysError, get_protocol_keys, protocol, auth_id)
 
     def test_get_launchpad_ssh_keys_returns_keys(self):
         auth_id = factory.make_name("auth_id")
-        key_string = get_data("data/test_rsa0.pub") + get_data(
-            "data/test_rsa1.pub"
-        )
+        key_string = get_data("data/test_rsa0.pub") + get_data("data/test_rsa1.pub")
         mock_requests = self.patch(requests_module, "get")
         mock_requests.return_value.text = key_string
         keys = get_launchpad_ssh_keys(auth_id)
@@ -99,9 +95,7 @@ class TestKeys(MAASServerTestCase):
         keys = get_github_ssh_keys(auth_id)
         url = "https://api.github.com/users/%s/keys" % auth_id
         mock_requests.assert_called_once_with(url, proxies=None)
-        self.assertEqual(
-            keys, [data["key"] for data in key_string if "key" in data]
-        )
+        self.assertEqual(keys, [data["key"] for data in key_string if "key" in data])
 
     @settings(deadline=None)
     @given(sampled_from([http.HTTPStatus.NOT_FOUND, http.HTTPStatus.GONE]))

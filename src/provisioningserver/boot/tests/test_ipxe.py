@@ -40,9 +40,7 @@ class TestIPXEBootMethod(MAASTestCase):
 
     def test_compose_config_path_follows_maas_pxe_directory_layout(self):
         mac = factory.make_mac_address()
-        self.assertEqual(
-            "ipxe.cfg-%s" % mac, compose_config_path(mac).decode("ascii")
-        )
+        self.assertEqual("ipxe.cfg-%s" % mac, compose_config_path(mac).decode("ascii"))
 
     def test_compose_config_path_does_not_include_tftp_root(self):
         tftproot = self.make_tftp_root().asBytesMode()
@@ -170,17 +168,13 @@ class TestIPXEBootMethodRegex(MAASTestCase):
         mac = b"aa:bb:cc:dd:ee:ff"
         match = re_config_file.match(b"ipxe.cfg-%s" % mac)
         self.assertIsNotNone(match)
-        self.assertEqual(
-            {"mac": mac, "arch": None, "subarch": None}, match.groupdict()
-        )
+        self.assertEqual({"mac": mac, "arch": None, "subarch": None}, match.groupdict())
 
     def test_re_config_file_matches_ipxe_cfg_with_leading_slash(self):
         mac = b"aa:bb:cc:dd:ee:ff"
         match = re_config_file.match(b"/ipxe.cfg-%s" % mac)
         self.assertIsNotNone(match)
-        self.assertEqual(
-            {"mac": mac, "arch": None, "subarch": None}, match.groupdict()
-        )
+        self.assertEqual({"mac": mac, "arch": None, "subarch": None}, match.groupdict())
 
     def test_re_config_file_does_not_match_non_config_file(self):
         self.assertIsNone(re_config_file.match(b"ipxe.cfg-kernel"))
@@ -199,9 +193,7 @@ class TestIPXEBootMethodRegex(MAASTestCase):
     def test_re_config_file_with_default_arch_and_subarch(self):
         arch = factory.make_name("arch", sep="").encode("ascii")
         subarch = factory.make_name("subarch", sep="").encode("ascii")
-        match = re_config_file.match(
-            b"ipxe.cfg-default-%s-%s" % (arch, subarch)
-        )
+        match = re_config_file.match(b"ipxe.cfg-default-%s-%s" % (arch, subarch))
         self.assertIsNotNone(match)
         self.assertEqual(
             {"mac": None, "arch": arch, "subarch": subarch}, match.groupdict()

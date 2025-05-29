@@ -17,9 +17,7 @@ class TestResourcePost(MAASServerTestCase):
     def test_creates_pool(self):
         name = factory.make_name("pool")
         description = factory.make_string()
-        form = ResourcePoolForm(
-            data={"name": name, "description": description}
-        )
+        form = ResourcePoolForm(data={"name": name, "description": description})
         form.save()
         pool = ResourcePool.objects.get(name=name)
         self.assertIsNotNone(pool)
@@ -28,9 +26,7 @@ class TestResourcePost(MAASServerTestCase):
     def test_updates_pool(self):
         pool = factory.make_ResourcePool()
         new_description = factory.make_string()
-        form = ResourcePoolForm(
-            data={"description": new_description}, instance=pool
-        )
+        form = ResourcePoolForm(data={"description": new_description}, instance=pool)
         form.save()
         pool = reload_object(pool)
         self.assertEqual(pool.description, new_description)

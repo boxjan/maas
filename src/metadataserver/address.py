@@ -84,9 +84,7 @@ def guess_server_host():
     :return: IP address or hostname.
     :rtype: unicode
     """
-    ip_route_output = get_command_output(
-        "/bin/ip", "-oneline", "route", "show"
-    )
+    ip_route_output = get_command_output("/bin/ip", "-oneline", "route", "show")
     interface = find_default_interface(ip_route_output)
     if interface is None:
         return socket.gethostname()

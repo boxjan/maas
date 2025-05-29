@@ -36,9 +36,7 @@ signals = SignalsManager()
 
 def pre_delete_update_events(sender, instance, **kwargs):
     """Update node hostname and id for events related to the node."""
-    instance.event_set.all().update(
-        node_hostname=instance.hostname, node_id=None
-    )
+    instance.event_set.all().update(node_hostname=instance.hostname, node_id=None)
 
 
 for klass in NODE_CLASSES:
@@ -75,17 +73,12 @@ for klass in NODE_CLASSES:
     signals.watch(pre_save, pre_save_update_status, sender=klass)
 
 
-def clear_owner_when_status_changes_to_new_or_ready(
-    sender, instance, **kwargs
-):
+def clear_owner_when_status_changes_to_new_or_ready(sender, instance, **kwargs):
     """Clear owner when the status changes to NEW or READY."""
     # Controllers are currently stateless but do have an owner.
     if not instance.is_controller:
         for status in {NODE_STATUS.NEW, NODE_STATUS.READY}:
-            if (
-                instance.__previous_status != status
-                and instance.status == status
-            ):
+            if instance.__previous_status != status and instance.status == status:
                 instance.owner = None
                 break
 
@@ -137,9 +130,7 @@ for klass in NODE_CLASSES:
     signals.watch(post_save, create_services_on_create, sender=klass)
 
 
-def create_default_related_entries_on_create(
-    sender, instance, created, **kwargs
-):
+def create_default_related_entries_on_create(sender, instance, created, **kwargs):
     """Create default related entries for a node."""
     if not created:
         return
@@ -150,9 +141,7 @@ def create_default_related_entries_on_create(
 
 
 for sender in (Device, Machine, Node, RackController, RegionController):
-    signals.watch(
-        post_save, create_default_related_entries_on_create, sender=sender
-    )
+    signals.watch(post_save, create_default_related_entries_on_create, sender=sender)
 
 
 def release_auto_ips(node, old_values, deleted=False):

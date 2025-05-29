@@ -24,9 +24,7 @@ class ByteString(formencode.FancyValidator):
     accept_python = False
     messages = {
         "noneType": "The input must be a byte string (not None)",
-        "badType": (
-            "The input must be a byte string (not a " "%(type)s: %(value)r)"
-        ),
+        "badType": ("The input must be a byte string (not a " "%(type)s: %(value)r)"),
     }
 
     def _validate(self, value, state=None):

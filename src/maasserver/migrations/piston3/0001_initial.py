@@ -82,15 +82,11 @@ class Migration(migrations.Migration):
                 ("verifier", models.CharField(max_length=10)),
                 (
                     "token_type",
-                    models.IntegerField(
-                        choices=[(1, "Request"), (2, "Access")]
-                    ),
+                    models.IntegerField(choices=[(1, "Request"), (2, "Access")]),
                 ),
                 (
                     "timestamp",
-                    models.IntegerField(
-                        default=piston3.models.get_default_timestamp
-                    ),
+                    models.IntegerField(default=piston3.models.get_default_timestamp),
                 ),
                 ("is_approved", models.BooleanField(default=False)),
                 (
@@ -100,9 +96,7 @@ class Migration(migrations.Migration):
                 ("callback_confirmed", models.BooleanField(default=False)),
                 (
                     "consumer",
-                    models.ForeignKey(
-                        to="piston3.Consumer", on_delete=models.CASCADE
-                    ),
+                    models.ForeignKey(to="piston3.Consumer", on_delete=models.CASCADE),
                 ),
                 (
                     "user",

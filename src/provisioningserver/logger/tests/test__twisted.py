@@ -43,8 +43,7 @@ class TestLegacyLogger(MAASTestCase):
         legacy_logger = LegacyLogger(namespace, self, events.append)
         message = factory.make_name("message")
         keywords = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
 
         t0 = time.time()
@@ -103,8 +102,7 @@ class TestLegacyLogger(MAASTestCase):
         message = factory.make_name("message")
         exception_type = factory.make_exception_type()
         keywords = {
-            factory.make_name("key"): factory.make_name("value")
-            for _ in range(3)
+            factory.make_name("key"): factory.make_name("value") for _ in range(3)
         }
         exc_instance = exception_type()
         try:
@@ -137,9 +135,9 @@ class TestLegacyLogger(MAASTestCase):
         # Twisted 16.6.0 (see issue #8858) now includes a traceback,
         # so we only match on the beginning of the string.
         self.assertTrue(
-            logger.formatEventAsClassicLogText(
-                event, formatTimeStatic
-            ).startswith(f"<when> [{namespace}#critical] {message}\n")
+            logger.formatEventAsClassicLogText(event, formatTimeStatic).startswith(
+                f"<when> [{namespace}#critical] {message}\n"
+            )
         )
 
 
@@ -157,8 +155,7 @@ class TestObserveTwistedInternetTCP(MAASTestCase):
 
     def test_ignores_protocol_starting_on_events(self):
         event = make_event(
-            "%s starting on %d"
-            % (factory.make_name("protocol"), factory.pick_port())
+            "%s starting on %d" % (factory.make_name("protocol"), factory.pick_port())
         )
         with TwistedLoggerFixture() as logger:
             observe_twisted_internet_tcp(event)
@@ -185,8 +182,7 @@ class TestObserveTwistedInternetUDP(MAASTestCase):
 
     def test_ignores_protocol_starting_on_events(self):
         event = make_event(
-            "%s starting on %d"
-            % (factory.make_name("protocol"), factory.pick_port())
+            "%s starting on %d" % (factory.make_name("protocol"), factory.pick_port())
         )
         with TwistedLoggerFixture() as logger:
             observe_twisted_internet_udp(event)
@@ -213,8 +209,7 @@ class TestObserveTwistedInternetUNIX(MAASTestCase):
 
     def test_ignores_protocol_starting_on_events(self):
         event = make_event(
-            "%s starting on %d"
-            % (factory.make_name("protocol"), factory.pick_port())
+            "%s starting on %d" % (factory.make_name("protocol"), factory.pick_port())
         )
         with TwistedLoggerFixture() as logger:
             observe_twisted_internet_unix(event)
@@ -246,8 +241,7 @@ class TestGetSystemName(MAASTestCase):
 
     scenarios = tuple(
         (
-            "%s => %s"
-            % (string_in or repr(string_in), string_out or repr(string_out)),
+            "%s => %s" % (string_in or repr(string_in), string_out or repr(string_out)),
             {"string_in": string_in, "string_out": string_out},
         )
         for string_in, string_out in expectations.items()
@@ -304,8 +298,7 @@ class TestFormatModernEvent(MAASTestCase):
     """Tests for `_formatModernEvent`."""
 
     scenarios = tuple(
-        (level.name, {"log_level": level})
-        for level in logger.LogLevel.iterconstants()
+        (level.name, {"log_level": level}) for level in logger.LogLevel.iterconstants()
     )
 
     def test_format_basics(self):
@@ -361,9 +354,7 @@ class TestFormatModernEvent(MAASTestCase):
     def test_formats_with_null_format(self):
         self.assertEqual(
             f"-: [{self.log_level.name}] \n",
-            _formatModernEvent(
-                {"log_format": None, "log_level": self.log_level}
-            ),
+            _formatModernEvent({"log_format": None, "log_level": self.log_level}),
         )
 
     def test_uses_namespace_if_system_missing(self):
@@ -393,8 +384,7 @@ class TestEventLogger(MAASTestCase):
     """Tests for `EventLogger`."""
 
     scenarios = tuple(
-        (level.name, {"log_level": level})
-        for level in logger.LogLevel.iterconstants()
+        (level.name, {"log_level": level}) for level in logger.LogLevel.iterconstants()
     )
 
     def setUp(self):
@@ -447,7 +437,5 @@ class TestEventLogger(MAASTestCase):
         for event in okay:
             self.log(event)
         # Only the `okay` logs will get through.
-        expected = [
-            ("-", self.log_level.name, event["log_text"]) for event in okay
-        ]
+        expected = [("-", self.log_level.name, event["log_text"]) for event in okay]
         self.assertSequenceEqual(expected, self.get_logs())

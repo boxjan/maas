@@ -421,9 +421,7 @@ class PostgresListenerService(Service):
                 "%s is not a registered channel." % channel
             )
         if action not in map_enum(ACTIONS).values():
-            raise PostgresListenerNotifyError(
-                "%s action is not supported." % action
-            )
+            raise PostgresListenerNotifyError("%s action is not supported." % action)
         return channel, action
 
     def runChannelRegistrar(self):
@@ -477,9 +475,7 @@ class PostgresListenerService(Service):
         except PostgresListenerNotifyError:
             # Log the error and continue processing the remaining
             # notifications.
-            self.log.failure(
-                "Failed to convert channel {channel!r}.", channel=channel
-            )
+            self.log.failure("Failed to convert channel {channel!r}.", channel=channel)
         else:
             defers = []
             handlers = self.listeners[channel]

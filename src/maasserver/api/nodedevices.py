@@ -111,9 +111,7 @@ class NodeDevicesHandler(OperationsHandler):
         if product_name is not None:
             qs = qs.filter(product_name__iexact=product_name)
 
-        commissioning_driver = get_optional_param(
-            request.GET, "commissioning_driver"
-        )
+        commissioning_driver = get_optional_param(request.GET, "commissioning_driver")
         if commissioning_driver is not None:
             qs = qs.filter(commissioning_driver__iexact=commissioning_driver)
 
@@ -181,9 +179,7 @@ class NodeDeviceHandler(OperationsHandler):
         )
         node_config = node.current_config
         if id.isdigit():
-            return get_object_or_404(
-                NodeDevice, node_config=node_config, id=id
-            )
+            return get_object_or_404(NodeDevice, node_config=node_config, id=id)
         else:
             try:
                 split_id = id.split(":")

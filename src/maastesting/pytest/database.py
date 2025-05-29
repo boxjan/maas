@@ -65,9 +65,7 @@ def load_initial_db_file(cluster, template_name, path):
         )
         with connect(cluster) as conn:
             with conn.cursor() as cursor:
-                cursor.execute(
-                    f'ALTER DATABASE "maas" RENAME TO "{template_name}"'
-                )
+                cursor.execute(f'ALTER DATABASE "maas" RENAME TO "{template_name}"')
 
 
 @contextmanager
@@ -93,9 +91,7 @@ def pytest_unconfigure(config):
     cluster.cleanUp()
 
 
-def _set_up_template_db(
-    cluster, template_name, template_path, force_recreate=False
-):
+def _set_up_template_db(cluster, template_name, template_path, force_recreate=False):
     if force_recreate:
         with connect(cluster) as conn:
             with conn.cursor() as cursor:
@@ -110,9 +106,7 @@ def _set_up_template_db(
     settings_name = "maasdjangotestsettings"
     tmp_python_path = Path(tempfile.mkdtemp())
     tmp_python_path.joinpath(f"{settings_name}.py").write_text(
-        settings_contents.replace(
-            '"NAME": "maas"', f'"NAME": "{template_name}"'
-        )
+        settings_contents.replace('"NAME": "maas"', f'"NAME": "{template_name}"')
     )
 
     old_name = development.DATABASES["default"]["NAME"]
@@ -140,9 +134,7 @@ def templatemaasdb(pytestconfig):
     template_path = Path(pytestconfig.option.maas_initial_db)
     with cluster.lock.exclusive:
         template_name = pytestconfig.stash[db_template_stash]
-        _set_up_template_db(
-            cluster, template_name, template_path, force_recreate
-        )
+        _set_up_template_db(cluster, template_name, template_path, force_recreate)
 
 
 @pytest.fixture
@@ -159,7 +151,5 @@ def ensuremaasdb(request, templatemaasdb, pytestconfig, worker_id):
         if request.node.get_closest_marker("recreate_db"):
             cursor.execute(f"DROP DATABASE IF EXISTS {dbname}")
         if dbname not in cluster.databases:
-            cursor.execute(
-                f'CREATE DATABASE "{dbname}" WITH TEMPLATE "{template}"'
-            )
+            cursor.execute(f'CREATE DATABASE "{dbname}" WITH TEMPLATE "{template}"')
     yield dbname

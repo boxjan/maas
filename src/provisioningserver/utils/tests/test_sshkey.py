@@ -111,9 +111,7 @@ class _TestNormaliseOpenSSHPublicKeyCommon:
         error = self.assertRaises(
             OpenSSHKeyError, normalise_openssh_public_key, example_key
         )
-        self.assertEqual(
-            "Key could not be converted to RFC4716 form.", str(error)
-        )
+        self.assertEqual("Key could not be converted to RFC4716 form.", str(error))
 
 
 class TestNormaliseOpenSSHPublicKeyWithComments(
@@ -122,8 +120,7 @@ class TestNormaliseOpenSSHPublicKeyWithComments(
     """Tests for `normalise_openssh_public_key` for keys with comments."""
 
     scenarios = sorted(
-        (name, dict(key=key))
-        for name, key in example_openssh_public_keys.items()
+        (name, dict(key=key)) for name, key in example_openssh_public_keys.items()
     )
 
     def test_normalises_mixed_whitespace(self):
@@ -135,9 +132,7 @@ class TestNormaliseOpenSSHPublicKeyWithComments(
         extra_comments = factory.make_name("foo"), factory.make_name("bar")
         example_key = self.key + " \t " + " \n\r ".join(extra_comments) + "\n"
         expected_key = self.key + " " + " ".join(extra_comments)
-        self.assertEqual(
-            expected_key, normalise_openssh_public_key(example_key)
-        )
+        self.assertEqual(expected_key, normalise_openssh_public_key(example_key))
 
 
 class TestNormaliseOpenSSHPublicKeyWithoutComments(

@@ -43,10 +43,7 @@ class SpaceQueriesMixin(MAASQueriesMixin):
             "subnet": (Subnet.objects, "vlan__space"),
         }
         return super().get_specifiers_q(
-            specifiers,
-            specifier_types=specifier_types,
-            separator=separator,
-            **kwargs
+            specifiers, specifier_types=specifier_types, separator=separator, **kwargs
         )
 
 

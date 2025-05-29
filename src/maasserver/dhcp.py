@@ -230,9 +230,7 @@ def ip_is_on_vlan(ip_address, vlan):
 def get_ip_address_for_interface(interface, vlan, ip_version: int):
     """Return the IP address for `interface` on `vlan`."""
     for ip_address in interface.ip_addresses.all():
-        if ip_is_version(ip_address, ip_version) and ip_is_on_vlan(
-            ip_address, vlan
-        ):
+        if ip_is_version(ip_address, ip_version) and ip_is_on_vlan(ip_address, vlan):
             return ip_address
     return None
 
@@ -242,10 +240,8 @@ def get_ip_address_for_rack_controller(rack_controller, vlan, ip_version: int):
     # First we build a list of all interfaces that have an IP address
     # on that vlan. Then we pick the best interface for that vlan
     # based on the `get_best_interface` function.
-    interfaces = (
-        rack_controller.current_config.interface_set.all().prefetch_related(
-            "ip_addresses__subnet"
-        )
+    interfaces = rack_controller.current_config.interface_set.all().prefetch_related(
+        "ip_addresses__subnet"
     )
     matching_interfaces = set()
     for interface in interfaces:
@@ -305,10 +301,7 @@ def get_ntp_server_addresses_for_rack(rack: RackController) -> dict:
 def make_interface_hostname(interface):
     """Return the host decleration name for DHCPD for this `interface`."""
     interface_name = interface.name.replace(".", "-")
-    if (
-        interface.type == INTERFACE_TYPE.UNKNOWN
-        and interface.node_config is None
-    ):
+    if interface.type == INTERFACE_TYPE.UNKNOWN and interface.node_config is None:
         return "unknown-%d-%s" % (interface.id, interface_name)
     else:
         return f"{interface.node_config.node.hostname}-{interface_name}"
@@ -333,9 +326,7 @@ def make_hosts_for_subnets(subnets, nodes_dhcp_snippets: list = None):
     def get_dhcp_snippets_for_interface(interface):
         dhcp_snippets = list()
         for dhcp_snippet in nodes_dhcp_snippets:
-            iface_node = (
-                interface.node_config.node if interface.node_config else None
-            )
+            iface_node = interface.node_config.node if interface.node_config else None
             if dhcp_snippet.node == iface_node:
                 dhcp_snippets.append(make_dhcp_snippet(dhcp_snippet))
         return dhcp_snippets
@@ -391,9 +382,7 @@ def make_hosts_for_subnets(subnets, nodes_dhcp_snippets: list = None):
                         "host": make_interface_hostname(interface),
                         "mac": str(interface.mac_address),
                         "ip": str(sip.ip),
-                        "dhcp_snippets": get_dhcp_snippets_for_interface(
-                            interface
-                        ),
+                        "dhcp_snippets": get_dhcp_snippets_for_interface(interface),
                     }
                 )
             else:
@@ -402,9 +391,7 @@ def make_hosts_for_subnets(subnets, nodes_dhcp_snippets: list = None):
                         "host": make_interface_hostname(interface),
                         "mac": str(interface.mac_address),
                         "ip": str(sip.ip),
-                        "dhcp_snippets": get_dhcp_snippets_for_interface(
-                            interface
-                        ),
+                        "dhcp_snippets": get_dhcp_snippets_for_interface(interface),
                     }
                 )
     return hosts
@@ -469,9 +456,7 @@ def make_subnet_config(
                     snippet.iprange.id, []
                 )
                 iprange_dhcp_snippets.append(make_dhcp_snippet(snippet))
-                ipranges_dhcp_snippets[
-                    snippet.iprange.id
-                ] = iprange_dhcp_snippets
+                ipranges_dhcp_snippets[snippet.iprange.id] = iprange_dhcp_snippets
             else:
                 subnet_only_dhcp_snippets.append(snippet)
         subnets_dhcp_snippets = subnet_only_dhcp_snippets
@@ -512,9 +497,7 @@ def make_failover_peer_config(vlan, rack_controller, ip_version: int):
         peer_rack = vlan.secondary_rack
     else:
         peer_rack = vlan.primary_rack
-    peer_address = get_ip_address_for_rack_controller(
-        peer_rack, vlan, ip_version
-    )
+    peer_address = get_ip_address_for_rack_controller(peer_rack, vlan, ip_version)
     name = "failover-vlan-%d" % vlan.id
     return (
         name,
@@ -585,9 +568,7 @@ def get_default_dns_servers(rack_controller, subnet, use_rack_proxy=True):
     if use_rack_proxy:
         # Add the IP address for the rack controllers on the subnet before the
         # region DNS servers.
-        rack_ips = [
-            IPAddress(ip) for ip in get_boot_rackcontroller_ips(subnet)
-        ]
+        rack_ips = [IPAddress(ip) for ip in get_boot_rackcontroller_ips(subnet)]
         if dns_servers:
             dns_servers = rack_ips + [
                 server
@@ -627,9 +608,7 @@ def get_dhcp_configure_for(
     """Get the DHCP configuration for `ip_version`."""
     # Select the best interface for this VLAN. This is an interface that
     # at least has an IP address.
-    interfaces = get_interfaces_with_ip_on_vlan(
-        rack_controller, vlan, ip_version
-    )
+    interfaces = get_interfaces_with_ip_on_vlan(rack_controller, vlan, ip_version)
     interface = get_best_interface(interfaces)
 
     has_secondary = vlan.secondary_rack_id is not None
@@ -651,9 +630,7 @@ def get_dhcp_configure_for(
         if dhcp_snippet.subnet is not None
     ]
     nodes_dhcp_snippets = [
-        dhcp_snippet
-        for dhcp_snippet in dhcp_snippets
-        if dhcp_snippet.node is not None
+        dhcp_snippet for dhcp_snippet in dhcp_snippets if dhcp_snippet.node is not None
     ]
 
     # Generate the shared network configurations.
@@ -696,8 +673,7 @@ def get_dhcp_configuration(rack_controller, test_dhcp_snippet=None):
 
     # Group the subnets on each VLAN into IPv4 and IPv6 subnets.
     vlan_subnets = {
-        vlan: split_managed_ipv4_ipv6_subnets(vlan.subnet_set.all())
-        for vlan in vlans
+        vlan: split_managed_ipv4_ipv6_subnets(vlan.subnet_set.all()) for vlan in vlans
     }
 
     # Get the list of all DHCP snippets so we only have to query the database
@@ -750,9 +726,7 @@ def get_dhcp_configuration(rack_controller, test_dhcp_snippet=None):
 
     default_domain = Domain.objects.get_default_domain()
     search_list = [default_domain.name] + [
-        name
-        for name in sorted(get_dns_search_paths())
-        if name != default_domain.name
+        name for name in sorted(get_dns_search_paths()) if name != default_domain.name
     ]
     for vlan, (subnets_v4, subnets_v6) in vlan_subnets.items():
         # IPv4
@@ -1012,8 +986,7 @@ def validate_dhcp_config(test_dhcp_snippet=None):
         # which is connected will result in testing a config which does
         # not contain the values we are trying to test.
         raise ValidationError(
-            "Unable to validate DHCP config, "
-            "no available rack controller connected."
+            "Unable to validate DHCP config, " "no available rack controller connected."
         )
 
     # XXX ltrager 2016-03-28 - This only tests the existing config with new
@@ -1029,8 +1002,7 @@ def validate_dhcp_config(test_dhcp_snippet=None):
     # snippet which we can test anywhere.
     if rack_controller is None:
         log.msg(
-            "Could not find a rack controller for the snippet. Trying "
-            "random client"
+            "Could not find a rack controller for the snippet. Trying " "random client"
         )
         try:
             client = getRandomClient()

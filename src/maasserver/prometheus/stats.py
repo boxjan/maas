@@ -95,15 +95,9 @@ STATS_DEFINITIONS = [
         "Amount of combined storage for all machines",
     ),
     MetricDefinition("Gauge", "maas_kvm_pods", "Number of KVM pods"),
-    MetricDefinition(
-        "Gauge", "maas_kvm_machines", "Number of KVM virtual machines"
-    ),
-    MetricDefinition(
-        "Gauge", "maas_kvm_cores", "Number of KVM cores", ["status"]
-    ),
-    MetricDefinition(
-        "Gauge", "maas_kvm_memory", "Memory for KVM pods", ["status"]
-    ),
+    MetricDefinition("Gauge", "maas_kvm_machines", "Number of KVM virtual machines"),
+    MetricDefinition("Gauge", "maas_kvm_cores", "Number of KVM cores", ["status"]),
+    MetricDefinition("Gauge", "maas_kvm_memory", "Memory for KVM pods", ["status"]),
     MetricDefinition(
         "Gauge", "maas_kvm_storage", "Size of storage for KVM pods", ["status"]
     ),
@@ -168,9 +162,7 @@ def prometheus_stats_handler(request):
             registry=prometheus_client.CollectorRegistry(),
         )
 
-    return HttpResponse(
-        content=_METRICS.generate_latest(), content_type="text/plain"
-    )
+    return HttpResponse(content=_METRICS.generate_latest(), content_type="text/plain")
 
 
 def update_prometheus_stats(metrics: PrometheusMetrics):
@@ -188,13 +180,9 @@ def update_prometheus_stats(metrics: PrometheusMetrics):
 
     # Gather counter for number of nodes (controllers/machine/devices)
     for ctype, number in stats["controllers"].items():
-        metrics.update(
-            "maas_nodes", "set", value=number, labels={"type": ctype}
-        )
+        metrics.update("maas_nodes", "set", value=number, labels={"type": ctype})
     for ctype, number in stats["nodes"].items():
-        metrics.update(
-            "maas_nodes", "set", value=number, labels={"type": ctype}
-        )
+        metrics.update("maas_nodes", "set", value=number, labels={"type": ctype})
 
     # Gather counter for networks
     for stype, number in stats["network_stats"].items():
@@ -302,9 +290,7 @@ def update_prometheus_stats(metrics: PrometheusMetrics):
         value=get_custom_images_deployed_stats(),
     )
 
-    metrics.update(
-        "maas_vmcluster_projects", "set", value=vmcluster["projects"]
-    )
+    metrics.update("maas_vmcluster_projects", "set", value=vmcluster["projects"])
     metrics.update("maas_vmcluster_hosts", "set", value=vmcluster["vm_hosts"])
     metrics.update("maas_vmcluster_vms", "set", value=vmcluster["vms"])
 
@@ -335,9 +321,7 @@ class PrometheusService(TimerService):
     """
 
     def __init__(self, interval=PROMETHEUS_SERVICE_PERIOD):
-        super().__init__(
-            interval.total_seconds(), self.maybe_push_prometheus_stats
-        )
+        super().__init__(interval.total_seconds(), self.maybe_push_prometheus_stats)
 
     def maybe_push_prometheus_stats(self):
         def determine_stats_request():
@@ -350,9 +334,7 @@ class PrometheusService(TimerService):
                 ]
             )
             # Update interval
-            self._update_interval(
-                timedelta(minutes=config["prometheus_push_interval"])
-            )
+            self._update_interval(timedelta(minutes=config["prometheus_push_interval"]))
             # Determine if we can run the actual update.
             if (
                 not config["prometheus_enabled"]

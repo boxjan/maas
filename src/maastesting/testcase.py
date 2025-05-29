@@ -148,9 +148,7 @@ class MAASTestCase(
             seed_info.append(f"MAAS_RAND_SEED={rand_seed}")
 
         if "PYTHONHASHSEED" in os.environ:
-            seed_info.append(
-                "PYTHONHASHSEED={}".format(os.environ["PYTHONHASHSEED"])
-            )
+            seed_info.append("PYTHONHASHSEED={}".format(os.environ["PYTHONHASHSEED"]))
 
         if seed_info:
             self.addDetail("Seeds", text_content(" ".join(seed_info)))
@@ -165,9 +163,7 @@ class MAASTestCase(
         self.addCleanup(self.tearDownResources)
 
     def setUpResources(self):
-        testresources.setUpResources(
-            self, self.resources, testresources._get_result()
-        )
+        testresources.setUpResources(self, self.resources, testresources._get_result())
 
     def tearDown(self):
         super().tearDown()
@@ -237,9 +233,7 @@ class MAASTestCase(
         with active_test(result, self):
             super().__call__(result)
 
-    def patch(
-        self, obj, attribute=None, value=mock.sentinel.unset
-    ) -> MagicMock:
+    def patch(self, obj, attribute=None, value=mock.sentinel.unset) -> MagicMock:
         """Patch `obj.attribute` with `value`.
 
         If `value` is unspecified, a new `MagicMock` will be created and

@@ -19,9 +19,7 @@ class TestDocstringParsing(MAASTestCase):
     """Tests for docstring parsing in `maascli.utils`."""
 
     def test_basic(self):
-        self.assertEqual(
-            ("Title", "Body"), utils.parse_docstring("Title\n\nBody")
-        )
+        self.assertEqual(("Title", "Body"), utils.parse_docstring("Title\n\nBody"))
         self.assertEqual(
             ("A longer title", "A longer body"),
             utils.parse_docstring("A longer title\n\nA longer body"),
@@ -38,8 +36,7 @@ class TestDocstringParsing(MAASTestCase):
         self.assertEqual(
             (
                 "Title over two lines",
-                "Paragraph over\ntwo lines\n\n"
-                "Another paragraph\nover two lines",
+                "Paragraph over\ntwo lines\n\n" "Another paragraph\nover two lines",
             ),
             utils.parse_docstring(
                 """
@@ -69,9 +66,7 @@ class TestDocstringParsing(MAASTestCase):
     def test_normalises_whitespace(self):
         # parse_docstring can parse CRLF/CR/LF text, but always emits LF (\n,
         # new-line) separated text.
-        self.assertEqual(
-            ("long title", ""), utils.parse_docstring("long\r\ntitle")
-        )
+        self.assertEqual(("long title", ""), utils.parse_docstring("long\r\ntitle"))
         self.assertEqual(
             ("title", "body1\n\nbody2"),
             utils.parse_docstring("title\n\nbody1\r\rbody2"),
@@ -116,8 +111,7 @@ class TestFunctions(MAASTestCase):
             "James-BOND-007": "james-bond-007",
         }
         observed = {
-            name_in: utils.handler_command_name(name_in)
-            for name_in in expected
+            name_in: utils.handler_command_name(name_in) for name_in in expected
         }
         assert expected == observed
 
@@ -125,9 +119,7 @@ class TestFunctions(MAASTestCase):
         # handler_command_name will not break if passed a string with
         # non-ASCII characters. However, those characters will not be present
         # in the returned name.
-        self.assertEqual(
-            "a-b-c", utils.handler_command_name("a\u1234_b\u5432_c\u9876")
-        )
+        self.assertEqual("a-b-c", utils.handler_command_name("a\u1234_b\u5432_c\u9876"))
 
     def test_ensure_trailing_slash(self):
         # ensure_trailing_slash ensures that the given string - typically a
@@ -162,17 +154,13 @@ class TestGetResponseContentType(MAASTestCase):
 
     def test_get_response_content_type_returns_content_type_header(self):
         response = httplib2.Response({"content-type": "application/json"})
-        self.assertEqual(
-            "application/json", utils.get_response_content_type(response)
-        )
+        self.assertEqual("application/json", utils.get_response_content_type(response))
 
     def test_get_response_content_type_omits_parameters(self):
         response = httplib2.Response(
             {"content-type": "application/json; charset=utf-8"}
         )
-        self.assertEqual(
-            "application/json", utils.get_response_content_type(response)
-        )
+        self.assertEqual("application/json", utils.get_response_content_type(response))
 
     def test_get_response_content_type_return_None_when_type_not_found(self):
         response = httplib2.Response({})
@@ -318,9 +306,7 @@ class TestPrintServerCertificate(MAASTestCase):
         from provisioningserver.testing.certificates import get_sample_cert
 
         cert = get_sample_cert()
-        self.patch(
-            ssl, "get_server_certificate"
-        ).return_value = cert.certificate_pem()
+        self.patch(ssl, "get_server_certificate").return_value = cert.certificate_pem()
 
         url = "https://example.com:5443"
 

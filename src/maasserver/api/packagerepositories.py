@@ -119,9 +119,7 @@ class PackageRepositoryHandler(OperationsHandler):
             No PackageRepository matches the given query.
         """
         package_repository = PackageRepository.objects.get_object_or_404(id)
-        form = PackageRepositoryForm(
-            instance=package_repository, data=request.data
-        )
+        form = PackageRepositoryForm(instance=package_repository, data=request.data)
         if form.is_valid():
             return form.save(ENDPOINT.API, request)
         else:
@@ -149,9 +147,7 @@ class PackageRepositoryHandler(OperationsHandler):
             ENDPOINT.API,
             request,
             None,
-            description=(
-                "Deleted package repository '%s'." % package_repository.name
-            ),
+            description=("Deleted package repository '%s'." % package_repository.name),
         )
         return rc.DELETED
 

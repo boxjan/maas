@@ -77,9 +77,7 @@ def find_addresses_between_nodes(nodes_left: Iterable, nodes_right: Iterable):
 AddressMap = Mapping[Node, Sequence[IPAddress]]
 
 
-def get_routable_address_map(
-    destinations: Iterable[Node], whence: Node
-) -> AddressMap:
+def get_routable_address_map(destinations: Iterable[Node], whence: Node) -> AddressMap:
     """Return addresses of `destinations` routable from `whence`.
 
     Returns a dict keyed by the nodes in `destinations`, with values that are

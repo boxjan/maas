@@ -80,9 +80,7 @@ class ZonesRepository(BaseRepository[Zone, ZoneRequest]):
             return None
         return Zone(**zone._asdict())
 
-    async def list(
-        self, pagination_params: PaginationParams
-    ) -> ListResult[Zone]:
+    async def list(self, pagination_params: PaginationParams) -> ListResult[Zone]:
         total_stmt = select(count()).select_from(ZoneTable)
         # There is always at least one "default" zone being created at first startup during the migrations.
         total = (await self.connection.execute(total_stmt)).scalar()

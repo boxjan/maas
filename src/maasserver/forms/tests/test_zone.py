@@ -52,7 +52,5 @@ class TestZoneForm(MAASServerTestCase):
 
     def test_allows_renaming_default_zone(self):
         zone = DefaultResource.objects.get_default_zone()
-        form = ZoneForm(
-            data={"name": factory.make_name("zone")}, instance=zone
-        )
+        form = ZoneForm(data={"name": factory.make_name("zone")}, instance=zone)
         self.assertTrue(form.is_valid(), form.errors)

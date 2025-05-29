@@ -69,9 +69,7 @@ class TemporalWorkerService(Service):
         temporal_status = SERVICE_STATE.UNKNOWN
         webapp_is_running = False
         while temporal_status != SERVICE_STATE.ON:
-            status = yield service_monitor.getServiceState(
-                "temporal", now=True
-            )
+            status = yield service_monitor.getServiceState("temporal", now=True)
             temporal_status = status.active_state
             yield deferLater(reactor, 1, lambda: None)
 
@@ -141,15 +139,13 @@ class TemporalWorkerService(Service):
         ]
 
         defers = [
-            Deferred.fromFuture(self._loop.create_task(w.run()))
-            for w in self._workers
+            Deferred.fromFuture(self._loop.create_task(w.run())) for w in self._workers
         ]
         returnValue(DeferredList(defers))
 
     def stopService(self):
         defers = [
-            Deferred.fromFuture(self._loop.create_task(w.stop()))
-            for w in self._workers
+            Deferred.fromFuture(self._loop.create_task(w.stop())) for w in self._workers
         ]
         if defers:
             return DeferredList(defers)

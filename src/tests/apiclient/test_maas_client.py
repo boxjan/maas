@@ -65,9 +65,7 @@ class TestMAASDispatcher(MAASTestCase):
     def test_dispatch_query_makes_direct_call(self):
         contents = factory.make_string().encode("ascii")
         url = "file://%s" % self.make_file(contents=contents)
-        self.assertEqual(
-            contents, MAASDispatcher().dispatch_query(url, {}).read()
-        )
+        self.assertEqual(contents, MAASDispatcher().dispatch_query(url, {}).read())
 
     @no_proxy
     def test_dispatch_query_encodes_string_data(self):
@@ -160,9 +158,7 @@ class TestMAASDispatcher(MAASTestCase):
             self.assertEqual(200, res.code)
             self.assertEqual("gzip", res.info().get("Content-Encoding"))
             raw_content = res.read()
-        read_content = gzip.GzipFile(
-            mode="rb", fileobj=BytesIO(raw_content)
-        ).read()
+        read_content = gzip.GzipFile(mode="rb", fileobj=BytesIO(raw_content)).read()
         self.assertEqual(content, read_content)
 
     @no_proxy
@@ -200,9 +196,7 @@ class TestMAASDispatcher(MAASTestCase):
             url = urljoin(httpd.url, name)
 
             def _wrap_open(*args, **kwargs):
-                raise urllib.error.HTTPError(
-                    url, 503, "service unavailable", {}, None
-                )
+                raise urllib.error.HTTPError(url, 503, "service unavailable", {}, None)
 
             self.open_func = _wrap_open
             err = self.assertRaises(
@@ -281,9 +275,7 @@ class FakeDispatcher:
 def make_client(root=None, result=None):
     """Create a MAASClient."""
     if root is None:
-        root = factory.make_simple_http_url(
-            path=factory.make_name("path") + "/"
-        )
+        root = factory.make_simple_http_url(path=factory.make_name("path") + "/")
     auth = MAASOAuth(
         factory.make_string(), factory.make_string(), factory.make_string()
     )
@@ -307,16 +299,12 @@ class TestMAASClient(APIClientTestCase):
     def test_make_url_converts_sequence_to_path(self):
         path = ["top", "sub", "leaf"]
         client = make_client(root="http://example.com/")
-        self.assertEqual(
-            "http://example.com/top/sub/leaf", client._make_url(path)
-        )
+        self.assertEqual("http://example.com/top/sub/leaf", client._make_url(path))
 
     def test_make_url_represents_path_components_as_text(self):
         number = randint(0, 100)
         client = make_client()
-        self.assertEqual(
-            urljoin(client.url, str(number)), client._make_url([number])
-        )
+        self.assertEqual(urljoin(client.url, str(number)), client._make_url([number]))
 
     def test_formulate_get_makes_url(self):
         path = make_path()
@@ -326,10 +314,7 @@ class TestMAASClient(APIClientTestCase):
         self.assertEqual(expected, url)
 
     def test_formulate_get_adds_parameters_to_url(self):
-        params = {
-            factory.make_string(): factory.make_string()
-            for counter in range(3)
-        }
+        params = {factory.make_string(): factory.make_string() for counter in range(3)}
         url, headers = make_client()._formulate_get(make_path(), params)
         expectation = {key: [value] for key, value in params.items()}
         self.assertEqual(expectation, parse_qs(urlparse(url).query))
@@ -375,13 +360,9 @@ class TestMAASClient(APIClientTestCase):
 
     def test_formulate_change_passes_parameters_in_body(self):
         params = {factory.make_string(): factory.make_string()}
-        url, headers, body = make_client()._formulate_change(
-            make_path(), params
-        )
+        url, headers, body = make_client()._formulate_change(make_path(), params)
         post, _ = self.parse_headers_and_body_with_django(headers, body)
-        self.assertEqual(
-            {name: [value] for name, value in params.items()}, post
-        )
+        self.assertEqual({name: [value] for name, value in params.items()}, post)
 
     def test_formulate_change_as_json(self):
         params = {factory.make_string(): factory.make_string()}
@@ -469,9 +450,7 @@ class TestMAASClient(APIClientTestCase):
             list_param=list_param,
         )
         request = client.dispatcher.last_call
-        self.assertEqual(
-            "application/json", request["headers"].get("Content-Type")
-        )
+        self.assertEqual("application/json", request["headers"].get("Content-Type"))
         content = self.parse_headers_and_body_with_mimer(
             request["headers"], request["data"]
         )

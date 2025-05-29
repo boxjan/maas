@@ -19,9 +19,7 @@ class TestGetConfigDir(MAASTestCase):
     """Tests for `get_syslog_config_path`."""
 
     def test_returns_default(self):
-        self.assertEqual(
-            "/var/lib/maas/rsyslog.conf", config.get_syslog_config_path()
-        )
+        self.assertEqual("/var/lib/maas/rsyslog.conf", config.get_syslog_config_path())
 
     def test_env_overrides_default(self):
         os.environ["MAAS_SYSLOG_CONFIG_DIR"] = factory.make_name("env")
@@ -137,9 +135,7 @@ class TestWriteConfig(MAASTestCase):
             lines = [line.strip() for line in syslog_file.readlines()]
             for host in forwarders:
                 self.assertLinesContain('target="%s"' % host["ip"], lines)
-                self.assertLinesContain(
-                    'queue.filename="%s"' % host["name"], lines
-                )
+                self.assertLinesContain('queue.filename="%s"' % host["name"], lines)
 
     def test_forwarders_diff_port(self):
         port = factory.pick_port()
@@ -168,14 +164,8 @@ class TestWriteConfig(MAASTestCase):
         config.write_config(True, forwarders)
         with self.syslog_path.open() as syslog_file:
             lines = [line.strip() for line in syslog_file.readlines()]
-            self.assertIn(
-                'set $!remote!SYSLOG_IDENTIFIER = "maas-enlist";', lines
-            )
-            self.assertIn(
-                'set $!remote!SYSLOG_IDENTIFIER = "maas-machine";', lines
-            )
+            self.assertIn('set $!remote!SYSLOG_IDENTIFIER = "maas-enlist";', lines)
+            self.assertIn('set $!remote!SYSLOG_IDENTIFIER = "maas-machine";', lines)
             for host in forwarders:
                 self.assertLinesContain('target="%s"' % host["ip"], lines)
-                self.assertLinesContain(
-                    'queue.filename="%s"' % host["name"], lines
-                )
+                self.assertLinesContain('queue.filename="%s"' % host["name"], lines)

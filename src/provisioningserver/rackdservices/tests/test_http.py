@@ -64,9 +64,7 @@ class TestRackHTTPService(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def test_service_uses__tryUpdate_as_periodic_function(self):
         service = http.RackHTTPService(
@@ -92,9 +90,7 @@ class TestRackHTTPService(MAASTestCase):
     def make_startable_RackHTTPService(self, *args, **kwargs):
         service = http.RackHTTPService(*args, **kwargs)
         service._orig_tryUpdate = service._tryUpdate
-        self.patch(service, "_tryUpdate").return_value = always_succeed_with(
-            None
-        )
+        self.patch(service, "_tryUpdate").return_value = always_succeed_with(None)
         service.call = (service._tryUpdate, tuple(), {})
         return service
 
@@ -102,9 +98,7 @@ class TestRackHTTPService(MAASTestCase):
         tempdir = self.make_dir()
         nginx_conf = Path(tempdir) / "rackd.nginx.conf"
         service = self.make_startable_RackHTTPService(tempdir, None, reactor)
-        self.patch(http, "compose_http_config_path").return_value = str(
-            nginx_conf
-        )
+        self.patch(http, "compose_http_config_path").return_value = str(nginx_conf)
         service._configure(["region1.maas", "region2.maas"])
         self.assertIn("root /usr/share/maas;", nginx_conf.read_text())
 
@@ -113,13 +107,9 @@ class TestRackHTTPService(MAASTestCase):
         tempdir = self.make_dir()
         nginx_conf = Path(tempdir) / "rackd.nginx.conf"
         service = self.make_startable_RackHTTPService(tempdir, None, reactor)
-        self.patch(http, "compose_http_config_path").return_value = str(
-            nginx_conf
-        )
+        self.patch(http, "compose_http_config_path").return_value = str(nginx_conf)
         service._configure(["region1.maas", "region2.maas"])
-        self.assertIn(
-            "root /snap/maas/123/usr/share/maas;", nginx_conf.read_text()
-        )
+        self.assertIn("root /snap/maas/123/usr/share/maas;", nginx_conf.read_text())
 
     @inlineCallbacks
     def test_getConfiguration_returns_configuration_object(self):
@@ -247,16 +237,12 @@ class TestRackHTTPService_Errors(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
 
     def make_startable_RackHTTPService(self, *args, **kwargs):
         service = http.RackHTTPService(*args, **kwargs)
         service._orig_tryUpdate = service._tryUpdate
-        self.patch(service, "_tryUpdate").return_value = always_succeed_with(
-            None
-        )
+        self.patch(service, "_tryUpdate").return_value = always_succeed_with(None)
         service.call = (service._tryUpdate, tuple(), {})
         return service
 
@@ -325,9 +311,7 @@ class TestHTTPLogResource(MAASTestCase):
 
         mock_deferLater = self.patch(http, "deferLater")
         mock_deferLater.side_effect = always_succeed_with(None)
-        mock_send_node_event_ip_address = self.patch(
-            http, "send_node_event_ip_address"
-        )
+        mock_send_node_event_ip_address = self.patch(http, "send_node_event_ip_address")
 
         resource = http.HTTPLogResource()
         resource.render_GET(request)
@@ -403,9 +387,7 @@ class TestHTTPBootResource(MAASTestCase):
         yield self.render_GET(resource, request)
 
         self.assertEqual(503, request.responseCode)
-        self.assertEqual(
-            b"HTTP boot service not ready.", b"".join(request.written)
-        )
+        self.assertEqual(b"HTTP boot service not ready.", b"".join(request.written))
 
     @inlineCallbacks
     def test_render_GET_400_when_no_local_addr(self):

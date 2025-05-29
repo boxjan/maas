@@ -61,9 +61,7 @@ def get_or_create_default_vlan(Fabric, VLAN):
     """Return the default VLAN for Fabric."""
     default_fabric, created = get_or_create_default_fabric(Fabric)
     if created:
-        return VLAN.objects.create(
-            name="Default VLAN", vid=0, fabric=default_fabric
-        )
+        return VLAN.objects.create(name="Default VLAN", vid=0, fabric=default_fabric)
     else:
         return default_fabric.vlan_set.all().order_by("id").first()
 

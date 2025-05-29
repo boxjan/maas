@@ -24,9 +24,7 @@ DISPLAYED_IPRANGE_FIELDS = (
 
 def raise_error_if_not_owner(iprange, user):
     if not user.is_superuser and iprange.user_id != user.id:
-        raise MAASAPIForbidden(
-            "Unable to modify IP range. You don't own the IP range."
-        )
+        raise MAASAPIForbidden("Unable to modify IP range. You don't own the IP range.")
 
 
 class IPRangesHandler(OperationsHandler):

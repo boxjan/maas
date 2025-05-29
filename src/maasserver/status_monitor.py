@@ -150,9 +150,7 @@ def mark_nodes_failed_after_missing_script_timeout(now, node_timeout):
                 script_result_status=SCRIPT_STATUS.TIMEDOUT,
             )
             if not node.enable_ssh:
-                maaslog.info(
-                    "%s: Stopped because SSH is disabled" % node.hostname
-                )
+                maaslog.info("%s: Stopped because SSH is disabled" % node.hostname)
                 node.stop(comment="Node stopped because SSH is disabled")
             continue
 
@@ -181,9 +179,7 @@ def mark_nodes_failed_after_missing_script_timeout(now, node_timeout):
             # its time limit. The node will try to kill the script and move on
             # by signaling the region. If after 5 minutes past the timeout the
             # region hasn't received the signal mark_failed and stop the node.
-            script_expires = (
-                script_result.started + timeout + timedelta(minutes=5)
-            )
+            script_expires = script_result.started + timeout + timedelta(minutes=5)
             if script_expires < now:
                 script_result.status = SCRIPT_STATUS.TIMEDOUT
                 script_result.save(update_fields=["status"])
@@ -197,9 +193,7 @@ def mark_nodes_failed_after_missing_script_timeout(now, node_timeout):
                     script_result_status=SCRIPT_STATUS.ABORTED,
                 )
                 if not node.enable_ssh:
-                    maaslog.info(
-                        "%s: Stopped because SSH is disabled" % node.hostname
-                    )
+                    maaslog.info("%s: Stopped because SSH is disabled" % node.hostname)
                     node.stop(comment="Node stopped because SSH is disabled")
                 break
 

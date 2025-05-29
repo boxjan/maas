@@ -31,9 +31,7 @@ class TestRackNetworksMonitoringService(MAASTestCase):
 
     def setUp(self):
         super().setUp()
-        self.patch(
-            clusterservice, "get_all_interfaces_definition"
-        ).return_value = {}
+        self.patch(clusterservice, "get_all_interfaces_definition").return_value = {}
         self.mock_refresh = self.patch(services_module, "refresh")
         self.metadata_creds = {
             "consumer_key": factory.make_string(),
@@ -82,9 +80,7 @@ class TestRackNetworksMonitoringService(MAASTestCase):
             }
         )
         details = yield service.getRefreshDetails()
-        self.assertEqual(
-            ("http://localhost/MAAS", "", self.metadata_creds), details
-        )
+        self.assertEqual(("http://localhost/MAAS", "", self.metadata_creds), details)
 
     @inlineCallbacks
     def test_reports_interfaces_to_region(self):

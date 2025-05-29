@@ -56,32 +56,24 @@ class TestResourceURIs(MAASTestCase):
             if resource.handler is not None:
                 yield resource.handler
 
-        handlers = chain.from_iterable(
-            map(gen_handlers, find_api_resources(urlconf))
-        )
+        handlers = chain.from_iterable(map(gen_handlers, find_api_resources(urlconf)))
 
         mismatches = []
 
         for handler in map(type, handlers):
             if hasattr(handler, "resource_uri"):
                 resource_uri_params = handler.resource_uri()[1]
-                resource_uri_template = generate_doc(
-                    handler
-                ).resource_uri_template
+                resource_uri_template = generate_doc(handler).resource_uri_template
 
                 fields_expected = tuple(resource_uri_params)
                 fields_observed = tuple(
                     fname
-                    for _, fname, _, _ in formatter.parse(
-                        resource_uri_template
-                    )
+                    for _, fname, _, _ in formatter.parse(resource_uri_template)
                     if fname is not None
                 )
 
                 if fields_observed != fields_expected:
-                    mismatches.append(
-                        (handler, fields_expected, fields_observed)
-                    )
+                    mismatches.append((handler, fields_expected, fields_observed))
 
         if len(mismatches) != 0:
             messages = (
@@ -143,16 +135,12 @@ class TestAccountAPI(APITestCase.ForUser):
         # The api operation create_authorisation_token returns a json dict
         # with the consumer_key, the token_key, the token_secret and the
         # consumer_name in it.
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         response = self.client.post(
             reverse("account_handler"), {"op": "create_authorisation_token"}
         )
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            "application/json; charset=utf-8", response["content-type"]
-        )
+        self.assertEqual("application/json; charset=utf-8", response["content-type"])
         parsed_result = json_load_bytes(response.content)
         self.assertCountEqual(
             ["consumer_key", "name", "token_key", "token_secret"],
@@ -167,18 +155,14 @@ class TestAccountAPI(APITestCase.ForUser):
     def test_create_authorisation_token_with_token_name(self):
         # The api operation create_authorisation_token can also accept
         # a new name for the generated token.
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         token_name = "Test_Token"
         response = self.client.post(
             reverse("account_handler"),
             {"op": "create_authorisation_token", "name": token_name},
         )
         self.assertEqual(http.client.OK, response.status_code)
-        self.assertEqual(
-            "application/json; charset=utf-8", response["content-type"]
-        )
+        self.assertEqual("application/json; charset=utf-8", response["content-type"])
         parsed_result = json_load_bytes(response.content)
         self.assertEqual(parsed_result["name"], token_name)
         mock_create_audit_event.assert_called_once()
@@ -186,9 +170,7 @@ class TestAccountAPI(APITestCase.ForUser):
     def test_delete_authorisation_token_not_found(self):
         # If the provided token_key does not exist (for the currently
         # logged-in user), the api returns a 'Not Found' (404) error.
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         response = self.client.post(
             reverse("account_handler"),
             {"op": "delete_authorisation_token", "token_key": "no-such-token"},
@@ -201,9 +183,7 @@ class TestAccountAPI(APITestCase.ForUser):
         # token_key is a mandatory parameter when calling
         # delete_authorisation_token. It it is not present in the request's
         # parameters, the api returns a 'Bad Request' (400) error.
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         response = self.client.post(
             reverse("account_handler"), {"op": "delete_authorisation_token"}
         )
@@ -214,9 +194,7 @@ class TestAccountAPI(APITestCase.ForUser):
     def test_update_authorisation_token(self):
         token_name_orig = "Test_Token"
         token_name_updated = "Test_Token update"
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         response_creation = self.client.post(
             reverse("account_handler"),
             {"op": "create_authorisation_token", "name": token_name_orig},
@@ -251,9 +229,7 @@ class TestAccountAPI(APITestCase.ForUser):
         # to update the token name.
         token_name_orig = "Test_Token"
         token_name_updated = "Test_Token update"
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         response_creation = self.client.post(
             reverse("account_handler"),
             {"op": "create_authorisation_token", "name": token_name_orig},
@@ -286,9 +262,7 @@ class TestAccountAPI(APITestCase.ForUser):
     def test_update_authorisation_token_name_not_found(self):
         # If the provided token_key does not exist (for the currently
         # logged-in user), the api returns a 'Not Found' (404) error.
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         response = self.client.post(
             reverse("account_handler"),
             {
@@ -305,9 +279,7 @@ class TestAccountAPI(APITestCase.ForUser):
         # `token` and `name` are mandatory parameters when calling
         # update_token_name. If it is not present in the request's
         # parameters, the api returns a 'Bad Request' (400) error.
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         response = self.client.post(
             reverse("account_handler"), {"op": "update_token_name"}
         )
@@ -317,9 +289,7 @@ class TestAccountAPI(APITestCase.ForUser):
 
     def test_list_tokens(self):
         token1_name = "Test Token 1"
-        mock_create_audit_event = self.patch(
-            account_module, "create_audit_event"
-        )
+        mock_create_audit_event = self.patch(account_module, "create_audit_event")
         response_creation = self.client.post(
             reverse("account_handler"),
             {"op": "create_authorisation_token", "name": token1_name},
@@ -336,9 +306,7 @@ class TestAccountAPI(APITestCase.ForUser):
                 self.assertEqual(
                     token_fields[0], parsed_creation_response["consumer_key"]
                 )
-                self.assertEqual(
-                    token_fields[1], parsed_creation_response["token_key"]
-                )
+                self.assertEqual(token_fields[1], parsed_creation_response["token_key"])
                 self.assertEqual(
                     token_fields[2], parsed_creation_response["token_secret"]
                 )
@@ -408,26 +376,18 @@ class TestSSHKeyHandlers(APITestCase.ForUser):
 
     def test_delete_by_id_works_and_creates_audit_event(self):
         _, keys = factory.make_user_with_keys(n_keys=2, user=self.user)
-        response = self.client.delete(
-            reverse("sshkey_handler", args=[keys[0].id])
-        )
-        self.assertEqual(
-            http.client.NO_CONTENT, response.status_code, response
-        )
+        response = self.client.delete(reverse("sshkey_handler", args=[keys[0].id]))
+        self.assertEqual(http.client.NO_CONTENT, response.status_code, response)
         keys_after = SSHKey.objects.filter(user=self.user)
         self.assertEqual(1, len(keys_after))
         self.assertEqual(keys[1].id, keys_after[0].id)
         event = Event.objects.get(type__level=AUDIT)
         self.assertIsNotNone(event)
-        self.assertEqual(
-            event.description, "Deleted SSH key id='%s'." % keys[0].id
-        )
+        self.assertEqual(event.description, "Deleted SSH key id='%s'." % keys[0].id)
 
     def test_delete_fails_if_not_your_key(self):
         user, keys = factory.make_user_with_keys(n_keys=1)
-        response = self.client.delete(
-            reverse("sshkey_handler", args=[keys[0].id])
-        )
+        response = self.client.delete(reverse("sshkey_handler", args=[keys[0].id]))
         self.assertEqual(http.client.FORBIDDEN, response.status_code, response)
         self.assertEqual(1, len(SSHKey.objects.filter(user=user)))
 
@@ -465,9 +425,7 @@ class TestSSHKeyHandlers(APITestCase.ForUser):
             reverse("sshkeys_handler"),
             data=dict(key=key_string, user=username),
         )
-        self.assertEqual(
-            http.client.BAD_REQUEST, response.status_code, response
-        )
+        self.assertEqual(http.client.BAD_REQUEST, response.status_code, response)
         self.assertIn(b"Supplied username", response.content)
 
     def test_adding_does_not_work_with_user_for_non_admin(self):
@@ -478,9 +436,7 @@ class TestSSHKeyHandlers(APITestCase.ForUser):
             reverse("sshkeys_handler"),
             data=dict(key=key_string, user=username),
         )
-        self.assertEqual(
-            http.client.BAD_REQUEST, response.status_code, response
-        )
+        self.assertEqual(http.client.BAD_REQUEST, response.status_code, response)
         self.assertIn(b"Only administrators", response.content)
 
     def test_adding_catches_key_validation_errors(self):
@@ -488,31 +444,23 @@ class TestSSHKeyHandlers(APITestCase.ForUser):
         response = self.client.post(
             reverse("sshkeys_handler"), data=dict(key=key_string)
         )
-        self.assertEqual(
-            http.client.BAD_REQUEST, response.status_code, response
-        )
+        self.assertEqual(http.client.BAD_REQUEST, response.status_code, response)
         self.assertIn(b"Invalid", response.content)
 
     def test_adding_returns_badrequest_when_key_not_in_form(self):
         response = self.client.post(reverse("sshkeys_handler"))
-        self.assertEqual(
-            http.client.BAD_REQUEST, response.status_code, response
-        )
+        self.assertEqual(http.client.BAD_REQUEST, response.status_code, response)
         self.assertEqual(
             dict(key=["This field is required."]),
             json_load_bytes(response.content),
         )
 
     def test_import_ssh_keys_creates_keys_keysource_and_audit_event(self):
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         ks = f"{protocol}:{auth_id}"
         key_string = get_data("data/test_rsa0.pub")
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.return_value = [key_string]
         response = self.client.post(
             reverse("sshkeys_handler"), data=dict(op="import", keysource=ks)
@@ -527,16 +475,12 @@ class TestSSHKeyHandlers(APITestCase.ForUser):
         self.assertEqual(event.description, "Imported SSH keys.")
 
     def test_import_ssh_keys_creates_keys_not_duplicate_keysource(self):
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         ks = f"{protocol}:{auth_id}"
         keysource = factory.make_KeySource(protocol=protocol, auth_id=auth_id)
         key_string = get_data("data/test_rsa0.pub")
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.return_value = [key_string]
         response = self.client.post(
             reverse("sshkeys_handler"), data=dict(op="import", keysource=ks)
@@ -549,14 +493,10 @@ class TestSSHKeyHandlers(APITestCase.ForUser):
         mock_get_protocol_keys.assert_called_once_with(protocol, auth_id)
 
     def test_import_ssh_keys_crashes_for_ImportSSHKeysERROR(self):
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         ks = f"{protocol}:{auth_id}"
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.side_effect = ImportSSHKeysError("error")
         response = self.client.post(
             reverse("sshkeys_handler"), data=dict(op="import", keysource=ks)
@@ -566,14 +506,10 @@ class TestSSHKeyHandlers(APITestCase.ForUser):
         )
 
     def test_import_ssh_keys_crashes_for_RequestException(self):
-        protocol = random.choice(
-            [KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH]
-        )
+        protocol = random.choice([KEYS_PROTOCOL_TYPE.LP, KEYS_PROTOCOL_TYPE.GH])
         auth_id = factory.make_name("auth_id")
         ks = f"{protocol}:{auth_id}"
-        mock_get_protocol_keys = self.patch(
-            keysource_module, "get_protocol_keys"
-        )
+        mock_get_protocol_keys = self.patch(keysource_module, "get_protocol_keys")
         mock_get_protocol_keys.side_effect = RequestException("error")
         response = self.client.post(
             reverse("sshkeys_handler"), data=dict(op="import", keysource=ks)
@@ -587,16 +523,12 @@ class TestMAASAPIAnon(APITestCase.ForAnonymous):
     """The MAAS' handler is not accessible to anon users."""
 
     def test_anon_get_config_unauthorized(self):
-        response = self.client.get(
-            reverse("maas_handler"), {"op": "get_config"}
-        )
+        response = self.client.get(reverse("maas_handler"), {"op": "get_config"})
 
         self.assertEqual(http.client.UNAUTHORIZED, response.status_code)
 
     def test_anon_set_config_unauthorized(self):
-        response = self.client.post(
-            reverse("maas_handler"), {"op": "set_config"}
-        )
+        response = self.client.post(reverse("maas_handler"), {"op": "set_config"})
 
         self.assertEqual(http.client.UNAUTHORIZED, response.status_code)
 
@@ -640,16 +572,12 @@ class TestMAASAPI(APITestCase.ForUser):
         self.assertEqual("/MAAS/api/2.0/maas/", reverse("maas_handler"))
 
     def test_simple_user_set_config_forbidden(self):
-        response = self.client.post(
-            reverse("maas_handler"), {"op": "set_config"}
-        )
+        response = self.client.post(reverse("maas_handler"), {"op": "set_config"})
 
         self.assertEqual(http.client.FORBIDDEN, response.status_code)
 
     def test_get_config_requires_name_param(self):
-        response = self.client.get(
-            reverse("maas_handler"), {"op": "get_config"}
-        )
+        response = self.client.get(reverse("maas_handler"), {"op": "get_config"})
 
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
         self.assertEqual(b"No provided name!", response.content)
@@ -706,9 +634,7 @@ class TestMAASAPI(APITestCase.ForUser):
         )
 
         self.assertEqual(http.client.BAD_REQUEST, response.status_code)
-        self.assertEqual(
-            b"Invalid name: Please enter a value", response.content
-        )
+        self.assertEqual(b"Invalid name: Please enter a value", response.content)
 
     def test_set_config_requires_value_param(self):
         self.become_admin()
@@ -729,9 +655,7 @@ class TestMAASAPI(APITestCase.ForUser):
             {"op": "set_config", "name": name, "value": value},
         )
 
-        self.assertEqual(
-            http.client.OK, response.status_code, response.content
-        )
+        self.assertEqual(http.client.OK, response.status_code, response.content)
         stored_value = Config.objects.get_config(name)
         self.assertEqual(stored_value, value)
 

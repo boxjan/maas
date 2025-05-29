@@ -71,9 +71,7 @@ class TestAuth(MAASTestCase):
         # stdin, trims whitespace, and converts it into a 3-tuple of creds.
         credentials = make_credentials()
         stdin = self.patch(sys, "stdin")
-        stdin.readline.return_value = (
-            convert_tuple_to_string(credentials) + "\n"
-        )
+        stdin.readline.return_value = convert_tuple_to_string(credentials) + "\n"
         self.assertEqual(
             credentials, auth.obtain_credentials("http://example.com/", "-")
         )
@@ -95,9 +93,7 @@ class TestAuth(MAASTestCase):
         # obtain_credentials returns None.
         getpass = self.patch(auth, "getpass")
         getpass.return_value = None
-        self.assertEqual(
-            None, auth.obtain_credentials("http://example.com/", None)
-        )
+        self.assertEqual(None, auth.obtain_credentials("http://example.com/", None))
         getpass.assert_called_once()
 
     def test_obtain_credentials_macaroon(self):
@@ -117,9 +113,7 @@ class TestAuth(MAASTestCase):
         self.bakery_response._content = json.dumps(token).encode("utf-8")
 
         credentials = auth.obtain_credentials("http://example.com/MAAS", None)
-        self.assertEqual(
-            ("consumer-key", "token-key", "token-secret"), credentials
-        )
+        self.assertEqual(("consumer-key", "token-key", "token-secret"), credentials)
 
     def test_check_valid_apikey_passes_valid_key(self):
         options = make_options()

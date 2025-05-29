@@ -53,9 +53,7 @@ def aggregate_vmhost_resources(cluster_resources, host_resources):
     cluster_resources.storage.allocated_tracked += (
         host_resources.storage.allocated_tracked
     )
-    cluster_resources.storage.allocated_other += (
-        host_resources.storage.allocated_other
-    )
+    cluster_resources.storage.allocated_other += host_resources.storage.allocated_other
 
     added_storage = 0
     for pool in host_resources.storage_pools.values():
@@ -111,9 +109,7 @@ class VMClusterManager(Manager):
             if perm != VMClusterPermission.view:
                 raise ValueError("Unknown perm: %s" % perm)
             result = []
-            fetched = rbac.get_resource_pool_ids(
-                user.username, "view", "view-all"
-            )
+            fetched = rbac.get_resource_pool_ids(user.username, "view", "view-all")
             pool_ids = set(fetched["view"] + fetched["view-all"])
             for cluster_group in cluster_groups:
                 cluster_group_list = list(
@@ -132,9 +128,7 @@ class VMClusterManager(Manager):
 
         if rbac.is_enabled():
             if perm == VMClusterPermission.view:
-                fetched = rbac.get_resource_pool_ids(
-                    user.username, "view", "view-all"
-                )
+                fetched = rbac.get_resource_pool_ids(user.username, "view", "view-all")
                 pool_ids = set(fetched["view"] + fetched["view-all"])
                 return self.filter(pool_id__in=pool_ids)
             else:
@@ -250,9 +244,7 @@ class VMCluster(CleanSave, TimestampedModel):
         @transactional
         def _get_peers(cluster, updated_attrs):
             peers = [peer for peer in cluster.hosts()]
-            updated_data = {
-                attr: getattr(cluster, attr) for attr in updated_attrs
-            }
+            updated_data = {attr: getattr(cluster, attr) for attr in updated_attrs}
             return (peers, updated_data)
 
         @transactional
@@ -265,10 +257,7 @@ class VMCluster(CleanSave, TimestampedModel):
         def _update_peers(result):
             (peers, updated_data) = result
             yield DeferredList(
-                [
-                    deferToDatabase(_update_vmhost, peer, updated_data)
-                    for peer in peers
-                ]
+                [deferToDatabase(_update_vmhost, peer, updated_data) for peer in peers]
             )
 
         # filter attributes that should not be propagated
@@ -386,12 +375,8 @@ class VMClusterResources:
     """Resources for a VM Cluster"""
 
     cores: VMClusterResource = field(default_factory=VMClusterResource)
-    memory: VMClusterMemoryResource = field(
-        default_factory=VMClusterMemoryResource
-    )
+    memory: VMClusterMemoryResource = field(default_factory=VMClusterMemoryResource)
     storage: VMClusterResource = field(default_factory=VMClusterResource)
-    storage_pools: Dict[str, VMClusterStoragePool] = field(
-        default_factory=dict
-    )
+    storage_pools: Dict[str, VMClusterStoragePool] = field(default_factory=dict)
     vm_count: VMClusterVMCount = field(default_factory=VMClusterVMCount)
     vmhost_count: int = 0

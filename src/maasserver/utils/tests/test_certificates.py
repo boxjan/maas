@@ -27,9 +27,7 @@ class TestGetMAASClientCN(MAASServerTestCase):
         Config.objects.set_config("maas_name", "my-maas")
         object_name = factory.make_string(size=60)
         truncated_name = object_name[:56]
-        self.assertEqual(
-            f"{truncated_name}@my-maas", get_maas_client_cn(object_name)
-        )
+        self.assertEqual(f"{truncated_name}@my-maas", get_maas_client_cn(object_name))
 
     def test_no_object(self):
         Config.objects.set_config("maas_name", "my-maas")
@@ -64,9 +62,7 @@ class TestGenerateCACertificate(MAASServerTestCase):
 
 class TestGenerateSignedCertificate(MAASServerTestCase):
     def test_generate_ca_certificate(self):
-        mock_cert_request = self.patch_autospec(
-            certificates, "CertificateRequest"
-        )
+        mock_cert_request = self.patch_autospec(certificates, "CertificateRequest")
         maas_uuid = str(uuid4())
         self.useFixture(MAASUUIDFixture(maas_uuid))
         ca = Mock()

@@ -35,9 +35,7 @@ class OwnerDataManager(Manager):
                 if not DATA_KEY_RE.match(key):
                     raise ValueError("Invalid character in key name")
 
-                self.update_or_create(
-                    node=node, key=key, defaults={"value": value}
-                )
+                self.update_or_create(node=node, key=key, defaults={"value": value})
         if to_remove:
             self.delete_owner_data(node, to_remove)
 

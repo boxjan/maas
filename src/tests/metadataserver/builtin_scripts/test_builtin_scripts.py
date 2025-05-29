@@ -61,14 +61,10 @@ class TestBuiltinScripts:
         script.description = factory.make_string()
         script.script_type = factory.pick_choice(SCRIPT_TYPE_CHOICES)
         script.results = [factory.make_name("result")]
-        script.script.parameters = {
-            factory.make_name("param"): {"type": "storage"}
-        }
+        script.script.parameters = {factory.make_name("param"): {"type": "storage"}}
 
         # Put fake old data in to simulate updating a script.
-        old_script = VersionedTextFile.objects.create(
-            data=factory.make_string()
-        )
+        old_script = VersionedTextFile.objects.create(data=factory.make_string())
         script.script = old_script
 
         # Change maas version
@@ -105,9 +101,7 @@ class TestBuiltinScripts:
 
         script.add_tag("deploy-info")
         # Put fake old data in to simulate updating a script.
-        old_script = VersionedTextFile.objects.create(
-            data=factory.make_string()
-        )
+        old_script = VersionedTextFile.objects.create(data=factory.make_string())
         script.script = old_script
         script.save()
 
@@ -159,9 +153,7 @@ class TestBuiltinScripts:
 
         # Test that subsequent scripts still get updated
         second_update_script_values = BUILTIN_SCRIPTS[update_script_index + 1]
-        second_script = Script.objects.get(
-            name=second_update_script_values.name
-        )
+        second_script = Script.objects.get(name=second_update_script_values.name)
         # Put fake old data in to simulate updating a script.
         orig_title = second_script.title
         orig_description = second_script.description
@@ -178,9 +170,7 @@ class TestBuiltinScripts:
         }
 
         # Put fake old data in to simulate updating a script.
-        old_script = VersionedTextFile.objects.create(
-            data=factory.make_string()
-        )
+        old_script = VersionedTextFile.objects.create(data=factory.make_string())
         second_script.script = old_script
 
         second_script.save()

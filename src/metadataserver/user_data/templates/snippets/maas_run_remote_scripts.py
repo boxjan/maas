@@ -184,12 +184,8 @@ def run_and_check(
                 scripts[0]["combined_name"]: open(
                     scripts[0]["combined_path"], "rb"
                 ).read(),
-                scripts[0]["stdout_name"]: open(
-                    scripts[0]["stdout_path"], "rb"
-                ).read(),
-                scripts[0]["stderr_name"]: open(
-                    scripts[0]["stderr_path"], "rb"
-                ).read(),
+                scripts[0]["stdout_name"]: open(scripts[0]["stdout_path"], "rb").read(),
+                scripts[0]["stderr_name"]: open(scripts[0]["stderr_path"], "rb").read(),
             }
             script["result_sent"] = output_and_send(
                 "Failed installing package(s) for %s" % script["msg_name"],
@@ -304,9 +300,7 @@ def _install_url_dependencies(packages, scripts, send_result=True):
         elif filename.endswith(".deb"):
             # Allow dpkg to fail incase it just needs dependencies
             # installed.
-            run_and_check(
-                ["dpkg", "-i", filename], scripts, "INSTALLING", False, True
-            )
+            run_and_check(["dpkg", "-i", filename], scripts, "INSTALLING", False, True)
             if not run_and_check(
                 ["apt-get", "install", "-qyf", "--no-install-recommends"],
                 scripts,
@@ -431,9 +425,7 @@ class CustomNetworking:
         global _networkd_interface
         global _networkd_properties_interface
         if tries == 0:
-            sys.stderr.write(
-                "WARNING: systemd-networkd did not come back up!\n"
-            )
+            sys.stderr.write("WARNING: systemd-networkd did not come back up!\n")
             return False
         elif _dbus is None:
             # Only open a dbus connection to systemd when its needed and keep
@@ -445,12 +437,8 @@ class CustomNetworking:
             _systemd_interface = dbus.Interface(
                 systemd_proxy, "org.freedesktop.systemd1.Manager"
             )
-            networkd_path = _systemd_interface.LoadUnit(
-                "systemd-networkd.service"
-            )
-            networkd_proxy = _dbus.get_object(
-                "org.freedesktop.systemd1", networkd_path
-            )
+            networkd_path = _systemd_interface.LoadUnit("systemd-networkd.service")
+            networkd_proxy = _dbus.get_object("org.freedesktop.systemd1", networkd_path)
             _networkd_interface = dbus.Interface(
                 networkd_proxy, "org.freedesktop.systemd1.Unit"
             )
@@ -637,8 +625,7 @@ def get_storage_model_from_udev(block_dev):
         # udev should always be available, if udev_path isn't found something
         # changed. lsblk will still give a model name, try using that.
         sys.stderr.write(
-            "WARNING: Unable to read block device data from "
-            "udev(%s)" % udev_path
+            "WARNING: Unable to read block device data from " "udev(%s)" % udev_path
         )
         block_dev["model_enc"] = block_dev["model"]
         return block_dev
@@ -677,15 +664,12 @@ def get_block_devices():
             ]
             block_list = check_output(cmd, timeout=60).decode("utf-8")
         except TimeoutExpired:
-            _block_devices = KeyError(
-                "%s timed out after 60 seconds" % " ".join(cmd)
-            )
+            _block_devices = KeyError("%s timed out after 60 seconds" % " ".join(cmd))
         except CalledProcessError as e:
             _block_devices = KeyError(
                 "%s failed with return code %s\n\n"
                 "STDOUT:\n%s\n\n"
-                "STDERR:\n%s\n"
-                % (" ".join(cmd), e.returncode, e.stdout, e.stderr)
+                "STDERR:\n%s\n" % (" ".join(cmd), e.returncode, e.stdout, e.stderr)
             )
         else:
             block_devices = []
@@ -752,11 +736,7 @@ def get_interfaces(clear_cache=False):
                     # We only care about devices which have addresses. This is
                     # how we differentiate between a bond and the interfaces
                     # that make that bond.
-                    if (
-                        "addresses" in info
-                        or info.get("dhcp4")
-                        or info.get("dhcp6")
-                    ):
+                    if "addresses" in info or info.get("dhcp4") or info.get("dhcp6"):
                         interfaces[macaddress] = info.get("set-name", dev)
 
         if interfaces:
@@ -802,8 +782,7 @@ def parse_parameters(script, scripts_dir):
             value = param["value"]
             if value == "all":
                 raise KeyError(
-                    "MAAS did not detect any storage devices during "
-                    "commissioning!"
+                    "MAAS did not detect any storage devices during " "commissioning!"
                 )
             model = value.get("model")
             serial = value.get("serial")
@@ -817,12 +796,9 @@ def parse_parameters(script, scripts_dir):
                 # the device name may have changed since commissioning.
                 for blockdev in get_block_devices():
                     if (
-                        model == blockdev["model"]
-                        or model == blockdev.get("model_enc")
+                        model == blockdev["model"] or model == blockdev.get("model_enc")
                     ) and serial == blockdev["serial"]:
-                        value["path"] = value["input"] = (
-                            "/dev/%s" % blockdev["name"]
-                        )
+                        value["path"] = value["input"] = "/dev/%s" % blockdev["name"]
                 if "id_path" in value and "path" not in value:
                     # some devices, such as RAID controllers, may have multiple serials
                     # and lsblik may return a different one from what was discovered
@@ -837,8 +813,7 @@ def parse_parameters(script, scripts_dir):
                     "This indicates the storage device has been removed or "
                     "the OS is unable to find it due to a hardware failure. "
                     "Please re-commission this node to re-discover the "
-                    "storage devices, or delete this device manually."
-                    % (model, serial)
+                    "storage devices, or delete this device manually." % (model, serial)
                 )
         elif param_type == "interface":
             value = param["value"]
@@ -847,12 +822,8 @@ def parse_parameters(script, scripts_dir):
                     "MAAS did not detect any interfaces during commissioning!"
                 )
             try:
-                value["input"] = value["name"] = get_interfaces()[
-                    value["mac_address"]
-                ]
-                argument_format = param.get(
-                    "argument_format", "--interface={name}"
-                )
+                value["input"] = value["name"] = get_interfaces()[value["mac_address"]]
+                argument_format = param.get("argument_format", "--interface={name}")
                 ret += argument_format.format(**value).split()
             except KeyError:
                 raise KeyError(
@@ -870,9 +841,7 @@ def parse_parameters(script, scripts_dir):
                     )
                 )
         else:
-            argument_format = param.get(
-                "argument_format", "--%s={input}" % param_type
-            )
+            argument_format = param.get("argument_format", "--%s={input}" % param_type)
             ret += argument_format.format(input=param["value"]).split()
 
     return ret
@@ -881,9 +850,7 @@ def parse_parameters(script, scripts_dir):
 def _check_link_connected(script):
     # Only check if a link is connected if its a network script
     # which applies configured networking and has an interface parameter.
-    if script["hardware_type"] != 4 or not script.get(
-        "apply_configured_networking"
-    ):
+    if script["hardware_type"] != 4 or not script.get("apply_configured_networking"):
         return
     interface = None
     for param in script.get("parameters", {}).values():
@@ -1085,13 +1052,9 @@ def run_script(script, scripts_dir, send_result=True):
             script["name"],
             str(e).replace('"', "").replace("\\n", "\n"),
         )
-        output += "Given parameters:\n%s\n\n" % str(
-            script.get("parameters", {})
-        )
+        output += "Given parameters:\n%s\n\n" % str(script.get("parameters", {}))
         try:
-            output += "Discovered storage devices:\n%s\n" % str(
-                get_block_devices()
-            )
+            output += "Discovered storage devices:\n%s\n" % str(get_block_devices())
         except KeyError:
             pass
         output += "Discovered interfaces:\n%s\n" % str(get_interfaces())
@@ -1102,8 +1065,7 @@ def run_script(script, scripts_dir, send_result=True):
             script["stderr_name"]: output,
         }
         output_and_send(
-            "Failed to execute %s: %d"
-            % (script["msg_name"], args["exit_status"]),
+            "Failed to execute %s: %d" % (script["msg_name"], args["exit_status"]),
             **args,
         )
         return False
@@ -1152,8 +1114,7 @@ def run_script(script, scripts_dir, send_result=True):
             ).read()
         args["runtime"] = script["runtime"] = time.monotonic() - start_time
         script["result_sent"] = output_and_send(
-            "Failed to execute %s: %d"
-            % (script["msg_name"], args["exit_status"]),
+            "Failed to execute %s: %d" % (script["msg_name"], args["exit_status"]),
             **args,
         )
         sys.stdout.write("%s\n" % stderr)
@@ -1165,9 +1126,7 @@ def run_script(script, scripts_dir, send_result=True):
         args["status"] = "TIMEDOUT"
         _check_link_connected(script)
         args["files"] = {
-            script["combined_name"]: open(
-                script["combined_path"], "rb"
-            ).read(),
+            script["combined_name"]: open(script["combined_path"], "rb").read(),
             script["stdout_name"]: open(script["stdout_path"], "rb").read(),
             script["stderr_name"]: open(script["stderr_path"], "rb").read(),
         }
@@ -1186,9 +1145,7 @@ def run_script(script, scripts_dir, send_result=True):
         script["exit_status"] = args["exit_status"] = proc.returncode
         _check_link_connected(script)
         args["files"] = {
-            script["combined_name"]: open(
-                script["combined_path"], "rb"
-            ).read(),
+            script["combined_name"]: open(script["combined_path"], "rb").read(),
             script["stdout_name"]: open(script["stdout_path"], "rb").read(),
             script["stderr_name"]: open(script["stderr_path"], "rb").read(),
         }
@@ -1442,24 +1399,14 @@ def run_scripts(
             script_out_dir = os.path.join(out_dir, script["name"])
         os.makedirs(script_out_dir, exist_ok=True)
         script["combined_name"] = script["name"]
-        script["combined_path"] = os.path.join(
-            script_out_dir, script["combined_name"]
-        )
+        script["combined_path"] = os.path.join(script_out_dir, script["combined_name"])
         script["stdout_name"] = "%s.out" % script["name"]
-        script["stdout_path"] = os.path.join(
-            script_out_dir, script["stdout_name"]
-        )
+        script["stdout_path"] = os.path.join(script_out_dir, script["stdout_name"])
         script["stderr_name"] = "%s.err" % script["name"]
-        script["stderr_path"] = os.path.join(
-            script_out_dir, script["stderr_name"]
-        )
+        script["stderr_path"] = os.path.join(script_out_dir, script["stderr_name"])
         script["result_name"] = "%s.yaml" % script["name"]
-        script["result_path"] = os.path.join(
-            script_out_dir, script["result_name"]
-        )
-        script["download_path"] = os.path.join(
-            scripts_dir, "downloads", script["name"]
-        )
+        script["result_path"] = os.path.join(script_out_dir, script["result_name"])
+        script["download_path"] = os.path.join(scripts_dir, "downloads", script["name"])
         script["resources_file"] = resources_file
         # Make sure the download path always exists
         os.makedirs(script["download_path"], exist_ok=True)
@@ -1561,9 +1508,7 @@ def run_scripts_from_metadata(
     release_scripts = scripts.get("release_scripts")
     if release_scripts is not None:
         if send_result:
-            signal_wrapper(
-                config.metadata_url, config.credentials, "RELEASING"
-            )
+            signal_wrapper(config.metadata_url, config.credentials, "RELEASING")
 
         sys.stdout.write("Starting release scripts...\n")
         sys.stdout.flush()
@@ -1762,9 +1707,7 @@ def main():
     has_content = True
     fail_count = 0
     if not args.no_download:
-        has_content = download_and_extract_tar(
-            url + "maas-scripts", creds, scripts_dir
-        )
+        has_content = download_and_extract_tar(url + "maas-scripts", creds, scripts_dir)
     if has_content:
         fail_count = run_scripts_from_metadata(
             config,

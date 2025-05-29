@@ -18,6 +18,5 @@ def clear_existing_sessions():
 def _get_session_length() -> int:
     """Return the session duration."""
     return (
-        Config.objects.get_config("session_length")
-        or DEFAULT_CONFIG["session_length"]
+        Config.objects.get_config("session_length") or DEFAULT_CONFIG["session_length"]
     )

@@ -49,15 +49,9 @@ class TestUpdateMemoryMetrics(MAASTestCase):
         )
         update_memory_metrics(prometheus_metrics, path=meminfo)
         output = prometheus_metrics.generate_latest().decode("ascii")
-        self.assertIn(
-            'maas_node_mem_MemTotal{service_type="rack"} 123.0', output
-        )
-        self.assertIn(
-            'maas_node_mem_SwapCached{service_type="rack"} 456.0', output
-        )
-        self.assertIn(
-            'maas_node_mem_VmallocUsed{service_type="rack"} 789.0', output
-        )
+        self.assertIn('maas_node_mem_MemTotal{service_type="rack"} 123.0', output)
+        self.assertIn('maas_node_mem_SwapCached{service_type="rack"} 456.0', output)
+        self.assertIn('maas_node_mem_VmallocUsed{service_type="rack"} 789.0', output)
         self.assertIn(
             'maas_node_mem_HugePages_Total{service_type="rack"} 321.0', output
         )

@@ -54,9 +54,7 @@ class TestProcessResponse(MAASTestCase):
         self.assertEqual(data, tags.process_response(response))
 
     def test_process_not_OK_response(self):
-        response = factory.make_response(
-            http.client.NOT_FOUND, b"", "application/json"
-        )
+        response = factory.make_response(http.client.NOT_FOUND, b"", "application/json")
         response.url = factory.make_string()
         error = self.assertRaises(
             urllib.error.HTTPError, tags.process_response, response
@@ -318,9 +316,7 @@ class TestGenBatchSlices(MAASTestCase):
         self.assertSequenceEqual([], list(tags.gen_batch_slices(0, 1)))
 
     def test_batch_of_1_one_thing(self):
-        self.assertSequenceEqual(
-            [slice(0, None, 1)], list(tags.gen_batch_slices(1, 1))
-        )
+        self.assertSequenceEqual([slice(0, None, 1)], list(tags.gen_batch_slices(1, 1)))
 
     def test_batch_of_1_more_things(self):
         self.assertSequenceEqual(
@@ -332,9 +328,7 @@ class TestGenBatchSlices(MAASTestCase):
         self.assertSequenceEqual([], list(tags.gen_batch_slices(0, 4)))
 
     def test_one_thing(self):
-        self.assertSequenceEqual(
-            [slice(0, None, 1)], list(tags.gen_batch_slices(1, 4))
-        )
+        self.assertSequenceEqual([slice(0, None, 1)], list(tags.gen_batch_slices(1, 4)))
 
     def test_more_things(self):
         self.assertSequenceEqual(
@@ -365,9 +359,7 @@ class TestGenBatches(MAASTestCase):
         self.assertSequenceEqual([[1]], list(tags.gen_batches([1], 1)))
 
     def test_batch_of_1_more_things(self):
-        self.assertSequenceEqual(
-            [[1], [2], [3]], list(tags.gen_batches([1, 2, 3], 1))
-        )
+        self.assertSequenceEqual([[1], [2], [3]], list(tags.gen_batches([1, 2, 3], 1)))
 
     def test_no_things(self):
         self.assertSequenceEqual([], list(tags.gen_batches([], 4)))
@@ -479,9 +471,7 @@ class TestTagUpdating(MAASTestCase):
     def test_post_updated_nodes_calls_correct_api_and_parses_result(self):
         client = self.fake_client()
         content = b'{"added": 1, "removed": 2}'
-        response = factory.make_response(
-            http.client.OK, content, "application/json"
-        )
+        response = factory.make_response(http.client.OK, content, "application/json")
         post_mock = MagicMock(return_value=response)
         self.patch(client, "post", post_mock)
         name = factory.make_name("tag")
@@ -518,12 +508,9 @@ class TestTagUpdating(MAASTestCase):
         wrong_tag_definition = factory.make_name("//")
         content = (
             "Definition supplied '%s' doesn't match"
-            " current definition '%s'"
-            % (wrong_tag_definition, right_tag_defintion)
+            " current definition '%s'" % (wrong_tag_definition, right_tag_defintion)
         )
-        err = urllib.error.HTTPError(
-            "url", http.client.CONFLICT, content, {}, None
-        )
+        err = urllib.error.HTTPError("url", http.client.CONFLICT, content, {}, None)
         post_mock = MagicMock(side_effect=err)
         self.patch(client, "post", post_mock)
         result = tags.post_updated_nodes(
@@ -556,15 +543,11 @@ class TestTagUpdating(MAASTestCase):
             ("b", xml("<not-node />")),
             ("c", xml("<parent><node /></parent>")),
         ]
-        self.assertEqual(
-            (["a", "c"], ["b"]), tags.classify(xpath, node_details)
-        )
+        self.assertEqual((["a", "c"], ["b"]), tags.classify(xpath, node_details))
 
     def test_process_node_tags_integration(self):
         self.useFixture(
-            ClusterConfigurationFixture(
-                maas_url=factory.make_simple_http_url()
-            )
+            ClusterConfigurationFixture(maas_url=factory.make_simple_http_url())
         )
         get_hw_system1 = factory.make_response(
             http.client.OK,
