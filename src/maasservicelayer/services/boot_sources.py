@@ -1,6 +1,9 @@
 #  Copyright 2025 Canonical Ltd.  This software is licensed under the
 #  GNU Affero General Public License version 3 (see the file LICENSE).
 
+import asyncio
+from typing import Awaitable
+
 from simplestreams.mirrors import UrlMirrorReader
 from simplestreams.util import path_from_mirror_url
 import structlog
@@ -33,7 +36,21 @@ class BootSourcesService(Service):
             descriptions.
         :return: A `BootImageMapping` describing available boot resources.
         """
+        return await asyncio.to_thread(
+            self._fetch,
+            source_url,
+            keyring,
+            user_agent,
+            validate_products,
+        )
 
+    def _fetch(
+        self,
+        source_url: str,
+        keyring: str | None = None,
+        user_agent: str | None = None,
+        validate_products: bool = True,
+    ) -> BootImageMapping:
         logger.info(f"Downloading image descriptions from '{source_url}'.")
         mirror, rpath = path_from_mirror_url(source_url, None)
         policy = get_signing_policy(rpath, keyring)
