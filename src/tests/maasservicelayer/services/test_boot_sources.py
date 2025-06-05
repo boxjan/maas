@@ -24,7 +24,7 @@ class TestBootSourcesService:
         source_url = factory.make_url()
         expected_mirror_url = "streams/v1/index.sjson"
 
-        await boot_sources_service.fetch(source_url)
+        boot_sources_service._fetch(source_url)
 
         # Also doesn't pass user agent when not set.
         repodumper_sync_mock.assert_called_once_with(
@@ -50,7 +50,7 @@ class TestBootSourcesService:
         user_agent = factory.make_name("user-agent")
         expected_mirror_url = "streams/v1/index.sjson"
 
-        await boot_sources_service.fetch(source_url, user_agent=user_agent)
+        boot_sources_service._fetch(source_url, user_agent=user_agent)
 
         repodumper_sync_mock.assert_called_once_with(
             urlmirrorreader_mock.return_value,
@@ -62,21 +62,28 @@ class TestBootSourcesService:
             user_agent=user_agent,
         )
 
+    @patch("maasservicelayer.services.boot_sources.RepoDumper.sync")
     @patch("maasservicelayer.services.boot_sources.UrlMirrorReader")
     async def test_fetch_without_user_agent_on_fallback(
         self,
         urlmirrorreader_mock: MagicMock,
+        repodumper_sync_mock: MagicMock,
     ) -> None:
         # Ported from TestDownloadImageDescriptionsUserAgent::test_doesnt_pass_user_agenton_fallback
         boot_sources_service = BootSourcesService(context=Context())
 
         source_url = factory.make_url()
         user_agent = factory.make_name("user-agent")
+        expected_mirror_url = "streams/v1/index.sjson"
 
-        urlmirrorreader_mock.side_effect = [TypeError(), MagicMock()]
+        urlmirrorreader_mock.side_effect = [TypeError(), urlmirrorreader_mock.return_value]
 
-        await boot_sources_service.fetch(source_url, user_agent=user_agent)
+        boot_sources_service._fetch(source_url, user_agent=user_agent)
 
+        repodumper_sync_mock.assert_called_once_with(
+            urlmirrorreader_mock.return_value,
+            expected_mirror_url,
+        )
         urlmirrorreader_mock.assert_has_calls(
             [
                 call(
@@ -97,11 +104,13 @@ class TestBootSourcesService:
     async def test_fetch_cannot_parse_response(self) -> None:
         assert False, "This test needs to be implemented."
 
-    async def test_real(self) -> None:
-        boot_sources_service = BootSourcesService(context=Context())
-        source_url = "https://images.maas.io/ephemeral-v3/stable/streams/v1/index.json"
+    # async def test_real(self) -> None:
+    #     boot_sources_service = BootSourcesService(context=Context())
+    #     source_url = (
+    #         "https://images.maas.io/ephemeral-v3/stable/streams/v1/index.json"
+    #     )
 
-        result = await boot_sources_service.fetch(source_url, keyring="")
-        print(list(result.items()))
+    #     result = await boot_sources_service.fetch(source_url, keyring="")
+    #     print(list(result.items()))
 
-        assert False
+    #     assert False

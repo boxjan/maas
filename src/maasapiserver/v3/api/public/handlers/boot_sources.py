@@ -9,7 +9,8 @@ from maasapiserver.v3.api.public.models.requests.boot_sources import (
     BootSourcesRequest,
 )
 from maasapiserver.v3.api.public.models.responses.boot_sources import (
-    BootSourcesResponse,
+    BootSourceResponse,
+    BootSourcesListResponse,
 )
 from maasapiserver.v3.auth.base import check_permissions
 from maasapiserver.v3.constants import V3_API_PREFIX
@@ -28,7 +29,7 @@ class BootSourcesHandler(Handler):
         tags=TAGS,
         responses={
             200: {
-                "model": BootSourcesResponse,
+                "model": BootSourcesListResponse,
             },
         },
         status_code=200,
@@ -41,14 +42,24 @@ class BootSourcesHandler(Handler):
         self,
         request: BootSourcesRequest,
         services: ServiceCollectionV3 = Depends(services),  # noqa: B008
-    ) -> BootSourcesResponse:
-        boot_sources = await services.boot_sources.fetch(
+    ) -> BootSourcesListResponse:
+        # TODO: Change fetch return type to ListResult[...] ?
+        boot_source_mapping = await services.boot_sources.fetch(
             request.url,
             keyring=request.keyring,
             user_agent=request.user_agent,
             validate_products=request.validate_products,
         )
-        return BootSourcesResponse(
-            boot_sources=boot_sources,
-            self_base_hyperlink=f"{V3_API_PREFIX}/boot_sources",
+        # The fetch method isn't paginated, so we return all items
+        # in a single response.
+        return BootSourcesListResponse(
+            items=[
+                BootSourceResponse.from_model(
+                    boot_source,
+                    self_base_hyperlink=f"{V3_API_PREFIX}/boot_sources",
+                )
+                for boot_source in boot_source_mapping.items()
+            ],
+            total=len(boot_source_mapping),
+            next=None,
         )
