@@ -12,7 +12,9 @@ ImageSpec = namedtuple(
 )
 
 
-def get_signing_policy(path: str, keyring: str | None=None) -> Callable | functools.partial:
+def get_signing_policy(
+    path: str, keyring: str | None = None
+) -> Callable | functools.partial:
     """Return Simplestreams signing policy for the given path.
 
     :param path: Path to the Simplestreams index file.

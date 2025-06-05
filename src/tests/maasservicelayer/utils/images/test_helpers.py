@@ -53,6 +53,7 @@ class TestGetSigningPolicy:
             content, path, keyring=keyring
         )
 
+
 class TestGetOSFromProduct:
     def test_returns_os_from_product(self):
         os = factory.make_name("os")

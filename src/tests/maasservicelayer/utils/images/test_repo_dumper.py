@@ -111,7 +111,9 @@ class TestValidateProduct:
                 bootloader["bootloader-type"],
                 bootloader["arch"],
             )
-            assert validate_product(bootloader, product_name), f"Failed to validate {product_name}"
+            assert validate_product(bootloader, product_name), (
+                f"Failed to validate {product_name}"
+            )
 
     def test_rejects_unknown_bootloader_version(self):
         version = random.randint(2, 100)
@@ -138,14 +140,14 @@ class TestValidateProduct:
 class TestRepoDumper:
     def make_item(
         self,
-        os: str | None=None,
-        release: str | None=None,
-        version: str | None=None,
-        arch: str | None=None,
-        subarch: str | None=None,
-        subarches: list[str] | None=None,
-        label: str | None=None,
-        bootloader_type: str | None=None,
+        os: str | None = None,
+        release: str | None = None,
+        version: str | None = None,
+        arch: str | None = None,
+        subarch: str | None = None,
+        subarches: list[str] | None = None,
+        label: str | None = None,
+        bootloader_type: str | None = None,
     ):
         if os is None:
             os = factory.make_name("os")
