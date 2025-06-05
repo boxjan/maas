@@ -484,9 +484,5 @@ class TestRepoDumper:
         boot_images_dict = BootImageMapping()
         dumper = RepoDumper(boot_images_dict)
 
-        # with FakeLogger("maas.import-images", level=logging.INFO) as maaslog:
         with pytest.raises(io_error):
             dumper.sync(sentinel.reader, sentinel.path)
-
-        # assert "I/O error while syncing boot images." in maaslog.output
-        # TODO
