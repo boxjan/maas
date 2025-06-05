@@ -2,7 +2,6 @@
 #  GNU Affero General Public License version 3 (see the file LICENSE).
 
 import asyncio
-from typing import Awaitable
 
 from simplestreams.mirrors import UrlMirrorReader
 from simplestreams.util import path_from_mirror_url
@@ -55,28 +54,12 @@ class BootSourcesService(Service):
         mirror, rpath = path_from_mirror_url(source_url, None)
         policy = get_signing_policy(rpath, keyring)
 
-        # TODO: Is this needed within the V3 API?
-        if user_agent:
-            # Since user_agent is set, we know we are downloading descriptions
-            # from the Images repository *by* the Region.
-            logger.info(
-                f"Region downloading image descriptions from '{source_url}'."
-            )
-            try:
-                reader = UrlMirrorReader(
-                    mirror, policy=policy, user_agent=user_agent
-                )
-            except TypeError:
-                # UrlMirrorReader doesn't support the user_agent argument.
-                # simplestream >=bzr429 is required for this feature.
-                reader = UrlMirrorReader(mirror, policy=policy)
-        else:
-            # If user_agent is NOT set, we know we are downloading descriptions
-            # from the Region controller *by* the Rack controller.
-            logger.info(
-                f"Rack downloading image descriptions from '{source_url}'."
-            )
-            reader = UrlMirrorReader(mirror, policy=policy)
+        # Since user_agent is set, we know we are downloading descriptions
+        # from the Images repository *by* the Region.
+        logger.info(
+            f"Region downloading image descriptions from '{source_url}'."
+        )
+        reader = UrlMirrorReader(mirror, policy=policy, user_agent=user_agent)
 
         boot_images_dict = BootImageMapping()
         dumper = RepoDumper(
