@@ -16,13 +16,14 @@ def make_boot_resource() -> dict[str, str]:
         "version_name": factory.make_name("version_name"),
     }
 
+
 def make_image_spec(
-    os: str | None=None,
-    arch: str | None=None,
-    subarch: str | None=None,
-    release: str | None=None,
-    kflavor: str | None=None,
-    label: str | None=None
+    os: str | None = None,
+    arch: str | None = None,
+    subarch: str | None = None,
+    release: str | None = None,
+    kflavor: str | None = None,
+    label: str | None = None,
 ) -> ImageSpec:
     """
     Build an `ImageSpec` with random values.
@@ -41,9 +42,10 @@ def make_image_spec(
         label = factory.make_name("label")
     return ImageSpec(os, arch, subarch, kflavor, release, label)
 
+
 def set_resource(
-    boot_dict: BootImageMapping | None=None,
-    image_spec: ImageSpec | None=None,
+    boot_dict: BootImageMapping | None = None,
+    image_spec: ImageSpec | None = None,
     resource=None,
 ) -> BootImageMapping:
     """
