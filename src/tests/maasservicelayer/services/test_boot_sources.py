@@ -34,6 +34,7 @@ class TestBootSourcesService:
         urlmirrorreader_mock.assert_called_once_with(
             source_url,
             policy=ANY,
+            user_agent=None,
         )
 
     @patch("maasservicelayer.services.boot_sources.RepoDumper.sync")
