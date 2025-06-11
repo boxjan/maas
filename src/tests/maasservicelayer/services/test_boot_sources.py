@@ -34,30 +34,4 @@ class TestBootSourcesService:
         urlmirrorreader_mock.assert_called_once_with(
             source_url,
             policy=ANY,
-            user_agent=None,
-        )
-
-    @patch("maasservicelayer.services.boot_sources.RepoDumper.sync")
-    @patch("maasservicelayer.services.boot_sources.UrlMirrorReader")
-    async def test_fetch_with_user_agent(
-        self,
-        urlmirrorreader_mock: MagicMock,
-        repodumper_sync_mock: MagicMock,
-    ) -> None:
-        boot_sources_service = BootSourcesService(context=Context())
-
-        source_url = factory.make_url()
-        user_agent = factory.make_name("user-agent")
-        expected_mirror_url = "streams/v1/index.sjson"
-
-        boot_sources_service._fetch(source_url, user_agent=user_agent)
-
-        repodumper_sync_mock.assert_called_once_with(
-            urlmirrorreader_mock.return_value,
-            expected_mirror_url,
-        )
-        urlmirrorreader_mock.assert_called_once_with(
-            source_url,
-            policy=ANY,
-            user_agent=user_agent,
         )

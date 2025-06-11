@@ -43,13 +43,12 @@ class BootSourcesHandler(Handler):
         request: BootSourcesRequest,
         services: ServiceCollectionV3 = Depends(services),  # noqa: B008
     ) -> BootSourcesListResponse:
-        # TODO: Change fetch return type to ListResult[...] ?
         boot_source_mapping = await services.boot_sources.fetch(
             request.url,
             keyring=request.keyring,
-            user_agent=request.user_agent,
             validate_products=request.validate_products,
         )
+
         # The fetch method isn't paginated, so we return all items
         # in a single response.
         return BootSourcesListResponse(
