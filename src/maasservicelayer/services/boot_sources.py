@@ -24,7 +24,6 @@ class BootSourcesService(Service):
         self,
         source_url: str,
         keyring: str | None = None,
-        user_agent: str | None = None,
         validate_products: bool = True,
     ) -> BootImageMapping:
         """Download image metadata from upstream Simplestreams repo.
@@ -39,7 +38,6 @@ class BootSourcesService(Service):
             self._fetch,
             source_url,
             keyring,
-            user_agent,
             validate_products,
         )
 
@@ -47,7 +45,6 @@ class BootSourcesService(Service):
         self,
         source_url: str,
         keyring: str | None = None,
-        user_agent: str | None = None,
         validate_products: bool = True,
     ) -> BootImageMapping:
         logger.info(f"Downloading image descriptions from '{source_url}'.")
@@ -59,7 +56,7 @@ class BootSourcesService(Service):
         logger.info(
             f"Region downloading image descriptions from '{source_url}'."
         )
-        reader = UrlMirrorReader(mirror, policy=policy, user_agent=user_agent)
+        reader = UrlMirrorReader(mirror, policy=policy)
 
         boot_images_dict = BootImageMapping()
         dumper = RepoDumper(

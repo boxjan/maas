@@ -13,11 +13,6 @@ class BootSourcesRequest(BaseModel):
         default=None,
         description="Keyring to use for verifying signatures of the boot sources.",
     )
-    user_agent: str | None = Field(
-        default=None,
-        description="User agent to use when fetching boot sources. "
-        "If not provided, the default user agent will be used.",
-    )
     validate_products: bool = Field(
         default=True,
         description="Whether to validate products in the boot sources.",
