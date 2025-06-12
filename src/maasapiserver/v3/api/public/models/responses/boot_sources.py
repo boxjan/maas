@@ -65,7 +65,7 @@ class BootSourceResponse(HalResponse[BaseHal]):
             support_eol=parsed_support_eol,
             # TODO: This is a placeholder for now.
             # TODO: If using path, url encode it.
-            hal_links=BaseHal(
+            hal_links=BaseHal(  # pyright: ignore [reportCallIssue]
                 self=BaseHref(
                     href=f"{self_base_hyperlink}/?url={metadata['path']}"
                 )
