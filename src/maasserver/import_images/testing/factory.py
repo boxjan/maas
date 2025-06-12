@@ -3,8 +3,8 @@
 
 """Factory helpers for the `import_images` package."""
 
-from maasserver.import_images.boot_image_mapping import BootImageMapping
-from maasserver.import_images.helpers import ImageSpec
+from maasservicelayer.utils.images.boot_image_mapping import BootImageMapping
+from maasservicelayer.utils.images.helpers import ImageSpec
 from maastesting.factory import factory
 
 
