@@ -20,6 +20,7 @@ from maasserver.import_images.testing.factory import (
     make_image_spec,
     set_resource,
 )
+from maasservicelayer.utils.images.boot_image_mapping import BootImageMapping
 from maastesting.factory import factory
 from maastesting.testcase import MAASTestCase
 
