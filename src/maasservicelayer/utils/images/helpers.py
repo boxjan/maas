@@ -7,6 +7,7 @@ from typing import Callable
 
 from simplestreams.util import policy_read_signed
 
+# A tuple of the items that together select a boot image.
 ImageSpec = namedtuple(
     "ImageSpec", ["os", "arch", "subarch", "kflavor", "release", "label"]
 )
@@ -29,7 +30,7 @@ def get_signing_policy(
         # index would have a suffix of '.sjson'.  Use a policy that doesn't
         # check anything.
 
-        def policy(content, path, keyring):
+        def policy(content, path, keyring=None):
             return content
 
     else:
