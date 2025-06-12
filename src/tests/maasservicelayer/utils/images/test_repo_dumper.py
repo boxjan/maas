@@ -5,6 +5,7 @@ import random
 from unittest.mock import MagicMock, patch, sentinel
 
 import pytest
+from structlog.testing import capture_logs
 
 from maasservicelayer.utils.images.boot_image_mapping import BootImageMapping
 from maasservicelayer.utils.images.repo_dumper import (
@@ -484,5 +485,8 @@ class TestRepoDumper:
         boot_images_dict = BootImageMapping()
         dumper = RepoDumper(boot_images_dict)
 
-        with pytest.raises(io_error):
-            dumper.sync(sentinel.reader, sentinel.path)
+        with capture_logs() as logs:
+            with pytest.raises(io_error):
+                dumper.sync(sentinel.reader, sentinel.path)
+
+            assert "I/O error while syncing boot images" in logs[0]["event"]
