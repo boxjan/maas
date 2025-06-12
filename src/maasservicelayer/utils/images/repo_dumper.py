@@ -110,7 +110,7 @@ def validate_product(data: dict[str, str], product_name: str) -> bool:
 class RepoDumper(BasicMirrorWriter):
     """Gather metadata about boot images available in a Simplestreams repo.
 
-    Used inside `download_image_descriptions`.  Stores basic metadata about
+    Used inside `BootSourcesService::fetch`.  Stores basic metadata about
     each image it finds upstream in a given `BootImageMapping`.  Each stored
     item is a dict containing the basic metadata for retrieving a boot image.
 
