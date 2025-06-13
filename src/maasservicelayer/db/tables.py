@@ -25,45 +25,6 @@ METADATA = MetaData()
 
 # Keep them in alphabetical order!
 
-BootSourceTable = Table(
-    "maasserver_bootsource",
-    METADATA,
-    Column("id", BigInteger, primary_key=True, unique=True),
-    Column("created", DateTime(timezone=True), nullable=False),
-    Column("updated", DateTime(timezone=True), nullable=False),
-    Column("url", String(200), nullable=False),
-    Column("keyring_filename", String(4096), nullable=False),
-    Column("keyring_data", LargeBinary, nullable=False),
-    UniqueConstraint("url", name="maasserver_bootsource_url_key"),
-    Index("maasserver_bootsource_url_54c78ba3_like", "url"),
-)
-
-BootSourceCacheTable = Table(
-    "maasserver_bootsourcecache",
-    METADATA,
-    Column("id", BigInteger, primary_key=True, nullable=False),
-    Column("created", DateTime(timezone=True), nullable=False),
-    Column("updated", DateTime(timezone=True), nullable=False),
-    Column("os", String(32), nullable=False),
-    Column("arch", String(32), nullable=False),
-    Column("subarch", String(32), nullable=False),
-    Column("release", String(32), nullable=False),
-    Column("label", String(32), nullable=False),
-    Column(
-    "boot_source_id",
-        BigInteger,
-        ForeignKey("maasserver_bootsource.id"),
-        nullable=False,
-    ),
-    Column("release_codename", String(255), nullable=True),
-    Column("release_title", String(255), nullable=True),
-    Column("support_eol", Date, nullable=True),
-    Column("kflavor", String(32), nullable=True),
-    Column("bootloader_type", String(32), nullable=True),
-    Column("extra", JSONB, nullable=False),
-    Index("maasserver_bootsourcecache_boot_source_id_73abe4d2", "boot_source_id")
-)
-
 BlockDeviceTable = Table(
     "maasserver_blockdevice",
     METADATA,
@@ -126,6 +87,65 @@ BMCTable = Table(
     Column("created_by_commissioning", Boolean, nullable=True),
 )
 
+BootSourceTable = Table(
+    "maasserver_bootsource",
+    METADATA,
+    Column("id", BigInteger, primary_key=True, unique=True),
+    Column("created", DateTime(timezone=True), nullable=False),
+    Column("updated", DateTime(timezone=True), nullable=False),
+    Column("url", String(200), nullable=False),
+    Column("keyring_filename", String(4096), nullable=False),
+    Column("keyring_data", LargeBinary, nullable=False),
+    Index("url"),
+    UniqueConstraint("url", name="maasserver_bootsource_url_key"),
+)
+
+BootSourceCacheTable = Table(
+    "maasserver_bootsourcecache",
+    METADATA,
+    Column("id", BigInteger, primary_key=True, nullable=False),
+    Column("created", DateTime(timezone=True), nullable=False),
+    Column("updated", DateTime(timezone=True), nullable=False),
+    Column("os", String(32), nullable=False),
+    Column("arch", String(32), nullable=False),
+    Column("subarch", String(32), nullable=False),
+    Column("release", String(32), nullable=False),
+    Column("label", String(32), nullable=False),
+    Column(
+    "boot_source_id",
+        BigInteger,
+        ForeignKey("maasserver_bootsource.id"),
+        nullable=False,
+    ),
+    Column("release_codename", String(255), nullable=True),
+    Column("release_title", String(255), nullable=True),
+    Column("support_eol", Date, nullable=True),
+    Column("kflavor", String(32), nullable=True),
+    Column("bootloader_type", String(32), nullable=True),
+    Column("extra", JSONB, nullable=False),
+    Index("boot_source_id")
+)
+
+BootSourceSelectionTable = Table(
+    "maasserver_bootsourceselection",
+    METADATA,
+    Column("id", BigInteger, primary_key=True, nullable=False),
+    Column("created", DateTime(timezone=True), nullable=False),
+    Column("updated", DateTime(timezone=True), nullable=False),
+    Column("os", String(20), nullable=False),
+    Column("release", String(20), nullable=False),
+    Column("arches", ARRAY(Text), nullable=True),
+    Column("subarches", ARRAY(Text), nullable=True),
+    Column("labels", ARRAY(Text), nullable=True),
+    Column(
+        "boot_source_id",
+        BigInteger,
+        ForeignKey("maasserver_bootsource.id"),
+        nullable=False
+    ),
+    Index("boot_source_id"),
+    UniqueConstraint("boot_source_id", "os", "release"),
+)
 
 BootResourceTable = Table(
     "maasserver_bootresource",
