@@ -90,7 +90,7 @@ BMCTable = Table(
 BootSourceTable = Table(
     "maasserver_bootsource",
     METADATA,
-    Column("id", BigInteger, primary_key=True, unique=True),
+    Column("id", BigInteger, primary_key=True, unique=True, nullable=False),
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
     Column("url", String(200), nullable=False),
@@ -103,7 +103,7 @@ BootSourceTable = Table(
 BootSourceCacheTable = Table(
     "maasserver_bootsourcecache",
     METADATA,
-    Column("id", BigInteger, primary_key=True, nullable=False),
+    Column("id", BigInteger, primary_key=True, unique=True, nullable=False),
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
     Column("os", String(32), nullable=False),
@@ -112,7 +112,7 @@ BootSourceCacheTable = Table(
     Column("release", String(32), nullable=False),
     Column("label", String(32), nullable=False),
     Column(
-    "boot_source_id",
+        "boot_source_id",
         BigInteger,
         ForeignKey("maasserver_bootsource.id"),
         nullable=False,
@@ -123,13 +123,13 @@ BootSourceCacheTable = Table(
     Column("kflavor", String(32), nullable=True),
     Column("bootloader_type", String(32), nullable=True),
     Column("extra", JSONB, nullable=False),
-    Index("boot_source_id")
+    Index("boot_source_id"),
 )
 
 BootSourceSelectionTable = Table(
     "maasserver_bootsourceselection",
     METADATA,
-    Column("id", BigInteger, primary_key=True, nullable=False),
+    Column("id", BigInteger, primary_key=True, unique=True, nullable=False),
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
     Column("os", String(20), nullable=False),
@@ -141,7 +141,7 @@ BootSourceSelectionTable = Table(
         "boot_source_id",
         BigInteger,
         ForeignKey("maasserver_bootsource.id"),
-        nullable=False
+        nullable=False,
     ),
     Index("boot_source_id"),
     UniqueConstraint("boot_source_id", "os", "release"),
@@ -150,7 +150,7 @@ BootSourceSelectionTable = Table(
 BootResourceTable = Table(
     "maasserver_bootresource",
     METADATA,
-    Column("id", BigInteger, primary_key=True, unique=True),
+    Column("id", BigInteger, primary_key=True, unique=True, nullable=False),
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
     Column("rtype", Integer, nullable=False),
@@ -162,8 +162,10 @@ BootResourceTable = Table(
     Column("rolling", Boolean, nullable=False),
     Column("base_image", String(255), nullable=False),
     Column("alias", String(255), nullable=True),
-    Column("last_deployed", DateTime(timezone=True), nullable=True),
+    Column("last_deployed", DateTime(timezone=False), nullable=True),
+    UniqueConstraint("name", "architecture", "alias"),
 )
+
 
 ConfigTable = Table(
     "maasserver_config",
