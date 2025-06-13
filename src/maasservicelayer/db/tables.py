@@ -9,7 +9,6 @@ from sqlalchemy import (
     DateTime,
     Float,
     ForeignKey,
-    Index,
     Integer,
     Interval,
     LargeBinary,
@@ -93,11 +92,9 @@ BootSourceTable = Table(
     Column("id", BigInteger, primary_key=True, unique=True, nullable=False),
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
-    Column("url", String(200), nullable=False),
+    Column("url", String(200), index=True, unique=True, nullable=False),
     Column("keyring_filename", String(4096), nullable=False),
     Column("keyring_data", LargeBinary, nullable=False),
-    UniqueConstraint("url"),
-    Index("url"),
 )
 
 BootSourceCacheTable = Table(
@@ -115,6 +112,7 @@ BootSourceCacheTable = Table(
         "boot_source_id",
         BigInteger,
         ForeignKey("maasserver_bootsource.id"),
+        index=True,
         nullable=False,
     ),
     Column("release_codename", String(255), nullable=True),
@@ -123,7 +121,6 @@ BootSourceCacheTable = Table(
     Column("kflavor", String(32), nullable=True),
     Column("bootloader_type", String(32), nullable=True),
     Column("extra", JSONB, nullable=False),
-    Index("boot_source_id"),
 )
 
 BootResourceTable = Table(
@@ -142,7 +139,7 @@ BootResourceTable = Table(
     Column("base_image", String(255), nullable=False),
     Column("alias", String(255), nullable=True),
     Column("last_deployed", DateTime(timezone=False), nullable=True),
-    UniqueConstraint("name", "architecture", "alias"),
+    UniqueConstraint("name", "architecture", "alias", unique=True),
 )
 
 BootResourceFileTable = Table(
@@ -158,21 +155,20 @@ BootResourceFileTable = Table(
         "largefile_id",
         BigInteger,
         ForeignKey("maasserver_largefile.id"),
+        index=True,
         nullable=True,
     ),
     Column(
         "resource_set_id",
         BigInteger,
         ForeignKey("maasserver_bootresourceset.id"),
+        index=True,
         nullable=False,
     ),
-    Column("sha256", String(64), nullable=False),
+    Column("sha256", String(64), index=True, nullable=False),
     Column("size", BigInteger, nullable=False),
     Column("filename_on_disk", String(64), nullable=False),
     UniqueConstraint("resource_set_id", "filename"),
-    Index("sha256"),
-    Index("largefile_id"),
-    Index("resource_set_id"),
 )
 
 BootResourceSetTable = Table(
@@ -187,10 +183,10 @@ BootResourceSetTable = Table(
         "resource_id",
         BigInteger,
         ForeignKey("maasserver_bootresource.id"),
+        index=True,
         nullable=False,
     ),
     UniqueConstraint("resource_id", "version"),
-    Index("resource_id"),
 )
 
 BootSourceSelectionTable = Table(
@@ -208,10 +204,10 @@ BootSourceSelectionTable = Table(
         "boot_source_id",
         BigInteger,
         ForeignKey("maasserver_bootsource.id"),
+        index=True,
         nullable=False,
     ),
     UniqueConstraint("boot_source_id", "os", "release"),
-    Index("boot_source_id"),
 )
 
 ConfigTable = Table(
