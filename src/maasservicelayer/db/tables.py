@@ -139,7 +139,7 @@ BootResourceTable = Table(
     Column("base_image", String(255), nullable=False),
     Column("alias", String(255), nullable=True),
     Column("last_deployed", DateTime(timezone=False), nullable=True),
-    UniqueConstraint("name", "architecture", "alias", unique=True),
+    UniqueConstraint("name", "architecture", "alias"),
 )
 
 BootResourceFileTable = Table(
