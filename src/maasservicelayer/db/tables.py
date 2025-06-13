@@ -10,6 +10,8 @@ from sqlalchemy import (
     ForeignKey,
     Integer,
     Interval,
+    Index,
+    LargeBinary,
     MetaData,
     String,
     Table,
@@ -21,6 +23,19 @@ from sqlalchemy.dialects.postgresql import ARRAY, CIDR, INET, JSONB
 METADATA = MetaData()
 
 # Keep them in alphabetical order!
+
+BootSourceTable = Table(
+    "maasserver_bootsource",
+    METADATA,
+    Column("id", BigInteger, primary_key=True, unique=True),
+    Column("created", DateTime(timezone=True), nullable=False),
+    Column("updated", DateTime(timezone=True), nullable=False),
+    Column("url", String(200), nullable=False),
+    Column("keyring_filename", String(4096), nullable=False),
+    Column("keyring_data", LargeBinary, nullable=False),
+    UniqueConstraint("url", name="maasserver_bootsource_url_key"),
+    Index("maasserver_bootsource_url_54c78ba3_like", "url"),
+)
 
 BlockDeviceTable = Table(
     "maasserver_blockdevice",
