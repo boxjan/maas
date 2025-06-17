@@ -96,6 +96,7 @@ def download_all_image_descriptions(
         repo_boot = service_layer.services.boot_sources.fetch(
             source["url"],
             keyring=source.get("keyring", None),
+            user_agent=user_agent,
             validate_products=validate_products,
         )
         boot_merge(boot, repo_boot, source["selections"])

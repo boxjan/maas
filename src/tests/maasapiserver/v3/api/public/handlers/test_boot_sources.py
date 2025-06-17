@@ -8,11 +8,11 @@ from httpx import AsyncClient
 import pytest
 
 from maasapiserver.v3.api.public.models.requests.boot_sources import (
-    BootSourcesRequest,
+    BootSourceFetchRequest,
 )
 from maasapiserver.v3.api.public.models.responses.boot_sources import (
-    BootSourceResponse,
-    BootSourcesListResponse,
+    BootSourceFetchListResponse,
+    BootSourceFetchResponse,
 )
 from maasapiserver.v3.constants import V3_API_PREFIX
 from maasservicelayer.services import ServiceCollectionV3
@@ -118,7 +118,7 @@ class TestBootSourcesApi(ApiCommonTests):
         services_mock.boot_sources = Mock(BootSourcesService)
         services_mock.boot_sources.fetch.return_value = mapping
 
-        request = BootSourcesRequest(
+        request = BootSourceFetchRequest(
             url="https://path/to/images/server",
         )
 
@@ -128,17 +128,12 @@ class TestBootSourcesApi(ApiCommonTests):
 
         assert response.status_code == 200
 
-        actual_response = BootSourcesListResponse(**response.json())
+        actual_response = BootSourceFetchListResponse(**response.json())
 
         expected_items = [
-            BootSourceResponse.from_model(
-                (spec, desc),
-                self_base_hyperlink=f"{V3_API_PREFIX}/boot_sources",
-            )
+            BootSourceFetchResponse.from_model((spec, desc))
             for spec, desc in zip(image_specs, descriptions)
         ]
 
-        assert actual_response.kind == "BootSourcesList"
-        assert actual_response.total == len(expected_items)
         for resp in actual_response.items:
             assert resp in expected_items

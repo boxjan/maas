@@ -2,20 +2,14 @@
 # GNU Affero General Public License version 3 (see the file LICENSE).
 
 from datetime import datetime
-from typing import Optional, Tuple
+from typing import Optional, Self, Tuple
 
-from maasapiserver.v3.api.public.models.responses.base import (
-    BaseHal,
-    BaseHref,
-    HalResponse,
-    PaginatedResponse,
-)
+from pydantic import BaseModel
+
 from maasservicelayer.utils.images.helpers import ImageSpec
 
 
-class BootSourceResponse(HalResponse[BaseHal]):
-    kind = "BootSource"
-
+class BootSourceFetchResponse(BaseModel):
     os: str
     arch: str
     subarch: str
@@ -38,8 +32,7 @@ class BootSourceResponse(HalResponse[BaseHal]):
     def from_model(
         cls,
         boot_source: Tuple[ImageSpec, dict[str, str]],
-        self_base_hyperlink: str,
-    ) -> "BootSourceResponse":
+    ) -> Self:
         image_spec, metadata = boot_source
         parsed_support_eol = None
         if "support_eol" in metadata:
@@ -63,15 +56,8 @@ class BootSourceResponse(HalResponse[BaseHal]):
             release_title=metadata.get("release_title"),
             release_codename=metadata.get("release_codename"),
             support_eol=parsed_support_eol,
-            # TODO: This is a placeholder for now.
-            # TODO: If using path, url encode it.
-            hal_links=BaseHal(  # pyright: ignore [reportCallIssue]
-                self=BaseHref(
-                    href=f"{self_base_hyperlink}/?url={metadata['path']}"
-                )
-            ),
         )
 
 
-class BootSourcesListResponse(PaginatedResponse[BootSourceResponse]):
-    kind = "BootSourcesList"
+class BootSourceFetchListResponse(BaseModel):
+    items: list[BootSourceFetchResponse]

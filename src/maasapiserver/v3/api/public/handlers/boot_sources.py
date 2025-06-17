@@ -6,14 +6,13 @@ from fastapi import Depends
 from maasapiserver.common.api.base import Handler, handler
 from maasapiserver.v3.api import services
 from maasapiserver.v3.api.public.models.requests.boot_sources import (
-    BootSourcesRequest,
+    BootSourceFetchRequest,
 )
 from maasapiserver.v3.api.public.models.responses.boot_sources import (
-    BootSourceResponse,
-    BootSourcesListResponse,
+    BootSourceFetchListResponse,
+    BootSourceFetchResponse,
 )
 from maasapiserver.v3.auth.base import check_permissions
-from maasapiserver.v3.constants import V3_API_PREFIX
 from maasservicelayer.auth.jwt import UserRole
 from maasservicelayer.services import ServiceCollectionV3
 
@@ -29,7 +28,7 @@ class BootSourcesHandler(Handler):
         tags=TAGS,
         responses={
             200: {
-                "model": BootSourcesListResponse,
+                "model": BootSourceFetchListResponse,
             },
         },
         status_code=200,
@@ -38,27 +37,23 @@ class BootSourcesHandler(Handler):
             Depends(check_permissions(required_roles={UserRole.USER}))
         ],
     )
-    async def list_boot_sources(
+    async def fetch_boot_sources(
         self,
-        request: BootSourcesRequest,
+        request: BootSourceFetchRequest,
         services: ServiceCollectionV3 = Depends(services),  # noqa: B008
-    ) -> BootSourcesListResponse:
+    ) -> BootSourceFetchListResponse:
         boot_source_mapping = await services.boot_sources.fetch(
             request.url,
             keyring=request.keyring,
+            user_agent=request.user_agent,
             validate_products=request.validate_products,
         )
 
         # The fetch method isn't paginated, so we return all items
         # in a single response.
-        return BootSourcesListResponse(
+        return BootSourceFetchListResponse(
             items=[
-                BootSourceResponse.from_model(
-                    boot_source,
-                    self_base_hyperlink=f"{V3_API_PREFIX}/boot_sources",
-                )
+                BootSourceFetchResponse.from_model(boot_source)
                 for boot_source in boot_source_mapping.items()
             ],
-            total=len(boot_source_mapping),
-            next=None,
         )
