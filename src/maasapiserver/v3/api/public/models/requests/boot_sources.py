@@ -1,17 +1,22 @@
-#  Copyright 2025 Canonical Ltd.  This software is licensed under the
-#  GNU Affero General Public License version 3 (see the file LICENSE).
+# Copyright 2025 Canonical Ltd.  This software is licensed under the
+# GNU Affero General Public License version 3 (see the file LICENSE).
 
 from pydantic import BaseModel, Field
 
 
-class BootSourcesRequest(BaseModel):
+class BootSourceFetchRequest(BaseModel):
     url: str = Field(
         description="URL of SimpleStreams server providing boot source information."
     )
 
+    # TODO: What is? File path? Data?
     keyring: str | None = Field(
         default=None,
         description="Keyring to use for verifying signatures of the boot sources.",
+    )
+    user_agent: str | None = Field(
+        default=None,
+        description="User agent to use when fetching boot sources.",
     )
     validate_products: bool = Field(
         default=True,
