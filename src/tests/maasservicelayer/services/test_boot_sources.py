@@ -99,9 +99,7 @@ class TestBootSourcesService:
         source_url = factory.make_url()
         user_agent = factory.make_name("agent")
 
-        boot_sources_service._fetch(
-            source_url, user_agent=user_agent
-        )
+        boot_sources_service._fetch(source_url, user_agent=user_agent)
 
         repodumper_sync_mock.assert_called()
         urlmirrorreader_mock.assert_has_calls(
