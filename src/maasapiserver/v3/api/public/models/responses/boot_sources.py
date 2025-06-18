@@ -47,10 +47,10 @@ class BootSourceFetchResponse(BaseModel):
             kflavor=image_spec.kflavor,
             release=image_spec.release,
             label=metadata.get("label"),
-            content_id=metadata.get("content_id"),
-            product_name=metadata.get("product_name"),
-            version_name=metadata.get("version_name"),
-            path=metadata.get("path"),
+            content_id=metadata.get("content_id"),  # pyright: ignore [reportArgumentType]
+            product_name=metadata.get("product_name"),  # pyright: ignore [reportArgumentType]
+            version_name=metadata.get("version_name"),  # pyright: ignore [reportArgumentType]
+            path=metadata.get("path"),  # pyright: ignore [reportArgumentType]
             subarches=metadata.get("subarches"),
             bootloader_type=metadata.get("bootloader_type"),
             release_title=metadata.get("release_title"),

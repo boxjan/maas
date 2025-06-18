@@ -59,12 +59,16 @@ class BootSourcesService(Service):
         if user_agent is None:
             # If user_agent is NOT set, we know we are downloading descriptions
             # from the Region controller *by* the Rack controller.
-            logger.info(f"Rack downloading image descriptions from '{source_url}'.")
+            logger.info(
+                f"Rack downloading image descriptions from '{source_url}'."
+            )
             reader = UrlMirrorReader(mirror, policy=policy)
         else:
             # Since user_agent is set, we know we are downloading descriptions
             # from the Images repository *by* the Region.
-            logger.info(f"Region downloading image descriptions from '{source_url}'.")
+            logger.info(
+                f"Region downloading image descriptions from '{source_url}'."
+            )
             try:
                 reader = UrlMirrorReader(
                     mirror, policy=policy, user_agent=user_agent
