@@ -9,10 +9,9 @@ class BootSourceFetchRequest(BaseModel):
         description="URL of SimpleStreams server providing boot source information."
     )
 
-    # TODO: What is? File path? Data?
-    keyring: str | None = Field(
+    keyring_path: str | None = Field(
         default=None,
-        description="Keyring to use for verifying signatures of the boot sources.",
+        description="File path to keyring to use for verifying signatures of the boot sources.",
     )
     user_agent: str | None = Field(
         default=None,

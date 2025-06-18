@@ -23,14 +23,14 @@ class BootSourcesService(Service):
     async def fetch(
         self,
         source_url: str,
-        keyring: str | None = None,
+        keyring_path: str | None = None,
         user_agent: str | None = None,
         validate_products: bool = True,
     ) -> BootImageMapping:
         """Download image metadata from upstream Simplestreams repo.
 
         :param path: The path to a Simplestreams repo.
-        :param keyring: Optional keyring for verifying the repo's signatures.
+        :param keyring: Optional filepath to the keyring for verifying the repo's signatures.
         :param user_agent: Optional user agent string for downloading the image
             descriptions.
         :param validate_products: Whether to validate products in the boot
@@ -40,7 +40,7 @@ class BootSourcesService(Service):
         return await asyncio.to_thread(
             self._fetch,
             source_url,
-            keyring,
+            keyring_path,
             user_agent,
             validate_products,
         )
@@ -48,13 +48,13 @@ class BootSourcesService(Service):
     def _fetch(
         self,
         source_url: str,
-        keyring: str | None = None,
+        keyring_path: str | None = None,
         user_agent: str | None = None,
         validate_products: bool = True,
     ) -> BootImageMapping:
         logger.info(f"Downloading image descriptions from '{source_url}'.")
         mirror, rpath = path_from_mirror_url(source_url, None)
-        policy = get_signing_policy(rpath, keyring)
+        policy = get_signing_policy(rpath, keyring_path)
 
         if user_agent is None:
             # If user_agent is NOT set, we know we are downloading descriptions
