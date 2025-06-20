@@ -20,7 +20,6 @@ from sqlalchemy import (
     String,
     Table,
     Text,
-    text,
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import ARRAY, CIDR, INET, JSONB, OID
@@ -651,6 +650,7 @@ ForwardDNSServerDomainsTable = Table(
 GlobalDefaultTable = Table(
     "maasserver_globaldefault",
     METADATA,
+    Column("id", Integer, Identity(), primary_key=True),
     Column("id", Integer, Identity(), primary_key=True),
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
