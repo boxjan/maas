@@ -114,6 +114,7 @@ BMCTable = Table(
     Index("maasserver_bmc_zone_id_774ea0de", "zone_id"),
 )
 
+
 BootResourceTable = Table(
     "maasserver_bootresource",
     METADATA,
