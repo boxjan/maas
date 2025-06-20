@@ -1,20 +1,9 @@
-# Copyright 2025 Canonical Ltd.  This software is licensed under the
+# Copyright 2025 Canonical Ltd. This software is licensed under the
 # GNU Affero General Public License version 3 (see the file LICENSE).
 
 from maasservicelayer.utils.images.boot_image_mapping import BootImageMapping
 from maasservicelayer.utils.images.helpers import ImageSpec
 from maastesting.factory import factory
-
-
-def make_boot_resource() -> dict[str, str]:
-    """
-    Create a fake resource dictionary.
-    """
-    return {
-        "content_id": factory.make_name("content_id"),
-        "product_name": factory.make_name("product_name"),
-        "version_name": factory.make_name("version_name"),
-    }
 
 
 def make_image_spec(
