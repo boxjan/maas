@@ -9,7 +9,9 @@ from typing import Iterator
 
 
 @contextmanager
-def tempdir(suffix: str="", prefix: str="maas-", location: str | None=None) -> Iterator[str]:
+def tempdir(
+    suffix: str = "", prefix: str = "maas-", location: str | None = None
+) -> Iterator[str]:
     """Context manager: temporary directory.
 
     Creates a temporary directory (yielding its path, as `unicode`), and

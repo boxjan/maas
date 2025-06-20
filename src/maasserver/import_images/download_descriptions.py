@@ -87,9 +87,7 @@ def boot_merge(destination, additions, filters=None):
             destination.setdefault(image, resource)
 
 
-def download_all_image_descriptions(
-    sources, validate_products: bool=True
-):
+def download_all_image_descriptions(sources, validate_products: bool = True):
     """Download image metadata for all sources in `config`."""
     boot = BootImageMapping()
     for source in sources:
