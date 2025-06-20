@@ -52,24 +52,24 @@ class BootSourcesService(Service):
         return await asyncio.to_thread(
             self._fetch,
             source_url,
+            user_agent,
             keyring_path,
             keyring_data,
-            user_agent,
             validate_products,
         )
 
     def _fetch(
         self,
         source_url: str,
+        user_agent: str,
         keyring_path: str | None = None,
         keyring_data: str | None = None,
-        user_agent: str | None = None,
         validate_products: bool = True,
     ) -> BootImageMapping:
         logger.info(f"Downloading image descriptions from '{source_url}'.")
         mirror, rpath = path_from_mirror_url(source_url, None)
 
-        # The simplestreams library uses an optional path to the keyring file, 
+        # The simplestreams library uses an optional path to the keyring file,
         # but we want to allow the user to provide a keyring file path or the
         # keyring data directly.
 
@@ -77,14 +77,16 @@ class BootSourcesService(Service):
         # file at the specified path with the provided data.
         if keyring_path is not None:
             if keyring_data is not None:
-                write_keyring(keyring_path, keyring_data)
+                write_keyring(keyring_path, keyring_data.encode("utf8"))
             else:
                 pass
         elif keyring_data is not None:
             # Otherwise, write the keyring data to a temporary file.
             with tempdir("keyrings") as tempdir_path:
-                keyring_file = os.path.join(tempdir_path, calculate_keyring_name(source_url))
-                write_keyring(keyring_file, keyring_data)
+                keyring_file = os.path.join(
+                    tempdir_path, calculate_keyring_name(source_url)
+                )
+                write_keyring(keyring_file, keyring_data.encode("utf8"))
 
         policy = get_signing_policy(rpath, keyring_path)
 

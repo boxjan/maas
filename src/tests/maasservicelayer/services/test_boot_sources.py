@@ -54,7 +54,9 @@ class TestBootSourcesService:
         user_agent = "maas/3.6.4/g.12345678"
 
         configurations_service_mock = Mock(ConfigurationsService)
-        configurations_service_mock.get_maas_user_agent.return_value = user_agent
+        configurations_service_mock.get_maas_user_agent.return_value = (
+            user_agent
+        )
 
         boot_sources_service = BootSourcesService(
             context=Context(),
@@ -66,11 +68,11 @@ class TestBootSourcesService:
 
         configurations_service_mock.get_maas_user_agent.assert_called_once()
         fetch_submethod_mock.assert_called_once_with(
-            source_url, # source_url
-            None, # keyring_path
-            None, # keyring_data
-            user_agent, # user_agent
-            True, # validate_products
+            source_url,  # source_url
+            user_agent,  # user_agent
+            None,  # keyring_path
+            None,  # keyring_data
+            True,  # validate_products
         )
 
     @patch("maasservicelayer.services.boot_sources.RepoDumper.sync")
@@ -118,7 +120,9 @@ class TestBootSourcesService:
         user_agent = "maas/3.6.4/g.12345678"
 
         configurations_service_mock = Mock(ConfigurationsService)
-        configurations_service_mock.get_maas_user_agent.return_value = user_agent
+        configurations_service_mock.get_maas_user_agent.return_value = (
+            user_agent
+        )
 
         boot_sources_service = BootSourcesService(
             context=Context(),
@@ -168,7 +172,7 @@ class TestBootSourcesService:
         )
 
         write_keyring_mock.assert_called_once_with(
-            keyring_path, keyring_data
+            keyring_path, keyring_data.encode("utf-8")
         )
         urlmirrorreader_mock.assert_called_once_with(
             source_url,
@@ -213,13 +217,14 @@ class TestBootSourcesService:
 
         boot_sources_service._fetch(
             source_url,
+            user_agent=user_agent,
             keyring_path=None,
             keyring_data=keyring_data,
-            user_agent=user_agent,
         )
 
         write_keyring_mock.assert_called_once_with(
-            os.path.join(tmp_path, calc_keyring_name), keyring_data
+            os.path.join(tmp_path, calc_keyring_name),
+            keyring_data.encode("utf-8"),
         )
         urlmirrorreader_mock.assert_called_once_with(
             source_url,
