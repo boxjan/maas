@@ -1,7 +1,6 @@
 # Copyright 2025 Canonical Ltd. This software is licensed under the
 # GNU Affero General Public License version 3 (see the file LICENSE).
 
-
 from contextlib import contextmanager
 from shutil import rmtree
 from tempfile import mkdtemp
