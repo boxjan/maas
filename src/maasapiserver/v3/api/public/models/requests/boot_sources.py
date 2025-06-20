@@ -13,6 +13,10 @@ class BootSourceFetchRequest(BaseModel):
         default=None,
         description="File path to keyring to use for verifying signatures of the boot sources.",
     )
+    keyring_data: str | None = Field(
+        default=None,
+        description="Keyring data to use for verifying signatures of the boot sources.",
+    )
     user_agent: str | None = Field(
         default=None,
         description="User agent to use when fetching boot sources.",

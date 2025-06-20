@@ -45,7 +45,7 @@ class BootSourcesHandler(Handler):
         boot_source_mapping = await services.boot_sources.fetch(
             request.url,
             keyring_path=request.keyring_path,
-            user_agent=request.user_agent,
+            keyring_data=request.keyring_data,
             validate_products=request.validate_products,
         )
 

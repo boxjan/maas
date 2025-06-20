@@ -4,7 +4,7 @@
 import html
 from os import environ
 import random
-from unittest.mock import ANY, MagicMock, patch
+from unittest.mock import MagicMock, patch
 
 from fixtures import EnvironmentVariableFixture
 from requests.exceptions import ConnectionError
@@ -35,7 +35,6 @@ from maasserver.testing.testcase import (
     MAASTransactionServerTestCase,
 )
 from maasserver.tests.test_bootresources import SimplestreamsEnvFixture
-from maasserver.utils import get_maas_user_agent
 from maasserver.utils.orm import reload_object
 from maasservicelayer.utils.images.boot_image_mapping import BootImageMapping
 from maasservicelayer.utils.images.helpers import ImageSpec
@@ -409,16 +408,6 @@ class TestPrivateCacheBootSources(MAASTransactionServerTestCase):
             self.assertEqual(environ.get("no_proxy"), "my.no_proxy")
             self.assertEqual(environ.get("http_proxy"), "my.http_proxy")
             self.assertEqual(environ.get("https_proxy"), "my.https_proxy")
-
-    def test_passes_user_agent_with_maas_version(self):
-        mock_download = self.patch(
-            bootsources, "download_all_image_descriptions"
-        )
-        factory.make_BootSource(keyring_data=b"1234")
-        cache_boot_sources()
-        mock_download.assert_called_once_with(
-            ANY, user_agent=get_maas_user_agent()
-        )
 
     def test_doesnt_have_env_http_and_https_proxy_set_if_disabled(self):
         proxy_address = factory.make_name("proxy")

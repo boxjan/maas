@@ -38,7 +38,6 @@ from maasserver.models import (
     Notification,
 )
 from maasserver.models.timestampedmodel import now
-from maasserver.utils import get_maas_user_agent
 from maasserver.utils.orm import post_commit_do, transactional
 from maasserver.utils.threads import deferToDatabase
 from provisioningserver.auth import get_maas_user_gpghome
@@ -406,11 +405,9 @@ def cache_boot_sources():
         with tempdir("keyrings") as keyrings_path:
             [source] = write_all_keyrings(keyrings_path, [source])
             try:
-                user_agent = yield deferToDatabase(get_maas_user_agent)
                 descriptions = yield deferToDatabase(
                     download_all_image_descriptions,
                     [source],
-                    user_agent=user_agent,
                 )
             except (OSError, ConnectionError) as error:
                 msg = "Failed to import images from %s: %s" % (

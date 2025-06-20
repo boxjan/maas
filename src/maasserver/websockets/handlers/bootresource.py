@@ -43,7 +43,6 @@ from maasserver.models import (
     Node,
 )
 from maasserver.models.bootresourcefile import BootResourceFile
-from maasserver.utils import get_maas_user_agent
 from maasserver.utils.converters import human_readable_bytes
 from maasserver.utils.orm import transactional
 from maasserver.utils.osystems import (
@@ -949,9 +948,7 @@ class BootResourceHandler(Handler):
         with tempdir("keyrings") as keyrings_path:
             [source] = write_all_keyrings(keyrings_path, [source])
             try:
-                descriptions = download_all_image_descriptions(
-                    [source], user_agent=get_maas_user_agent()
-                )
+                descriptions = download_all_image_descriptions([source])
             except Exception as error:
                 raise HandlerError(str(error))  # noqa: B904
         items = list(descriptions.items())
