@@ -20,6 +20,7 @@ from sqlalchemy import (
     String,
     Table,
     Text,
+    text,
     UniqueConstraint,
 )
 from sqlalchemy.dialects.postgresql import ARRAY, CIDR, INET, JSONB, OID
@@ -111,6 +112,43 @@ BMCTable = Table(
         postgresql_where=text("(power_type)::text <> 'manual'::text"),
     ),
     Index("maasserver_bmc_zone_id_774ea0de", "zone_id"),
+)
+
+BootSourceTable = Table(
+    "maasserver_bootsource",
+    METADATA,
+    Column("id", BigInteger, primary_key=True, unique=True, nullable=False),
+    Column("created", DateTime(timezone=True), nullable=False),
+    Column("updated", DateTime(timezone=True), nullable=False),
+    Column("url", String(200), index=True, unique=True, nullable=False),
+    Column("keyring_filename", String(4096), nullable=False),
+    Column("keyring_data", LargeBinary, nullable=False),
+)
+
+BootSourceCacheTable = Table(
+    "maasserver_bootsourcecache",
+    METADATA,
+    Column("id", BigInteger, primary_key=True, unique=True, nullable=False),
+    Column("created", DateTime(timezone=True), nullable=False),
+    Column("updated", DateTime(timezone=True), nullable=False),
+    Column("os", String(32), nullable=False),
+    Column("arch", String(32), nullable=False),
+    Column("subarch", String(32), nullable=False),
+    Column("release", String(32), nullable=False),
+    Column("label", String(32), nullable=False),
+    Column(
+        "boot_source_id",
+        BigInteger,
+        ForeignKey("maasserver_bootsource.id"),
+        index=True,
+        nullable=False,
+    ),
+    Column("release_codename", String(255), nullable=True),
+    Column("release_title", String(255), nullable=True),
+    Column("support_eol", Date, nullable=True),
+    Column("kflavor", String(32), nullable=True),
+    Column("bootloader_type", String(32), nullable=True),
+    Column("extra", JSONB, nullable=False),
 )
 
 BootResourceTable = Table(
@@ -650,7 +688,6 @@ ForwardDNSServerDomainsTable = Table(
 GlobalDefaultTable = Table(
     "maasserver_globaldefault",
     METADATA,
-    Column("id", Integer, Identity(), primary_key=True),
     Column("id", Integer, Identity(), primary_key=True),
     Column("created", DateTime(timezone=True), nullable=False),
     Column("updated", DateTime(timezone=True), nullable=False),
