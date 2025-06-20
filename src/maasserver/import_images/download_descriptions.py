@@ -88,15 +88,15 @@ def boot_merge(destination, additions, filters=None):
 
 
 def download_all_image_descriptions(
-    sources, user_agent=None, validate_products=True
+    sources, validate_products: bool=True
 ):
     """Download image metadata for all sources in `config`."""
     boot = BootImageMapping()
     for source in sources:
         repo_boot = service_layer.services.boot_sources.fetch(
             source["url"],
-            keyring=source.get("keyring", None),
-            user_agent=user_agent,
+            keyring_path=source.get("keyring", None),
+            keyring_data=source.get("keyring_data", None),
             validate_products=validate_products,
         )
         boot_merge(boot, repo_boot, source["selections"])

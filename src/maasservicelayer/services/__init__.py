@@ -503,5 +503,6 @@ class ServiceCollectionV3:
         )
         services.boot_sources = BootSourcesService(
             context=context,
+            configuration_service=services.configurations,
         )
         return services

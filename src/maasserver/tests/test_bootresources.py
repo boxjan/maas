@@ -1336,7 +1336,7 @@ class TestImportImages(MAASTransactionServerTestCase):
         bootresources.ensure_boot_source_definition.assert_called_once()
         bootresources.cache_boot_sources.assert_called_once()
         write_all_keyrings.assert_called_once_with(ANY, [])
-        image_descriptions.assert_called_once_with([], get_maas_user_agent())
+        image_descriptions.assert_called_once_with([])
         map_products.assert_called_once_with(descriptions)
         download_all_boot_resources.assert_called_once_with(
             [], sentinel.mapping, notify=None

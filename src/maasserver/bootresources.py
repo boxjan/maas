@@ -1024,9 +1024,7 @@ def _import_resources_internal(notify=None):
         Event.objects.create_region_event(EVENT_TYPES.REGION_IMPORT_INFO, msg)
         maaslog.info(msg)
 
-        image_descriptions = download_all_image_descriptions(
-            sources, get_maas_user_agent()
-        )
+        image_descriptions = download_all_image_descriptions(sources)
         if image_descriptions.is_empty():
             msg = (
                 "Unable to import boot images, no image "
