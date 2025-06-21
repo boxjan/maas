@@ -4,6 +4,7 @@
 from typing import Callable, Self
 
 from maasservicelayer.context import Context
+from maasservicelayer.db.repositories.bootsources import BootSourcesRepository
 from maasservicelayer.db.repositories.consumers import ConsumersRepository
 from maasservicelayer.db.repositories.database_configurations import (
     DatabaseConfigurationsRepository,
@@ -504,6 +505,7 @@ class ServiceCollectionV3:
         )
         services.boot_sources = BootSourcesService(
             context=context,
+            repository=BootSourcesRepository(context),
             configuration_service=services.configurations,
         )
         return services
