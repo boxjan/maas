@@ -31,9 +31,7 @@ class BootSourceResponse(HalResponse[BaseHal]):
         cls, boot_source: BootSource, self_base_hyperlink: str
     ) -> Self:
         keyring_data_b64 = (
-            base64.b64encode(boot_source.keyring_data.encode("utf-8")).decode(
-                "utf-8"
-            )
+            base64.b64encode(boot_source.keyring_data).decode("utf-8")
             if boot_source.keyring_data
             else None
         )
