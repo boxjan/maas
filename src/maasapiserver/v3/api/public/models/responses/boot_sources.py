@@ -1,7 +1,6 @@
 # Copyright 2025 Canonical Ltd.  This software is licensed under the
 # GNU Affero General Public License version 3 (see the file LICENSE).
 
-import base64
 from datetime import datetime
 from typing import Optional, Self, Tuple
 
@@ -30,16 +29,11 @@ class BootSourceResponse(HalResponse[BaseHal]):
     def from_model(
         cls, boot_source: BootSource, self_base_hyperlink: str
     ) -> Self:
-        keyring_data_b64 = (
-            base64.b64encode(boot_source.keyring_data).decode("utf-8")
-            if boot_source.keyring_data
-            else None
-        )
         return cls(
             id=boot_source.id,
             url=boot_source.url,
             keyring_filename=boot_source.keyring_filename,
-            keyring_data=keyring_data_b64,
+            keyring_data=boot_source.keyring_data,
             priority=boot_source.priority,
             skip_keyring_verification=boot_source.skip_keyring_verification,
             hal_links=BaseHal(  # pyright: ignore [reportCallIssue]
