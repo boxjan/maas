@@ -49,11 +49,11 @@ var (
 )
 
 type Handler4 interface {
-	ServeDHCP4(context.Context, Message) error
+	ServeDHCPv4(context.Context, Message) error
 }
 
 type Handler6 interface {
-	ServeDHCP6(context.Context, Message) error
+	ServeDHCPv6(context.Context, Message) error
 }
 
 type Message struct {
