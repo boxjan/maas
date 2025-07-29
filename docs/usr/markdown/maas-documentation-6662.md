@@ -67,7 +67,7 @@ Considering MAAS for your next project? [Get in touch](/t/how-to-contact-us/5448
 | 3     | how-to-authenticate-to-the-maas-api       | [API login](/t/-/5060)                        |
 | 3     | profile                                   | [API profile](/t/-/11347)                     |
 | 3     | reference-api-documentation               | [API reference](/docs/api)                    |
-| 2     |                                           | CLI reference                                 |
+| 2     | cli-reference                             | [CLI reference](/t/-/11975)                   |
 | 3     | account                                   | [account](/t/-/3205)                          |
 | 3     | apikey                                    | [apikey](/t/-/11400)                          |
 | 3     | bcache                                    | [bcache](/t/-/6836)                           |
