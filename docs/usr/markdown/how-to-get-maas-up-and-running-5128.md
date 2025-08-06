@@ -218,7 +218,7 @@ sudo apt update && sudo apt upgrade maas
 
 The following general notes apply to an upgrade:
 
-* Review PostgreSQL Requirements: MAAS 3.6 supports Postgres 14 and recommends PostgreSQL 16. [Upgrade instructions to Postgres 14 here.](https://maas.io/docs/how-to-upgrade-postgresql-v12-to-v14) [Upgrade instructions to Postgres 16 here.](https://maas.io/docs/how-to-upgrade-from-postgresql-v14-to-v16)
+* Review PostgreSQL Requirements: MAAS 3.6 supports Postgres 14 and recommends PostgreSQL 16. [Upgrade instructions to Postgres 14 here.](https://canonical.com/maas/docs/how-to-upgrade-postgresql-v12-to-v14) [Upgrade instructions to Postgres 16 here.](https://canonical.com/maas/docs/how-to-upgrade-from-postgresql-v14-to-v16)
 * Upgrade Ubuntu if needed: Ensure you’re running Ubuntu 24.04 (Noble) before upgrading MAAS.
 * Backup your data: Always create a backup before upgrading.
 * Multi-node setups: Upgrade rack nodes first, then region nodes
