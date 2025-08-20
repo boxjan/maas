@@ -7,6 +7,8 @@
 #define UDP_PROTO 0x11
 #define ETH_PROTO_IP 0x0800
 #define ETH_PROTO_IPV6 0x86DD
+
+// TODO: where is port 547 for IPv6?
 #define DHCP_PORT 67
 #define MAX_PKT_BYTES 16384
 // minimum packet size is 576 bytes, there is no default max, but 1500 is the average MTU
@@ -148,4 +150,3 @@ int xdp_prog_func(struct xdp_md *ctx) {
 
     return XDP_DROP; // the packet has been read into the queue, it's now ok to drop it
 }
-
