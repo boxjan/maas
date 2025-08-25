@@ -1,6 +1,16 @@
 MAAS uses standard command-line utilities for simple, familiar backups.  The options described here allow you to either back up and restore everything MAAS-related, or just back up key packages and files.
 
-## Clean reset backup
+## Back up a POC database
+
+In many proof-of-concept (POC) environments, the `maas_test_db` ends up serving as the foundation for production. Backing it up protects the effort you’ve already invested in setup and configuration. Fortunately, the procedure is a simple one-line command:
+
+```bash
+pg_dump maasdb -U maas -h /var/snap/maas-test-db/common/postgres/sockets > dump.sql
+```
+
+Be sure to use a memorable label for the dump file.
+
+## Clean reset production backup
 
 The method uses `pg_dumpall` the entire database and make a complete snapshot of MAAS.
 
@@ -61,7 +71,7 @@ The method uses `pg_dumpall` the entire database and make a complete snapshot of
    sudo snap restart maas
    ```
 
-## Package backup
+## Package production backup
 
 Backs up PostgreSQL and key MAAS files.
 
