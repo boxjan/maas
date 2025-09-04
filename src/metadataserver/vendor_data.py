@@ -235,15 +235,24 @@ def generate_kvm_pod_configuration(node):
         # would conflict with the snap. Also, ensure that the snap version is
         # the latest, since MAAS requires features not present in the one
         # installed by default in Focal.
-        yield "runcmd", [
-            "apt autoremove --purge --yes lxd lxd-client lxcfs",
-            "snap install lxd --channel=5.21/stable",
-            "snap refresh lxd --channel=5.21/stable",
-            "lxd init --auto --network-address=[::]",
-            f"lxc project create {maas_project}",
-            f"lxc config trust add {cert_file} --restricted --projects {maas_project}",
-            f"rm {cert_file}",
-        ]
+        yield (
+            "runcmd",
+            [
+                # uninstall only if the package has been installed
+                "apt-get autoremove --purge --yes lxd || true",
+                "apt-get autoremove --purge --yes lxd-client || true",
+                "apt-get autoremove --purge --yes lxcfs || true",
+                # install LXD
+                "snap install lxd --channel=5.21/stable",
+                # Wait for LXD to become ready (timeout after 5 minutes)
+                "timeout 300 bash -c 'until lxc info >/dev/null 2>&1; do sleep 1; done'",
+                "snap refresh lxd --channel=5.21/stable",
+                "lxd init --auto --network-address=[::]",
+                f"lxc project create {maas_project}",
+                f"lxc config trust add {cert_file} --restricted --projects {maas_project}",
+                f"rm {cert_file}",
+            ],
+        )
 
     if node.install_kvm:
         password = _generate_password()
