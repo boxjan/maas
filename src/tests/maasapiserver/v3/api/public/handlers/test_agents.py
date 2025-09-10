@@ -3,7 +3,6 @@
 
 from unittest.mock import Mock
 
-from fastapi.encoders import jsonable_encoder
 from httpx import AsyncClient
 import pytest
 
@@ -13,13 +12,6 @@ from maasapiserver.v3.api.public.models.responses.agents import (
     AgentsListResponse,
 )
 from maasapiserver.v3.constants import V3_API_PREFIX
-from maasservicelayer.exceptions.catalog import (
-    AlreadyExistsException,
-    BaseExceptionDetail,
-)
-from maasservicelayer.exceptions.constants import (
-    UNIQUE_CONSTRAINT_VIOLATION_TYPE,
-)
 from maasservicelayer.models.agents import Agent
 from maasservicelayer.models.base import ListResult
 from maasservicelayer.services import ServiceCollectionV3
