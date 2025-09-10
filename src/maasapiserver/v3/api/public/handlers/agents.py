@@ -8,7 +8,6 @@ from maasapiserver.common.api.models.responses.errors import (
     NotFoundBodyResponse,
 )
 from maasapiserver.v3.api import services
-from maasapiserver.v3.api.public.models.requests.agents import AgentRequest
 from maasapiserver.v3.api.public.models.requests.query import PaginationParams
 from maasapiserver.v3.api.public.models.responses.agents import (
     AgentResponse,
@@ -101,36 +100,6 @@ class AgentsHandler(Handler):
                 )
                 else None
             ),
-        )
-
-    @handler(
-        path="/agents",
-        methods=["POST"],
-        tags=TAGS,
-        responses={
-            201: {
-                "model": AgentResponse,
-                "headers": {"ETag": OPENAPI_ETAG_HEADER},
-            },
-        },
-        response_model_exclude_none=True,
-        status_code=201,
-        dependencies=[
-            Depends(check_permissions(required_roles={UserRole.ADMIN}))
-        ],
-    )
-    async def create_agent(
-        self,
-        agent_request: AgentRequest,
-        response: Response,
-        services: ServiceCollectionV3 = Depends(services),  # noqa: B008
-    ) -> AgentResponse:
-        builder = agent_request.to_builder()
-        agent = await services.agents.create(builder)
-        response.headers["ETag"] = agent.etag()
-        return AgentResponse.from_model(
-            agent=agent,
-            self_base_hyperlink=f"{V3_API_PREFIX}/agents",
         )
 
     @handler(

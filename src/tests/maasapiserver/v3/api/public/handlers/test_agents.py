@@ -127,64 +127,6 @@ class TestAgentsApi(ApiCommonTests):
         assert error_response.kind == "Error"
         assert error_response.code == 404
 
-    async def test_post_200(
-        self,
-        services_mock: ServiceCollectionV3,
-        mocked_api_client_admin: AsyncClient,
-    ) -> None:
-        services_mock.agents = Mock(AgentsService)
-        services_mock.agents.create.return_value = TEST_AGENT_1
-
-        create_request = {
-            "secret": TEST_AGENT_1.secret,
-            "rack_id": TEST_AGENT_1.rack_id,
-            "rackcontroller_id": TEST_AGENT_1.rackcontroller_id,
-        }
-        response = await mocked_api_client_admin.post(
-            self.BASE_PATH, json=jsonable_encoder(create_request)
-        )
-        assert response.status_code == 201
-        assert response.headers["ETag"]
-        agent_response = AgentResponse(**response.json())
-
-        assert agent_response.secret == TEST_AGENT_1.secret
-        assert agent_response.rack_id == TEST_AGENT_1.rack_id
-        assert (
-            agent_response.rackcontroller_id == TEST_AGENT_1.rackcontroller_id
-        )
-        assert (
-            agent_response.hal_links.self.href
-            == f"{self.BASE_PATH}/{agent_response.id}"
-        )
-
-    async def test_post_409(
-        self,
-        services_mock: ServiceCollectionV3,
-        mocked_api_client_admin: AsyncClient,
-    ) -> None:
-        services_mock.agents = Mock(AgentsService)
-        services_mock.agents.create.side_effect = AlreadyExistsException(
-            details=[
-                BaseExceptionDetail(
-                    type=UNIQUE_CONSTRAINT_VIOLATION_TYPE,
-                    message="A resource with such identifiers already exist.",
-                )
-            ]
-        )
-        create_request = {
-            "secret": TEST_AGENT_1.secret,
-            "rack_id": TEST_AGENT_1.rack_id,
-            "rackcontroller_id": TEST_AGENT_1.rackcontroller_id,
-        }
-        response = await mocked_api_client_admin.post(
-            self.BASE_PATH, json=jsonable_encoder(create_request)
-        )
-        assert response.status_code == 409
-
-        error_response = ErrorBodyResponse(**response.json())
-        assert error_response.kind == "Error"
-        assert error_response.code == 409
-
     async def test_delete_resource(
         self,
         services_mock: ServiceCollectionV3,
