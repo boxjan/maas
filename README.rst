@@ -1,6 +1,6 @@
-************************
+*************************
 MAAS: Metal as a Service
-************************
+*************************
 Metal as a Service -- MAAS -- lets you treat physical servers like virtual machines in the cloud.
 Rather than having to manage each server individually, MAAS turns your bare metal into an elastic
 cloud-like resource.
