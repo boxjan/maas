@@ -1,4 +1,4 @@
-# Copyright 2024 Canonical Ltd.  This software is licensed under the
+# Copyright 2024-2025 Canonical Ltd.  This software is licensed under the
 # GNU Affero General Public License version 3 (see the file LICENSE).
 
 import asyncio
@@ -25,7 +25,6 @@ from maascommon.enums.node import NodeTypeEnum
 from maascommon.enums.subnet import RdnsMode
 from maascommon.workflows.dns import (
     CONFIGURE_DNS_WORKFLOW_NAME,
-    ConfigureDNSParam,
     InvalidDNSUpdateError,
 )
 from maasservicelayer.db.filters import QuerySpec
@@ -1243,7 +1242,7 @@ class DNSConfigActivity(ActivityBase):
 @workflow.defn(name=CONFIGURE_DNS_WORKFLOW_NAME, sandboxed=False)
 class ConfigureDNSWorkflow:
     @workflow_run_with_context
-    async def run(self, param: ConfigureDNSParam) -> None:
+    async def run(self) -> None:
         region_controllers = await workflow.execute_activity(
             GET_REGION_CONTROLLERS_NAME,
             start_to_close_timeout=GET_REGION_CONTROLLERS_TIMEOUT,
@@ -1252,8 +1251,23 @@ class ConfigureDNSWorkflow:
         for region_controller_system_id in region_controllers[
             "region_controller_system_ids"
         ]:
-            updates = None
-            need_full_reload = param.need_full_reload
+            latest_serial, updates = await workflow.execute_activity(
+                GET_CHANGES_SINCE_CURRENT_SERIAL_NAME,
+                start_to_close_timeout=GET_CHANGES_SINCE_CURRENT_SERIAL_TIMEOUT,
+                task_queue=get_task_queue_for_update(
+                    region_controller_system_id
+                ),
+            )
+            if latest_serial is None or latest_serial == -1:  # up-to-date
+                return
+
+            need_full_reload = False
+            if updates["force_reload"]:
+                need_full_reload = True
+            else:
+                for publication in updates["updates"]:
+                    if publication["operation"] == DnsUpdateAction.RELOAD:
+                        need_full_reload = True
 
             if not need_full_reload:
                 latest_serial, updates = await workflow.execute_activity(

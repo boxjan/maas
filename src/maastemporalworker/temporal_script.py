@@ -13,7 +13,8 @@ from maasservicelayer.db import Database
 from maasservicelayer.db.locks import wait_for_startup
 from maasservicelayer.logging.configure import configure_logging
 from maasservicelayer.services import CacheForServices
-from maastemporalworker.worker import REGION_TASK_QUEUE
+from maastemporalworker.schedules import register_schedules
+from maastemporalworker.worker import get_client_async, REGION_TASK_QUEUE
 from maastemporalworker.worker import Worker as TemporalWorker
 from maastemporalworker.workflow.bootresource import (
     BootResourcesActivity,
@@ -119,6 +120,9 @@ async def main() -> None:
     log.debug("connecting to Temporal server")
 
     maas_id = await get_maas_id()
+
+    temporal_client = await get_client_async()
+
     services_cache = CacheForServices()
 
     boot_res_activity = BootResourcesActivity(db, services_cache)
@@ -134,6 +138,7 @@ async def main() -> None:
     temporal_workers = [
         # All regions listen to a shared task queue. The first to pick up a task will execute it.
         TemporalWorker(
+            client=temporal_client,
             task_queue=REGION_TASK_QUEUE,
             workflows=[
                 # Boot resources workflows
@@ -207,6 +212,7 @@ async def main() -> None:
         ),
         # Individual region controller worker
         TemporalWorker(
+            client=temporal_client,
             task_queue=f"region:{maas_id}",
             workflows=[
                 # Boot resources workflows
@@ -235,6 +241,9 @@ async def main() -> None:
                 _stop_temporal_workers(temporal_workers)
             ),
         )
+
+    log.info("Reconciling schedules")
+    await register_schedules(temporal_client)
 
     log.info("temporal-worker started")
     await _start_temporal_workers(temporal_workers)

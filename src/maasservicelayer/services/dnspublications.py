@@ -4,14 +4,7 @@
 from datetime import datetime
 from typing import Optional
 
-from temporalio.common import WorkflowIDReusePolicy
-
 from maascommon.enums.dns import DnsUpdateAction
-from maascommon.workflows.dns import (
-    CONFIGURE_DNS_WORKFLOW_NAME,
-    ConfigureDNSParam,
-    merge_configure_dns_params,
-)
 from maasservicelayer.builders.dnspublications import DNSPublicationBuilder
 from maasservicelayer.context import Context
 from maasservicelayer.db.repositories.dnspublications import (
@@ -52,7 +45,6 @@ class DNSPublicationsService(
         answer: Optional[str] = None,
         timestamp: Optional[datetime] = None,
     ) -> DNSPublication:
-        update = None
         if action == DnsUpdateAction.RELOAD:
             update = DnsUpdateAction.RELOAD
         else:
@@ -66,17 +58,6 @@ class DNSPublicationsService(
 
         if not timestamp:
             timestamp = utcnow()
-
-        self.temporal_service.register_or_update_workflow_call(
-            CONFIGURE_DNS_WORKFLOW_NAME,
-            ConfigureDNSParam(
-                need_full_reload=action == DnsUpdateAction.RELOAD
-            ),
-            parameter_merge_func=merge_configure_dns_params,
-            wait=False,
-            workflow_id="configure-dns",
-            id_reuse_policy=WorkflowIDReusePolicy.TERMINATE_IF_RUNNING,
-        )
 
         return await self.create(
             DNSPublicationBuilder(

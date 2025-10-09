@@ -1,3 +1,6 @@
+# Copyright 2025 Canonical Ltd.  This software is licensed under the
+# GNU Affero General Public License version 3 (see the file LICENSE).
+
 import asyncio
 from collections import Counter, defaultdict
 from datetime import datetime, timezone
@@ -16,10 +19,7 @@ from temporalio.worker import Worker
 
 from maascommon.enums.dns import DnsUpdateAction
 from maascommon.enums.subnet import RdnsMode
-from maascommon.workflows.dns import (
-    CONFIGURE_DNS_WORKFLOW_NAME,
-    ConfigureDNSParam,
-)
+from maascommon.workflows.dns import CONFIGURE_DNS_WORKFLOW_NAME
 from maasservicelayer.db import Database
 from maasservicelayer.models.subnets import Subnet
 from maasservicelayer.services import CacheForServices
@@ -1024,7 +1024,6 @@ class TestDNSConfigWorkflow:
             ) as worker:
                 await env.client.execute_workflow(
                     CONFIGURE_DNS_WORKFLOW_NAME,
-                    ConfigureDNSParam(need_full_reload=True),
                     id="configure-dns",
                     task_queue=worker.task_queue,
                 )
@@ -1102,7 +1101,6 @@ class TestDNSConfigWorkflow:
             ) as worker:
                 await env.client.execute_workflow(
                     CONFIGURE_DNS_WORKFLOW_NAME,
-                    ConfigureDNSParam(need_full_reload=False),
                     id="configure-dns",
                     task_queue=worker.task_queue,
                 )
@@ -1171,7 +1169,6 @@ class TestDNSConfigWorkflow:
             ) as worker:
                 await env.client.execute_workflow(
                     CONFIGURE_DNS_WORKFLOW_NAME,
-                    ConfigureDNSParam(need_full_reload=False),
                     id="configure-dns",
                     task_queue=worker.task_queue,
                 )
@@ -1240,7 +1237,6 @@ class TestDNSConfigWorkflow:
             ) as worker:
                 await env.client.execute_workflow(
                     CONFIGURE_DNS_WORKFLOW_NAME,
-                    ConfigureDNSParam(need_full_reload=False),
                     id="configure-dns",
                     task_queue=worker.task_queue,
                 )
