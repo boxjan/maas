@@ -45,18 +45,18 @@ async def register_schedules(temporal_client: Client):
     2. Register missing schedules:
        If a schedule is defined locally in `SCHEDULES` but does not
        yet exist in Temporal, it is created.
-
     """
+
     _expected_schedules = set(SCHEDULES.keys())
-    _missing_schedules = set()
+    _registered_schedules = set()
     async for schedule in await temporal_client.list_schedules():
-        if schedule.id not in _expected_schedules:
-            handle = temporal_client.get_schedule_handle(schedule.id)
-            await handle.delete()
-        else:
-            _missing_schedules.add(schedule.id)
+        _registered_schedules.add(schedule.id)
 
-    schedules_to_create = _expected_schedules - _missing_schedules
+    _schedules_to_delete = _registered_schedules - _expected_schedules
+    for schedule in _schedules_to_delete:
+        handle = temporal_client.get_schedule_handle(schedule)
+        await handle.delete()
 
-    for schedule in schedules_to_create:
+    _schedules_to_add = _expected_schedules - _registered_schedules
+    for schedule in _schedules_to_add:
         await temporal_client.create_schedule(schedule, SCHEDULES[schedule])
