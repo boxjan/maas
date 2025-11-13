@@ -47,127 +47,15 @@ ACTIVE_DISCOVERY_INTERVAL_CHOICES = [
     (_timedelta_to_whole_seconds(minutes=10), "Every 10 minutes"),
 ]
 
-
-def get_default_config():
-    """
-    :return: A dictionary mapping default settings keys to default values.
-    """
-    return {
-        # Ubuntu section configuration.
-        "commissioning_osystem": DEFAULT_OS.name,
-        "commissioning_distro_series": DEFAULT_OS.get_default_commissioning_release(),
-        "default_dns_ttl": 30,
-        "default_min_hwe_kernel": "",
-        "default_storage_layout": "flat",
-        # kernel options
-        "kernel_opts": None,
-        # Network section configuration.
-        "maas_url": "http://localhost:5240/MAAS",
-        "maas_name": gethostname(),
-        "theme": "",
-        "default_osystem": DEFAULT_OS.name,
-        "default_distro_series": DEFAULT_OS.get_default_release(),
-        # Proxy settings
-        "enable_http_proxy": True,
-        "maas_proxy_port": 8000,
-        "use_peer_proxy": False,
-        "http_proxy": None,
-        "prefer_v4_proxy": False,
-        # DNS settings
-        "upstream_dns": None,
-        "dnssec_validation": "auto",
-        "dns_trusted_acl": None,
-        "maas_internal_domain": "maas-internal",
-        # NTP settings
-        "ntp_servers": "ntp.ubuntu.com",
-        "ntp_external_only": False,
-        "omapi_key": "",
-        # Syslog settings
-        "remote_syslog": None,
-        "maas_syslog_port": 5247,
-        # Network discovery.
-        "network_discovery": "enabled",
-        "active_discovery_interval": _timedelta_to_whole_seconds(hours=3),
-        "active_discovery_last_scan": 0,
-        # IP Mode setting
-        "default_boot_interface_link_type": "auto",
-        # RPC configuration.
-        "rpc_shared_secret": None,
-        "uuid": None,
-        # Images.
-        "boot_images_auto_import": True,
-        "boot_images_no_proxy": False,
-        # Third Party
-        "enable_third_party_drivers": True,
-        # Default deployment options
-        "enable_kernel_crash_dump": False,
-        # Disk erasing.
-        "enable_disk_erasing_on_release": False,
-        "disk_erase_with_secure_erase": True,
-        "disk_erase_with_quick_erase": False,
-        # Curtin.
-        "curtin_verbose": True,
-        # Netplan
-        "force_v1_network_yaml": False,
-        # Analytics.
-        "enable_analytics": True,
-        # First admin journey.
-        "completed_intro": False,
-        "max_node_commissioning_results": 10,
-        "max_node_testing_results": 10,
-        "max_node_installation_results": 3,
-        "max_node_release_results": 3,
-        # Notifications.
-        "subnet_ip_exhaustion_threshold_count": 16,
-        "release_notifications": True,
-        # MAAS Architecture.
-        "use_rack_proxy": True,
-        "node_timeout": NODE_TIMEOUT,
-        # prometheus.
-        "prometheus_enabled": False,
-        "prometheus_push_gateway": None,
-        "prometheus_push_interval": 60,
-        # Loki Promtail
-        "promtail_enabled": False,
-        "promtail_port": 5238,
-        # Enlistment options
-        "enlist_commissioning": True,
-        "maas_auto_ipmi_user": "maas",
-        "maas_auto_ipmi_user_privilege_level": "ADMIN",
-        "maas_auto_ipmi_k_g_bmc_key": "",
-        "maas_auto_ipmi_cipher_suite_id": "3",
-        "maas_auto_ipmi_workaround_flags": None,
-        # VMware vCenter crednetials
-        "vcenter_server": "",
-        "vcenter_username": "",
-        "vcenter_password": "",
-        "vcenter_datacenter": "",
-        # Hardware Sync options
-        "hardware_sync_interval": "15m",
-        # TLS certificate options
-        "tls_port": None,
-        "tls_cert_expiration_notification_enabled": False,
-        "tls_cert_expiration_notification_interval": 30,
-        "vault_enabled": False,
-        # Windows settings
-        "windows_kms_host": None,
-        # Session timeout length (s)
-        "session_length": 1209600,
-        "auto_vlan_creation": True,
-    }
-
-
-# Default values for config options.
-DEFAULT_CONFIG = get_default_config()
-
-# Map config keys that are secrets to their path in the Secret model (as
-# they're actually stored there)
-CONFIG_SECRETS = {
-    "rpc_shared_secret": "rpc-shared",
-    "omapi_key": "omapi-key",
-    "maas_auto_ipmi_k_g_bmc_key": "ipmi-k_g-key",
-    "vcenter_password": "vcenter-password",
-}
+DNS_CONFIG_PARAMS = (
+    "upstream_dns",
+    "dnssec_validation",
+    "dns_trusted_acl",
+    "default_dns_ttl",
+    "allow_only_trusted_transfers",
+    "windows_kms_host",
+    "maas_internal_domain",
+)
 
 # Encapsulates the possible states for network discovery
 NetworkDiscoveryConfig = namedtuple(

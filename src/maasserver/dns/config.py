@@ -111,7 +111,11 @@ def dns_update_all_zones(
     )
     subnets = Subnet.objects.exclude(rdns_mode=RDNS_MODE.DISABLED)
     default_ttl = Config.objects.get_config("default_dns_ttl")
-    serial = current_zone_serial()
+    allow_only_trusted_transfers = Config.objects.get_config(
+        "allow_only_trusted_transfers"
+    )
+    if serial is None:
+        serial = current_zone_serial()
     zones = ZoneGenerator(
         domains,
         subnets,
@@ -143,6 +147,7 @@ def dns_update_all_zones(
     bind_write_configuration(
         zones,
         trusted_networks=get_trusted_networks(),
+        allow_only_trusted_transfers=allow_only_trusted_transfers,
         forwarded_zones=forwarded_zones,
     )
 
