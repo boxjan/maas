@@ -1981,7 +1981,7 @@ class TestMakeHostsForSubnet(MAASServerTestCase):
                 "dhcp_snippets": [],
             },
             {
-                "host": "",
+                "host": "rsvd-%s" % str(reserved_ip.id),
                 "mac": str(reserved_ip.mac_address),
                 "ip": str(reserved_ip.ip),
                 "dhcp_snippets": [],
