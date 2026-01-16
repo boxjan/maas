@@ -101,7 +101,10 @@ from maasservicelayer.db.repositories.subnet_utilization import (
     SubnetUtilizationRepository,
 )
 from maasservicelayer.db.repositories.subnets import SubnetsRepository
-from maasservicelayer.db.repositories.switches import SwitchesRepository
+from maasservicelayer.db.repositories.switches import (
+    SwitchesRepository,
+    SwitchInterfacesRepository,
+)
 from maasservicelayer.db.repositories.tags import TagsRepository
 from maasservicelayer.db.repositories.tokens import (
     OIDCRevokedTokenRepository,
@@ -196,7 +199,10 @@ from maasservicelayer.services.subnet_utilization import (
     V3SubnetUtilizationService,
 )
 from maasservicelayer.services.subnets import SubnetsService
-from maasservicelayer.services.switches import SwitchesService
+from maasservicelayer.services.switches import (
+    SwitchesService,
+    SwitchInterfacesService,
+)
 from maasservicelayer.services.tags import TagsService
 from maasservicelayer.services.temporal import TemporalService
 from maasservicelayer.services.tokens import (
@@ -299,6 +305,7 @@ class ServiceCollectionV3:
     staticroutes: StaticRoutesService
     subnets: SubnetsService
     switches: SwitchesService
+    switchinterfaces: SwitchInterfacesService
     tags: TagsService
     temporal: TemporalService
     tokens: TokensService
@@ -607,6 +614,10 @@ class ServiceCollectionV3:
         services.switches = SwitchesService(
             context=context,
             switches_repository=SwitchesRepository(context),
+        )
+        services.switchinterfaces = SwitchInterfacesService(
+            context=context,
+            switchinterfaces_repository=SwitchInterfacesRepository(context),
         )
         services.dnsdata = DNSDataService(
             context=context,
