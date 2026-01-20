@@ -113,15 +113,15 @@ class ONIEOS(OperatingSystem):
         """
         return [BOOT_IMAGE_PURPOSE.XINSTALL]
 
-    def get_default_release(self) -> str | None:
+    def get_default_release(self) -> str:
         """Gets the default release to use when a release is not explicit.
 
         ONIE has no sensible default since the appropriate release depends
         on the specific vendor and model of the switch.
 
-        :return: None (no default)
+        :return: Empty string (no default)
         """
-        return None
+        return ""
 
     def get_supported_commissioning_releases(self) -> list[str]:
         """List operating system's supported commissioning releases.
@@ -141,7 +141,7 @@ class ONIEOS(OperatingSystem):
         """
         return None
 
-    @lru_cache(maxsize=256)
+    @lru_cache(maxsize=256)  # noqa: B019
     def parse_release(self, release: str) -> tuple[str, str] | None:
         """Parse a release string into vendor and version components.
 
