@@ -293,4 +293,15 @@ class ONIEOS(OperatingSystem):
 
         :return: Dictionary mapping filename patterns to file types
         """
-        return self._get_image_filetypes(tgz=True, dd=True)
+        return self._get_image_filetypes(tgz=True, dd=True) #TODO need new file type for self-extracting binaries
+    # Need this in order to prevent machines from deploying ONIE images
+
+ # maas admin boot-resources create
+# name=onie/sonic-vs
+# architecture=amd64/sonic
+# sha256=$(sha256sum sonic-vs.bin | cut -d' ' -f1)
+# size=$(stat -c%s sonic-vs.bin)
+# content@=sonic-vs.bin
+
+# NTS look at logic for selecting operating system during deploy
+# Having a separate type for ONIE images would make sense so that switches cannot deploy other types and vice versa
