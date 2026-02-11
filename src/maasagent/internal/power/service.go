@@ -236,13 +236,14 @@ type DetailsParam struct {
 	PowerParam
 }
 
-// DetailsResult is the result of the details action
+// Details is the result of single detail
 type Details struct {
 	Manufacturer string `json:"manufacturer"`
 	Model        string `json:"model"`
 	ChassisType  string `json:"chassis_type"`
 }
 
+// DetailsResult is the result of details action
 type DetailsResult struct {
 	Details []Details `json:"details"`
 }

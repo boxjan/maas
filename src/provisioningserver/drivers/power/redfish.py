@@ -494,7 +494,9 @@ class RedfishPowerDriver(RedfishPowerDriverBase):
 
             results.append(
                 {
-                    "manufacturer": chassis_info.get("Manufacturer", "unknown"),
+                    "manufacturer": chassis_info.get(
+                        "Manufacturer", "unknown"
+                    ),
                     "model": chassis_info.get("Model", "unknown"),
                     "chassis_type": chassis_info.get("ChassisType", "unknown"),
                 }
