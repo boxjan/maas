@@ -1,10 +1,11 @@
 #  Copyright 2024 Canonical Ltd.  This software is licensed under the
 #  GNU Affero General Public License version 3 (see the file LICENSE).
 
-from datetime import timedelta
-from json import dumps as _dumps, loads as _loads
-from unittest.mock import AsyncMock, MagicMock, Mock, patch
 import base64
+from datetime import timedelta
+from json import dumps as _dumps
+from json import loads as _loads
+from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
