@@ -1,10 +1,8 @@
 #  Copyright 2024 Canonical Ltd.  This software is licensed under the
 #  GNU Affero General Public License version 3 (see the file LICENSE).
 
-import base64
 from datetime import timedelta
 from json import dumps as _dumps
-from json import loads as _loads
 from unittest.mock import AsyncMock, MagicMock, Mock, patch
 
 from fastapi.encoders import jsonable_encoder
@@ -33,6 +31,7 @@ from maasservicelayer.auth.external_oauth import (
     OAuthInitiateData,
     OAuthTokenData,
 )
+from maascommon.utils.jwt import decode_unverified_jwt
 from maasservicelayer.auth.jwt import JWT, UserRole
 from maasservicelayer.auth.oidc_jwt import OAuthAccessToken
 from maasservicelayer.exceptions.catalog import (
@@ -146,10 +145,10 @@ class TestAuthApi:
 
         token_response = TokenResponse(**response.json())
         assert token_response.token_type == "bearer"
-        # Manually decode JWT to get claims without verification
-        payload_part = token_response.access_token.split(".")[1]
-        payload_part += "=" * (4 - len(payload_part) % 4)
-        claims = _loads(base64.urlsafe_b64decode(payload_part))
+        # Decode JWT to get claims without verification
+        claims = decode_unverified_jwt(
+            token_response.access_token, check_expiration=False
+        )
         assert claims["sub"] == "username"
         assert token_response.refresh_token == "abc123"
 
@@ -235,10 +234,10 @@ class TestAuthApi:
         token_response = TokenResponse(**response.json())
         assert token_response.kind == "Tokens"
         assert token_response.token_type == "bearer"
-        # Manually decode JWT to get claims without verification
-        payload_part = token_response.access_token.split(".")[1]
-        payload_part += "=" * (4 - len(payload_part) % 4)
-        decoded_token = _loads(base64.urlsafe_b64decode(payload_part))
+        # Decode JWT to get claims without verification
+        decoded_token = decode_unverified_jwt(
+            token_response.access_token, check_expiration=False
+        )
         assert decoded_token["sub"] == "username"
         assert decoded_token["user_id"] == 0
         assert token_response.refresh_token is None
@@ -260,10 +259,10 @@ class TestAuthApi:
         token_response = TokenResponse(**response.json())
         assert token_response.kind == "Tokens"
         assert token_response.token_type == "bearer"
-        # Manually decode JWT to get claims without verification
-        payload_part = token_response.access_token.split(".")[1]
-        payload_part += "=" * (4 - len(payload_part) % 4)
-        decoded_token = _loads(base64.urlsafe_b64decode(payload_part))
+        # Decode JWT to get claims without verification
+        decoded_token = decode_unverified_jwt(
+            token_response.access_token, check_expiration=False
+        )
         assert decoded_token["sub"] == "username"
         assert decoded_token["user_id"] == 0
         assert token_response.refresh_token is None
