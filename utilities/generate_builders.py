@@ -11,8 +11,7 @@ model in src/maasservicelayer/models.
 To generate a builder for a model, just decorate the model with
 `generate_builder` from src/maasservicelayer/models/base.py.
 
-HEADS UP: this is currently tested with SQLAlchemy 1.x, we might want to revise
-this when we switch to 2.x.
+HEADS UP: this is currently tested with Pydantic 2.x
 """
 
 from abc import ABC, abstractmethod
@@ -27,7 +26,7 @@ from types import FunctionType, ModuleType
 from typing import get_args, get_origin, Self, TypeVar, Union
 
 from pydantic import BaseModel
-from pydantic.fields import ModelField
+from pydantic.fields import FieldInfo
 
 MODELS_PATH = "src/maasservicelayer/models"
 BUILDERS_PATH = "src/maasservicelayer/builders"
@@ -82,7 +81,7 @@ def default_imports() -> set:
 
 
 def process_string(s) -> str:
-    """Preprocess the `annotation` or `type_` field of a ModelField.
+    """Preprocess annotation string representation.
 
     This function:
         - removes all the not wanted chars in e.g. <class 'x'> and <enum 'x'>
@@ -95,15 +94,12 @@ def process_string(s) -> str:
         .removeprefix("<enum '")
         .removesuffix("'>")
     )
-    # while dealing with pydantic modelfield, sometimes None is expressed as NoneType
     s = s.replace("NoneType", "None")
-    # remove all module prefixes
     s = re.sub(r"\w*\.", "", s)
     return s
 
 
 def get_module_name_for_type(type_) -> str:
-    # workaround for Literal["foo"]
     if isinstance(type_, str):
         return "builtins"
     module = inspect.getmodule(type_)
@@ -137,31 +133,21 @@ def handle_simple_type(type_, imports: set):
     add_imports(module_name, process_string(type_), imports)
 
 
-def process_field(field: ModelField, imports: set) -> ModelField:
-    """Modifies the field and updates the import statements.
-
-    Updates the type_ and annotation of the field, making it a Union of the
-    already present value and Unset.
-    It also set the required attribute to False and updated the model_config
-    with the config of ResourceBuilder (in order to allow for arbitrary types).
-    """
-    if get_origin(field.annotation) is not None:
-        handle_composite_type(field.annotation, imports)
+def process_field_annotation(annotation, imports: set) -> str:
+    """Process a field annotation and update imports, return Union annotation string."""
+    if get_origin(annotation) is not None:
+        handle_composite_type(annotation, imports)
     else:
-        handle_simple_type(field.annotation, imports)
+        handle_simple_type(annotation, imports)
 
-    field.type_ = Union[field.type_, Unset]
-    field.annotation = Union[field.annotation, Unset]
-    field.default = UNSET
-    field.required = False
-    field.model_config = ResourceBuilder.__config__
-    return field
+    union_annotation = Union[annotation, Unset]
+    return process_string(str(union_annotation))
 
 
 @dataclasses.dataclass(kw_only=True)
 class GenericModel(ABC):
     name: str
-    fields: list[ModelField]
+    fields: dict[str, FieldInfo]
     model_imports: set = dataclasses.field(default_factory=default_imports)
 
 
@@ -215,11 +201,20 @@ class BuilderModel(GenericModel):
 
     def to_file(self) -> str:
         field_lines = ""
-        for field in sorted(self.fields, key=lambda f: f.name):
-            field_lines += f"    {field.name}: {process_string(str(field.annotation))} = Field(default=UNSET, required=False)\n"
+        imports = self.model_imports.copy()
+        
+        for field_name in sorted(self.fields.keys()):
+            field_info = self.fields[field_name]
+            annotation_str = process_field_annotation(
+                field_info.annotation, imports
+            )
+            field_lines += f"    {field_name}: {annotation_str} = Field(default=UNSET)\n"
+        
         method_lines = ""
         for _, method_obj in self.methods:
             method_lines += "".join(inspect.getsourcelines(method_obj)[0])
+        
+        self.model_imports = imports
         return CLASS_TEMPLATE.format(
             model_name=self.name,
             fields_definitions=field_lines,
@@ -230,18 +225,15 @@ class BuilderModel(GenericModel):
         self.methods = methods
 
     def __eq__(self, other) -> bool:
-        """Compare the fields to check if the two model differs."""
+        """Compare the fields to check if the two models differ."""
         if isinstance(other, BuilderModel):
             if self.name != other.name:
                 return False
-            fields_self = sorted(self.fields, key=lambda m: m.name)
-            fields_other = sorted(other.fields, key=lambda m: m.name)
-            if len(fields_self) != len(fields_other):
+            if set(self.fields.keys()) != set(other.fields.keys()):
                 return False
-            for f1, f2 in zip(fields_self, fields_other):
-                if f1.name != f2.name or f1.annotation != f2.annotation:
+            for field_name in self.fields:
+                if self.fields[field_name].annotation != other.fields[field_name].annotation:
                     return False
-
             return True
         return False
 
@@ -252,7 +244,7 @@ class BuilderModule(GenericModule[BuilderModel]):
     def from_file(cls, module: ModuleType, filename: str):
         model_classes = inspect.getmembers(
             module,
-            lambda x: inspect.isclass and inspect.getmodule(x) == module,
+            lambda x: inspect.isclass(x) and inspect.getmodule(x) == module,
         )
         models = []
         for name, class_ in model_classes:
@@ -263,8 +255,10 @@ class BuilderModule(GenericModule[BuilderModel]):
                     and not getattr(ResourceBuilder, x.__name__, False)
                     and not getattr(BaseModel, x.__name__, False),
                 )
-                fields = list(class_.__fields__.values())
-                fields = [f for f in fields if f.name not in EXCLUDED_FIELDS]
+                fields = {
+                    k: v for k, v in class_.model_fields.items()
+                    if k not in EXCLUDED_FIELDS
+                }
                 models.append(
                     BuilderModel(
                         name=name,
@@ -279,7 +273,7 @@ class BuilderModule(GenericModule[BuilderModel]):
         for class_ in self.models:
             class_defs += class_.to_file()
             self.module_imports = self.module_imports | class_.model_imports
-        imports = "\n".join(self.module_imports)
+        imports = "\n".join(sorted(self.module_imports))
         header = HEADER_TEMPLATE.format(import_stmts=imports)
         return header + class_defs
 
@@ -328,12 +322,18 @@ class BuilderCollection(GenericCollection[BuilderModule]):
 @dataclasses.dataclass(kw_only=True)
 class DomainModel(GenericModel):
     def to_builder(self) -> BuilderModel:
-        fields = []
         imports = default_imports()
-        for field in sorted(self.fields, key=lambda f: f.name):
-            fields.append(process_field(field, imports))
+        processed_fields = {}
+        
+        for field_name in sorted(self.fields.keys()):
+            field_info = self.fields[field_name]
+            process_field_annotation(field_info.annotation, imports)
+            processed_fields[field_name] = field_info
+        
         return BuilderModel(
-            name=f"{self.name}Builder", fields=fields, model_imports=imports
+            name=f"{self.name}Builder",
+            fields=processed_fields,
+            model_imports=imports,
         )
 
 
@@ -348,8 +348,10 @@ class DomainModule(GenericModule[DomainModel]):
         )
         models = []
         for name, class_ in model_classes:
-            fields = list(class_.__fields__.values())
-            fields = [f for f in fields if f.name not in EXCLUDED_FIELDS]
+            fields = {
+                k: v for k, v in class_.model_fields.items()
+                if k not in EXCLUDED_FIELDS
+            }
             models.append(DomainModel(name=name, fields=fields))
 
         return cls(filename=filename, models=models)
@@ -373,7 +375,6 @@ class DomainCollection(GenericCollection[DomainModule]):
             module = importlib.import_module(modulename)
             domain_module = DomainModule.from_file(module, filename)
             if len(domain_module.models) == 0:
-                # we don't have to generate anything
                 continue
             modules.append(domain_module)
         return cls(modules=modules)
@@ -393,7 +394,6 @@ def main():
     parser.add_argument("-c", "--check", action="store_true")
     args = parser.parse_args()
 
-    # domain collection and builder collection
     domain_collection = DomainCollection.from_path(MODELS_PATH)
     builder_collection = BuilderCollection.from_path(BUILDERS_PATH)
 
@@ -415,7 +415,6 @@ def main():
             )
             to_write[filename] = generated_builder_module.to_file()
 
-    # if there are other builders not processed, delete them
     for module in builder_collection:
         to_delete.append(module.filename)
 
