@@ -23,26 +23,20 @@ class PackageRepositoryBuilder(ResourceBuilder):
     the generated code.
     """
 
-    arches: Union[set[KnownArchesEnum], Unset] = Field(
-        default=UNSET, required=False
-    )
-    components: Union[set[KnownComponentsEnum], Unset] = Field(
-        default=UNSET, required=False
-    )
-    created: Union[datetime, Unset] = Field(default=UNSET, required=False)
-    default: Union[bool, Unset] = Field(default=UNSET, required=False)
-    disable_sources: Union[bool, Unset] = Field(default=UNSET, required=False)
+    arches: Union[set[KnownArchesEnum], Unset] = Field(default=UNSET)
+    components: Union[set[KnownComponentsEnum], Unset] = Field(default=UNSET)
+    created: Union[datetime, Unset] = Field(default=UNSET)
+    default: Union[bool, Unset] = Field(default=UNSET)
+    disable_sources: Union[bool, Unset] = Field(default=UNSET)
     disabled_components: Union[set[ComponentsToDisableEnum], Unset] = Field(
-        default=UNSET, required=False
+        default=UNSET
     )
     disabled_pockets: Union[set[PocketsToDisableEnum], Unset] = Field(
-        default=UNSET, required=False
+        default=UNSET
     )
-    distributions: Union[list[str], Unset] = Field(
-        default=UNSET, required=False
-    )
-    enabled: Union[bool, Unset] = Field(default=UNSET, required=False)
-    key: Union[str, Unset] = Field(default=UNSET, required=False)
-    name: Union[str, Unset] = Field(default=UNSET, required=False)
-    updated: Union[datetime, Unset] = Field(default=UNSET, required=False)
-    url: Union[PackageRepoUrl, Unset] = Field(default=UNSET, required=False)
+    distributions: Union[list[str], Unset] = Field(default=UNSET)
+    enabled: Union[bool, Unset] = Field(default=UNSET)
+    key: Union[str, Unset] = Field(default=UNSET)
+    name: Union[str, Unset] = Field(default=UNSET)
+    updated: Union[datetime, Unset] = Field(default=UNSET)
+    url: Union[PackageRepoUrl, Unset] = Field(default=UNSET)
