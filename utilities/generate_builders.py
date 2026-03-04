@@ -310,11 +310,24 @@ class BuilderModule(GenericModule[BuilderModel]):
         default_factory=dict
     )
     source_imports: set = dataclasses.field(default_factory=set)
+    copyright_year: str = "2025"
 
     @classmethod
     def from_file(cls, module: ModuleType, filename: str):
-        # Extract methods from source code to avoid import-time failures
+        # Extract copyright year from existing file
         filepath = os.path.join(BUILDERS_PATH, filename)
+        copyright_year = "2025"
+        try:
+            with open(filepath, 'r') as f:
+                first_line = f.readline()
+                if 'Copyright' in first_line:
+                    match = re.search(r'Copyright (\d{4})', first_line)
+                    if match:
+                        copyright_year = match.group(1)
+        except FileNotFoundError:
+            pass  # New file, use default
+        
+        # Extract methods from source code to avoid import-time failures
         
         models = []
         try:
@@ -354,7 +367,7 @@ class BuilderModule(GenericModule[BuilderModel]):
                             methods=methods_list,
                         )
                     )
-        return cls(filename=filename, models=models)
+        return cls(filename=filename, models=models, copyright_year=copyright_year)
 
     def to_file(self) -> str:
         """Generate the complete file output."""
@@ -367,9 +380,10 @@ class BuilderModule(GenericModule[BuilderModel]):
         models_other = sorted(other.models, key=lambda m: m.name)
         for model, other_model in zip(models_self, models_other):
             model.update_methods(other_model.methods)
-        # Preserve source methods and imports from existing builder
+        # Preserve source methods, imports, and copyright year from existing builder
         self.source_methods = other.source_methods
         self.source_imports = other.source_imports
+        self.copyright_year = other.copyright_year
 
     def __eq__(self, other) -> bool:
         models_self = sorted(self.models, key=lambda m: m.name)
@@ -401,7 +415,10 @@ class BuilderModule(GenericModule[BuilderModel]):
         module_imports = normalize_imports(module_imports)
         
         imports = "\n".join(sorted(module_imports))
-        header = HEADER_TEMPLATE.format(import_stmts=imports)
+        # Use preserved copyright year
+        header = f"# Copyright {self.copyright_year} Canonical Ltd.  This software is licensed under the\n"
+        header += "# GNU Affero General Public License version 3 (see the file LICENSE).\n\n"
+        header += imports + "\n\n"
         return header + class_defs
 
     def outputs_match(self, other: 'BuilderModule') -> bool:

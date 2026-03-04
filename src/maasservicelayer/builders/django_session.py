@@ -1,4 +1,4 @@
-# Copyright 2025 Canonical Ltd.  This software is licensed under the
+# Copyright 2026 Canonical Ltd.  This software is licensed under the
 # GNU Affero General Public License version 3 (see the file LICENSE).
 
 from datetime import datetime
@@ -16,6 +16,6 @@ class DjangoSessionBuilder(ResourceBuilder):
     the generated code.
     """
 
-    expire_date: Union[datetime, Unset] = Field(default=UNSET)
-    session_data: Union[str, Unset] = Field(default=UNSET)
-    session_key: Union[str, Unset] = Field(default=UNSET)
+    expire_date: Union[datetime, Unset] = Field(default=UNSET, required=False)
+    session_data: Union[str, Unset] = Field(default=UNSET, required=False)
+    session_key: Union[str, Unset] = Field(default=UNSET, required=False)
