@@ -20,7 +20,7 @@ Generation Flow:
     1. Scan domain models with @generate_builder decorator
     2. Scan existing builders using AST to preserve custom methods and imports
        (AST parsing avoids import-time errors when builders reference new fields)
-    3. Generate builder classes (fields become Union[FieldType, Unset])
+    3. Generate builder classes (fields become FieldType | Unset)
     4. Merge custom code back into generated builders
     5. Write output only if changes detected
     6. Delete builders for removed models
@@ -42,8 +42,8 @@ import inspect
 import os
 import re
 import sys
-from types import FunctionType, ModuleType
-from typing import get_args, get_origin, Self, Union
+from types import FunctionType, ModuleType, UnionType
+from typing import get_args, get_origin, Self
 
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
@@ -84,7 +84,6 @@ except KeyError as e:
 
 def default_imports() -> set:
     imports = set()
-    imports.add("from typing import Union")
     imports.add("from pydantic import Field")
     imports.add(
         "from maasservicelayer.models.base import ResourceBuilder, UNSET, Unset"
@@ -129,6 +128,14 @@ def add_imports(module_name: str, field: str, imports: set):
 
 def handle_composite_type(type_, imports: set):
     outer = get_origin(type_)
+    if outer is UnionType:
+        inner = get_args(type_)
+        for inner_type in inner:
+            if get_origin(inner_type) is not None:
+                handle_composite_type(inner_type, imports)
+            else:
+                handle_simple_type(inner_type, imports)
+        return
     module_name = get_module_name_for_type(outer)
     add_imports(module_name, process_string(outer), imports)
 
@@ -180,11 +187,29 @@ def normalize_imports(imports: set) -> set:
     return normalized
 
 
+
+def format_annotation(annotation) -> str:
+    origin = get_origin(annotation)
+    if origin is UnionType:
+        return " | ".join(format_annotation(arg) for arg in get_args(annotation))
+    return process_string(str(annotation))
+
+
+def annotation_contains_unset(annotation) -> bool:
+    if annotation is Unset:
+        return True
+    origin = get_origin(annotation)
+    if origin is UnionType:
+        return any(annotation_contains_unset(arg) for arg in get_args(annotation))
+    return False
+
 def process_field_annotation(annotation, imports: set) -> str:
-    """Process a field annotation and update imports, return Union annotation string."""
+    """Process a field annotation and update imports, rendering a |-style union."""
     extract_imports_from_annotation(annotation, imports)
-    union_annotation = Union[annotation, Unset]
-    return process_string(str(union_annotation))
+    annotation_str = format_annotation(annotation)
+    if annotation_contains_unset(annotation):
+        return annotation_str
+    return f"{annotation_str} | Unset"
 
 
 def extract_imports_from_annotation(annotation, imports: set):
