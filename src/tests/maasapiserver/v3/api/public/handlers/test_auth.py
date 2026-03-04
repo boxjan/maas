@@ -25,13 +25,13 @@ from maasapiserver.v3.api.public.models.responses.oauth2 import (
 )
 from maasapiserver.v3.auth.cookie_manager import MAASOAuth2Cookie
 from maasapiserver.v3.constants import V3_API_PREFIX
+from maascommon.utils.jwt import decode_unverified_jwt
 from maasservicelayer.auth.external_oauth import (
     OAuth2Client,
     OAuthIDToken,
     OAuthInitiateData,
     OAuthTokenData,
 )
-from maascommon.utils.jwt import decode_unverified_jwt
 from maasservicelayer.auth.jwt import JWT, UserRole
 from maasservicelayer.auth.oidc_jwt import OAuthAccessToken
 from maasservicelayer.exceptions.catalog import (
