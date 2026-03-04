@@ -18,20 +18,14 @@ class StaticIPAddressBuilder(ResourceBuilder):
     the generated code.
     """
 
-    alloc_type: Union[IpAddressType, Unset] = Field(
-        default=UNSET, required=False
-    )
-    created: Union[datetime, Unset] = Field(default=UNSET, required=False)
-    ip: Union[IPvAnyAddress, None, Unset] = Field(
-        default=UNSET, required=False
-    )
-    lease_time: Union[int, Unset] = Field(default=UNSET, required=False)
-    subnet_id: Union[int, None, Unset] = Field(default=UNSET, required=False)
-    temp_expires_on: Union[datetime, None, Unset] = Field(
-        default=UNSET, required=False
-    )
-    updated: Union[datetime, Unset] = Field(default=UNSET, required=False)
-    user_id: Union[int, None, Unset] = Field(default=UNSET, required=False)
+    alloc_type: Union[IpAddressType, Unset] = Field(default=UNSET)
+    created: Union[datetime, Unset] = Field(default=UNSET)
+    ip: Union[IPvAnyAddress, None, Unset] = Field(default=UNSET)
+    lease_time: Union[int, Unset] = Field(default=UNSET)
+    subnet_id: Union[int, None, Unset] = Field(default=UNSET)
+    temp_expires_on: Union[datetime, None, Unset] = Field(default=UNSET)
+    updated: Union[datetime, Unset] = Field(default=UNSET)
+    user_id: Union[int, None, Unset] = Field(default=UNSET)
 
     def must_trigger_workflow(self) -> bool:
         return (

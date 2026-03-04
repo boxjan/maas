@@ -16,6 +16,7 @@ HEADS UP: this is currently tested with Pydantic 2.x
 
 from abc import ABC, abstractmethod
 import argparse
+import ast
 import dataclasses
 import importlib
 import inspect
@@ -133,15 +134,68 @@ def handle_simple_type(type_, imports: set):
     add_imports(module_name, process_string(type_), imports)
 
 
+def normalize_imports(imports: set) -> set:
+    """Normalize and deduplicate imports from the same module.
+    
+    Combines multiple imports from the same module into a single statement.
+    E.g., ["from x import a", "from x import b"] -> ["from x import a, b"]
+    """
+    from_imports = {}  # module -> set of items
+    other_imports = set()
+    
+    for imp in imports:
+        if not imp.startswith('from '):
+            other_imports.add(imp)
+            continue
+            
+        parts = imp.split(' import ', 1)
+        if len(parts) != 2:
+            other_imports.add(imp)
+            continue
+            
+        module = parts[0].replace('from ', '')
+        if module not in from_imports:
+            from_imports[module] = set()
+        
+        for item in parts[1].split(', '):
+            from_imports[module].add(item.strip())
+    
+    # Rebuild normalized imports
+    normalized = other_imports.copy()
+    for module in sorted(from_imports.keys()):
+        items = ', '.join(sorted(from_imports[module]))
+        normalized.add(f"from {module} import {items}")
+    
+    return normalized
+
+
 def process_field_annotation(annotation, imports: set) -> str:
     """Process a field annotation and update imports, return Union annotation string."""
+    extract_imports_from_annotation(annotation, imports)
+    union_annotation = Union[annotation, Unset]
+    return process_string(str(union_annotation))
+
+
+def extract_imports_from_annotation(annotation, imports: set):
+    """Extract imports from a type annotation."""
     if get_origin(annotation) is not None:
         handle_composite_type(annotation, imports)
     else:
         handle_simple_type(annotation, imports)
 
-    union_annotation = Union[annotation, Unset]
-    return process_string(str(union_annotation))
+
+def extract_imports_from_method(method_obj: FunctionType, imports: set):
+    """Extract type hint imports from a method's signature."""
+    sig = inspect.signature(method_obj)
+    
+    # Process return annotation
+    if sig.return_annotation != inspect.Signature.empty:
+        extract_imports_from_annotation(sig.return_annotation, imports)
+    
+    # Process parameter annotations
+    for param in sig.parameters.values():
+        if param.annotation != inspect.Parameter.empty:
+            extract_imports_from_annotation(param.annotation, imports)
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -200,26 +254,14 @@ class BuilderModel(GenericModel):
     )
 
     def to_file(self) -> str:
-        field_lines = ""
+        output = self.get_output()
+        # Update model_imports for side effect (used by BuilderModule.to_file)
         imports = self.model_imports.copy()
-        
-        for field_name in sorted(self.fields.keys()):
+        for field_name in self.fields.keys():
             field_info = self.fields[field_name]
-            annotation_str = process_field_annotation(
-                field_info.annotation, imports
-            )
-            field_lines += f"    {field_name}: {annotation_str} = Field(default=UNSET)\n"
-        
-        method_lines = ""
-        for _, method_obj in self.methods:
-            method_lines += "".join(inspect.getsourcelines(method_obj)[0])
-        
+            process_field_annotation(field_info.annotation, imports)
         self.model_imports = imports
-        return CLASS_TEMPLATE.format(
-            model_name=self.name,
-            fields_definitions=field_lines,
-            builder_methods=method_lines,
-        )
+        return output
 
     def update_methods(self, methods):
         self.methods = methods
@@ -237,45 +279,95 @@ class BuilderModel(GenericModel):
             return True
         return False
 
+    def get_output(self) -> str:
+        """Generate the class definition output."""
+        field_lines = ""
+        imports = self.model_imports.copy()
+        
+        for field_name in sorted(self.fields.keys()):
+            field_info = self.fields[field_name]
+            annotation_str = process_field_annotation(
+                field_info.annotation, imports
+            )
+            field_lines += f"    {field_name}: {annotation_str} = Field(default=UNSET)\n"
+        
+        method_lines = ""
+        for method_item in self.methods:
+            # Handle both (name, source_code) and (name, method_obj) formats
+            if isinstance(method_item[1], str):
+                # Source code string
+                method_lines += method_item[1] + "\n"
+            else:
+                # Method object
+                method_obj = method_item[1]
+                if method_obj is not None:
+                    method_lines += "".join(inspect.getsourcelines(method_obj)[0])
+        
+        return CLASS_TEMPLATE.format(
+            model_name=self.name,
+            fields_definitions=field_lines,
+            builder_methods=method_lines,
+        )
+
+
+
+
 
 @dataclasses.dataclass(kw_only=True)
 class BuilderModule(GenericModule[BuilderModel]):
+    source_methods: dict[str, list[tuple[str, str]]] = dataclasses.field(
+        default_factory=dict
+    )
+    source_imports: set = dataclasses.field(default_factory=set)
+
     @classmethod
     def from_file(cls, module: ModuleType, filename: str):
-        model_classes = inspect.getmembers(
-            module,
-            lambda x: inspect.isclass(x) and inspect.getmodule(x) == module,
-        )
+        # Extract methods from source code to avoid import-time failures
+        filepath = os.path.join(BUILDERS_PATH, filename)
+        
         models = []
-        for name, class_ in model_classes:
-            if name.endswith("Builder") and name != "ResourceBuilder":
-                builder_methods = inspect.getmembers(
-                    class_,
-                    lambda x: (inspect.isfunction(x) or inspect.ismethod(x))
-                    and not getattr(ResourceBuilder, x.__name__, False)
-                    and not getattr(BaseModel, x.__name__, False),
-                )
-                fields = {
-                    k: v for k, v in class_.model_fields.items()
-                    if k not in EXCLUDED_FIELDS
-                }
-                models.append(
-                    BuilderModel(
-                        name=name,
-                        fields=fields,
-                        methods=builder_methods,
+        try:
+            model_classes = inspect.getmembers(
+                module,
+                lambda x: inspect.isclass(x) and inspect.getmodule(x) == module,
+            )
+            for name, class_ in model_classes:
+                if name.endswith("Builder") and name != "ResourceBuilder":
+                    builder_methods = inspect.getmembers(
+                        class_,
+                        lambda x: (inspect.isfunction(x) or inspect.ismethod(x))
+                        and not getattr(ResourceBuilder, x.__name__, False)
+                        and not getattr(BaseModel, x.__name__, False),
                     )
-                )
+                    fields = {
+                        k: v for k, v in class_.model_fields.items()
+                        if k not in EXCLUDED_FIELDS
+                    }
+                    models.append(
+                        BuilderModel(
+                            name=name,
+                            fields=fields,
+                            methods=builder_methods,
+                        )
+                    )
+        except Exception:
+            # If import fails, extract methods from source code instead
+            source_methods_dict = extract_methods_from_source_file(filepath)
+            for class_name, methods_list in source_methods_dict.items():
+                if class_name.endswith("Builder") and class_name != "ResourceBuilder":
+                    # Convert source code methods to tuples of (name, source)
+                    models.append(
+                        BuilderModel(
+                            name=class_name,
+                            fields={},
+                            methods=methods_list,
+                        )
+                    )
         return cls(filename=filename, models=models)
 
     def to_file(self) -> str:
-        class_defs = ""
-        for class_ in self.models:
-            class_defs += class_.to_file()
-            self.module_imports = self.module_imports | class_.model_imports
-        imports = "\n".join(sorted(self.module_imports))
-        header = HEADER_TEMPLATE.format(import_stmts=imports)
-        return header + class_defs
+        """Generate the complete file output."""
+        return self._generate_output(use_to_file=True)
 
     def update_models_methods_from_other(self, other):
         if self.filename != other.filename:
@@ -284,6 +376,9 @@ class BuilderModule(GenericModule[BuilderModel]):
         models_other = sorted(other.models, key=lambda m: m.name)
         for model, other_model in zip(models_self, models_other):
             model.update_methods(other_model.methods)
+        # Preserve source methods and imports from existing builder
+        self.source_methods = other.source_methods
+        self.source_imports = other.source_imports
 
     def __eq__(self, other) -> bool:
         models_self = sorted(self.models, key=lambda m: m.name)
@@ -295,6 +390,91 @@ class BuilderModule(GenericModule[BuilderModel]):
                 return False
         return True
 
+    def get_output(self) -> str:
+        """Generate the complete file output without mutating self."""
+        return self._generate_output(use_to_file=False)
+
+    def _generate_output(self, use_to_file: bool = False) -> str:
+        """Internal method to generate output with optional mutation."""
+        class_defs = ""
+        module_imports = self.module_imports.copy()
+        
+        for class_ in self.models:
+            if class_.name in self.source_methods:
+                class_.methods = self.source_methods[class_.name]
+            
+            class_defs += class_.to_file() if use_to_file else class_.get_output()
+            module_imports = module_imports | class_.model_imports
+        
+        module_imports |= self.source_imports
+        module_imports = normalize_imports(module_imports)
+        
+        imports = "\n".join(sorted(module_imports))
+        header = HEADER_TEMPLATE.format(import_stmts=imports)
+        return header + class_defs
+
+    def outputs_match(self, other: 'BuilderModule') -> bool:
+        """Check if two modules would generate identical output."""
+        if not isinstance(other, BuilderModule):
+            return False
+        return self.get_output() == other.get_output()
+
+
+def extract_source_methods_and_imports(filepath: str) -> tuple[dict[str, list[tuple[str, str]]], set]:
+    """Extract custom methods and imports from a builder source file without importing it.
+    
+    Returns (methods_dict, imports_set) where methods_dict maps class names to lists of
+    (method_name, source_code) tuples.
+    """
+    methods_by_class = {}
+    imports = set()
+    
+    # Standard methods to exclude from extraction
+    EXCLUDED_METHODS = {
+        '__init__', '__new__', '__del__', '__repr__', '__str__',
+        '__bytes__', '__format__', '__lt__', '__le__', '__eq__',
+        '__ne__', '__gt__', '__ge__', '__bool__', '__getattr__',
+        '__getattribute__', '__setattr__', '__delattr__', '__dir__',
+        '__class_getitem__', '__mro_entries__', '__set_name__',
+        'to_file', 'update_methods',
+    }
+    
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read()
+        
+        tree = ast.parse(content)
+        lines = content.splitlines(keepends=True)
+        
+        # Extract imports
+        for node in ast.walk(tree):
+            if isinstance(node, ast.Import):
+                for alias in node.names:
+                    imports.add(f"import {alias.name} as {alias.asname}" if alias.asname else f"import {alias.name}")
+            elif isinstance(node, ast.ImportFrom):
+                module = node.module or ''
+                names = ', '.join(f"{a.name} as {a.asname}" if a.asname else a.name for a in node.names)
+                imports.add(f"from {module} import {names}")
+        
+        # Extract methods from classes
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                class_methods = []
+                seen_methods = set()
+                for item in node.body:
+                    if isinstance(item, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                        if item.name not in EXCLUDED_METHODS and item.name not in seen_methods:
+                            seen_methods.add(item.name)
+                            start_line = item.decorator_list[0].lineno - 1 if item.decorator_list else item.lineno - 1
+                            source = ''.join(lines[start_line:item.end_lineno])
+                            class_methods.append((item.name, source))
+                if class_methods:
+                    methods_by_class[node.name] = class_methods
+    except Exception:
+        pass
+    
+    return methods_by_class, imports
+
 
 @dataclasses.dataclass(kw_only=True)
 class BuilderCollection(GenericCollection[BuilderModule]):
@@ -305,8 +485,20 @@ class BuilderCollection(GenericCollection[BuilderModule]):
         modules = []
         for filename in os.listdir(path):
             modulename = f"{cls.module_prefix}.{filename.removesuffix('.py')}"
-            module = importlib.import_module(modulename)
-            builder_module = BuilderModule.from_file(module, filename)
+            filepath = os.path.join(BUILDERS_PATH, filename)
+            source_methods, source_imports = extract_source_methods_and_imports(filepath)
+            
+            try:
+                module = importlib.import_module(modulename)
+                builder_module = BuilderModule.from_file(module, filename)
+            except Exception:
+                # If import fails, create an empty builder module
+                builder_module = BuilderModule(filename=filename, models=[])
+            
+            # Store source methods and imports for later use
+            builder_module.source_methods = source_methods
+            builder_module.source_imports = source_imports
+            
             if len(builder_module.models) == 0:
                 continue
             modules.append(builder_module)
@@ -323,16 +515,13 @@ class BuilderCollection(GenericCollection[BuilderModule]):
 class DomainModel(GenericModel):
     def to_builder(self) -> BuilderModel:
         imports = default_imports()
-        processed_fields = {}
         
-        for field_name in sorted(self.fields.keys()):
-            field_info = self.fields[field_name]
-            process_field_annotation(field_info.annotation, imports)
-            processed_fields[field_name] = field_info
+        for field_info in self.fields.values():
+            extract_imports_from_annotation(field_info.annotation, imports)
         
         return BuilderModel(
             name=f"{self.name}Builder",
-            fields=processed_fields,
+            fields=self.fields,
             model_imports=imports,
         )
 
@@ -409,11 +598,14 @@ def main():
 
         if existing_builder_module is None:
             to_write[filename] = generated_builder_module.to_file()
-        elif generated_builder_module != existing_builder_module:
+        else:
+            # Always update with existing methods first
             generated_builder_module.update_models_methods_from_other(
                 existing_builder_module
             )
-            to_write[filename] = generated_builder_module.to_file()
+            # Now check if the output would be the same
+            if not generated_builder_module.outputs_match(existing_builder_module):
+                to_write[filename] = generated_builder_module.to_file()
 
     for module in builder_collection:
         to_delete.append(module.filename)

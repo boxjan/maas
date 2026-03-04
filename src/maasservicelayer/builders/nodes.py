@@ -18,35 +18,25 @@ class NodeBuilder(ResourceBuilder):
     the generated code.
     """
 
-    boot_interface_id: Union[int, None, Unset] = Field(
-        default=UNSET, required=False
-    )
-    created: Union[datetime, Unset] = Field(default=UNSET, required=False)
+    boot_interface_id: Union[int, None, Unset] = Field(default=UNSET)
+    created: Union[datetime, Unset] = Field(default=UNSET)
     current_commissioning_script_set_id: Union[int, None, Unset] = Field(
-        default=UNSET, required=False
+        default=UNSET
     )
-    current_config_id: Union[int, None, Unset] = Field(
-        default=UNSET, required=False
-    )
+    current_config_id: Union[int, None, Unset] = Field(default=UNSET)
     current_installation_script_set_id: Union[int, None, Unset] = Field(
-        default=UNSET, required=False
+        default=UNSET
     )
     current_testing_script_set_id: Union[int, None, Unset] = Field(
-        default=UNSET, required=False
+        default=UNSET
     )
-    domain_id: Union[int, None, Unset] = Field(default=UNSET, required=False)
-    error_description: Union[str, Unset] = Field(default=UNSET, required=False)
-    hostname: Union[str, Unset] = Field(default=UNSET, required=False)
-    node_type: Union[NodeTypeEnum, Unset] = Field(
-        default=UNSET, required=False
-    )
-    owner_id: Union[int, None, Unset] = Field(default=UNSET, required=False)
-    power_state: Union[PowerState, Unset] = Field(
-        default=UNSET, required=False
-    )
-    power_state_updated: Union[datetime, None, Unset] = Field(
-        default=UNSET, required=False
-    )
-    status: Union[NodeStatus, Unset] = Field(default=UNSET, required=False)
-    system_id: Union[str, Unset] = Field(default=UNSET, required=False)
-    updated: Union[datetime, Unset] = Field(default=UNSET, required=False)
+    domain_id: Union[int, None, Unset] = Field(default=UNSET)
+    error_description: Union[str, Unset] = Field(default=UNSET)
+    hostname: Union[str, Unset] = Field(default=UNSET)
+    node_type: Union[NodeTypeEnum, Unset] = Field(default=UNSET)
+    owner_id: Union[int, None, Unset] = Field(default=UNSET)
+    power_state: Union[PowerState, Unset] = Field(default=UNSET)
+    power_state_updated: Union[datetime, None, Unset] = Field(default=UNSET)
+    status: Union[NodeStatus, Unset] = Field(default=UNSET)
+    system_id: Union[str, Unset] = Field(default=UNSET)
+    updated: Union[datetime, Unset] = Field(default=UNSET)
