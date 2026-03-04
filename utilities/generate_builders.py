@@ -5,13 +5,32 @@
 
 """Auto generate builders for domain models.
 
-It generates a builder in src/maasservicelayer/builders/ for the corresponding
-model in src/maasservicelayer/models.
+Generates builder classes in src/maasservicelayer/builders/ for domain models
+in src/maasservicelayer/models/ decorated with `@generate_builder`.
 
-To generate a builder for a model, just decorate the model with
-`generate_builder` from src/maasservicelayer/models/base.py.
+Usage:
+    @generate_builder
+    class User(BaseModel):
+        name: str
 
-HEADS UP: this is currently tested with Pydantic 2.x
+    $ make generate-builders        # Generate/update builders
+    $ make generate-builders-check  # Check if builders need updates
+
+Generation Flow:
+    1. Scan domain models with @generate_builder decorator
+    2. Scan existing builders using AST to preserve custom methods and imports
+       (AST parsing avoids import-time errors when builders reference new fields)
+    3. Generate builder classes (fields become Union[FieldType, Unset])
+    4. Merge custom code back into generated builders
+    5. Write output only if changes detected
+    6. Delete builders for removed models
+
+Features:
+    - Preserves custom methods and imports in builder classes
+    - Automatically manages imports from type annotations
+    - Idempotent - only writes when changes detected
+
+Requires Pydantic 2.x and Python 3.10+.
 """
 
 from abc import ABC, abstractmethod
@@ -24,7 +43,7 @@ import os
 import re
 import sys
 from types import FunctionType, ModuleType
-from typing import get_args, get_origin, Self, TypeVar, Union
+from typing import get_args, get_origin, Self, Union
 
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
@@ -33,14 +52,6 @@ MODELS_PATH = "src/maasservicelayer/models"
 BUILDERS_PATH = "src/maasservicelayer/builders"
 MODELS_MODULE = "maasservicelayer.models"
 BUILDERS_MODULE = "maasservicelayer.builders"
-
-HEADER_TEMPLATE = """\
-# Copyright 2025 Canonical Ltd.  This software is licensed under the
-# GNU Affero General Public License version 3 (see the file LICENSE).
-
-{import_stmts}
-
-"""
 
 CLASS_TEMPLATE = """
 
@@ -184,28 +195,11 @@ def extract_imports_from_annotation(annotation, imports: set):
         handle_simple_type(annotation, imports)
 
 
-def extract_imports_from_method(method_obj: FunctionType, imports: set):
-    """Extract type hint imports from a method's signature."""
-    sig = inspect.signature(method_obj)
-    
-    # Process return annotation
-    if sig.return_annotation != inspect.Signature.empty:
-        extract_imports_from_annotation(sig.return_annotation, imports)
-    
-    # Process parameter annotations
-    for param in sig.parameters.values():
-        if param.annotation != inspect.Parameter.empty:
-            extract_imports_from_annotation(param.annotation, imports)
-
-
 @dataclasses.dataclass(kw_only=True)
 class GenericModel(ABC):
     name: str
     fields: dict[str, FieldInfo]
     model_imports: set = dataclasses.field(default_factory=default_imports)
-
-
-T = TypeVar("T", bound=GenericModel)
 
 
 @dataclasses.dataclass(kw_only=True)
@@ -218,9 +212,6 @@ class GenericModule[T](ABC):
     @abstractmethod
     def from_file(cls, module: ModuleType, filename: str) -> Self:
         pass
-
-
-M = TypeVar("M", bound=GenericModule)
 
 
 @dataclasses.dataclass(kw_only=True)
