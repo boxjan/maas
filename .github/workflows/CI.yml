@@ -36,7 +36,7 @@ jobs:
             -w /work \
             ghcr.io/${{ env.IMAGE_NAME }} \
             tail -f /dev/null # keep the container up and runnning
-      - name: Prepare docker container
+      - name: Prepare docker container and lint
         run: |
           docker exec -u root ci-container sh -c "
               git config --global --add safe.directory /work
@@ -44,11 +44,9 @@ jobs:
               chown -R ubuntu:ubuntu /work
               sudo -H -u ubuntu make install-dependencies
               sudo -H -u ubuntu make build
+              sudo -H -u ubuntu make lint
             "
-      - name: Lint
-        run: |
-          docker exec -u root ci-container sh -c "sudo -H -u ubuntu make lint"
-      - name: Test
+      - name: Run tests
         run: | 
           docker exec -u root ci-container sh -c "sudo -H -u ubuntu make test"
       - name: Remove container
