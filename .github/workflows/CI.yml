@@ -8,7 +8,7 @@ env:
 
 jobs:
   lint-and-test:
-    runs-on: [self-hosted-linux-amd64-noble-medium]
+    runs-on: ubuntu-24.04
 
     permissions:
       packages: read
@@ -34,12 +34,13 @@ jobs:
             -v ${{ github.workspace }}:/work \
             -w /work \
             ghcr.io/${{ env.IMAGE_NAME }} \
-            sh -c "git config --global --add safe.directory /work && make lint"
+            sh -c "
+              git config --global --add safe.directory /work
+              useradd ubuntu || true
+              chown -R ubuntu:ubuntu /work
 
-      - name: Run tests
-        run: |
-          docker run --rm \
-            -v ${{ github.workspace }}:/work \
-            -w /work \
-            ghcr.io/${{ env.IMAGE_NAME }} \
-            sh -c "git config --global --add safe.directory /work && MAAS_MAX_TEST_PROCESSES=2 make test"
+              sudo -H -u ubuntu make install-dependencies
+              sudo -H -u ubuntu make build
+              sudo -H -u ubuntu make lint
+              sudo -H -u ubuntu make test
+            "
