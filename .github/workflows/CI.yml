@@ -28,31 +28,19 @@ jobs:
       - name: Pull image
         run: |
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-      - name: Start docker container
+      - name: Prepare container, lint and test
         run: |
-          docker run -d \
-            --name ci-container \
+          docker run --rm \
             -v ${{ github.workspace }}:/work \
             -w /work \
             ghcr.io/${{ env.IMAGE_NAME }} \
-            tail -f /dev/null # keep the container up and runnning
-      - name: Prepare docker container and lint
-        run: |
-          docker exec -u root ci-container sh -c "
+            sh -c "
               git config --global --add safe.directory /work
-              cd /work
-              echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu
               chown -R ubuntu:ubuntu /work
               sudo -H -u ubuntu make install-dependencies
-              sudo -H -u ubuntu make build
               sudo -H -u ubuntu make lint
+              sudo -H -u ubuntu make test
             "
-      - name: Run tests
-        run: | 
-          docker exec -u root ci-container sh -c "sudo -H -u ubuntu make test"
-      - name: Remove container
-        if: always()
-        run: docker rm -f ci-container
       - name: Archive logs
         if: always()
         uses: actions/upload-artifact@v4
