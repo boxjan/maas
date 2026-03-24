@@ -34,7 +34,7 @@ jobs:
             -v ${{ github.workspace }}:/work \
             -w /work \
             ghcr.io/${{ env.IMAGE_NAME }} \
-            git config --global --add safe.directory /work && make lint
+            'git config --global --add safe.directory /work && make lint'
 
       - name: Run tests
         run: |
@@ -42,4 +42,4 @@ jobs:
             -v ${{ github.workspace }}:/work \
             -w /work \
             ghcr.io/${{ env.IMAGE_NAME }} \
-            git config --global --add safe.directory /work && make test
+            'git config --global --add safe.directory /work && make test'
