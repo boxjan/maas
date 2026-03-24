@@ -27,20 +27,36 @@ jobs:
       - name: Pull image
         run: |
           docker pull ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-
-      - name: Run linting
+      - name: Start docker container
         run: |
-          docker run --rm \
+          docker run -d \
+            --name ci-container \
             -v ${{ github.workspace }}:/work \
             -w /work \
             ghcr.io/${{ env.IMAGE_NAME }} \
-            sh -c "
+            tail -f /dev/null # keep the container up and runnning
+      - name: Prepare docker container
+        run: |
+          docker exec -u root ci-container sh -c "
               git config --global --add safe.directory /work
               useradd ubuntu || true
               chown -R ubuntu:ubuntu /work
-
               sudo -H -u ubuntu make install-dependencies
               sudo -H -u ubuntu make build
-              sudo -H -u ubuntu make lint
-              sudo -H -u ubuntu make test
             "
+      - name: Lint
+        run: |
+          docker exec -u root ci-container sh -c "sudo -H -u ubuntu make lint"
+      - name: Test
+        run: | 
+          docker exec -u root ci-container sh -c "sudo -H -u ubuntu make test"
+      - name: Remove container
+        if: always()
+        run: docker rm -f ci-container
+      - name: Archive logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: |
+            /work/junit*.xml
