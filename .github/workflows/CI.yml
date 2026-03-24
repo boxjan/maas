@@ -4,8 +4,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_TAG: ${{ replace(github.base_ref, '/', '-') }}
-  IMAGE_NAME: ${{ github.repository }}:${{ env.IMAGE_TAG }}
+  IMAGE_NAME: ${{ github.repository }}:${{ github.base_ref }}
 
 jobs:
   lint-and-test:
