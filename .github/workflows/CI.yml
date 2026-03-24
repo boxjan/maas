@@ -40,10 +40,10 @@ jobs:
         run: |
           docker exec -u root ci-container sh -c "
               git config --global --add safe.directory /work
+              cd /work
               echo 'ubuntu ALL=(ALL) NOPASSWD:ALL' > /etc/sudoers.d/ubuntu
               chown -R ubuntu:ubuntu /work
               sudo -H -u ubuntu make install-dependencies
-              export PATH=$PATH:/work/bin
               sudo -H -u ubuntu make build
               sudo -H -u ubuntu make lint
             "
