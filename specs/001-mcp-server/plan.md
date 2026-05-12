@@ -126,13 +126,13 @@ debian/
 **Deliverables**: `config.py`, `auth.py`, `client.py`, `logging_events.py`, `errors.py`, updated `server.py` and `main.py`.
 
 **Tasks**:
-- [ ] T101: `config.py` — `MaasServerConfig` Pydantic Settings: `MAAS_URL`, `MAAS_REQUEST_TIMEOUT` (int, default 30), `MCP_HOST` (default `0.0.0.0`), `MCP_PORT` (int, default 8765). Remove `maas_mcp_api_key`, `maas_mcp_db_dsn`, `maas_mcp_transport` from existing skeleton (TC-3/TC-4 violations).
+- [ ] T101: `config.py` — `MaasServerConfig` Pydantic Settings: `MAAS_URL`, `MAAS_REQUEST_TIMEOUT` (int, default 30), `MCP_HOST` (default `0.0.0.0`), `MCP_PORT` (int, default 8765).
 - [ ] T102: `auth.py` — `extract_token(request)` extracts JWT from `Authorization: Bearer` header; `build_auth_header(token) → dict` returns `{"Authorization": "Bearer <token>"}` for use by `MAASClient`. `hash_token(token) → str` returns SHA-256 hex digest (for logging — never log the raw token).
 - [ ] T103: `client.py` — `MAASClient(base_url, api_key, timeout)` async context manager wrapping `httpx.AsyncClient`. Methods: `get()`, `post()`, `put()`, `delete()` — each adds `Authorization: Bearer` header, enforces timeout, emits `maas.request` + `maas.response` log events. On timeout or connection refused, raises `MAASUnreachableError`.
 - [ ] T104: `logging_events.py` — implement `configure_logging()` following the `maasservicelayer.logging.configure` pattern (`structlog` + `pythonjsonlogger.json.JsonFormatter` on `StreamHandler(sys.stdout)`). Use `maascommon.logging.security.hash_token_for_logging()` for token hashing in `session.opened` events. Emit all six FR-10 mandatory events as `structlog.getLogger()` calls with keyword fields. **Do not import from `maasservicelayer`** — only `maascommon` imports are permitted.
 - [ ] T105: `errors.py` — `MAASUnreachableError(url_pattern, failure_mode)`, `MCPNotImplementedError(tool_name)`. Both produce `CallToolResult(is_error=True)` with correct `error_code` fields.
 - [ ] T106: `server.py` — Rewrite to create `FastMCP` server with lifespan context providing `MaasServerConfig`. Tool modules register via `register_*_tools(server)`. Replace dynamic plugin loading with explicit imports.
-- [ ] T107: `main.py` — Rewrite entry point: `asyncio.run(serve())` calls `mcp.run(transport="streamable-http", host=cfg.mcp_host, port=cfg.mcp_port)`. Remove all stdio code paths (TC-3). Remove TLS config (TC-4).
+- [ ] T107: `main.py` — Entry point: `asyncio.run(serve())` calls `mcp.run(transport="streamable-http", host=cfg.mcp_host, port=cfg.mcp_port)`. HTTP/SSE only (TC-3); no TLS (TC-4).
 - [ ] T108: Auth middleware — ASGI middleware extracts `Authorization` header, validates format, stores API key in `contextvars.ContextVar` before passing to MCP handler. Returns HTTP 401 if missing or malformed.
 
 **Quality Gates**:

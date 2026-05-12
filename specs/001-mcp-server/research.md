@@ -18,7 +18,7 @@
 
 ## Decision 2: MCP Transport — Streamable-HTTP Only
 
-**Decision**: The server uses `streamable-http` as its sole transport (MCP Python SDK `FastMCP.run(transport="streamable-http", ...)`). The existing skeleton's `stdio` code path is a **TC-3 violation** and must be removed entirely.
+**Decision**: The server uses `streamable-http` as its sole transport (MCP Python SDK `FastMCP.run(transport="streamable-http", ...)`). stdio is not supported (TC-3 hard constraint).
 
 **Rationale**: TC-3 is a hard constraint — stdio transport is explicitly prohibited. The HTTP/SSE model is the correct choice for a persistent, multi-user network service. Removing stdio simplifies the entry point and eliminates an entire class of deployment errors.
 
@@ -32,7 +32,7 @@
 
 **Decision**: The MAAS API key is passed by the MCP client as an HTTP `Authorization: Bearer <api-key>` header on the initial connection request. An ASGI middleware layer extracts it, validates the format (must be `<jwt-token>`), stores it in a `contextvars.ContextVar`, and makes it available to tool handlers throughout the session lifetime.
 
-**Rationale**: HTTP headers are the standard transport-level mechanism for per-connection credentials in HTTP-based protocols. The `Authorization` header is universally supported by HTTP clients and MCP client libraries. The app-level `maas_mcp_api_key` config field in the existing skeleton is incorrect — it would create a single-user server rather than the multi-user, token-delegation model required by FR-2.
+**Rationale**: HTTP headers are the standard transport-level mechanism for per-connection credentials in HTTP-based protocols. The `Authorization` header is universally supported by HTTP clients and MCP client libraries, and correctly implements the multi-user token-delegation model required by FR-2.
 
 **Alternatives considered**:
 - *MCP `initialize` request params*: The MCP protocol's `initialize` message carries `clientInfo` and optional `meta`. Passing the API key here is possible but requires SDK-level hooks to access init params, which is more complex and less standard than HTTP headers.
@@ -83,26 +83,7 @@ All log statements use `structlog.getLogger()` with keyword-argument structured 
 
 ---
 
-## Decision 7: Existing Code Skeleton Assessment
-
-The `src/maasmcpserver/` directory contains compiled `.pyc` files (no `.py` sources) representing a proof-of-concept skeleton. The following components must be **rewritten or removed**:
-
-| File | Assessment | Action |
-|------|-----------|--------|
-| `config.py` | Has `maas_mcp_api_key`, `maas_mcp_db_dsn`, `maas_mcp_transport` — spec violations | Rewrite: remove these fields, add `MAAS_URL`, `MCP_HOST`, `MCP_PORT` |
-| `main.py` | Supports both stdio and streamable-http — TC-3 violation | Rewrite: streamable-http only |
-| `server.py` | Uses dynamic plugin loading (fragile); no lifespan context | Rewrite: explicit imports, lifespan |
-| `services/context.py` | asyncpg database pool — no DB needed per spec | **Delete**: incompatible with spec |
-| `tools/deployments.py` | allocate/deploy/release — TC-2 violations | **Delete**: machine lifecycle writes deferred |
-| `tools/machines.py` | Stub with hardcoded test data; wrong tool names | Rewrite as `tools/fleet.py` |
-| `tools/networking.py` | Interface-level tools; missing fabric/VLAN/subnet CRUD | Rewrite as `tools/network.py` (FR-13) |
-| `tools/images.py` | Custom image upload tool — not in spec scope | Rewrite as `tools/boot_sources.py` (FR-14 only) |
-| `tools/capacity.py` | check_capacity/hardware test failures — partial coverage | Fold into `tools/fleet.py` and `tools/diagnostics.py` |
-| `models/responses.py` | Partial, inconsistent models | Rewrite per `models/` structure in plan |
-
----
-
-## Decision 8: MCP SDK Tool Context Injection
+## Decision 7: MCP SDK Tool Context Injection
 
 **Decision**: Tool functions accept `ctx: Context[ServerSession, AppLifespan]` as an injected parameter (automatically provided by the `FastMCP` framework). The session's MAAS API key is retrieved from the `ContextVar` set by the auth middleware. `MAASClient` is instantiated per tool call (not per session) using the session's API key and the server-level config.
 
