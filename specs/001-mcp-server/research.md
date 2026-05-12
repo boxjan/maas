@@ -67,15 +67,17 @@
 
 ---
 
-## Decision 6: Structured Logging — Custom `NdjsonFormatter`
+## Decision 6: Structured Logging — Reuse `maasservicelayer.logging.configure`
 
-**Decision**: A custom `NdjsonFormatter` Python log formatter serializes every log record as a single-line JSON object terminated by `\n`. The formatter is installed on the root logger's `StreamHandler(sys.stdout)`. Six mandatory event types are emitted via dedicated helper functions that set the correct structured fields. The raw API key is **never** logged; only its SHA-256 hex digest (`user_token_hash`) appears in `session.opened` events.
+**Decision**: Use the existing `configure_logging()` function from `maasservicelayer.logging.configure` directly. This sets up `structlog` + `python-json-logger` (`pythonjsonlogger.json.JsonFormatter`) on the root logger with JSON output to stdout. All log statements use `structlog.getLogger()` with keyword-argument structured fields, consistent with the rest of the MAAS codebase.
 
-**Rationale**: FR-10 mandates NDJSON to stdout for all log entries. A custom formatter is the simplest, most maintainable approach — it plugs into Python's standard `logging` module and requires no additional dependencies.
+The six mandatory FR-10 event types are emitted as structured `structlog` log calls with explicit keyword fields (e.g. `logger.info("session.opened", session_id=..., user_token_hash=...)`). No custom formatter or dedicated `logging.py` module is needed.
+
+**Rationale**: `maasservicelayer.logging.configure` already solves exactly this problem — JSON to stdout, ISO 8601 timestamps, `structlog` context binding, third-party library coercion. Reusing it avoids duplication, keeps the MCP server consistent with the MAAS observability stack, and means `structlog` and `python-json-logger` are already available as Ubuntu archive packages (`python3-structlog`, `python3-pythonjsonlogger`).
 
 **Alternatives considered**:
-- *`structlog`*: Popular structured logging library. Added as a dependency solely for logging seems unnecessary when a ~50-line custom formatter achieves the same result.
-- *`python-json-logger`*: Another option; custom formatter avoids any additional Ubuntu archive availability risk.
+- *Custom `NdjsonFormatter`*: Rejected — unnecessary duplication of `maasservicelayer.logging.configure`, which already provides this capability.
+- *`logging` stdlib only*: Rejected — produces inconsistent format vs. rest of MAAS and requires reimplementing what `structlog` already handles.
 
 ---
 

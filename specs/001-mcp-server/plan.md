@@ -21,7 +21,7 @@ A new, standalone Python module `src/maasmcpserver/` that implements a Model Con
 **Testing**: `pytest` + `pytest-asyncio` + `httpx` (`AsyncMock`) — no `db_connection` fixture needed.  
 **Target Component**: `src/maasmcpserver/` — new standalone module, NOT part of `maasapiserver` or `maasservicelayer`.  
 **Architecture Pattern**: **Exception to 3-tier constitution rule** (documented below). This module is a thin adapter layer: MCP protocol ↔ MAAS HTTP API v3. No service layer, no repository layer, no database.  
-**Scale/Scope**: 1 standalone server module, ~30 MCP tools, 5 tool-group files, 1 async HTTP client, 1 NDJSON logging component, 1 Pydantic config, 1 session-auth middleware.
+**Scale/Scope**: 1 standalone server module, ~30 MCP tools, 5 tool-group files, 1 async HTTP client, `structlog`-based structured logging (via `maasservicelayer.logging.configure`), 1 Pydantic config, 1 session-auth middleware.
 
 ## Constitution Check
 
@@ -68,7 +68,7 @@ src/maasmcpserver/          # New standalone module
 ├── main.py                 # Entry point (streamable-http only)
 ├── auth.py                 # MAAS API key extraction & OAuth signing
 ├── client.py               # MAAS API v3 async HTTP client (httpx)
-├── logging.py              # NDJSON structured logging (FR-10)
+├── logging_events.py       # FR-10 structured log event helpers (structlog)
 ├── errors.py               # MCP error types (maas_unreachable, etc.)
 ├── models/
 │   ├── __init__.py
@@ -89,7 +89,7 @@ src/tests/maasmcpserver/    # Test suite
 ├── test_config.py          # Config loading, env var defaults
 ├── test_auth.py            # OAuth signing, key extraction
 ├── test_client.py          # MAAS HTTP client (timeout, errors)
-├── test_logging.py         # NDJSON format, field validation
+├── test_logging_events.py  # FR-10 structured field validation
 ├── tools/
 │   ├── test_fleet_tools.py
 │   ├── test_diagnostic_tools.py
@@ -122,13 +122,13 @@ debian/
 
 **Goal**: Build the non-tool infrastructure that all tools depend on.
 
-**Deliverables**: `config.py`, `auth.py`, `client.py`, `logging.py`, `errors.py`, updated `server.py` and `main.py`.
+**Deliverables**: `config.py`, `auth.py`, `client.py`, `logging_events.py`, `errors.py`, updated `server.py` and `main.py`.
 
 **Tasks**:
 - [ ] T101: `config.py` — `MaasServerConfig` Pydantic Settings: `MAAS_URL`, `MAAS_REQUEST_TIMEOUT` (int, default 30), `MCP_HOST` (default `0.0.0.0`), `MCP_PORT` (int, default 8765). Remove `maas_mcp_api_key`, `maas_mcp_db_dsn`, `maas_mcp_transport` from existing skeleton (TC-3/TC-4 violations).
 - [ ] T102: `auth.py` — `extract_token(request)` extracts JWT from `Authorization: Bearer` header; `build_auth_header(token) → dict` returns `{"Authorization": "Bearer <token>"}` for use by `MAASClient`. `hash_token(token) → str` returns SHA-256 hex digest (for logging — never log the raw token).
 - [ ] T103: `client.py` — `MAASClient(base_url, api_key, timeout)` async context manager wrapping `httpx.AsyncClient`. Methods: `get()`, `post()`, `put()`, `delete()` — each adds `Authorization: Bearer` header, enforces timeout, emits `maas.request` + `maas.response` log events. On timeout or connection refused, raises `MAASUnreachableError`.
-- [ ] T104: `logging.py` — `NdjsonFormatter` (Python `logging.Formatter` subclass) serializes log records to JSON; `setup_logging()` configures root logger with this formatter on `stdout`. Helper functions: `log_session_opened()`, `log_tool_received()`, `log_maas_request()`, `log_maas_response()`, `log_tool_outcome()`, `log_session_closed()`. Sanitize `params` field (redact credential-like values).
+- [ ] T104: Logging setup — call `configure_logging()` from `maasservicelayer.logging.configure` in `main.py`. Emit all FR-10 mandatory events as structured `structlog` calls with keyword fields (e.g. `logger.info("session.opened", session_id=..., user_token_hash=...)`). No custom formatter or dedicated `logging.py` needed — `configure_logging()` handles JSON-to-stdout via `structlog` + `pythonjsonlogger`.
 - [ ] T105: `errors.py` — `MAASUnreachableError(url_pattern, failure_mode)`, `MCPNotImplementedError(tool_name)`. Both produce `CallToolResult(is_error=True)` with correct `error_code` fields.
 - [ ] T106: `server.py` — Rewrite to create `FastMCP` server with lifespan context providing `MaasServerConfig`. Tool modules register via `register_*_tools(server)`. Replace dynamic plugin loading with explicit imports.
 - [ ] T107: `main.py` — Rewrite entry point: `asyncio.run(serve())` calls `mcp.run(transport="streamable-http", host=cfg.mcp_host, port=cfg.mcp_port)`. Remove all stdio code paths (TC-3). Remove TLS config (TC-4).
@@ -223,11 +223,11 @@ debian/
 
 ### Phase 6: Session Management, Auth Flow & Logging Compliance (US1 / FR-2, FR-10)
 
-**Goal**: Verify end-to-end session lifecycle, per-session isolation, and NDJSON compliance.
+**Goal**: Verify end-to-end session lifecycle, per-session isolation, and structured log compliance.
 
 **Tasks**:
 - [ ] T601: Session isolation test — two concurrent sessions with different API keys; confirm each `MAASClient` uses only its own key.
-- [ ] T602: NDJSON compliance test — execute a single tool call end-to-end, capture stdout, assert exactly 6 JSON lines in correct sequence, required fields present, no raw API key visible.
+- [ ] T602: Structured log compliance test — execute a single tool call end-to-end, capture stdout, assert exactly 6 JSON lines in correct sequence, required fields present, no raw JWT token visible.
 - [ ] T603: Auth rejection test — connect without `Authorization` header → HTTP 401; invalid key format → descriptive error.
 - [ ] T604: Key revocation test — mock MAAS API returning 401 → all subsequent tool calls return `authentication_error`.
 - [ ] T605: Timeout test — mock MAAS with delay > `MAAS_REQUEST_TIMEOUT` → `maas_unreachable` error within timeout, no retry in logs.
@@ -268,7 +268,7 @@ debian/
 
 **Command**: `make test-py -k "maasmcpserver"`
 
-- Config loading from env vars; auth OAuth header; logging NDJSON format; error types
+- Config loading from env vars; auth Bearer header; structlog setup via `configure_logging()`; error types
 - Location: `src/tests/maasmcpserver/`
 
 ### Tier 3: Integration Tests — Full Session Lifecycle (Optional Live MAAS)
@@ -308,7 +308,8 @@ MAAS_URL=http://maas.local:5240 MCP_PORT=8765 python -m maasmcpserver.main
 | `python3-httpx` | Ubuntu archive | Async HTTP client |
 | `python3-pydantic` | Ubuntu archive | v2.x |
 | `uvicorn` | Ubuntu archive | ASGI server for streamable-http |
-| `python3-jwt` | Ubuntu archive | JWT forwarding; no OAuth signing needed |
+| `python3-structlog` | Ubuntu archive | Structured logging (reuses `maasservicelayer.logging.configure`) |
+| `python3-pythonjsonlogger` | Ubuntu archive | JSON formatter used by `configure_logging()` |
 | `python3-pytest-asyncio` | Dev only | Async test support |
 
 ### Known Risks
@@ -332,7 +333,7 @@ MAAS_URL=http://maas.local:5240 MCP_PORT=8765 python -m maasmcpserver.main
 - ✅ No TLS config on MCP listener (TC-4 compliance)
 - ✅ `python3-mcp` from Ubuntu archive only (TC-1 compliance)
 - ✅ Machine lifecycle write tools absent from tool listing (TC-2 compliance)
-- ✅ Six mandatory NDJSON log event types emitted per tool call
+- ✅ Six mandatory structured log event types emitted per tool call (via `structlog`)
 - ✅ Raw API key never in any log line
 - ✅ Timeout returns `maas_unreachable` error ≤ `MAAS_REQUEST_TIMEOUT` seconds
 - ✅ `quickstart.md` documented (≤15-minute setup goal)
