@@ -21,7 +21,8 @@ A new, standalone Python module `src/maasmcpserver/` that implements a Model Con
 **Testing**: `pytest` + `pytest-asyncio` + `httpx` (`AsyncMock`) — no `db_connection` fixture needed.  
 **Target Component**: `src/maasmcpserver/` — new standalone module, NOT part of `maasapiserver` or `maasservicelayer`.  
 **Architecture Pattern**: **Exception to 3-tier constitution rule** (documented below). This module is a thin adapter layer: MCP protocol ↔ MAAS HTTP API v3. No service layer, no repository layer, no database.  
-**Scale/Scope**: 1 standalone server module, ~30 MCP tools, 5 tool-group files, 1 async HTTP client, `structlog`-based structured logging (via `maasservicelayer.logging.configure`), 1 Pydantic config, 1 session-auth middleware.
+**Import boundary (hard constraint)**: `maasmcpserver` may only import from `maascommon`. Imports from `maasservicelayer`, `maasapiserver`, `maasserver`, or any other MAAS component are **not permitted**.  
+**Scale/Scope**: 1 standalone server module, ~30 MCP tools, 5 tool-group files, 1 async HTTP client, `structlog`-based structured logging (pattern from `maasservicelayer`, implemented locally), 1 Pydantic config, 1 session-auth middleware.
 
 ## Constitution Check
 
@@ -128,7 +129,7 @@ debian/
 - [ ] T101: `config.py` — `MaasServerConfig` Pydantic Settings: `MAAS_URL`, `MAAS_REQUEST_TIMEOUT` (int, default 30), `MCP_HOST` (default `0.0.0.0`), `MCP_PORT` (int, default 8765). Remove `maas_mcp_api_key`, `maas_mcp_db_dsn`, `maas_mcp_transport` from existing skeleton (TC-3/TC-4 violations).
 - [ ] T102: `auth.py` — `extract_token(request)` extracts JWT from `Authorization: Bearer` header; `build_auth_header(token) → dict` returns `{"Authorization": "Bearer <token>"}` for use by `MAASClient`. `hash_token(token) → str` returns SHA-256 hex digest (for logging — never log the raw token).
 - [ ] T103: `client.py` — `MAASClient(base_url, api_key, timeout)` async context manager wrapping `httpx.AsyncClient`. Methods: `get()`, `post()`, `put()`, `delete()` — each adds `Authorization: Bearer` header, enforces timeout, emits `maas.request` + `maas.response` log events. On timeout or connection refused, raises `MAASUnreachableError`.
-- [ ] T104: Logging setup — call `configure_logging()` from `maasservicelayer.logging.configure` in `main.py`. Emit all FR-10 mandatory events as structured `structlog` calls with keyword fields (e.g. `logger.info("session.opened", session_id=..., user_token_hash=...)`). No custom formatter or dedicated `logging.py` needed — `configure_logging()` handles JSON-to-stdout via `structlog` + `pythonjsonlogger`.
+- [ ] T104: `logging_events.py` — implement `configure_logging()` following the `maasservicelayer.logging.configure` pattern (`structlog` + `pythonjsonlogger.json.JsonFormatter` on `StreamHandler(sys.stdout)`). Use `maascommon.logging.security.hash_token_for_logging()` for token hashing in `session.opened` events. Emit all six FR-10 mandatory events as `structlog.getLogger()` calls with keyword fields. **Do not import from `maasservicelayer`** — only `maascommon` imports are permitted.
 - [ ] T105: `errors.py` — `MAASUnreachableError(url_pattern, failure_mode)`, `MCPNotImplementedError(tool_name)`. Both produce `CallToolResult(is_error=True)` with correct `error_code` fields.
 - [ ] T106: `server.py` — Rewrite to create `FastMCP` server with lifespan context providing `MaasServerConfig`. Tool modules register via `register_*_tools(server)`. Replace dynamic plugin loading with explicit imports.
 - [ ] T107: `main.py` — Rewrite entry point: `asyncio.run(serve())` calls `mcp.run(transport="streamable-http", host=cfg.mcp_host, port=cfg.mcp_port)`. Remove all stdio code paths (TC-3). Remove TLS config (TC-4).

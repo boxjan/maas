@@ -67,17 +67,19 @@
 
 ---
 
-## Decision 6: Structured Logging — Reuse `maasservicelayer.logging.configure`
+## Decision 6: Structured Logging — Local `configure_logging()` following `maasservicelayer` pattern
 
-**Decision**: Use the existing `configure_logging()` function from `maasservicelayer.logging.configure` directly. This sets up `structlog` + `python-json-logger` (`pythonjsonlogger.json.JsonFormatter`) on the root logger with JSON output to stdout. All log statements use `structlog.getLogger()` with keyword-argument structured fields, consistent with the rest of the MAAS codebase.
+**Decision**: The MCP server implements its own `configure_logging()` in `logging_events.py`, following the identical pattern used by `maasservicelayer.logging.configure` — `structlog` + `pythonjsonlogger` (`CustomJsonFormatter`) on the root logger's `StreamHandler(sys.stdout)`. It cannot import from `maasservicelayer` directly (only `maascommon` imports are permitted).
 
-The six mandatory FR-10 event types are emitted as structured `structlog` log calls with explicit keyword fields (e.g. `logger.info("session.opened", session_id=..., user_token_hash=...)`). No custom formatter or dedicated `logging.py` module is needed.
+For token hashing in `session.opened` events, use `maascommon.logging.security.hash_token_for_logging()` — this is already the canonical SHA-256 helper for this purpose.
 
-**Rationale**: `maasservicelayer.logging.configure` already solves exactly this problem — JSON to stdout, ISO 8601 timestamps, `structlog` context binding, third-party library coercion. Reusing it avoids duplication, keeps the MCP server consistent with the MAAS observability stack, and means `structlog` and `python-json-logger` are already available as Ubuntu archive packages (`python3-structlog`, `python3-pythonjsonlogger`).
+All log statements use `structlog.getLogger()` with keyword-argument structured fields, consistent with the rest of the MAAS codebase.
+
+**Rationale**: `maasservicelayer` is out of bounds for the MCP server. Replicating the ~40-line `configure_logging()` locally is the right approach — it keeps the JSON-to-stdout format consistent with the MAAS observability stack without introducing a forbidden dependency. `maascommon` imports are permitted and provide `hash_token_for_logging()` out of the box.
 
 **Alternatives considered**:
-- *Custom `NdjsonFormatter`*: Rejected — unnecessary duplication of `maasservicelayer.logging.configure`, which already provides this capability.
-- *`logging` stdlib only*: Rejected — produces inconsistent format vs. rest of MAAS and requires reimplementing what `structlog` already handles.
+- *Import `maasservicelayer.logging.configure` directly*: Rejected — `maasservicelayer` imports are not permitted from the MCP server.
+- *Custom `NdjsonFormatter` from scratch*: Rejected — unnecessary; the `structlog` + `pythonjsonlogger` pattern is already established and both packages are in the Ubuntu archive.
 
 ---
 
