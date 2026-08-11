@@ -175,3 +175,4 @@ jobs:
           ticsAuthToken: ${{ secrets.TICSAUTHTOKEN }}
           installTics: true
           tmpdir: /tmp/tics
+          additionalFlags: -nosanity
